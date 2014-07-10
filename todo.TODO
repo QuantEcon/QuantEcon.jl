@@ -1,0 +1,46 @@
+Julia:
+ ☐ Part 1: Programming in Python
+   ☐ About Python
+   ☐ Setting up Your Python Environment
+   ☐ An Introductory Example
+   ☐ Python Essentials
+   ☐ Object Oriented Programming
+   ☐ How it Works: Data, Variables and Names
+   ☐ More Language Features
+ ☐ Part 2: The Scientific Libraries
+   ☐ NumPy
+   ☐ SciPy
+   ☐ Matplotlib
+   ☐ Pandas
+   ☐ IPython Shell and Notebook
+ ☐ Part 3: Introductory Applications
+   ✔ Linear Algebra @done (14-07-10 00:47)
+   ☐ Finite Markov Chains
+   ☐ Shortest Paths
+   ☐ Schelling’s Segregation Model
+   ☐ LLN and CLT
+   ☐ Linear State Space Models
+   ☐ A First Look at the Kalman Filter
+   ✔ Infinite Horizon Dynamic Programming @done (14-06-30 13:09)
+   ✔ LQ Control Problems @done (14-07-01 23:27)
+   ✔ Rational Expectations Equilibrium @done (14-07-05 17:03)
+   ✔ The Lucas Asset Pricing Model @done (14-07-05 17:03)
+   ✔ The Permanent Income Model @done (14-07-09 23:47)
+ ☐ Part 4: Advanced Applications
+   ☐ Continuous State Markov Chains
+   ☐ Modeling Career Choice
+   ☐ On-the-Job Search
+   ☐ Search with Offer Distribution Unknown
+   ☐ Optimal Savings
+   ☐ Robustness
+   ☐ Linear Stochastic Models
+   ☐ Estimation of Spectra
+   ☐ Optimal Taxation
+
+
+Python:
+   ☐ CompEcon
+      ☐ Combine quadrature commits into single commit @maybe
+      ☐ Unit tests for quadrature routines. Just use the demqua files, save the data, and match it in python.
+      ☐ Root Finding:
+         ✔ Bisect @done (14-07-02 14:15)

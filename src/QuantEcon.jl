@@ -1,5 +1,7 @@
 module QuantEcon
 
+include("discrete_rv.jl")
+include("mc_tools.jl")
 include("ricatti.jl")
 include("asset_pricing.jl")
 include("compute_fp.jl")
@@ -10,6 +12,8 @@ include("optgrowth.jl")
 using Distributions
 import Optim: optimize
 import Grid: CoordInterpGrid, BCnan, BCnearest, InterpLinear
+
+import Base: setfield!
 
 export
 # lqcontrol
@@ -37,6 +41,15 @@ export
     AssetPrices,
     tree_price,
     consol_price,
-    call_option
+    call_option,
+
+# discrete_rv
+    DiscreteRV,
+    draw,
+
+# mc_tools
+    mc_compute_stationary,
+    mc_sample_path
+
 
 end # module
