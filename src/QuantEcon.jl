@@ -2,6 +2,7 @@ module QuantEcon
 
 include("discrete_rv.jl")
 include("mc_tools.jl")
+include("markov_approx.jl")
 include("ricatti.jl")
 include("asset_pricing.jl")
 include("compute_fp.jl")
@@ -49,7 +50,10 @@ export
 
 # mc_tools
     mc_compute_stationary,
-    mc_sample_path
+    mc_sample_path,
 
+# mc_tools
+    tauchen,
+    rouwenhorst
 
 end # module
