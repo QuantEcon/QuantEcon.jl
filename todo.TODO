@@ -15,9 +15,9 @@ Julia:
    ☐ IPython Shell and Notebook
  ☐ Part 3: Introductory Applications
    ✔ Linear Algebra @done (14-07-10 00:47)
-   ☐ Finite Markov Chains
-   ☐ Shortest Paths
-   ☐ Schelling’s Segregation Model
+   ✔ Finite Markov Chains
+   ✔ Shortest Paths
+   ✔ Schelling’s Segregation Model
    ☐ LLN and CLT
    ☐ Linear State Space Models
    ☐ A First Look at the Kalman Filter
