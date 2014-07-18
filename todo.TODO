@@ -18,7 +18,7 @@ Julia:
    ✔ Finite Markov Chains
    ✔ Shortest Paths
    ✔ Schelling’s Segregation Model
-   ☐ LLN and CLT
+   ☐ LLN and CLT (for clt3d.py need to find gaussian_kde function in Julia)
    ☐ Linear State Space Models
    ☐ A First Look at the Kalman Filter
    ✔ Infinite Horizon Dynamic Programming @done (14-06-30 13:09)
