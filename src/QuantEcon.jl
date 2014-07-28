@@ -3,6 +3,7 @@ module QuantEcon
 include("discrete_rv.jl")
 include("mc_tools.jl")
 include("markov_approx.jl")
+include("lss.jl")
 include("ricatti.jl")
 include("asset_pricing.jl")
 include("compute_fp.jl")
@@ -54,6 +55,11 @@ export
 
 # mc_tools
     tauchen,
-    rouwenhorst
+    rouwenhorst,
+
+# lss
+    LSS,
+    simulate,
+    replicate
 
 end # module
