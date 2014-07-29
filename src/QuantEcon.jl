@@ -60,6 +60,8 @@ export
 # lss
     LSS,
     simulate,
-    replicate
+    replicate,
+    moment_sequence,
+    stationary_distributions
 
 end # module
