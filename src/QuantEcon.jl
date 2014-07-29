@@ -4,6 +4,7 @@ include("discrete_rv.jl")
 include("mc_tools.jl")
 include("markov_approx.jl")
 include("lss.jl")
+include("kalman.jl")
 include("ricatti.jl")
 include("asset_pricing.jl")
 include("compute_fp.jl")
@@ -62,6 +63,14 @@ export
     simulate,
     replicate,
     moment_sequence,
-    stationary_distributions
+    stationary_distributions,
+
+# kalman
+    Kalman,
+    set_state!,
+    prior_to_filtered!,
+    filtered_to_forecast!,
+    update!,
+    stationary_values
 
 end # module

@@ -19,8 +19,8 @@ Julia:
    ✔ Shortest Paths
    ✔ Schelling’s Segregation Model
    ☐ LLN and CLT (for clt3d.py need to find gaussian_kde function in Julia)
-   ☐ Linear State Space Models
-   ☐ A First Look at the Kalman Filter
+   ✔ Linear State Space Models @done (14-07-28 23:52)
+   ✔ A First Look at the Kalman Filter @done (14-07-29 01:46)
    ✔ Infinite Horizon Dynamic Programming @done (14-06-30 13:09)
    ✔ LQ Control Problems @done (14-07-01 23:27)
    ✔ Rational Expectations Equilibrium @done (14-07-05 17:03)
