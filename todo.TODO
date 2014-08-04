@@ -1,4 +1,4 @@
-Julia:
+Julia port:
  ☐ Part 1: Programming in Python
    ☐ About Python
    ☐ Setting up Your Python Environment
@@ -37,6 +37,8 @@ Julia:
    ☐ Estimation of Spectra
    ☐ Optimal Taxation
 
+Julia (other):
+ ☐ Add web references to top of files in examples/
 
 Python:
    ☐ CompEcon
