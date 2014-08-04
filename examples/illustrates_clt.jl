@@ -1,14 +1,12 @@
 #=
-Filename: illustrates_clt.jl
+Visual illustration of the central limit theorem
 
-Authors: Spencer Lyon
-
-Visual illustration of the law of large numbers.
+@author : Spencer Lyon <spencer.lyon@nyu.edu>
 
 References
 ----------
-Based off the original python file illustrates_clt.py
 
+Based off the original python file illustrates_clt.py
 =#
 using PyPlot
 using Distributions

@@ -1,14 +1,11 @@
 #=
-Filename: clt3d.jl
-
-Authors: Spencer Lyon
-
 Visual illustration of the central limit theorem in 3d
+
+@author : Spencer Lyon <spencer.lyon@nyu.edu>
 
 References
 ----------
 Based off the original python file clt3d.py
-
 =#
 # using PyPlot
 using Distributions
@@ -86,5 +83,4 @@ ax[:set_yticks]((-3, 0, 3))
 ax[:set_ylim3d](a, b)
 ax[:set_zlim3d](0, 0.4)
 ax[:set_zticks]((0.2, 0.4))
-
 =#

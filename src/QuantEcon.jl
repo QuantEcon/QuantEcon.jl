@@ -4,6 +4,7 @@ include("discrete_rv.jl")
 include("mc_tools.jl")
 include("markov_approx.jl")
 include("lss.jl")
+include("lae.jl")
 include("kalman.jl")
 include("ricatti.jl")
 include("asset_pricing.jl")
@@ -15,8 +16,6 @@ include("optgrowth.jl")
 using Distributions
 import Optim: optimize
 import Grid: CoordInterpGrid, BCnan, BCnearest, InterpLinear
-
-import Base: setfield!
 
 export
 # lqcontrol
@@ -71,6 +70,10 @@ export
     prior_to_filtered!,
     filtered_to_forecast!,
     update!,
-    stationary_values
+    stationary_values,
+
+# lae
+    LSS,
+    lae_est
 
 end # module

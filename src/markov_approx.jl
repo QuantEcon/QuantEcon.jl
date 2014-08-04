@@ -5,6 +5,10 @@ Various routines to discretize AR(1) processes
 
 @date : 2014-04-10 23:55:05
 
+References
+----------
+
+http://quant-econ.net/finite_markov.html
 =#
 norm_cdf{T <: Real}(x::T) = 0.5 * erfc(-x/sqrt(2))
 norm_cdf{T <: Real}(x::Array{T}) = 0.5 .* erfc(-x./sqrt(2))

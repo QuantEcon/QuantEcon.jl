@@ -1,9 +1,18 @@
 #=
-    Filename: compute_fp.jl
-    Authors: Spencer Lyon, Thomas Sargent, John Stachurski
+Compute the fixed point of a given operator T, starting from
+specified initial condition v.
 
-    Compute the fixed point of a given operator T, starting from
-    specified initial condition v.
+
+@author : Spencer Lyon <spencer.lyon@nyu.edu>
+
+@date: 2014-07-05
+
+References
+----------
+
+Simple port of the file quantecon.compute_fp
+
+http://quant-econ.net/dp_intro.html?highlight=compute_fp
 =#
 
 

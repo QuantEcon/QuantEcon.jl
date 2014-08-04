@@ -1,7 +1,8 @@
 #=
 Illustrates vectors in the plane.
 
-@authors: Spencer Lyon, Tom Sargent, John Stachurski
+@author : Spencer Lyon <spencer.lyon@nyu.edu>
+
 @date: 07/09/2014
 =#
 

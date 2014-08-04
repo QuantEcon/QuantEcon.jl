@@ -9,7 +9,6 @@ Economic Models' by Kenneth L. Judd, Lilia Maliar and Serguei Maliar,
 (2011), Quantitative Economics 2/2, 173-210 (henceforth, JMM, 2011).'
 
 As such, it is adapted from the file 'Num_Stab_Approx.m'.
-
 =#
 using MathProgBase  # load in linprog function
 

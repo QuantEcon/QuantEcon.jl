@@ -1,9 +1,7 @@
 #=
-Authors: Spencer Lyon
-
-Filename: gaussian_contours1.jl
-
 Plots of bivariate Gaussians to illustrate the Kalman filter.
+
+@author : Spencer Lyon <spencer.lyon@nyu.edu>
 =#
 using PyPlot
 

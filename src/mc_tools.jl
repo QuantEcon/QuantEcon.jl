@@ -1,7 +1,16 @@
 #=
-Filename: mc_tools.jl
-Authors: Spencer Lyon, Thomas J. Sargent, John Stachurski
-Date: 07/10/2014
+Tools for working with Markov Chains
+
+@author : Spencer Lyon
+
+@date: 07/10/2014
+
+References
+----------
+
+Simple port of the file quantecon.mc_tools
+
+http://quant-econ.net/finite_markov.html
 =#
 function mc_compute_stationary{T <: FloatingPoint}(P::Matrix{T})
     n = size(P, 1)

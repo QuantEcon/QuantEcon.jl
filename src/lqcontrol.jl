@@ -1,11 +1,19 @@
 #=
-    Filename: lqcontrol.jl
-    Authors: Spencer Lyon, John Stachurski, and Thomas J. Sargent
+Provides a type called LQ for solving linear quadratic control
+problems.
 
-    Provides a type called LQ for solving linear quadratic control
-    problems.
+@author : Spencer Lyon <spencer.lyon@nyu.edu>
 
-    TODO: Untested.
+@date : 2014-07-05
+
+References
+----------
+
+Simple port of the file quantecon.lqcontrol
+
+http://quant-econ.net/lqcontrol.html
+
+TODO: Untested.
 =#
 typealias ScalarOrArray{T} Union(T, Array{T})
 

@@ -1,9 +1,8 @@
 #=
-Filename: optgrowth_v0.jl
-Authors: Spencer Lyon, Thomas Sargent, John Stachurski
-
 A first pass at solving the optimal growth problem via value function
 iteration.  A more general version is provided in optgrowth.py.
+
+@author : Spencer Lyon <spencer.lyon@nyu.edu>
 =#
 
 import Optim: optimize

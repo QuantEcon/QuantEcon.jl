@@ -1,14 +1,12 @@
 #=
-Filename: illustrates_lln.jl
-
-Authors: Spencer Lyon
-
 Visual illustration of the law of large numbers.
+
+@author : Spencer Lyon <spencer.lyon@nyu.edu>
 
 References
 ----------
-Based off the original python file illustrates_lln.py
 
+Based off the original python file illustrates_lln.py
 =#
 using PyPlot
 using Distributions

@@ -1,10 +1,16 @@
 #=
-    Origin: QE by John Stachurski and Thomas J. Sargent
-    Filename: riccati.jl
-    Authors: Spencer Lyon, John Stachurski, and Thomas Sargent
-    LastModified: 11/09/2013
+Solves the discrete-time algebraic Riccati equation
 
-    Solves the discrete-time algebraic Riccati equation
+@author : Spencer Lyon <spencer.lyon@nyu.edu>
+
+@date : 2014-07-05
+
+References
+----------
+
+Simple port of the file quantecon.ricatti
+
+http://quant-econ.net/kalman.html
 =#
 
 function dare(A, B, R, Q, tolerance=1e-10, max_iter=150)

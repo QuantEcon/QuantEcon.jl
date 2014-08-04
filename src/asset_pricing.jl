@@ -1,15 +1,20 @@
 #=
-Filename: asset_pricing.jl
-Authors: Spencer Lyon, John Stachurski and Thomas J. Sargent
-Date: 2014-06-27
-
 Computes asset prices in an endowment economy when the endowment obeys
 geometric growth driven by a finite state Markov chain.  The transition
 matrix of the Markov chain is P, and the set of states is s.  The
 discount factor is beta, and gamma is the coefficient of relative risk
 aversion in the household's utility function.
 
-Simple port of the file asset_pricing.py
+@author : Spencer Lyon <spencer.lyon@nyu.edu>
+
+@date: 2014-06-27
+
+References
+----------
+
+Simple port of the file quantecon.models.asset_pricing.py
+
+http://quant-econ.net/markov_asset.html
 =#
 
 type AssetPrices{T <: FloatingPoint}

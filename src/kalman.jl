@@ -1,10 +1,16 @@
 #=
-Authors: Spencer Lyon
-
-Filename: kalman.jl
-
 Implements the Kalman filter for a linear Gaussian state space model.
 
+@author : Spencer Lyon <spencer.lyon@nyu.edu>
+
+@date: 2014-07-29
+
+References
+----------
+
+Simple port of the file quantecon.kalman
+
+http://quant-econ.net/kalman.html
 =#
 
 type Kalman

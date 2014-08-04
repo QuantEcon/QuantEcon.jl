@@ -2,8 +2,9 @@
 Plots consumption, income and debt for the simple infinite horizon LQ
 permanent income model with Gaussian iid income.
 
-@authors: Spencer Lyon, Tom Sargent, John Stachurski
-@date: 07/09/201407/09/2014
+@author : Spencer Lyon
+
+@date: 07/09/2014
 =#
 
 using PyPlot

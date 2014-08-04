@@ -1,30 +1,33 @@
 #=
-    Filename: lucastree.jl
-    Authors: Spencer Lyon, Thomas Sargent, John Stachurski
+Solves the price function for the Lucas tree in a continuous state
+setting, using piecewise linear approximation for the sequence of
+candidate price functions.  The consumption endownment follows the
+log linear AR(1) process
 
-    Solves the price function for the Lucas tree in a continuous state
-    setting, using piecewise linear approximation for the sequence of
-    candidate price functions.  The consumption endownment follows the
-    log linear AR(1) process
+    log y' = alpha log y + sigma epsilon
 
-        log y' = alpha log y + sigma epsilon
+where y' is a next period y and epsilon is an iid standard normal
+shock. Hence
 
-    where y' is a next period y and epsilon is an iid standard normal
-    shock. Hence
+    y' = y^alpha * xi   where xi = e^(sigma * epsilon)
 
-        y' = y^alpha * xi   where xi = e^(sigma * epsilon)
+The distribution phi of xi is
 
-    The distribution phi of xi is
+    phi = LN(0, sigma^2) where LN means lognormal
 
-        phi = LN(0, sigma^2) where LN means lognormal
+@author : Spencer Lyon <spencer.lyon@nyu.edu>
 
-    Example usage:
+@date : 2014-07-05
 
-        tree = LucasTree(2, 0.95, 0.90, 0.1)
-        grid, price_vals = compute_price(tree)
+
+References
+----------
+
+Simple port of the file quantecon.models.lucastree.py
+
+http://quant-econ.net/markov_asset.html
 =#
-# using Distributions
-# import Grid: CoordInterpGrid, BCnearest, InterpLinear
+
 
 type LucasTree{T <: FloatingPoint}
     γ::T

@@ -1,12 +1,9 @@
 #=
-Filename: binom_df.jl
-
-Authors: Spencer Lyon
+@author : Spencer Lyon <spencer.lyon@nyu.edu>
 
 References
 ----------
 Based off the original python file binom_df.py
-
 =#
 using PyPlot
 using Distributions

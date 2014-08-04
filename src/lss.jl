@@ -1,8 +1,4 @@
 #=
-Authors: Spencer Lyon
-
-Filename: lss.py
-
 Computes quantities related to the Gaussian linear state space model
 
     x_{t+1} = A x_t + C w_{t+1}
@@ -10,6 +6,17 @@ Computes quantities related to the Gaussian linear state space model
         y_t = G x_t
 
 The shocks {w_t} are iid and N(0, I)
+
+@author : Spencer Lyon <spencer.lyon@nyu.edu>
+
+@date : 2014-07-28
+
+References
+----------
+
+Simple port of the file quantecon.lss
+
+http://quant-econ.net/linear_models.html
 =#
 import Distributions: MultivariateNormal, rand
 # using Debug

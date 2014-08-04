@@ -1,16 +1,25 @@
 #=
-Filename: discrete_rv.jl
-Authors: Spencer Lyon, Thomas Sargent, John Stachurski
-
 Generates an array of draws from a discrete random variable with a
 specified vector of probabilities.
+
+
+@author : Spencer Lyon <spencer.lyon@nyu.edu>
+
+@date: 2014-07-10
+
+References
+----------
+
+Simple port of the file quantecon.discrete_rv
+
+http://quant-econ.net/finite_markov.html?highlight=discrete_rv
+
 
 TODO: as of 07/10/2014 it is not possible to define the property
       interface we see in the python version. Once issue 1974 from
       the main Julia repository is resolved, we can revisit this and
       implement that feature.
 =#
-import Base: setfield!
 import Distributions: Uniform
 
 

@@ -1,12 +1,17 @@
 #=
-    Filename: optgrowth.jl
-    Authors: Spencer Lyon, Thomas Sargent, John Stachurski
+Solving the optimal growth problem via value function iteration.
 
-    Solving the optimal growth problem via value function iteration.
+@author : Spencer Lyon <spencer.lyon@nyu.edu>
+
+@date : 2014-07-05
+
+References
+----------
+
+Simple port of the file quantecon.models.optgrowth
+
+http://quant-econ.net/dp_intro.html
 =#
-
-# import Optim: optimize
-# import Grid: CoordInterpGrid, BCnan, InterpLinear
 
 #=
     This type defines the primitives representing the growth model. The
