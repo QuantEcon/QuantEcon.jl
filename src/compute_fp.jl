@@ -2,7 +2,6 @@
 Compute the fixed point of a given operator T, starting from
 specified initial condition v.
 
-
 @author : Spencer Lyon <spencer.lyon@nyu.edu>
 
 @date: 2014-07-05
@@ -12,7 +11,7 @@ References
 
 Simple port of the file quantecon.compute_fp
 
-http://quant-econ.net/dp_intro.html?highlight=compute_fp
+http://quant-econ.net/dp_intro.html
 =#
 
 
@@ -35,8 +34,8 @@ http://quant-econ.net/dp_intro.html?highlight=compute_fp
     verbose : Bool, optional(default=true)
         Whether or not to print a status update each iteration
 =#
-function compute_fixed_point{S <: FloatingPoint}(T::Function, v::Vector{S};
-    err_tol=1e-3, max_iter=50, verbose=true)
+function compute_fixed_point(T::Function, v; err_tol=1e-3, max_iter=50,
+                             verbose=true, print_skip=10)
     iterate = 0
     err = err_tol + 1
     while iterate < max_iter && err > err_tol
@@ -44,9 +43,18 @@ function compute_fixed_point{S <: FloatingPoint}(T::Function, v::Vector{S};
         iterate += 1
         err = Base.maxabs(new_v - v)
         if verbose
-            println("Compute iterate $iterate with error $err")
+            if iterate % print_skip == 0
+                println("Compute iterate $iterate with error $err")
+            end
         end
         v = new_v
     end
+
+    if iterate < max_iter && verbose
+        println("Converged in $iterate steps")
+    elseif iterate == max_iter
+        println("WARNING: max_iter exceeded in compute_fixed_point")
+    end
+
     return v
 end

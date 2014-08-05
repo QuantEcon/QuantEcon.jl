@@ -1,21 +1,11 @@
 module QuantEcon
 
-include("discrete_rv.jl")
-include("mc_tools.jl")
-include("markov_approx.jl")
-include("lss.jl")
-include("lae.jl")
-include("kalman.jl")
-include("ricatti.jl")
-include("asset_pricing.jl")
-include("compute_fp.jl")
-include("lqcontrol.jl")
-include("lucastree.jl")
-include("optgrowth.jl")
-
 using Distributions
 import Optim: optimize
 import Grid: CoordInterpGrid, BCnan, BCnearest, InterpLinear
+
+import Base: mean, std, var
+import Distributions: pdf, skewness
 
 export
 # lqcontrol
@@ -74,6 +64,31 @@ export
 
 # lae
     LAE,
-    lae_est
+    lae_est,
+
+# distributions
+    BetaBinomial,
+    pdf, mean, std, var, skewness,
+
+# career
+    CareerWorkerProblem,
+    bellman, get_greedy
+
+### includes
+include("discrete_rv.jl")
+include("mc_tools.jl")
+include("markov_approx.jl")
+include("lss.jl")
+include("lae.jl")
+include("kalman.jl")
+include("ricatti.jl")
+include("asset_pricing.jl")
+include("compute_fp.jl")
+include("lqcontrol.jl")
+include("lucastree.jl")
+include("optgrowth.jl")
+include("distributions.jl")
+include("career.jl")
 
 end # module
+
