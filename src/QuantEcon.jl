@@ -73,7 +73,7 @@ export
     stationary_values,
 
 # lae
-    LSS,
+    LAE,
     lae_est
 
 end # module

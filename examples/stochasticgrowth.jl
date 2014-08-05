@@ -1,3 +1,18 @@
+#=
+Example continuous state Markov chains within the stochastic growth
+model
+
+@author : Spencer Lyon <spencer.lyon@nyu.edu>
+
+@date: 2014-08-05
+
+References
+----------
+
+Simple port of the file quantecon/examples/stochasticgrowth.py
+
+http://quant-econ.net/stationary_densities.html
+=#
 import QuantEcon: LAE, lae_est
 using Distributions
 using PyPlot
@@ -51,5 +66,3 @@ ax[:set_xlabel]("capital")
 t=LaTeXString("Density of \$k_1\$ (lighter) to \$k_T\$ (darker) for \$T=$T\$")
 ax[:set_title](t)
 show()
-
-rmprocs(7)
