@@ -7,8 +7,9 @@ References
 ----------
 Based off the original python file clt3d.py
 =#
-# using PyPlot
+using PyPlot
 using Distributions
+using KernelDensity
 
 beta_dist = Beta(2.0, 2.0)
 
@@ -28,8 +29,6 @@ function gen_x_draws(k)
         X[i]=  bdraws[js[i], i]
     end
 
-    # TODO: pick up here
-
     # == Rescale, so that the random variable is zero mean == #
     m, sigma = mean(X), std(X)
     return (X .- m) ./ sigma
@@ -41,7 +40,7 @@ ns = 1:nmax
 
 # == Form a matrix Z such that each column is reps independent draws of X == #
 Z = Array(Float64, reps, nmax)
-for i=1:nmax
+for i=ns
     Z[:, i] = gen_x_draws(reps)
 end
 
@@ -49,7 +48,7 @@ end
 S = cumsum(Z, 2)
 
 # == Multiply j-th column by sqrt j == #
-Y = S .* (1. ./ sqrt(ns))''
+Y = S .* (1. ./ sqrt(ns))'
 
 # == Plot == #
 fig = figure()
@@ -59,22 +58,15 @@ a, b = -3, 3
 gs = 100
 xs = linspace(a, b, gs)
 
-# TODO: Don't know where to find a gaussian kde in Julia. Need to look
-#       Finish from here.
-
-#=
 # == Build verts == #
 greys = linspace(0.3, 0.7, nmax)
-verts = []
+verts = {}
 for n=ns
-    density = gaussian_kde(Y[:,n-1])
-    ys = density(xs)
-    verts.append(zip(xs, ys))
+    kde_est = kde(Y[:, n])
+    _xs, ys = kde_est.x, kde_est.density
+    ax[:plot3D](_xs, ys, n, zdir="x", color=string(greys[n]),
+                fillstyle="bottom")
 end
-
-poly = PolyCollection(verts, facecolors = [str(g) for g in greys])
-poly[:set_alpha](0.85)
-ax[:add_collection3d](poly, zs=ns, zdir="x")
 
 ax[:set_xlim3d](1, nmax)
 ax[:set_xticks](ns)
@@ -83,4 +75,3 @@ ax[:set_yticks]((-3, 0, 3))
 ax[:set_ylim3d](a, b)
 ax[:set_zlim3d](0, 0.4)
 ax[:set_zticks]((0.2, 0.4))
-=#

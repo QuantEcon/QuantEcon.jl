@@ -18,8 +18,8 @@ Julia port:
    ✔ Finite Markov Chains
    ✔ Shortest Paths
    ✔ Schelling’s Segregation Model
-   ☐ LLN and CLT (for clt3d.py need to find gaussian_kde function in Julia)
-      ☐ See kde from KernelDensity.jl
+   ✔ LLN and CLT (for clt3d.py need to find gaussian_kde function in Julia) @done (14-08-11 14:10)
+      ✔ See kde from KernelDensity.jl @done (14-08-11 14:10)
    ✔ Linear State Space Models @done (14-07-28 23:52)
    ✔ A First Look at the Kalman Filter @done (14-07-29 01:46)
    ✔ Infinite Horizon Dynamic Programming @done (14-06-30 13:09)
