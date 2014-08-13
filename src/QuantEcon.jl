@@ -72,7 +72,10 @@ export
 
 # career
     CareerWorkerProblem,
-    bellman, get_greedy
+    bellman, get_greedy,
+
+# jv
+    JVWorker
 
 ### includes
 include("discrete_rv.jl")
@@ -89,6 +92,7 @@ include("lucastree.jl")
 include("optgrowth.jl")
 include("distributions.jl")
 include("career.jl")
+include("jv.jl")
 
 end # module
 
