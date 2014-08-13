@@ -53,7 +53,6 @@ function JvWorker(A=1.4, alpha=0.6, bet=0.96, grid_size=50)
     JvWorker(A, alpha, bet, x_grid, G, pi_func, F)
 end
 
-
 # make kwarg version
 JvWorker(;A=1.4, alpha=0.6, bet=0.96, grid_size=50) = JvWorker(A, alpha, bet,
                                                                grid_size)
