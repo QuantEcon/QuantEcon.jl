@@ -24,7 +24,7 @@ type LQ{S <: FloatingPoint}
     A::Matrix{S}
     B::Matrix{S}
     C::Union(Nothing, Matrix{S})
-    β::S
+    bet::S
     T::Union(Int, Nothing)
     Rf::Matrix{S}
     k::Int
@@ -41,7 +41,7 @@ function LQ{S <: FloatingPoint}(Q::ScalarOrArray{S},
                                 A::ScalarOrArray{S},
                                 B::ScalarOrArray{S},
                                 C::Union(Nothing, ScalarOrArray{S})=nothing,
-                                β::ScalarOrArray{S}=1.0,
+                                bet::ScalarOrArray{S}=1.0,
                                 T::Union(Int, Nothing)=nothing,
                                 Rf::Union(Nothing, ScalarOrArray{S})=nothing)
     k = size(Q, 1)
@@ -72,7 +72,7 @@ function LQ{S <: FloatingPoint}(Q::ScalarOrArray{S},
     P = copy(Rf)
     d = 0.0
 
-    LQ(Q, R, A, B, C, β, T, Rf, k, n, j, P, d, F)
+    LQ(Q, R, A, B, C, bet, T, Rf, k, n, j, P, d, F)
 end
 
 
@@ -81,9 +81,9 @@ function update_values!(lq::LQ)
     Q, R, A, B, C, P, d = lq.Q, lq.R, lq.A, lq.B, lq.C, lq.P, lq.d
 
     # == Some useful matrices == #
-    S1 = Q .+ lq.β .* (B' * P * B)
-    S2 = lq.β .* (B' * P * A)
-    S3 = lq.β .* (A' * P * A)
+    S1 = Q .+ lq.bet .* (B' * P * B)
+    S2 = lq.bet .* (B' * P * A)
+    S3 = lq.bet .* (A' * P * A)
 
     # == Compute F as (Q + B'PB)^{-1} (beta B'PA) == #
     lq.F = S1 \ S2
@@ -92,7 +92,7 @@ function update_values!(lq::LQ)
     new_P = R - S2'*lq.F + S3
 
     # == Recalling that trace(AB) = trace(BA) == #
-    new_d = lq.β * (d + trace(P * C * C'))
+    new_d = lq.bet * (d + trace(P * C * C'))
 
     # == Set new state == #
     lq.P = new_P
@@ -106,16 +106,16 @@ function stationary_values!(lq::LQ)
     Q, R, A, B, C = lq.Q, lq.R, lq.A, lq.B, lq.C
 
     # === solve Riccati equation, obtain P === #
-    A0, B0 = sqrt(lq.β) .* A, sqrt(lq.β) .* B
+    A0, B0 = sqrt(lq.bet) .* A, sqrt(lq.bet) .* B
     P = dare(A0, B0, Q, R)
 
     # == Compute F == #
-    S1 = Q .+ lq.β .* (B' * P * B)
-    S2 = lq.β .* (B' * P * A)
+    S1 = Q .+ lq.bet .* (B' * P * B)
+    S2 = lq.bet .* (B' * P * A)
     F = S1 \ S2
 
     # == Compute d == #
-    d = lq.β .* trace(P * C * C') / (1 - lq.β)
+    d = lq.bet .* trace(P * C * C') / (1 - lq.bet)
 
     # == Bind states and return values == #
     lq.P, lq.F, lq.d = P, F, d

@@ -24,7 +24,7 @@ http://quant-econ.net/dp_intro.html
 =#
 type GrowthModel{T <: FloatingPoint}
     f::Function
-    β::T
+    bet::T
     u::Function
     grid_max::Int
     grid_size::Int
@@ -36,10 +36,10 @@ default_f(k) = k^0.65
 default_u(c) = log(c)
 
 
-function GrowthModel(f=default_f, β=0.95, u=default_u,
+function GrowthModel(f=default_f, bet=0.95, u=default_u,
                      grid_max=2, grid_size=150)
     grid = 1e-6:(grid_max-1e-6)/(grid_size-1):grid_max
-    return GrowthModel(f, β, u, grid_max, grid_size, grid)
+    return GrowthModel(f, bet, u, grid_max, grid_size, grid)
 end
 
 #=
@@ -59,24 +59,24 @@ function bellman_operator{T <: FloatingPoint}(g::GrowthModel, w::Vector{T},
     Aw = CoordInterpGrid(g.grid, w, BCnan, InterpLinear)
 
     if compute_policy
-        σ = zeros(w)
+        sigma = zeros(w)
     end
 
     # === set Tw[i] equal to max_c { u(c) + beta w(f(k_i) - c)} === #
     Tw = zeros(w)
     for (i, k) in enumerate(g.grid)
-        objective(c) = - g.u(c) - g.β * Aw[g.f(k) - c]
+        objective(c) = - g.u(c) - g.bet * Aw[g.f(k) - c]
         res = optimize(objective, 1e-6, g.f(k))
         c_star = res.minimum
         if compute_policy
-            σ[i] = c_star
+            sigma[i] = c_star
         end
 
         Tw[i] = - objective(c_star)
     end
 
     if compute_policy
-        return Tw, σ
+        return Tw, sigma
     else
         return Tw
     end

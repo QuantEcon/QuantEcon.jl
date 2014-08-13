@@ -11,16 +11,16 @@ using PyPlot
 
 
 ## Primitives and grid
-α = 0.65
-β = 0.95
+alpha = 0.65
+bet = 0.95
 grid_max = 2
 grid_size = 150
 grid = 1e-6:(grid_max-1e-6)/(grid_size-1):grid_max
 
 ## Exact solution
-ab = α * β
-c1 = (log(1 - ab) + log(ab) * ab / (1 - ab)) / (1 - β)
-c2 = α / (1 - ab)
+ab = alpha * bet
+c1 = (log(1 - ab) + log(ab) * ab / (1 - ab)) / (1 - bet)
+c2 = alpha / (1 - ab)
 v_star(k) = c1 .+ c2 .* log(k)
 
 
@@ -30,8 +30,8 @@ function bellman_operator(grid, w)
     Tw = zeros(w)
 
     for (i, k) in enumerate(grid)
-        objective(c) = - log(c) - β * Aw[k^α - c]
-        res = optimize(objective, 1e-6, k^α)
+        objective(c) = - log(c) - bet * Aw[k^alpha - c]
+        res = optimize(objective, 1e-6, k^alpha)
         Tw[i] = - objective(res.minimum)
     end
     return Tw

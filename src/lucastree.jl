@@ -30,52 +30,52 @@ http://quant-econ.net/markov_asset.html
 
 
 type LucasTree{T <: FloatingPoint}
-    γ::T
-    β::T
-    α::T
-    σ::T
+    gam::T
+    bet::T
+    alpha::T
+    sigma::T
 end
 
 
-function make_grid(α, σ)
+function make_grid(alpha, sigma)
     grid_size = 100
-    if abs(α) >= 1
+    if abs(alpha) >= 1
         grid_min, grid_max = 0.0, 10.
     else
         # Set the grid interval to contain most of the mass of the
         # stationary distribution of the consumption endowment
-        ssd = σ / sqrt(1 - α^2)
+        ssd = sigma / sqrt(1 - alpha^2)
         grid_min, grid_max = exp(-4 * ssd), exp(4 * ssd)
     end
     return grid_min:(grid_max-grid_min)/(grid_size-1):grid_max
 end
 
 
-function integrate{T<:FloatingPoint}(g::Function, int_min::T, int_max::T, ϕ)
+function integrate{T<:FloatingPoint}(g::Function, int_min::T, int_max::T, phi)
     #= NOTE, below I had to make sure we don't try to evaluate the
        lognormal pdf at a negative number. The syntax
-       pdf(ϕ, x > 0 ? x : eps()) can be read
+       pdf(phi, x > 0 ? x : eps()) can be read
 
        if x > 0
-           pdf(ϕ, x)
+           pdf(phi, x)
        else
-           pdf(ϕ, eps())
+           pdf(phi, eps())
        end
     =#
-    #    = Af[y^α * x] * pdf(ϕ, x > 0 ? x : eps())
-    int_func(x::T) = g(x) * pdf(ϕ, x)
+    #    = Af[y^alpha * x] * pdf(phi, x > 0 ? x : eps())
+    int_func(x::T) = g(x) * pdf(phi, x)
     return quadgk(int_func, int_min, int_max)[1]
 end
 
 
 # == Set up the Lucas operator T == #
-function lucas_operator(f, grid, int_min, int_max, h, ϕ, lt::LucasTree)
+function lucas_operator(f, grid, int_min, int_max, h, phi, lt::LucasTree)
     Tf = zeros(f)
     Af = CoordInterpGrid(grid, f, BCnearest, InterpLinear)
 
     for (i, y) in enumerate(grid)
-        to_integrate(z) = Af[y^lt.α * z]
-        Tf[i] = h[i] + lt.β * integrate(to_integrate, int_min, int_max, ϕ)
+        to_integrate(z) = Af[y^lt.alpha * z]
+        Tf[i] = h[i] + lt.bet * integrate(to_integrate, int_min, int_max, phi)
     end
     return Tf
 end
@@ -84,11 +84,11 @@ end
 function compute_lt_price{T <: FloatingPoint}(lt::LucasTree,
                                               grid::FloatRange{T})
     # == Simplify names, set up distribution phi == #
-    γ, β, α, σ = lt.γ, lt.β, lt.α, lt.σ
-    ϕ = LogNormal(0.0, σ)
+    gam, bet, alpha, sigma = lt.gam, lt.bet, lt.alpha, lt.sigma
+    phi = LogNormal(0.0, sigma)
 
     # == Set up a function for integrating w.r.t. phi == #
-    int_min, int_max = exp(-4 * σ), exp(4 * σ)
+    int_min, int_max = exp(-4 * sigma), exp(4 * sigma)
 
     grid_min, grid_max, grid_size = minimum(grid), maximum(grid), length(grid)
 
@@ -97,8 +97,8 @@ function compute_lt_price{T <: FloatingPoint}(lt::LucasTree,
     h = zeros(grid)
     # Recall that h(y) = beta * int u'(G(y,z)) G(y,z) phi(dz)
     for (i, y) in enumerate(grid)
-        integrand(z) = (y^α * z)^(1 - γ) # u'(G(y,z)) G(y,z)
-        h[i] = β*integrate(integrand, int_min, int_max, ϕ)
+        integrand(z) = (y^alpha * z)^(1 - gam) # u'(G(y,z)) G(y,z)
+        h[i] = bet*integrate(integrand, int_min, int_max, phi)
     end
 
     # == Now compute the price by iteration == #
@@ -107,7 +107,7 @@ function compute_lt_price{T <: FloatingPoint}(lt::LucasTree,
     iterate = 0
     f = zeros(grid)  # Initial condition
     while iterate < max_iter && err > err_tol
-        new_f = lucas_operator(f, grid, int_min, int_max, h, ϕ, lt)
+        new_f = lucas_operator(f, grid, int_min, int_max, h, phi, lt)
         iterate += 1
         err = Base.maxabs(new_f - f)
         @printf("Iteration: %d\t error:%.9f\n", iterate, err)
@@ -118,12 +118,12 @@ function compute_lt_price{T <: FloatingPoint}(lt::LucasTree,
         error("Convergence error in compute_lt_price")
     end
 
-    return grid, f .* grid .^ γ # p(y) = f(y) / u'(y) = f(y) * y^gamma
+    return grid, f .* grid .^ gam # p(y) = f(y) / u'(y) = f(y) * y^gamma
 end
 
 
 function compute_lt_price(lt::LucasTree)
-    grid = make_grid(lt.α, lt.σ)
+    grid = make_grid(lt.alpha, lt.sigma)
     return compute_lt_price(lt, grid)
 end
 
