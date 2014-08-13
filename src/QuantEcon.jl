@@ -75,7 +75,7 @@ export
     bellman, get_greedy,
 
 # jv
-    JVWorker
+    JvWorker
 
 ### includes
 include("discrete_rv.jl")
