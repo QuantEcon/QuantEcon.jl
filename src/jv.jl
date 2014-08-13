@@ -12,6 +12,15 @@ Simple port of the file quantecon.models.jv
 http://quant-econ.net/jv.html
 =#
 
+# TODO: the three lines below will allow us to use the non brute-force
+#       approach in bellman operator. I have commented it out because
+#       I am waiting on a simple constrained optimizer to be written in
+#       pure Julia
+
+# using PyCall
+# @pyimport scipy.optimize as opt
+# minimize = opt.minimize
+
 epsilon = 1e-4  # a small number, used in optimization routine
 
 type JVWorker
@@ -44,11 +53,10 @@ function JVWorker(A=1.4, alpha=0.6, bet=0.96, grid_size=50)
     JVWorker(A, alpha, bet, x_grid, G, pi_func, F)
 end
 
-
 # TODO: as of 2014-08-13 there is no simple constrained optimizer in Julia
 #       so, we just implement the brute force gridsearch approach for this
 #       problem
-function bellman_operator(jv::JVWorker, V::Array; brute_force=true,
+function bellman_operator(jv::JVWorker, V::Vector; brute_force=true,
                           return_policies=false)
     G, pi_func, F, bet = jv.G, jv.pi_func, jv.F, jv.bet
 
@@ -62,9 +70,17 @@ function bellman_operator(jv::JVWorker, V::Array; brute_force=true,
     a, b, = quantile(F, 0.005), quantile(F, 0.995)
     search_grid = linspace(epsilon, 1.0, 15)
 
+    if !brute_force
+        c1(z) = 1.0 - sum(z)
+        c2(z) = z[1] - epsilon
+        c3(z) = z[2] - epsilon
+        guess = (0.2, 0.2)
+        constraints = [{"type" => "ineq", "fun"=> i} for i in [c1, c2, c3]]
+    end
+
+
     for (i, x) in enumerate(jv.x_grid)
 
-        # set up objective function
         function w(z)
             s, phi = z
             h(u) = Vf[max(G(x, phi), u)] * pdf(F, u)
@@ -77,26 +93,38 @@ function bellman_operator(jv::JVWorker, V::Array; brute_force=true,
         if brute_force
             # instantiate variables so they are available outside loop
             max_val = -1.0
+            cur_val = 0.0
             max_s = 1.0
             max_phi = 1.0
             for s in search_grid
                 for phi in search_grid
-                    cur_val = s + phi <= 1.0 ? -w((s, phi)) : -1.0
+                    if s + phi <= 1.0
+                        cur_val = -w((s, phi))
+                    else
+                        cur_val = -1.0
+                    end
                     if cur_val > max_val
                         max_val, max_s, max_phi = cur_val, s, phi
                     end
                 end
             end
+        else
+            max_s, max_phi = minimize(w, guess, constraints=constraints,
+                                      options={"disp"=> 0},
+                                      method="SLSQP")["x"]
+
+            max_val = -w((max_s, max_phi), x, a, b, Vf, jv)
+
         end
 
         new_V[i] = max_val
         s_policy[i], phi_policy[i] = max_s, max_phi
     end
 
-    if return_policies
-        return s_policy, phi_policy
-    else
-        return new_V
-    end
+    # if return_policies
+    #     return s_policy, phi_policy
+    # else
+    return new_V::Vector{Float64}
+    # end
 
 end
