@@ -13,7 +13,6 @@ References
 http://quant-econ.net/odu.html
 
 =#
-using Debug
 
 type SearchProblem
     bet::Real
@@ -60,8 +59,6 @@ function SearchProblem(;bet=0.95, c=0.6, F_a=1, F_b=1, G_a=3, G_b=1.2,
     SearchProblem(bet, c, F_a, F_b, G_a, G_b, w_max, w_grid_size,
                   pi_grid_size)
 end
-
-@debug begin
 
 function q(sp::SearchProblem, w, pi_val)
     new_pi = 1.0 ./ (1 + ((1 - pi_val) .* sp.g(w)) ./ (pi_val .* sp.f(w)))
@@ -131,5 +128,3 @@ function res_wage_operator(sp::SearchProblem, phi)
     end
     return new_phi
 end
-
-end  # debug
