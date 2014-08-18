@@ -75,7 +75,20 @@ export
     bellman, get_greedy,
 
 # jv
-    JvWorker
+    JvWorker,
+
+# util
+    meshgrid,
+    linspace_range,
+# odu
+    SearchProblem,
+    res_wage_operator,
+
+# quad
+    qnwlege,
+    quadrect,
+    gridmake,
+    do_quad
 
 ### includes
 include("discrete_rv.jl")
@@ -93,6 +106,9 @@ include("optgrowth.jl")
 include("distributions.jl")
 include("career.jl")
 include("jv.jl")
+include("util.jl")
+include("odu.jl")
+include("quad.jl")
 
 end # module
 
