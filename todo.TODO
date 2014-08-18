@@ -33,8 +33,9 @@ Julia port:
       ✔ Do boxplot example shown in exercise 3 @done (14-08-13 13:46)
    ✔ Modeling Career Choice @done (14-08-05 02:13)
       ☐ The solutions notebook matches the python version, but I think we can do better. I think we can design more clever functions so that it is easy for people to call with different arguments
-   ☐ On-the-Job Search
+   ✔ On-the-Job Search @done (14-08-14 10:43)
    ☐ Search with Offer Distribution Unknown
+      ☐ Fix bellman_operator in odu.jl. It is just cycling and not updating properly.
    ☐ Optimal Savings
    ☐ Robustness
    ☐ Linear Stochastic Models
