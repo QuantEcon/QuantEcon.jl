@@ -79,7 +79,20 @@ export
     bellman, get_greedy,
 
 # jv
-    JvWorker
+    JvWorker,
+
+# util
+    meshgrid,
+    linspace_range,
+# odu
+    SearchProblem,
+    res_wage_operator,
+
+# quad
+    qnwlege,
+    quadrect,
+    gridmake,
+    do_quad
 
 ### includes
 include("asset_pricing.jl")
@@ -97,7 +110,10 @@ include("lucastree.jl")
 include("markov_approx.jl")
 include("matrix_eqn.jl")
 include("mc_tools.jl")
+include("odu.jl")
 include("optgrowth.jl")
+include("util.jl")
+include("quad.jl")
 
 end # module
 
