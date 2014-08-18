@@ -24,6 +24,10 @@ export
     LucasTree,
     compute_lt_price,
 
+# matrix_eqn
+    solve_discrete_lyapunov,
+    solve_discrete_riccati,
+
 # optgrowth
     GrowthModel,
     bellman_operator,
@@ -78,21 +82,22 @@ export
     JvWorker
 
 ### includes
-include("discrete_rv.jl")
-include("mc_tools.jl")
-include("markov_approx.jl")
-include("lss.jl")
-include("lae.jl")
-include("kalman.jl")
-include("ricatti.jl")
 include("asset_pricing.jl")
-include("compute_fp.jl")
-include("lqcontrol.jl")
-include("lucastree.jl")
-include("optgrowth.jl")
-include("distributions.jl")
 include("career.jl")
+include("compute_fp.jl")
+include("discrete_rv.jl")
+include("distributions.jl")
 include("jv.jl")
+include("kalman.jl")
+include("lae.jl")
+include("ricatti.jl")
+include("lqcontrol.jl")
+include("lss.jl")
+include("lucastree.jl")
+include("markov_approx.jl")
+include("matrix_eqn.jl")
+include("mc_tools.jl")
+include("optgrowth.jl")
 
 end # module
 
