@@ -13,7 +13,11 @@ References
 http://quant-econ.net/ifp.html
 
 =#
+# using PyCall
+# @pyimport scipy.optimize as opt
+# brentq = opt.brentq
 
+using Debug
 
 type ConsumerProblem
     u::Function
@@ -27,10 +31,11 @@ type ConsumerProblem
     asset_grid::Union(Vector, Range)
 end
 
+default_du{T <: Real}(x::T) = 1.0 / x
 
 function ConsumerProblem(r=0.01, bet=0.96, Pi=[0.6 0.4; 0.05 0.95],
                          z_vals=[0.5, 1.0], b=0.0, grid_max=16, grid_size=50,
-                         u=log, du=x -> 1./x)
+                         u=log, du=default_du)
     R = 1 + r
     asset_grid = linspace_range(-b, grid_max, grid_size)
 
@@ -92,13 +97,13 @@ function coleman_operator(cp::ConsumerProblem, c)
     gam = R * bet
     vals = Array(Float64, z_size)
 
-    # linear interpolation to get consumption function
-    function cf(a)
+    # linear interpolation to get consumption function. Updates vals inplace
+    function cf!(a, vals)
         for i=1:z_size
             vals[i] = CoordInterpGrid(asset_grid, c[:, i], BCnearest,
                                       InterpLinear)[a]
         end
-        return vals
+        nothing
     end
 
     Kc = similar(c)
@@ -108,11 +113,13 @@ function coleman_operator(cp::ConsumerProblem, c)
     for (i_z, z) in enumerate(z_vals)
         for (i_a, a) in enumerate(asset_grid)
             function h(t)
-                expectation = dot(du(cf(R*a+z-t)), Pi[i_z, :])
-                return du(t) - max(gam * expectation, du(R*a+z+b))
+                cf!(R*a+z-t, vals)  # update vals
+                expectation = dot(du(vals), Pi[i_z, :])
+                return abs(du(t) - max(gam * expectation, du(R*a+z+b)))
             end
 
-            Kc[i_a, i_z] = optimize(h, opt_lb, R*a + z + b).minimum
+            res = optimize(h, opt_lb, R*a + z + b, method=:brent)
+            Kc[i_a, i_z] = res.minimum
         end
     end
     return Kc
