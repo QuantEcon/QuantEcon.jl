@@ -1,4 +1,4 @@
-function qnwbeta{T <: Real}(n::Int, a::T, b::T)
+function qnwbeta{T <: Real, S <: Real}(n::Int, a::T, b::S)
     a -= 1
     b -= 1
 
