@@ -107,7 +107,7 @@ function stationary_values!(lq::LQ)
 
     # === solve Riccati equation, obtain P === #
     A0, B0 = sqrt(lq.bet) .* A, sqrt(lq.bet) .* B
-    P = solve_discrete_riccati(A0, B0, Q, R)
+    P = solve_discrete_riccati(A0, B0, R, Q)
 
     # == Compute F == #
     S1 = Q .+ lq.bet .* (B' * P * B)
