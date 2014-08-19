@@ -88,7 +88,12 @@ export
     qnwlege,
     quadrect,
     gridmake,
-    do_quad
+    do_quad,
+
+# ifp
+    ConsumerProblem,
+    coleman_operator,
+    initialize
 
 ### includes
 include("discrete_rv.jl")
@@ -109,6 +114,7 @@ include("jv.jl")
 include("util.jl")
 include("odu.jl")
 include("quad.jl")
+include("ifp.jl")
 
 end # module
 
