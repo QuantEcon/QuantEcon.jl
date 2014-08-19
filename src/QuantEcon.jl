@@ -72,7 +72,28 @@ export
 
 # career
     CareerWorkerProblem,
-    bellman, get_greedy
+    bellman, get_greedy,
+
+# jv
+    JvWorker,
+
+# util
+    meshgrid,
+    linspace_range,
+# odu
+    SearchProblem,
+    res_wage_operator,
+
+# quad
+    qnwlege,
+    quadrect,
+    gridmake,
+    do_quad,
+
+# ifp
+    ConsumerProblem,
+    coleman_operator,
+    initialize
 
 ### includes
 include("discrete_rv.jl")
@@ -89,6 +110,11 @@ include("lucastree.jl")
 include("optgrowth.jl")
 include("distributions.jl")
 include("career.jl")
+include("jv.jl")
+include("util.jl")
+include("odu.jl")
+include("quad.jl")
+include("ifp.jl")
 
 end # module
 

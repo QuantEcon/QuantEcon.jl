@@ -1,6 +1,5 @@
 using PyPlot
-require("../../src/ricatti.jl")
-require("../../src/lqcontrol.jl")
+using QuantEcon
 
 # == Model parameters == #
 r = 0.05

@@ -17,9 +17,10 @@ References
 Simple port of the file quantecon.lss
 
 http://quant-econ.net/linear_models.html
+
 =#
 import Distributions: MultivariateNormal, rand
-# using Debug
+
 #=
     numpy allows its multivariate_normal function to have a matrix of
     zeros for the covariance matrix; Stats.jl doesn't. This type just
@@ -35,7 +36,6 @@ type FakeMVTNorm{T <: Real}
 end
 
 Base.rand{T}(d::FakeMVTNorm{T}) = copy(d.mu_0)
-# rand{T}(d::FakeMVTNorm{T}, n::Int) = repmat(d.mu_0, 1, n)
 
 type LSS{T <: Real}
     A::Matrix{T}
@@ -51,17 +51,17 @@ end
 
 
 function LSS{T <: Real}(A::Matrix{T}, C::Matrix{T}, G::Matrix{T};
-                        μ_0::Vector{T}=zeros(size(G, 2)),
-                        Σ_0::Matrix{T}=zeros(size(G, 2), size(G, 2)))
+                        mu_0::Vector{T}=zeros(size(G, 2)),
+                        Sigma_0::Matrix{T}=zeros(size(G, 2), size(G, 2)))
     k = size(G, 1)
     n = size(G, 2)
     m = size(C, 2)
-    if all(Σ_0 .== 0.0)   # no variance -- no distribution
-        dist = FakeMVTNorm(μ_0, Σ_0)
+    if all(Sigma_0 .== 0.0)   # no variance -- no distribution
+        dist = FakeMVTNorm(mu_0, Sigma_0)
     else
-        dist = MultivariateNormal(μ_0, Σ_0)
+        dist = MultivariateNormal(mu_0, Sigma_0)
     end
-    LSS(A, C, G, k, n, m, μ_0, Σ_0, dist)
+    LSS(A, C, G, k, n, m, mu_0, Sigma_0, dist)
 end
 
 
@@ -92,14 +92,14 @@ end
 
 function moment_sequence{T <: Real}(lss::LSS{T})
     A, C, G = lss.A, lss.C, lss.G
-    μ_x, Σ_x = copy(lss.mu_0), copy(lss.Sigma_0)
+    mu_x, Sigma_x = copy(lss.mu_0), copy(lss.Sigma_0)
     while true
-        μ_y, Σ_y = G * μ_x, G * Σ_x * G'
-        produce((μ_x, μ_y, Σ_x, Σ_y))
+        mu_y, Sigma_y = G * mu_x, G * Sigma_x * G'
+        produce((mu_x, mu_y, Sigma_x, Sigma_y))
 
         # == Update moments of x == #
-        μ_x = A * μ_x
-        Σ_x = A * Σ_x * A' + C * C'
+        mu_x = A * mu_x
+        Sigma_x = A * Sigma_x * A' + C * C'
     end
 end
 
@@ -109,7 +109,7 @@ function stationary_distributions{T <: Real}(lss::LSS{T};
                                              tol=1e-5)
     # == Initialize iteration == #
     m = @task moment_sequence(lss)
-    μ_x, μ_y, Σ_x, Σ_y = consume(m)
+    mu_x, mu_y, Sigma_x, Sigma_y = consume(m)
 
     i = 0
     err = tol + 1.
@@ -120,21 +120,21 @@ function stationary_distributions{T <: Real}(lss::LSS{T};
             break
         else
             i += 1
-            μ_x1, μ_y, Σ_x1, Σ_y = consume(m)
-            err_μ = Base.maxabs(μ_x1 - μ_x)
-            err_Σ = Base.maxabs(Σ_x1 - Σ_x)
-            err = max(err_Σ, err_μ)
-            μ_x, Σ_x = μ_x1, Σ_x1
+            mu_x1, mu_y, Sigma_x1, Sigma_y = consume(m)
+            err_mu = Base.maxabs(mu_x1 - mu_x)
+            err_Sigma = Base.maxabs(Sigma_x1 - Sigma_x)
+            err = max(err_Sigma, err_mu)
+            mu_x, Sigma_x = mu_x1, Sigma_x1
         end
     end
 
-    return μ_x, μ_y, Σ_x, Σ_y
+    return mu_x, mu_y, Sigma_x, Sigma_y
 end
 
 
-function geometric_sums{T <: Real}(lss::LSS{T}, β, x_t)
+function geometric_sums{T <: Real}(lss::LSS{T}, bet, x_t)
     I = eye(lss.n)
-    S_x = (I - β .* A) \ x_t
+    S_x = (I - bet .* A) \ x_t
     S_y = lss.G * S_x
     return S_x, S_y
 end
