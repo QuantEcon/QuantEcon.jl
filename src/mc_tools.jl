@@ -12,7 +12,7 @@ Simple port of the file quantecon.mc_tools
 
 http://quant-econ.net/finite_markov.html
 =#
-function mc_compute_stationary{T <: FloatingPoint}(P::Matrix{T})
+function mc_compute_stationary{T <: Real}(P::Matrix{T})
     n = size(P, 1)
     I = eye(n)
     B, b = ones(n, n), ones(n)
@@ -28,15 +28,14 @@ function mc_path_storage(init::Int=1, sample_size::Int=1000)
 end
 
 
-function mc_path_storage(init::Vector{Float64}, sample_size::Int=1000)
+function mc_path_storage(init::Vector, sample_size::Int=1000)
     X = Array(Int, sample_size)
     X[1] = draw(DiscreteRV(init))
     return X
 end
 
 
-function mc_sample_path{T <: FloatingPoint}(P::Matrix{T}, init::Int=1,
-                                            sample_size=1000)
+function mc_sample_path(P, init=1, sample_size=1000)
     # === set up array to store output === #
     X = mc_path_storage(init, sample_size)
 
