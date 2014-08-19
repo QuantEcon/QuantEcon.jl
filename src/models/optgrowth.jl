@@ -76,7 +76,7 @@ function bellman_operator{T <: FloatingPoint}(g::GrowthModel, w::Vector{T},
     end
 
     if compute_policy
-        return Tw, sigma
+        return sigma
     else
         return Tw
     end
@@ -89,8 +89,5 @@ end
     ==========
         w : a Vector{T <: FloatingPoint} where len(w) == g.grid_size
 =#
-function compute_greedy{T <: FloatingPoint}(g::GrowthModel, w::Vector{T})
-    Tw, sigma = bellman_operator(g, w, true)
-    return sigma
-end
+get_greedy{T <: FloatingPoint}(g::GrowthModel, w::Vector{T}) = bellman_operator(g, w, true)
 

@@ -1,8 +1,6 @@
 module QuantEcon
 
 using Distributions
-import Optim: optimize
-import Grid: CoordInterpGrid, BCnan, BCnearest, InterpLinear
 
 import Base: mean, std, var
 import Distributions: pdf, skewness
@@ -19,21 +17,6 @@ export
 
 # ricatti
     dare,
-
-# lucastree
-    LucasTree,
-    compute_lt_price,
-
-# optgrowth
-    GrowthModel,
-    bellman_operator,
-    compute_greedy,
-
-# asset_pricing
-    AssetPrices,
-    tree_price,
-    consol_price,
-    call_option,
 
 # discrete_rv
     DiscreteRV,
@@ -70,30 +53,15 @@ export
     BetaBinomial,
     pdf, mean, std, var, skewness,
 
-# career
-    CareerWorkerProblem,
-    bellman, get_greedy,
-
-# jv
-    JvWorker,
-
 # util
     meshgrid,
     linspace_range,
-# odu
-    SearchProblem,
-    res_wage_operator,
 
 # quad
     qnwlege,
     quadrect,
     gridmake,
-    do_quad,
-
-# ifp
-    ConsumerProblem,
-    coleman_operator,
-    initialize
+    do_quad
 
 ### includes
 include("discrete_rv.jl")
@@ -103,18 +71,14 @@ include("lss.jl")
 include("lae.jl")
 include("kalman.jl")
 include("ricatti.jl")
-include("asset_pricing.jl")
 include("compute_fp.jl")
 include("lqcontrol.jl")
-include("lucastree.jl")
-include("optgrowth.jl")
 include("distributions.jl")
-include("career.jl")
-include("jv.jl")
 include("util.jl")
-include("odu.jl")
 include("quad.jl")
-include("ifp.jl")
+
 
 end # module
 
+# include the models file/module
+include("models.jl")

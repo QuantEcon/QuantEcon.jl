@@ -49,7 +49,7 @@ function CareerWorkerProblem(;beta::Real=0.95, B::Real=5.0, N::Real=50,
 end
 
 
-function bellman(cp::CareerWorkerProblem, v::Array)
+function bellman_operator(cp::CareerWorkerProblem, v::Array)
     new_v = Array(Float64, size(v)...)
     for i=1:cp.N
         for j=1:cp.N

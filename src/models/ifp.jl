@@ -126,7 +126,7 @@ function coleman_operator(cp::ConsumerProblem, c)
 end
 
 
-function initialize(cp::ConsumerProblem)
+function init_values(cp::ConsumerProblem)
     # simplify names, set up arrays
     R, bet, u, b = cp.R, cp.bet, cp.u, cp.b
     asset_grid, z_vals = cp.asset_grid, cp.z_vals
