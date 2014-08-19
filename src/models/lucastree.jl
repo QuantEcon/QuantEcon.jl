@@ -82,7 +82,9 @@ end
 
 
 function compute_lt_price{T <: FloatingPoint}(lt::LucasTree,
-                                              grid::FloatRange{T})
+                                              grid::FloatRange{T};
+                                              verbose=true,
+                                              print_skip=10)
     # == Simplify names, set up distribution phi == #
     gam, bet, alpha, sigma = lt.gam, lt.bet, lt.alpha, lt.sigma
     phi = LogNormal(0.0, sigma)
@@ -110,7 +112,11 @@ function compute_lt_price{T <: FloatingPoint}(lt::LucasTree,
         new_f = lucas_operator(f, grid, int_min, int_max, h, phi, lt)
         iterate += 1
         err = Base.maxabs(new_f - f)
-        @printf("Iteration: %d\t error:%.9f\n", iterate, err)
+        if verbose
+            if iterate % print_skip == 0
+                @printf("Iteration: %d\t error:%.9f\n", iterate, err)
+            end
+        end
         f = copy(new_f)
     end
 
