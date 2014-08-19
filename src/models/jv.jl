@@ -27,7 +27,7 @@ type JvWorker
     A::Real
     alpha::Real
     bet::Real
-    x_grid::Union(Vector, Range)
+    x_grid::FloatRange
     G::Function
     pi_func::Function
     F::UnivariateDistribution
@@ -46,9 +46,7 @@ function JvWorker(A=1.4, alpha=0.6, bet=0.96, grid_size=50)
 
     # range for linspace(epsilon, grid_max, grid_size). Needed for
     # CoordInterpGrid below
-    x_grid = epsilon:(grid_max-epsilon)/(grid_size-1):grid_max
-
-    linspace(epsilon, grid_max, grid_size)
+    x_grid = linspace_range(epsilon, grid_max, grid_size)
 
     JvWorker(A, alpha, bet, x_grid, G, pi_func, F)
 end

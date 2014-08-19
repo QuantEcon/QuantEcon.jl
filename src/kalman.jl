@@ -43,11 +43,11 @@ end
 
 
 function prior_to_filtered!(k::Kalman, y)
-    # === simplify notation === #
+    # simplify notation
     G, R = k.G, k.R
     x_hat, Sigma = k.cur_x_hat, k.cur_sigma
 
-    # === and then update === #
+    # and then update
     if k.k > 1
         reshape(y, k.k, 1)
     end
@@ -61,11 +61,11 @@ end
 
 
 function filtered_to_forecast!(k::Kalman)
-    # === simplify notation === #
+    # simplify notation
     A, Q = k.A, k.Q
     x_hat, Sigma = k.cur_x_hat, k.cur_sigma
 
-    # === and then update === #
+    # and then update
     k.cur_x_hat = A * x_hat
     k.cur_sigma = A * Sigma * A' + Q
     nothing
@@ -80,10 +80,10 @@ end
 
 
 function stationary_values(k::Kalman)
-    # === simplify notation === #
+    # simplify notation
     A, Q, G, R = k.A, k.Q, k.G, k.R
 
-    # === solve Riccati equation, obtain Kalman gain === #
+    # solve Riccati equation, obtain Kalman gain
     Sigma_inf = solve_discrete_riccati(A', G', Q, R)
     K_inf = A * Sigma_inf * G' * inv(G * Sigma_inf * G' + R)
     return Sigma_inf, K_inf

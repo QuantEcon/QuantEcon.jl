@@ -17,7 +17,7 @@ http://quant-econ.net/career.html
 
 type CareerWorkerProblem
     beta::Real
-    N::Integer
+    N::Int
     B::Real
     theta::Vector
     epsilon::Vector

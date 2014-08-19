@@ -35,11 +35,11 @@ function mc_path_storage(init::Vector, sample_size::Int=1000)
 end
 
 
-function mc_sample_path(P, init=1, sample_size=1000)
-    # === set up array to store output === #
+function mc_sample_path(P::Matrix, init=1, sample_size::Int=1000)
+    # set up array to store output
     X = mc_path_storage(init, sample_size)
 
-    # === turn each row into a distribution === #
+    # turn each row into a distribution
     # In particular, let P_dist[i] be the distribution corresponding to
     # the i-th row P[i,:]
     n = size(P, 1)

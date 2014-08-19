@@ -37,22 +37,22 @@ end
 
 Base.rand{T}(d::FakeMVTNorm{T}) = copy(d.mu_0)
 
-type LSS{T <: Real}
-    A::Matrix{T}
-    C::Matrix{T}
-    G::Matrix{T}
+type LSS
+    A::Matrix
+    C::Matrix
+    G::Matrix
     k::Int
     n::Int
     m::Int
-    mu_0::Vector{T}
-    Sigma_0::Matrix{T}
+    mu_0::Vector
+    Sigma_0::Matrix
     dist::Union(MultivariateNormal, FakeMVTNorm)
 end
 
 
-function LSS{T <: Real}(A::Matrix{T}, C::Matrix{T}, G::Matrix{T};
-                        mu_0::Vector{T}=zeros(size(G, 2)),
-                        Sigma_0::Matrix{T}=zeros(size(G, 2), size(G, 2)))
+function LSS(A::Matrix, C::Matrix, G::Matrix;
+             mu_0::Vector=zeros(size(G, 2)),
+             Sigma_0::Matrix=zeros(size(G, 2), size(G, 2)))
     k = size(G, 1)
     n = size(G, 2)
     m = size(C, 2)
@@ -65,8 +65,8 @@ function LSS{T <: Real}(A::Matrix{T}, C::Matrix{T}, G::Matrix{T};
 end
 
 
-function simulate{T <: Real}(lss::LSS{T}, ts_length=100)
-    x = Array(T, lss.n, ts_length)
+function simulate(lss::LSS, ts_length=100)
+    x = Array(Float64, lss.n, ts_length)
     x[:, 1] = rand(lss.dist)
     w = randn(lss.m, ts_length - 1)
     for t=1:ts_length-1
@@ -78,10 +78,10 @@ function simulate{T <: Real}(lss::LSS{T}, ts_length=100)
 end
 
 
-function replicate{T <: Real}(lss::LSS{T}, t=10, num_reps=100)
-    x = Array(T, lss.n, num_reps)
+function replicate(lss::LSS, t=10, num_reps=100)
+    x = Array(Float64, lss.n, num_reps)
     for j=1:num_reps
-        x_t, _ = simulate(lss, T+1)
+        x_t, _ = simulate(lss, t+1)
         x[:, j] = x_T[:, end]
     end
 
@@ -90,24 +90,23 @@ function replicate{T <: Real}(lss::LSS{T}, t=10, num_reps=100)
 end
 
 
-function moment_sequence{T <: Real}(lss::LSS{T})
+function moment_sequence(lss::LSS)
     A, C, G = lss.A, lss.C, lss.G
     mu_x, Sigma_x = copy(lss.mu_0), copy(lss.Sigma_0)
     while true
         mu_y, Sigma_y = G * mu_x, G * Sigma_x * G'
         produce((mu_x, mu_y, Sigma_x, Sigma_y))
 
-        # == Update moments of x == #
+        # Update moments of x
         mu_x = A * mu_x
         Sigma_x = A * Sigma_x * A' + C * C'
     end
+    nothing
 end
 
 
-function stationary_distributions{T <: Real}(lss::LSS{T};
-                                             max_iter=200,
-                                             tol=1e-5)
-    # == Initialize iteration == #
+function stationary_distributions(lss::LSS; max_iter=200, tol=1e-5)
+    # Initialize iteration
     m = @task moment_sequence(lss)
     mu_x, mu_y, Sigma_x, Sigma_y = consume(m)
 
@@ -132,7 +131,7 @@ function stationary_distributions{T <: Real}(lss::LSS{T};
 end
 
 
-function geometric_sums{T <: Real}(lss::LSS{T}, bet, x_t)
+function geometric_sums(lss::LSS, bet, x_t)
     I = eye(lss.n)
     S_x = (I - bet .* A) \ x_t
     S_y = lss.G * S_x

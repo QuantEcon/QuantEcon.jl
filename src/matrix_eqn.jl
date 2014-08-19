@@ -28,7 +28,7 @@ function solve_discrete_lyapunov(A::ScalarOrArray,
         n_its += 1
 
         if n_its > max_it
-            msg = "Exceeded maximum iterations, check input matrics"
+            msg = "Exceeded maximum iterations, check input matrices"
             error(msg)
         end
     end
@@ -37,8 +37,7 @@ function solve_discrete_lyapunov(A::ScalarOrArray,
 end
 
 
-function solve_discrete_riccati(A::ScalarOrArray,
-                                B::ScalarOrArray,
+function solve_discrete_riccati(A::ScalarOrArray, B::ScalarOrArray,
                                 Q::ScalarOrArray,
                                 R::ScalarOrArray,
                                 C::ScalarOrArray=zeros(size(R, 1), size(Q, 1));
@@ -85,14 +84,14 @@ function solve_discrete_riccati(A::ScalarOrArray,
     gamma = best_gamma
     R_hat = R + gamma .* BB
 
-    # == Initial conditions == #
+    # Initial conditions
     Q_tilde = - Q + C' * (R_hat\(C + gamma .* BTA)) + gamma .* I
     G0 = B * (R_hat\B')
     A0 = (I - gamma .* G0) * A - B * (R_hat\C)
     H0 = gamma .* A'*A0 - Q_tilde
     i = 1
 
-    # == Main loop == #
+    # Main loop
     while dist > tolerance
 
         if i > max_it

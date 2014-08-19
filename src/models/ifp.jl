@@ -50,7 +50,7 @@ function ConsumerProblem(;r=0.01, beta=0.96, Pi=[0.6 0.4; 0.05 0.95],
 end
 
 
-function bellman_operator(cp::ConsumerProblem, V; ret_policy=false)
+function bellman_operator(cp::ConsumerProblem, V::Matrix; ret_policy=false)
     # simplify names, set up arrays
     R, Pi, bet, u, b = cp.R, cp.Pi, cp.bet, cp.u, cp.b
     asset_grid, z_vals = cp.asset_grid, cp.z_vals
@@ -89,7 +89,7 @@ function bellman_operator(cp::ConsumerProblem, V; ret_policy=false)
 end
 
 
-function coleman_operator(cp::ConsumerProblem, c)
+function coleman_operator(cp::ConsumerProblem, c::Matrix)
     # simplify names, set up arrays
     R, Pi, bet, du, b = cp.R, cp.Pi, cp.bet, cp.du, cp.b
     asset_grid, z_vals = cp.asset_grid, cp.z_vals

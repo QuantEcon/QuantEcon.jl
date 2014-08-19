@@ -43,7 +43,7 @@ function SearchProblem(bet=0.95, c=0.6, F_a=1, F_b=1, G_a=3, G_b=1.2,
     g(x) = pdf(G, x./w_max)./w_max
 
     pi_min = 1e-3  # avoids instability
-    pi_max = 1 - 1e-3
+    pi_max = 1 - pi_min
 
     w_grid = linspace_range(0, w_max, w_grid_size)
     pi_grid = linspace_range(pi_min, pi_max, pi_grid_size)
@@ -109,7 +109,7 @@ get_greedy(sp::SearchProblem, v::Matrix) = bellman_operator(sp, v,
                                                             ret_policy=true)
 
 
-function res_wage_operator(sp::SearchProblem, phi)
+function res_wage_operator(sp::SearchProblem, phi::Vector)
     # Simplify name
     f, g, bet, c = sp.f, sp.g, sp.bet, sp.c
 

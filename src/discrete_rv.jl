@@ -35,12 +35,12 @@ end
 
 DiscreteRV{T <: Real}(x::Vector{T}) = DiscreteRV(x, cumsum(x))
 
-function draw(d::DiscreteRV, k::Int=1)
-    if k == 1  # handle scalar case separately
-        return searchsortedfirst(d.Q, rand())
-    end
 
-    # move on to multiple draw case
+# handle scalar case as a single argument function
+draw(d::DiscreteRV) = searchsortedfirst(d.Q, rand())
+
+# multiple draw case
+function draw(d::DiscreteRV, k::Int)
     out = Array(Int, k)
     for i=1:k
         out[i] = searchsortedfirst(d.Q, rand())
