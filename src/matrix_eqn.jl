@@ -60,15 +60,15 @@ function solve_discrete_riccati(A::ScalarOrArray,
     for gamma in candidates
         Z = R + gamma .* BB
         cn = cond(Z)
-        if cn < Inf
-            Q_tilde = -Q + C' * (Z \ (C .+ gamma .* BTA)) + gamma .* I
+        if isfinite(cn)
+            Q_tilde = -Q + C' * (Z \ (C + gamma .* BTA)) + gamma .* I
             G0 = B * (Z \ B')
             A0 = (I - gamma .* G0) * A - B * (Z \ C)
-            H0 = gamma .* A' * A0 - Q_tilde
+            H0 = gamma .* (A' * A0) - Q_tilde
             f1 = cond(Z, Inf)
             f2 = gamma .* f1
             f3 = cond(I + G0 * H0)
-            f_gamma = maximum([f1, f2, f3])
+            f_gamma = max(f1, f2, f3)
 
             if f_gamma < current_min
                 best_gamma = gamma
@@ -77,9 +77,9 @@ function solve_discrete_riccati(A::ScalarOrArray,
         end
     end
 
-    if current_min == Inf
-        msg = "Unable to initialize routine due to ill conditioned args"
-        error(msg)
+    if isinf(current_min)
+        err = "Unable to initialize routine due to ill conditioned args"
+        error(err)
     end
 
     gamma = best_gamma
@@ -87,8 +87,8 @@ function solve_discrete_riccati(A::ScalarOrArray,
 
     # == Initial conditions == #
     Q_tilde = - Q + C' * (R_hat\(C + gamma .* BTA)) + gamma .* I
-    G0 = B * R_hat\B'
-    A0 = I - gamma .* G0 * A - B * R_hat\C
+    G0 = B * (R_hat\B')
+    A0 = (I - gamma .* G0) * A - B * (R_hat\C)
     H0 = gamma .* A'*A0 - Q_tilde
     i = 1
 
@@ -96,15 +96,15 @@ function solve_discrete_riccati(A::ScalarOrArray,
     while error > tolerance
 
         if i > max_it
-            msg = "Maximum Iterations reached $i"
-            error(msg)
+            err = "Maximum Iterations reached $i"
+            error(err)
         end
 
         A1 = A0 * ((I + G0 * H0)\A0)
         G1 = G0 + A0 * G0 * ((I + H0 * G0)\A0')
         H1 = H0 + A0' * ((I + H0*G0)\(H0*A0))
 
-        error = maximum(abs(H1 - H0))
+        error = Base.maxabs(H1 - H0))
         A0 = A1
         G0 = G1
         H0 = H1
