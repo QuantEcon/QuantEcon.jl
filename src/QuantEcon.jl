@@ -15,8 +15,9 @@ export
 # compute_fp
     compute_fixed_point,
 
-# ricatti
-    dare,
+# matrix_eqn
+    solve_discrete_lyapunov,
+    solve_discrete_riccati,
 
 # discrete_rv
     DiscreteRV,
@@ -64,18 +65,19 @@ export
     do_quad
 
 ### includes
-include("discrete_rv.jl")
-include("mc_tools.jl")
-include("markov_approx.jl")
-include("lss.jl")
-include("lae.jl")
-include("kalman.jl")
-include("ricatti.jl")
 include("compute_fp.jl")
-include("lqcontrol.jl")
+include("discrete_rv.jl")
 include("distributions.jl")
-include("util.jl")
+include("kalman.jl")
+include("kalman.jl")
+include("lae.jl")
+include("lqcontrol.jl")
+include("lss.jl")
+include("markov_approx.jl")
+include("matrix_eqn.jl")
+include("mc_tools.jl")
 include("quad.jl")
+include("util.jl")
 
 
 end # module
