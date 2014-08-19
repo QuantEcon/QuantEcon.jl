@@ -45,7 +45,7 @@ function solve_discrete_riccati(A::ScalarOrArray,
                                 tolerance::Float64=1e-10,
                                 max_it::Int=50)
     # Set up
-    error = tolerance + 1
+    dist = tolerance + 1
     best_gamma = 0.0
 
     n = size(R, 1)
@@ -78,8 +78,8 @@ function solve_discrete_riccati(A::ScalarOrArray,
     end
 
     if isinf(current_min)
-        err = "Unable to initialize routine due to ill conditioned args"
-        error(err)
+        msg = "Unable to initialize routine due to ill conditioned args"
+        error(msg)
     end
 
     gamma = best_gamma
@@ -93,18 +93,18 @@ function solve_discrete_riccati(A::ScalarOrArray,
     i = 1
 
     # == Main loop == #
-    while error > tolerance
+    while dist > tolerance
 
         if i > max_it
-            err = "Maximum Iterations reached $i"
-            error(err)
+            msg = "Maximum Iterations reached $i"
+            error(msg)
         end
 
         A1 = A0 * ((I + G0 * H0)\A0)
         G1 = G0 + A0 * G0 * ((I + H0 * G0)\A0')
         H1 = H0 + A0' * ((I + H0*G0)\(H0*A0))
 
-        error = Base.maxabs(H1 - H0))
+        dist = Base.maxabs(H1 - H0)
         A0 = A1
         G0 = G1
         H0 = H1
