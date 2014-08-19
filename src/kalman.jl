@@ -84,7 +84,7 @@ function stationary_values(k::Kalman)
     A, Q, G, R = k.A, k.Q, k.G, k.R
 
     # === solve Riccati equation, obtain Kalman gain === #
-    Sigma_inf = dare(A', G', R, Q)
+    Sigma_inf = solve_discrete_riccati(A', G', R, Q)
     K_inf = A * Sigma_inf * G' * inv(G * Sigma_inf * G' + R)
     return Sigma_inf, K_inf
 end

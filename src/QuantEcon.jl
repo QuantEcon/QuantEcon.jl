@@ -17,9 +17,6 @@ export
 # compute_fp
     compute_fixed_point,
 
-# ricatti
-    dare,
-
 # lucastree
     LucasTree,
     compute_lt_price,
