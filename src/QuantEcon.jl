@@ -81,4 +81,4 @@ include("quad.jl")
 end # module
 
 # include the models file/module
-include("models.jl")
+include("Models.jl")

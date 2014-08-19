@@ -13,7 +13,7 @@ Simple port of the file quantecon/examples/stochasticgrowth.py
 
 http://quant-econ.net/stationary_densities.html
 =#
-import QuantEcon: LAE, lae_est
+using QuantEcon: LAE, lae_est
 using Distributions
 using PyPlot
 

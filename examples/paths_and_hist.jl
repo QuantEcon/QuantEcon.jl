@@ -13,7 +13,7 @@ C = [σ 0.0 0.0 0.0]'
 G = [1.0 0.0 0.0 0.0]
 
 T = 30
-ar = LSS(A, C, G, μ_0=ones(4))
+ar = LSS(A, C, G, mu_0=ones(4))
 
 ymin, ymax = -0.8, 1.25
 

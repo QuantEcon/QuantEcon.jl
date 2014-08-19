@@ -5,8 +5,8 @@ iteration.  A more general version is provided in optgrowth.py.
 @author : Spencer Lyon <spencer.lyon@nyu.edu>
 =#
 
-import Optim: optimize
-import Grid: CoordInterpGrid, BCnan, InterpLinear
+using Optim: optimize
+using Grid: CoordInterpGrid, BCnan, InterpLinear
 using PyPlot
 
 

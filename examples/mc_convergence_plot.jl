@@ -1,5 +1,5 @@
 using PyPlot
-import QuantEcon: mc_compute_stationary
+using QuantEcon: mc_compute_stationary
 
 P =[0.971 0.029 0.000
     0.145 0.778 0.077

@@ -11,7 +11,7 @@ References
 http://quant-econ.net/career.html
 =#
 using PyPlot
-using QuantEcon
+using QuantEcon, Models
 
 # Quick meshgrid function
 meshgrid(x::Vector, y::Vector) = (repmat(x, 1, length(y))',
@@ -20,7 +20,7 @@ meshgrid(x::Vector, y::Vector) = (repmat(x, 1, length(y))',
 srand(41)  # reproducible results
 wp = CareerWorkerProblem()
 v_init = fill(100.0, wp.N, wp.N)
-func(x) = bellman(wp, x)
+func(x) = bellman_operator(wp, x)
 v = compute_fixed_point(func, v_init, max_iter=500, verbose=false)
 
 fig = figure(figsize=(8,6))
