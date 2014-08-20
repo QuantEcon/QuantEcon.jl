@@ -52,7 +52,7 @@ function prior_to_filtered!(k::Kalman, y)
         reshape(y, k.k, 1)
     end
     A = Sigma * G'
-    B = G * Sigma' + R
+    B = G * Sigma' * G' + R
     M = A * inv(B)
     k.cur_x_hat = x_hat + M * (y - G * x_hat)
     k.cur_sigma = Sigma - M * G * Sigma
