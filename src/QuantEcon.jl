@@ -9,7 +9,7 @@ export
 # lqcontrol
     LQ,
     update_values!,
-    stationary_values!,
+    stationary_values!, stationary_values,
     compute_sequence,
 
 # compute_fp
@@ -58,11 +58,23 @@ export
     meshgrid,
     linspace_range,
 
+# robustlq
+    RBLQ,
+    d_operator, b_operator,
+    robust_rule, robust_rule_simple,
+    F_to_K, K_to_F,
+    compute_deterministic_entropy,
+    evaluate_F,
+
 # quad
     qnwlege,
     quadrect,
     gridmake,
-    do_quad
+    do_quad,
+
+# quadsums
+    var_quadratic_sum,
+    m_quadratic_sum
 
 ### includes
 include("compute_fp.jl")
@@ -76,7 +88,9 @@ include("lss.jl")
 include("markov_approx.jl")
 include("matrix_eqn.jl")
 include("mc_tools.jl")
+include("robustlq.jl")
 include("quad.jl")
+include("quadsums.jl")
 include("util.jl")
 
 

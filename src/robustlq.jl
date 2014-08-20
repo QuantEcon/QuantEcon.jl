@@ -4,7 +4,7 @@ problems.
 
 @author : Spencer Lyon <spencer.lyon@nyu.edu>
 
-@date : 2014-07-05
+@date : 2014-08-19
 
 References
 ----------
@@ -12,10 +12,9 @@ References
 Simple port of the file quantecon.robustlq
 
 http://quant-econ.net/robustness.html
-
 =#
 
-type RBLQ:
+type RBLQ
     A::Matrix
     B::Matrix
     C::Matrix
@@ -33,7 +32,7 @@ function RBLQ(Q::Matrix, R::Matrix, A::Matrix, B::Matrix, C::Matrix,
     k = size(Q, 1)
     n = size(R, 1)
     j = size(C, 2)
-    RBLQ(A, B, C< Q, R< k, n, j bet, theta)
+    RBLQ(A, B, C, Q, R, k, n, j, bet, theta)
 end
 
 
@@ -49,7 +48,7 @@ function b_operator(rlq::RBLQ, P::Matrix)
 end
 
 
-function robust_rule(rlq:RBLQ)
+function robust_rule(rlq::RBLQ)
     A, B, C, Q, R = rlq.A, rlq.B, rlq.C, rlq.Q, rlq.R
     bet, theta, k, j = rlq.bet, rlq.theta, rlq.k, rlq.j
 
@@ -58,12 +57,12 @@ function robust_rule(rlq:RBLQ)
     Ba = [B C]
     Qa = [Q Z
           Z' -bet.*I.*theta]
-    lq = LQ(Qz, R, A, Ba, bet=bet)
+    lq = LQ(Qa, R, A, Ba, bet=bet)
 
     # Solve and convert back to robust problem
     P, f, d = stationary_values(lq)
     F = f[1:k, :]
-    K = -f[k:end, :]
+    K = -f[k+1:end, :]
 
     return F, K, P
 end
@@ -78,7 +77,7 @@ function robust_rule_simple(rlq::RBLQ,
 
     F = similar(P)
 
-    while iterate < max_iter and e > tol
+    while iterate < max_iter && e > tol
         F, new_P = b_operator(rlq, d_operator(rlq, P))
         e = norm(new_P - P)
         iterate += 1
@@ -137,9 +136,9 @@ function evaluate_F(rlq::RBLQ, F::Matrix)
     bet, theta, j = rlq.bet, rlq.theta, rlq.j
 
     # Solve for policies and costs using agent 2's problem
-    K_F, P_F = F_to_K(F)
+    K_F, P_F = F_to_K(rlq, F)
     I = eye(j)
-    H = inv(I - C'*P_f*C./theta)
+    H = inv(I - C'*P_F*C./theta)
     d_F = log(det(H))
 
     # compute O_F and o_F

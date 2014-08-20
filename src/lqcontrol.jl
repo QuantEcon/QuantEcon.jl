@@ -82,7 +82,7 @@ function LQ(Q::ScalarOrArray,
             C::Union(Nothing, ScalarOrArray)=nothing,
             bet::ScalarOrArray=1.0,
             T::Union(Int, Nothing)=nothing,
-            Rf::Union(Nothing, ScalarOrArray)=nothing
+            Rf::Union(Nothing, ScalarOrArray)=nothing)
     LQ(Q, R, A, B, C, bet, T, Rf)
 end
 
@@ -129,10 +129,14 @@ function stationary_values!(lq::LQ)
     # Compute d
     d = lq.bet .* trace(P * C * C') / (1 - lq.bet)
 
-    # Bind states and return values
+    # Bind states
     lq.P, lq.F, lq.d = P, F, d
+    nothing
+end
 
-    return P, F, d
+function stationary_values(lq::LQ)
+    stationary_values!(lq)
+    return lq.P, lq.F, lq.d
 end
 
 
