@@ -44,20 +44,20 @@ end
 
 #=
     The approximate Bellman operator, which computes and returns the
-    updated value function Tw on the grid points.
+    updated value function Tw on the grid points. Could also return the
+    policy function instead if asked.
 =#
-function bellman_operator(g::GrowthModel, w::Vector,
-                          compute_policy::Bool=false)
+function bellman_operator!(g::GrowthModel, w::Vector, out::Vector;
+                          ret_policy::Bool=false)
     # Apply linear interpolation to w
     Aw = CoordInterpGrid(g.grid, w, BCnan, InterpLinear)
 
-    out = similar(w)
     for (i, k) in enumerate(g.grid)
         objective(c) = - g.u(c) - g.bet * Aw[g.f(k) - c]
         res = optimize(objective, 1e-6, g.f(k))
         c_star = res.minimum
 
-        if compute_policy
+        if ret_policy
             # set the policy equal to the optimal c
             out[i] = c_star
         else
@@ -69,8 +69,17 @@ function bellman_operator(g::GrowthModel, w::Vector,
     return out
 end
 
+function bellman_operator(g::GrowthModel, w::Vector,
+                          ret_policy::Bool=false)
+    out = similar(w)
+    bellman_operator!(g, w, out, ret_policy=ret_policy)
+end
+
 #=
     Compute the w-greedy policy on the grid points.
 =#
-get_greedy(g::GrowthModel, w::Vector) = bellman_operator(g, w, true)
+function get_greedy!(g::GrowthModel, w::Vector, out::Vector)
+    bellman_operator(g, w, out, ret_policy=true)
+end
 
+get_greedy(g::GrowthModel, w::Vector) = bellman_operator(g, w, ret_policy=true)

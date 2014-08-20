@@ -49,10 +49,15 @@ function CareerWorkerProblem(;beta::Real=0.95, B::Real=5.0, N::Real=50,
 end
 
 
-function bellman_operator(cp::CareerWorkerProblem, v::Array)
-    new_v = Array(Float64, size(v)...)
-    for i=1:cp.N
-        for j=1:cp.N
+function bellman_operator!(cp::CareerWorkerProblem, v::Array, out::Array;
+                           ret_policy=false)
+    # new life. This is a function of the distribution parameters and is
+    # always constant. No need to recompute it in the loop
+    v3 = (cp.G_mean + cp.F_mean + cp.beta .*
+          cp.F_probs' * v * cp.G_probs)[1]  # don't need 1 element array
+
+    for j=1:cp.N
+        for i=1:cp.N
             # stay put
             v1 = cp.theta[i] + cp.epsilon[j] + cp.beta * v[i, j]
 
@@ -60,42 +65,35 @@ function bellman_operator(cp::CareerWorkerProblem, v::Array)
             v2 = (cp.theta[i] .+ cp.G_mean .+ cp.beta .*
                   v[i, :]*cp.G_probs)[1]  # don't need a single element array
 
-            # new life
-            v3 = (cp.G_mean + cp.F_mean + cp.beta .*
-                  cp.F_probs' * v * cp.G_probs)[1]  # ^^ me neither
-            new_v[i, j] = max(v1, v2, v3)
+            if ret_policy
+                if v1 > max(v2, v3)
+                    action = 1
+                elseif v2 > max(v1, v3)
+                    action = 2
+                else
+                    action = 3
+                end
+                out[i, j] = action
+            else
+                out[i, j] = max(v1, v2, v3)
+            end
         end
     end
-    return new_v
+end
+
+
+function bellman_operator(cp::CareerWorkerProblem, v::Array; ret_policy=false)
+    out = similar(v)
+    bellman_operator!(cp, v, out, ret_policy=ret_policy)
+    return out
+end
+
+
+function get_greedy!(cp::CareerWorkerProblem, v::Array, out::Array)
+    bellman_operator!(cp, v, out, ret_policy=true)
 end
 
 
 function get_greedy(cp::CareerWorkerProblem, v::Array)
-    policy = Array(Int8, size(v)...)
-    for i=1:cp.N
-        for j=1:cp.N
-            # stay put
-            v1 = cp.theta[i] + cp.epsilon[j] + cp.beta * v[i, j]
-
-            # new job
-            v2 = (cp.theta[i] .+ cp.G_mean .+ cp.beta .*
-                  v[i, :]*cp.G_probs)[1]  # don't need a single element array
-
-            # new life
-            v3 = (cp.G_mean + cp.F_mean + cp.beta .*
-                  cp.F_probs' * v * cp.G_probs)[1]  # ^^ me neither
-
-            if v1 > max(v2, v3)
-                action = 1
-            elseif v2 > max(v1, v3)
-                action = 2
-            else
-                action = 3
-            end
-            policy[i, j] = action
-        end
-    end
-    policy
+    bellman_operator(cp, v, ret_policy=true)
 end
-
-

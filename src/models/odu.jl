@@ -68,16 +68,12 @@ function q(sp::SearchProblem, w, pi_val)
 end
 
 
-function bellman_operator(sp::SearchProblem, v::Matrix;
+function bellman_operator!(sp::SearchProblem, v::Matrix, out::Matrix;
                           ret_policy::Bool=false)
     # Simplify names
     f, g, bet, c = sp.f, sp.g, sp.bet, sp.c
 
     vf = CoordInterpGrid((sp.w_grid, sp.pi_grid), v, BCnan, InterpLinear)
-
-    # PERF: remove allocation here
-    out_type = ret_policy ? Bool : Float64
-    out = Array(out_type, sp.n_w, sp.n_pi)
 
     # set up quadrature nodes/weights
     # q_nodes, q_weights = qnwlege(21, 0.0, sp.w_max)
@@ -104,19 +100,28 @@ function bellman_operator(sp::SearchProblem, v::Matrix;
     return out
 end
 
+function bellman_operator(sp::SearchProblem, v::Matrix;
+                          ret_policy::Bool=false)
+    out_type = ret_policy ? Bool : Float64
+    out = Array(out_type, sp.n_w, sp.n_pi)
+    bellman_operator!(sp, v, out, ret_policy=ret_policy)
+end
+
+
+function get_greedy!(sp::SearchProblem, v::Matrix, out::Matrix)
+    bellman_operator!(sp, v, out, ret_policy=true)
+end
 
 get_greedy(sp::SearchProblem, v::Matrix) = bellman_operator(sp, v,
                                                             ret_policy=true)
 
 
-function res_wage_operator(sp::SearchProblem, phi::Vector)
+function res_wage_operator!(sp::SearchProblem, phi::Vector, out::Vector)
     # Simplify name
     f, g, bet, c = sp.f, sp.g, sp.bet, sp.c
 
     # Construct interpolator over pi_grid, given phi
     phi_f = CoordInterpGrid(sp.pi_grid, phi, BCnearest, InterpLinear)
-
-    new_phi = similar(phi)
 
     # set up quadrature nodes/weights
     q_nodes, q_weights = qnwlege(7, 0.0, sp.w_max)
@@ -124,7 +129,13 @@ function res_wage_operator(sp::SearchProblem, phi::Vector)
     for (i, _pi) in enumerate(sp.pi_grid)
         integrand(x) = max(x, phi_f[q(sp, x, _pi)]).*(_pi*f(x) + (1-_pi)*g(x))
         integral = do_quad(integrand, q_nodes, q_weights)
-        new_phi[i] = (1 - bet)*c + bet*integral
+        out[i] = (1 - bet)*c + bet*integral
     end
-    return new_phi
+end
+
+
+function res_wage_operator(sp::SearchProblem, phi::Vector)
+    out = similar(phi)
+    res_wage_operator!(sp, phi, out)
+    return out
 end

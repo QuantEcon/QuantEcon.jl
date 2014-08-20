@@ -50,7 +50,8 @@ function ConsumerProblem(;r=0.01, beta=0.96, Pi=[0.6 0.4; 0.05 0.95],
 end
 
 
-function bellman_operator(cp::ConsumerProblem, V::Matrix; ret_policy=false)
+function bellman_operator!(cp::ConsumerProblem, V::Matrix, out::Matrix;
+                           ret_policy::Bool=false)
     # simplify names, set up arrays
     R, Pi, bet, u, b = cp.R, cp.Pi, cp.bet, cp.u, cp.b
     asset_grid, z_vals = cp.asset_grid, cp.z_vals
@@ -77,19 +78,33 @@ function bellman_operator(cp::ConsumerProblem, V::Matrix; ret_policy=false)
             end
             res = optimize(obj, opt_lb, R.*a.+z.+b)
             c_star = res.minimum
-            new_c[i_a, i_z], new_V[i_a, i_z] = c_star, -obj(c_star)
+            if ret_policy
+                out[i_a, i_z] = c_star
+            else
+               out[i_a, i_z] = - obj(c_star)
+            end
         end
-    end
-
-    if ret_policy
-        return new_c
-    else
-        return new_V
     end
 end
 
+function bellman_operator(cp::ConsumerProblem, V::Matrix; ret_policy=false)
+    out = similar(V)
+    bellman_operator!(cp, V, out, ret_policy=ret_policy)
+    return out
+end
 
-function coleman_operator(cp::ConsumerProblem, c::Matrix)
+
+function get_greedy!(cp::ConsumerProblem, V::Matrix, out::Matrix)
+    bellman_operator!(cp, v, out, ret_policy=true)
+end
+
+
+function get_greedy(cp::ConsumerProblem, V::Matrix)
+    bellman_operator(cp, v, ret_policy=true)
+end
+
+
+function coleman_operator!(cp::ConsumerProblem, c::Matrix, out::Matrix)
     # simplify names, set up arrays
     R, Pi, bet, du, b = cp.R, cp.Pi, cp.bet, cp.du, cp.b
     asset_grid, z_vals = cp.asset_grid, cp.z_vals
@@ -106,8 +121,6 @@ function coleman_operator(cp::ConsumerProblem, c::Matrix)
         nothing
     end
 
-    Kc = similar(c)
-
     # compute lower_bound for optimization
     opt_lb = minimum(z_vals) - 1e-5
     for (i_z, z) in enumerate(z_vals)
@@ -119,10 +132,17 @@ function coleman_operator(cp::ConsumerProblem, c::Matrix)
             end
 
             res = optimize(h, opt_lb, R*a + z + b, method=:brent)
-            Kc[i_a, i_z] = res.minimum
+            out[i_a, i_z] = res.minimum
         end
     end
-    return Kc
+    return out
+end
+
+
+function coleman_operator(cp::ConsumerProblem, c::Matrix)
+    out = similar(c)
+    coleman_operator(cp, c, out)
+    return out
 end
 
 
