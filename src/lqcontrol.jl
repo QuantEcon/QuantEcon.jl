@@ -17,32 +17,32 @@ http://quant-econ.net/lqcontrol.html
 typealias ScalarOrArray{T} Union(T, Array{T})
 
 
-type LQ{S <: FloatingPoint}
-    Q::Matrix{S}
-    R::Matrix{S}
-    A::Matrix{S}
-    B::Matrix{S}
-    C::Union(Nothing, Matrix{S})
-    bet::S
+type LQ
+    Q::Matrix
+    R::Matrix
+    A::Matrix
+    B::Matrix
+    C::Union(Nothing, Matrix)
+    bet::Real
     T::Union(Int, Nothing)
-    Rf::Matrix{S}
+    Rf::Matrix
     k::Int
     n::Int
     j::Int
-    P::Matrix{S}
-    d::S
-    F::Matrix{S}
+    P::Matrix
+    d::Real
+    F::Matrix
 end
 
 
-function LQ{S <: FloatingPoint}(Q::ScalarOrArray{S},
-                                R::ScalarOrArray{S},
-                                A::ScalarOrArray{S},
-                                B::ScalarOrArray{S},
-                                C::Union(Nothing, ScalarOrArray{S})=nothing,
-                                bet::ScalarOrArray{S}=1.0,
-                                T::Union(Int, Nothing)=nothing,
-                                Rf::Union(Nothing, ScalarOrArray{S})=nothing)
+function LQ(Q::ScalarOrArray,
+            R::ScalarOrArray,
+            A::ScalarOrArray,
+            B::ScalarOrArray,
+            C::Union(Nothing, ScalarOrArray)=nothing,
+            bet::ScalarOrArray=1.0,
+            T::Union(Int, Nothing)=nothing,
+            Rf::Union(Nothing, ScalarOrArray)=nothing)
     k = size(Q, 1)
     n = size(R, 1)
 
@@ -60,19 +60,32 @@ function LQ{S <: FloatingPoint}(Q::ScalarOrArray{S},
         Rf = zeros(R) * NaN
     end
 
-    # Reshape arrays to make sure they are Matrix{S}
+    # Reshape arrays to make sure they are Matrix
     Q = reshape([Q], k, k)
     R = reshape([R], n, n)
     A = reshape([A], n, n)
     B = reshape([B], n, k)
     Rf = reshape([Rf], n, n)
 
-    F = zeros(S, k, n)
+    F = zeros(Float64, k, n)
     P = copy(Rf)
     d = 0.0
 
     LQ(Q, R, A, B, C, bet, T, Rf, k, n, j, P, d, F)
 end
+
+# make kwarg version
+function LQ(Q::ScalarOrArray,
+            R::ScalarOrArray,
+            A::ScalarOrArray,
+            B::ScalarOrArray;
+            C::Union(Nothing, ScalarOrArray)=nothing,
+            bet::ScalarOrArray=1.0,
+            T::Union(Int, Nothing)=nothing,
+            Rf::Union(Nothing, ScalarOrArray)=nothing
+    LQ(Q, R, A, B, C, bet, T, Rf)
+end
+
 
 
 function update_values!(lq::LQ)
