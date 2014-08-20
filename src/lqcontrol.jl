@@ -123,8 +123,7 @@ function stationary_values!(lq::LQ)
 end
 
 
-function compute_sequence{S <: FloatingPoint}(lq::LQ, x0::Vector{S},
-                                              ts_length=100)
+function compute_sequence(lq::LQ, x0::Vector, ts_length=100)
     # simplify notation
     Q, R, A, B, C = lq.Q, lq.R, lq.A, lq.B, lq.C
 
@@ -138,8 +137,8 @@ function compute_sequence{S <: FloatingPoint}(lq::LQ, x0::Vector{S},
     end
 
     # Set up initial condition and arrays to store paths
-    x_path = Array(S, lq.n, T+1)
-    u_path = Array(S, lq.k, T)
+    x_path = Array(eltype(x0), lq.n, T+1)
+    u_path = Array(eltype(x0), lq.k, T)
     w_path = C * randn(lq.j, T+1)
 
     # Compute and record the sequence of policies
