@@ -12,7 +12,7 @@ function var_quadratic_sum(A::Matrix, C::Matrix, H::Matrix, bet::Real,
     cq = C'*Q*C
     v = trace(cq) * bet / (1 - bet)
     q0 = x0'*Q*x0 + v
-    return q0
+    return q0[1]
 end
 
 
