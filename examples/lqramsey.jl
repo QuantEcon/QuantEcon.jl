@@ -63,7 +63,7 @@ function compute_paths(econ::Economy, T)
 
     # Simulate the exogenous process x
     if econ.is_discrete
-        state = mc_sample_path(P, 0, T)
+        state = mc_sample_path(P, 1, T)
         x = x_vals[:, state]
     else
         # Generate an initial condition x0 satisfying x0 = A x0
@@ -97,8 +97,8 @@ function compute_paths(econ::Economy, T)
         # TODO: test this somehow. We don't have a test case in quant-econ
         ns = size(P, 1)
         F = eye(ns) - bet.*P
-        a0 = F \ ((Sm * x_vals)'.^2)[1] ./ 2
-        H = (Sb - Sd + Sg) * x_vals .* (Sg - Ss) * x_vals
+        a0 = (F \ ((Sm * x_vals)'.^2))[1] ./ 2
+        H = ((Sb - Sd + Sg) * x_vals) .* ((Sg - Ss)*x_vals)
         b0 = (F \ H')[1] ./ 2
     else
         H = Sm'Sm
@@ -133,11 +133,11 @@ function compute_paths(econ::Economy, T)
 
     # compute remaining variables
     if econ.is_discrete
-        H = (Sb - Sc)*x_vals .* (Sl - Sg)*x_vals - (Sl*x_vals).^2
+        H = ((Sb - Sc)*x_vals) .* ((Sl - Sg)*x_vals) - (Sl*x_vals).^2
         temp = squeeze(F*H', 2)
         B = temp[state] ./ p
         H = squeeze(P[state, :] * ((Sb - Sc)*x_vals)', 2)
-        R = p / (bet .* H)
+        R = p ./ (bet .* H)
         temp = squeeze(P[state, :] *((Sb - Sc) * x_vals)', 2)
         xi = p[2:end] ./ temp[1:end-1]
     else
