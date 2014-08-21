@@ -28,15 +28,19 @@ type ARMA
 end
 
 function ARMA{T <: Real}(phi::Union(Vector{T}, T), theta::Union(Vector{T}, T), sigma::T)
-    # Build signal processing representation of polynomials
+    # == Coerce scalars into a vectors as necessary == #
+    phi = [phi]       
+    theta = [theta]   
+    # == Record dimensions == #
     p = length(phi)
     q = length(theta)
+    # == Build filtering representation of polynomials == #
     ma_poly = [1.0, theta]
     ar_poly = [1.0, -phi]
     return ARMA(phi, theta, p, q, sigma, ma_poly, ar_poly)
 end
 
-function spectral_density(arma::ARMA; res=512, two_pi=true)
+function spectral_density(arma::ARMA; res=1200, two_pi=true)
     wmax = two_pi ? 2pi : pi
     w = linspace(0, wmax, res)
     tf = TFFilter(reverse(arma.ma_poly), reverse(arma.ar_poly))
@@ -125,14 +129,28 @@ function plot_impulse_response(arma::ARMA; ax=None, show=true)
     end
 end
 
+function quad_plot(arma::ARMA)
+    (num_rows, num_cols) = (2, 2)
+    fig, axes = plt.subplots(num_rows, num_cols, figsize=(12, 8))
+    plt.subplots_adjust(hspace=0.4)
+    plot_functions = [plot_impulse_response,
+                     plot_spectral_density,
+                     plot_autocovariance,
+                     plot_impulse_response]
+                     #plot_simulation]
+    for (plot_func, ax) in zip(plot_functions, reshape(axes, 1, 4))
+        plot_func(arma, ax=ax, show=false)
+    end
+    plt.show()
+end
 
 
-phi = [0.5]
+# == Testing == #
+
+phi = 0.5
 theta = [0.0, -0.8]
 sigma = 1.0
 lp = ARMA(phi, theta, sigma)
 #plot_spectral_density(lp)
-plot_impulse_response(lp)
+quad_plot(lp)
 
-#fig, axes = plt.subplots(2, 2, figsize=(6, 6))
-#plt.semilogy(w, spect, axes=axes[1, 1])
