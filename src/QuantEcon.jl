@@ -54,6 +54,9 @@ export
     BetaBinomial,
     pdf, mean, std, var, skewness,
 
+# estspec
+    smooth, periodogram, ar_periodogram,
+
 # util
     meshgrid,
     linspace_range,
@@ -80,6 +83,7 @@ export
 include("compute_fp.jl")
 include("discrete_rv.jl")
 include("distributions.jl")
+include("estspec.jl")
 include("kalman.jl")
 include("kalman.jl")
 include("lae.jl")
