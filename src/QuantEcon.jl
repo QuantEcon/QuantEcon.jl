@@ -5,6 +5,9 @@ using Distributions
 import Base: mean, std, var
 import Distributions: pdf, skewness
 
+using DSP: TFFilter, freqz
+
+
 export
 # arma
     ARMA,
@@ -83,6 +86,7 @@ export
     var_quadratic_sum,
     m_quadratic_sum
 
+include("util.jl")
 ### includes
 include("arma.jl")
 include("compute_fp.jl")
@@ -100,7 +104,6 @@ include("mc_tools.jl")
 include("robustlq.jl")
 include("quad.jl")
 include("quadsums.jl")
-include("util.jl")
 
 
 end # module

@@ -22,9 +22,7 @@ lp = ARMA(phi, theta, sigma)
 quad_plot(lp)
 
 =#
-
 import PyPlot.plt
-using DSP
 
 type ARMA
     phi::Vector      # AR parameters phi_1, ..., phi_p
@@ -188,5 +186,3 @@ function quad_plot(arma::ARMA)
     end
     plt.show()
 end
-
-
