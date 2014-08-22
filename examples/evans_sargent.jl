@@ -226,6 +226,57 @@ function plot1(rp::RamseyPath)
     plt.show()
 end
 
+function plot2(rp::RamseyPath)
+    y, uhatdif, tauhatdif, mu = rp.y, rp.uhatdif, rp.tauhatdif, rp.mu
+    G, GPay = rp.G, rp.GPay
+    T = length(rp.mu)
+    tt = 1:T  # tt is used to make the plot time index correct.
+    tt2 = 1:T-1
+
+    n_rows = 4
+    fig, axes = subplots(n_rows, 1, figsize=(10, 16))
+
+    plt.subplots_adjust(hspace=0.5)
+    for ax in axes
+        ax[:grid](alpha=.5)
+        ax[:set_xlim](-0.5, 15)
+    end
+
+    bbox = (0., 1.02, 1., .102)
+    legend_args = {:bbox_to_anchor => bbox, :loc => 3, :mode => "expand"}
+    p_args = {:lw => 2, :alpha => 0.7}
+
+    ax = axes[1]
+    ax[:plot](tt2, tauhatdif,
+              label="time inconsistency differential for tax rate"; p_args...)
+    ax[:set_ylabel](L"$\Delta\tau$", fontsize=16)
+    ax[:set_yticks]((0.0, 0.4, 0.8, 1.2))
+    ax[:legend](ncol=1; legend_args...)
+
+    ax = axes[2]
+    ax[:plot](tt, uhatdif,
+              label=L"time inconsistency differential for $u$"; p_args...)
+    ax[:set_ylabel](L"$\Delta u$", fontsize=16)
+    ax[:set_yticks]((-3.0, -2.0, -1.0, 0.0))
+    ax[:legend](ncol=1; legend_args...)
+
+    ax = axes[3]
+    ax[:plot](tt, mu, label="Lagrange multiplier"; p_args...)
+    ax[:set_ylabel](L"$\mu$", fontsize=16)
+    ax[:set_yticks]((2.34e-3, 2.43e-3, 2.52e-3))
+    ax[:legend](ncol=1; legend_args...)
+
+    ax = axes[4]
+    ax[:plot](tt, G, label="government revenue"; p_args...)
+    ax[:set_ylabel](L"$G$", fontsize=16)
+    ax[:set_yticks]((9200, 9400, 9600, 9800))
+    ax[:legend](ncol=1; legend_args...)
+
+    ax[:set_xlabel](L"time", fontsize=16)
+
+    plt.show()
+end
+
 
 # Primitives
 T    = 20
@@ -244,3 +295,4 @@ hdr = HistDepRamsey(A0, A1, d, Q0, tau0, mu0, bet)
 rp = init_path(hdr, mu0, T)
 compute_ramsey_path!(hdr, rp)  # updates rp in place
 plot1(rp)
+plot2(rp)
