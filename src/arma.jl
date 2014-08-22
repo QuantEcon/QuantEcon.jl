@@ -1,15 +1,15 @@
 #=
 
-@authors: Doc-Jin Jang, Jerry Choi, Thomas Sargent, John Stachurski
+@authors: John Stachurski
+Date: Thu Aug 21 11:09:30 EST 2014
 
 Provides functions for working with and visualizing scalar ARMA processes.
+Ported from Python module quantecon.arma, which was written by Doc-Jin Jang,
+Jerry Choi, Thomas Sargent and John Stachurski
 
-@date: Thu Aug 21 11:09:30 EST 2014
 
 References
 ----------
-
-Simple port of the file quantecon.arma
 
 http://quant-econ.net/arma.html
 
