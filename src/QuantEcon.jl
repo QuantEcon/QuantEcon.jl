@@ -6,6 +6,10 @@ import Base: mean, std, var
 import Distributions: pdf, skewness
 
 export
+# arma
+    ARMA,
+    spectral_density, autocovariance, impulse_response, simulation,
+
 # lqcontrol
     LQ,
     update_values!,
@@ -80,6 +84,7 @@ export
     m_quadratic_sum
 
 ### includes
+include("arma.jl")
 include("compute_fp.jl")
 include("discrete_rv.jl")
 include("distributions.jl")

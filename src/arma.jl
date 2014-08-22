@@ -26,6 +26,8 @@ quad_plot(lp)
 import PyPlot.plt
 using DSP
 
+typealias ScalarOrVector{T} Union(T, Vector{T})
+
 type ARMA
     phi::Vector      # AR parameters phi_1, ..., phi_p
     theta::Vector    # MA parameters theta_1, ..., theta_q
@@ -36,13 +38,16 @@ type ARMA
     ar_poly::Vector  # AR polynomial --- filtering representation
 end
 
-function ARMA{T <: Real}(phi::Union(Vector{T}, T), theta::Union(Vector{T}, T), sigma::T)
-    # == Coerce scalars into a vectors as necessary == #
-    phi = [phi]       
-    theta = [theta]   
+# constructors to coerce phi/theta to vectors
+ARMA(phi::Real, theta::Real=0.0, sigma::Real=1.0) = ARMA([phi], [theta], sigma)
+ARMA(phi::Real, theta::Vector=[0.0], sigma::Real=1.0) = ARMA([phi], theta, sigma)
+ARMA(phi::Vector, theta::Real=0.0, sigma::Real=1.0) = ARMA(phi, theta, sigma)
+
+function ARMA(phi::Vector, theta::Vector=[0.0], sigma::Real=1.0)
     # == Record dimensions == #
     p = length(phi)
     q = length(theta)
+
     # == Build filtering representation of polynomials == #
     ma_poly = [1.0, theta]
     ar_poly = [1.0, -phi]
@@ -77,7 +82,7 @@ function impulse_response(arma::ARMA; impulse_length=30)
     psi_zero = 1.0
     psi = Array(Float64, impulse_length)
     for j = 1:impulse_length
-        psi[j] = theta[j] 
+        psi[j] = theta[j]
         for i = 1:min(j, arma.p)
             psi[j] += arma.phi[i] * (j-i > 0 ? psi[j-i] : psi_zero)
         end
@@ -87,7 +92,7 @@ end
 
 function simulation(arma::ARMA; ts_length=90, impulse_length=30)
     # Simulate the ARMA process arma assuing Gaussian shocks
-    J = impulse_length 
+    J = impulse_length
     T = ts_length
     psi = impulse_response(arma, impulse_length=impulse_length)
     epsilon = arma.sigma * randn(T + J)
@@ -177,9 +182,9 @@ function quad_plot(arma::ARMA)
     fig, axes = plt.subplots(num_rows, num_cols, figsize=(12, 8))
     plt.subplots_adjust(hspace=0.4)
     plot_functions = [plot_impulse_response,
-                     plot_spectral_density,
-                     plot_autocovariance,
-                     plot_simulation]
+                      plot_spectral_density,
+                      plot_autocovariance,
+                      plot_simulation]
     for (plot_func, ax) in zip(plot_functions, reshape(axes, 1, 4))
         plot_func(arma, ax=ax, show=false)
     end
