@@ -22,7 +22,6 @@ lp = ARMA(phi, theta, sigma)
 quad_plot(lp)
 
 =#
-import PyPlot.plt
 
 type ARMA
     phi::Vector      # AR parameters phi_1, ..., phi_p

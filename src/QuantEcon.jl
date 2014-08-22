@@ -7,6 +7,8 @@ import Distributions: pdf, skewness
 
 using DSP: TFFilter, freqz
 
+using PyPlot  # TODO: Get rid of this
+
 
 export
 # arma
