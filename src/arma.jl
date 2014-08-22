@@ -26,8 +26,6 @@ quad_plot(lp)
 import PyPlot.plt
 using DSP
 
-typealias ScalarOrVector{T} Union(T, Vector{T})
-
 type ARMA
     phi::Vector      # AR parameters phi_1, ..., phi_p
     theta::Vector    # MA parameters theta_1, ..., theta_q
