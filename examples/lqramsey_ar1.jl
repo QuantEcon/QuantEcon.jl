@@ -27,7 +27,7 @@ Sd = [0.0 0.0]
 Sb = [0 2.135]
 Ss = [0.0 0.0]
 discrete = false
-proc = (A, C)
+proc = ContStochProcess(A, C)
 
 econ = Economy(bet, Sg, Sd, Sb, Ss, discrete, proc)
 T = 50
