@@ -40,6 +40,13 @@ export
     tauchen,
     rouwenhorst,
 
+# lae
+    LAE,
+    lae_est,
+
+# lqnash
+    nnash,
+
 # lss
     LSS,
     simulate,
@@ -54,10 +61,6 @@ export
     filtered_to_forecast!,
     update!,
     stationary_values,
-
-# lae
-    LAE,
-    lae_est,
 
 # distributions
     BetaBinomial,
@@ -99,6 +102,7 @@ include("kalman.jl")
 include("kalman.jl")
 include("lae.jl")
 include("lqcontrol.jl")
+include("lqnash.jl")
 include("lss.jl")
 include("markov_approx.jl")
 include("matrix_eqn.jl")
@@ -111,4 +115,4 @@ include("quadsums.jl")
 end # module
 
 # include the models file/module
-include("Models.jl")
+include("models.jl")
