@@ -7,13 +7,20 @@ import Distributions: pdf, skewness
 
 using DSP: TFFilter, freqz
 
-using PyPlot  # TODO: Get rid of this
+# using PyPlot  # TODO: Get rid of this
+
+# useful types
+typealias ScalarOrArray{T} Union(T, Array{T})
 
 
 export
 # arma
     ARMA,
     spectral_density, autocovariance, impulse_response, simulation,
+
+# ecdf
+    ECDF,
+    ecdf,
 
 # lqcontrol
     LQ,
@@ -94,6 +101,7 @@ include("arma.jl")
 include("compute_fp.jl")
 include("discrete_rv.jl")
 include("distributions.jl")
+include("ecdf.jl")
 include("estspec.jl")
 include("kalman.jl")
 include("kalman.jl")
