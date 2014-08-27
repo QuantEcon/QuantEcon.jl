@@ -23,20 +23,23 @@ type AssetPrices
     s::Vector
     gamm::Real
     n::Int
+    P_tilde::Matrix
+    P_check::Matrix
 end
 
 
 function AssetPrices(bet::Real, P::Matrix, s::Vector, gamm::Real)
-    return AssetPrices(bet, P, s, gamm, size(P, 1))
+    P_tilde = P .* s'.^(1-gamm)
+    P_check = P .* s'.^(-gamm)
+    return AssetPrices(bet, P, s, gamm, size(P, 1), P_tilde, P_check)
 end
 
 
 function tree_price(ap::AssetPrices)
     # Simplify names
-    P, s, gamm, bet = ap.P, ap.s, ap.gamm, ap.bet
+    P, s, gamm, bet, P_tilde = ap.P, ap.s, ap.gamm, ap.bet, ap.P_tilde
 
     # Compute v
-    P_tilde = P .* s'.^(1-gamm)  # transpose to broadcast in right direction
     I = eye(ap.n)
     O = ones(ap.n)
     v = bet .* ((I - bet .* P_tilde)\ (P_tilde * O))
@@ -46,10 +49,9 @@ end
 
 function consol_price(ap::AssetPrices, zet::Real)
     # Simplify names
-    P, s, gamm, bet = ap.P, ap.s, ap.gamm, ap.bet
+    P, s, gamm, bet, P_check = ap.P, ap.s, ap.gamm, ap.bet, ap.P_check
 
     # Compute v
-    P_check = P .* s'.^(-gamm)  # transpose to broadcast in right direction
     I = eye(ap.n)
     O = ones(ap.n)
     v = bet .* ((I - bet .* P_check)\ (P_check * (zet .*O)))
@@ -60,8 +62,7 @@ end
 function call_option(ap::AssetPrices, zet::Real, p_s::Real,
                      T::Vector{Int}=Int[], epsilon=1e-8)
     # Simplify names, initialize variables
-    P, s, gamm, bet = ap.P, ap.s, ap.gamm, ap.bet
-    P_check = P .* s'.^(-gamm)
+    P, s, gamm, bet, P_check = ap.P, ap.s, ap.gamm, ap.bet, ap.P_check
 
     # Compute consol price
     v_bar = consol_price(ap, zet)
