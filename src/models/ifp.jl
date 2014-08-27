@@ -100,7 +100,7 @@ end
 
 
 function get_greedy(cp::ConsumerProblem, V::Matrix)
-    bellman_operator(cp, v, ret_policy=true)
+    bellman_operator(cp, V, ret_policy=true)
 end
 
 
@@ -141,7 +141,7 @@ end
 
 function coleman_operator(cp::ConsumerProblem, c::Matrix)
     out = similar(c)
-    coleman_operator(cp, c, out)
+    coleman_operator!(cp, c, out)
     return out
 end
 
