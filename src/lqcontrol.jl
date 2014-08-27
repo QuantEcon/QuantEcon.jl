@@ -14,8 +14,6 @@ Simple port of the file quantecon.lqcontrol
 http://quant-econ.net/lqcontrol.html
 
 =#
-typealias ScalarOrArray{T} Union(T, Array{T})
-
 
 type LQ
     Q::Matrix
@@ -140,20 +138,23 @@ function stationary_values(lq::LQ)
 end
 
 
-function compute_sequence(lq::LQ, x0::Vector, ts_length=100)
+function compute_sequence(lq::LQ, x0::ScalarOrArray, ts_length=100)
     # simplify notation
     Q, R, A, B, C = lq.Q, lq.R, lq.A, lq.B, lq.C
 
-    # Preliminaries, finite horizon case
+    # Preliminaries,
     if lq.T != nothing
+        # finite horizon case
         T = min(ts_length, lq.T)
         lq.P, lq.d = lq.Rf, 0.0
     else
+        # infinite horizon case
         T = ts_length
         stationary_values!(lq)
     end
 
     # Set up initial condition and arrays to store paths
+    x0 = reshape([x0], lq.n, 1)  # make sure x0 is a column vector
     x_path = Array(eltype(x0), lq.n, T+1)
     u_path = Array(eltype(x0), lq.k, T)
     w_path = C * randn(lq.j, T+1)
@@ -181,7 +182,7 @@ function compute_sequence(lq::LQ, x0::Vector, ts_length=100)
     end
 
     Ax, Bu = A * x_path[:, T], B * u_path[:, T]
-    x_path[:, T+1] = Ax .+ Bu .+ w_path[:, T]
+    x_path[:, T+1] = Ax .+ Bu .+ w_path[:, T+1]
     return x_path, u_path, w_path
 end
 
