@@ -69,7 +69,7 @@ function bellman_operator!(g::GrowthModel, w::Vector, out::Vector;
     return out
 end
 
-function bellman_operator(g::GrowthModel, w::Vector,
+function bellman_operator(g::GrowthModel, w::Vector;
                           ret_policy::Bool=false)
     out = similar(w)
     bellman_operator!(g, w, out, ret_policy=ret_policy)
@@ -79,7 +79,7 @@ end
     Compute the w-greedy policy on the grid points.
 =#
 function get_greedy!(g::GrowthModel, w::Vector, out::Vector)
-    bellman_operator(g, w, out, ret_policy=true)
+    bellman_operator!(g, w, out, ret_policy=true)
 end
 
 get_greedy(g::GrowthModel, w::Vector) = bellman_operator(g, w, ret_policy=true)
