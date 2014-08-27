@@ -7,8 +7,9 @@ function solve_discrete_lyapunov(A::ScalarOrArray,
                                  B::ScalarOrArray,
                                  max_it::Int=50)
     # TODO: Implement Bartels-Stewardt
-    alpha0 = A
-    gamma0 = B
+    n = size(A, 2)
+    alpha0 = reshape([A], n, n)
+    gamma0 = reshape([B], n, n)
 
     alpha1 = zeros(alpha0)
     gamma1 = zeros(gamma0)
