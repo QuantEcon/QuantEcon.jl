@@ -18,15 +18,16 @@ import DSP
 
 function smooth(x::Array, window_len::Int=7, window::String="hanning")
     if length(x) < window_len
-        error("Input vector length must be >= window length")
+        throw(ArgumentError("Input vector length must be >= window length"))
     end
 
     if window_len < 3
-       error("Window length must be at least 3.")
+       throw(ArgumentError("Window length must be at least 3."))
     end
 
     if iseven(window_len)
-        println("Window length reset to $window_len")
+        window_len += 1
+        println("Window length must be odd, reset to $window_len")
     end
 
     windows = {"hanning" => DSP.hanning,
@@ -80,7 +81,7 @@ function periodogram(x::Vector, window::String, window_len::Int=7)
 end
 
 
-function ar_periodogram(x, window::String, window_len::Int=7)
+function ar_periodogram(x, window::String="hanning", window_len::Int=7)
     # run regression
     x_current, x_lagged = x[2:end], x[1:end-1]  # x_t and x_{t-1}
     coefs = linreg(x_lagged, x_current)

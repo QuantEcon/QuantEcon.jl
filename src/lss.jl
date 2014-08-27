@@ -50,18 +50,34 @@ type LSS
 end
 
 
-function LSS(A::Matrix, C::Matrix, G::Matrix;
-             mu_0::Vector=zeros(size(G, 2)),
+function LSS(A::ScalarOrArray, C::ScalarOrArray, G::ScalarOrArray,
+             mu_0::ScalarOrArray=zeros(size(G, 2)),
              Sigma_0::Matrix=zeros(size(G, 2), size(G, 2)))
     k = size(G, 1)
     n = size(G, 2)
     m = size(C, 2)
+
+    # coerce shapes
+    A = reshape([A], n, n)
+    C = reshape([C], n, m)
+    G = reshape([G], k, n)
+
+    mu_0 = reshape([mu_0], n)
+
+    # define distribution
     if all(Sigma_0 .== 0.0)   # no variance -- no distribution
         dist = FakeMVTNorm(mu_0, Sigma_0)
     else
         dist = MultivariateNormal(mu_0, Sigma_0)
     end
     LSS(A, C, G, k, n, m, mu_0, Sigma_0, dist)
+end
+
+# make kwarg version
+function LSS(A::Matrix, C::Matrix, G::Matrix;
+             mu_0::Vector=zeros(size(G, 2)),
+             Sigma_0::Matrix=zeros(size(G, 2), size(G, 2)))
+    return LSS(A, C, G, mu_0, Sigma_0)
 end
 
 
@@ -82,12 +98,14 @@ function replicate(lss::LSS, t=10, num_reps=100)
     x = Array(Float64, lss.n, num_reps)
     for j=1:num_reps
         x_t, _ = simulate(lss, t+1)
-        x[:, j] = x_T[:, end]
+        x[:, j] = x_t[:, end]
     end
 
     y = lss.G * x
     return x, y
 end
+
+replicate(lss::LSS; t=10, num_reps=100) = replicate(lss, t, num_reps)
 
 
 function moment_sequence(lss::LSS)
