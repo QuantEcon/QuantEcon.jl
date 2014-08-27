@@ -24,12 +24,11 @@ http://quant-econ.net/stationary_densities.html
 type LAE
     p::Function
     X::Matrix
-end
 
-
-function LAE(p::Function, X::Array)
-    n = length(X)
-    LAE(p, reshape(X, n, 1))
+    function LAE(p::Function, X::Array)
+        n = length(X)
+        new(p, reshape(X, n, 1))
+    end
 end
 
 
