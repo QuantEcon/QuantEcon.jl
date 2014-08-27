@@ -13,7 +13,7 @@ Julia port:
    ☐ Matplotlib
    ☐ Pandas
    ☐ IPython Shell and Notebook
- ☐ Part 3: Introductory Applications
+ ✔ Part 3: Introductory Applications @done (14-08-26 01:35)
    ✔ Linear Algebra @done (14-07-10 00:47)
    ✔ Finite Markov Chains
    ✔ Shortest Paths
@@ -26,27 +26,42 @@ Julia port:
    ✔ LQ Control Problems @done (14-07-01 23:27)
    ✔ Rational Expectations Equilibrium @done (14-07-05 17:03)
    ✔ The Lucas Asset Pricing Model @done (14-07-05 17:03)
+      ☐ LucasTree code is really slow.
    ✔ The Permanent Income Model @done (14-07-09 23:47)
- ☐ Part 4: Advanced Applications
+ ✔ Part 4: Advanced Applications @done (14-08-26 01:35)
    ✔ Continuous State Markov Chains @done (14-08-05 00:31)
       ☐ I could not to the reshaping and stop relying on broadcasting. Explicit for loops would be more efficient
       ✔ Do boxplot example shown in exercise 3 @done (14-08-13 13:46)
    ✔ Modeling Career Choice @done (14-08-05 02:13)
       ☐ The solutions notebook matches the python version, but I think we can do better. I think we can design more clever functions so that it is easy for people to call with different arguments
    ✔ On-the-Job Search @done (14-08-14 10:43)
-   ☐ Search with Offer Distribution Unknown
-      ☐ Fix bellman_operator in odu.jl. It is just cycling and not updating properly.
-   ☐ Optimal Savings
-   ☐ Robustness
-   ☐ Linear Stochastic Models
-   ☐ Estimation of Spectra
-   ☐ Optimal Taxation
+   ✔ Search with Offer Distribution Unknown @done (14-08-25 09:07)
+      ✔ Fix bellman_operator in odu.jl. It is just cycling and not updating properly. @done (14-08-25 09:07)
+   ✔ Optimal Savings @done (14-08-25 09:07)
+   ✔ Robustness @done (14-08-25 09:07)
+   ✔ Linear Stochastic Models @done (14-08-25 09:07)
+   ✔ Estimation of Spectra @done (14-08-25 09:07)
+   ✔ Optimal Taxation @done (14-08-25 09:07)
 
 Julia (other):
 
  ☐ Add web references to top of files in examples/
  ☐ Create a macro that takes a function with just positional arguments and creates one with only kwargs
- ☐ I use my meshgrid function a few places. maybe I should just write it once.
+ ✔ I use my meshgrid function a few places. maybe I should just write it once. @done (14-08-26 01:34)
+ ☐ Finish writing quad routines
+
+Juila Tests:
+   ☐ quadsum.jl
+      ☐ Test m_quadratic_sum
+   ✔  asset_pricing.jl @done (14-08-27 10:19)
+   ✔  career.jl @done (14-08-27 10:19)
+   ✔  ifp.jl @done (14-08-27 10:19)
+   ✔  jv.jl @done (14-08-27 10:19)
+   ✔  lucastree.jl @done (14-08-27 10:19)
+   ✔  odu.jl @done (14-08-27 10:19)
+   ✔  optgrowth.jl @done (14-08-27 10:19)
+   ☐  mc_tools.jl
+   ☐  quad.jl
 
 Python:
    ☐ CompEcon
