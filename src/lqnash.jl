@@ -6,7 +6,6 @@ function nnash(a, b1, b2, r1, r2, q1, q2, s1, s2, w1, w2, m1, m2;
     n = size(a)[1]
 
     # Conditional checks
-    # TODO
     if ndims(b1) == 2
         k_1 = size(b1)[2]
     else
