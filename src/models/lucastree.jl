@@ -26,6 +26,8 @@ References
 Simple port of the file quantecon.models.lucastree.py
 
 http://quant-econ.net/markov_asset.html
+
+TODO: refactor. Python is much cleaner.
 =#
 
 
@@ -34,6 +36,39 @@ type LucasTree
     bet::Real
     alpha::Real
     sigma::Real
+    phi::Distribution
+    grid::Union(FloatRange, Vector)
+    grid_min::Real
+    grid_max::Real
+    grid_size::Int
+    _int_min::Real
+    _int_max::Real
+    h::Vector
+
+    # this needs to be an internal constructor because we need to incompletely
+    # initialize the object before we can compute h.
+    function LucasTree(gam::Real, bet::Real, alpha::Real, sigma::Real)
+        phi = LogNormal(0.0, sigma)
+        grid = make_grid(alpha, sigma)
+        grid_min, grid_max, grid_size = minimum(grid), maximum(grid), length(grid)
+        _int_min, _int_max = exp(-4 * sigma), exp(4 * sigma)
+
+        # create lt object without h
+        lt = new(gam, bet, alpha, sigma, phi, grid, grid_min, grid_max, grid_size,
+                 _int_min, _int_max)
+
+        # initialize h
+        h = Array(Float64, grid_size)
+
+        for (i, y) in enumerate(grid)
+            integrand(z) = (y^alpha * z).^(1 - gam)
+            h[i] = bet .* integrate(lt, integrand)
+        end
+
+        # now add h to it
+        lt.h = h
+        lt
+    end
 end
 
 
@@ -51,67 +86,47 @@ function make_grid(alpha, sigma)
 end
 
 
-function integrate(g::Function, int_min::Real, int_max::Real, phi)
+function integrate(lt::LucasTree, g::Function, int_min=nothing,
+                   int_max=nothing)
+    phi = lt.phi
+    if int_min == nothing
+        int_min = lt._int_min
+    end
+
+    if int_max == nothing
+        int_max = lt._int_max
+    end
+
     int_func(x::Real) = g(x) * pdf(phi, x)
     return quadgk(int_func, int_min, int_max)[1]
 end
 
 
 # Set up the Lucas operator T
-function lucas_operator(f::Vector, grid::FloatRange, int_min::Real,
-                        int_max::Real, h::Vector, phi, lt::LucasTree)
+function lucas_operator(lt::LucasTree, f::Vector)
+    grid, h, alpha, bet = lt.grid, lt.h, lt.alpha, lt.bet
+
     Tf = similar(f)
     Af = CoordInterpGrid(grid, f, BCnearest, InterpLinear)
 
     for (i, y) in enumerate(grid)
-        to_integrate(z) = Af[y^lt.alpha * z]
-        Tf[i] = h[i] + lt.bet * integrate(to_integrate, int_min, int_max, phi)
+        to_integrate(z) = Af[y^alpha * z]
+        Tf[i] = h[i] + bet * integrate(lt, to_integrate)
     end
     return Tf
 end
 
 
-function compute_lt_price(lt::LucasTree,
-                          grid::FloatRange=make_grid(lt.alpha, lt.sigma);
-                          verbose=true, print_skip=10)
+function compute_lt_price(lt::LucasTree,;kwargs...)
     # Simplify names, set up distribution phi
-    gam, bet, alpha, sigma = lt.gam, lt.bet, lt.alpha, lt.sigma
-    phi = LogNormal(0.0, sigma)
+    grid, grid_size, gam = lt.grid, lt.grid_size, lt.gam
 
-    # Set up a function for integrating w.r.t. phi
-    int_min, int_max = exp(-4 * sigma), exp(4 * sigma)
+    f_init = zeros(grid)  # Initial condition
+    func(x) = lucas_operator(lt, x)
+    f = compute_fixed_point(func, f_init; kwargs...)
 
-    grid_min, grid_max, grid_size = minimum(grid), maximum(grid), length(grid)
+    # p(y) = f(y) / u'(y) = f(y) * y^gamma
+    price = f .* grid.^(gam)
 
-    # Compute the function h in the Lucas operator as a vector of
-    # values on the grid
-    h = zeros(grid)
-    # Recall that h(y) = beta * int u'(G(y,z)) G(y,z) phi(dz)
-    for (i, y) in enumerate(grid)
-        integrand(z) = (y^alpha * z)^(1 - gam) # u'(G(y,z)) G(y,z)
-        h[i] = bet*integrate(integrand, int_min, int_max, phi)
-    end
-
-    # Now compute the price by iteration
-    err_tol, max_iter = 1e-3, 500
-    err = err_tol + 1.0
-    iterate = 0
-    f = zeros(grid)  # Initial condition
-    while iterate < max_iter && err > err_tol
-        new_f = lucas_operator(f, grid, int_min, int_max, h, phi, lt)
-        iterate += 1
-        err = Base.maxabs(new_f - f)
-        if verbose
-            if iterate % print_skip == 0
-                @printf("Iteration: %d\t error:%.9f\n", iterate, err)
-            end
-        end
-        f = copy(new_f)
-    end
-
-    if iterate == max_iter
-        error("Convergence error in compute_lt_price")
-    end
-
-    return grid, f .* grid .^ gam # p(y) = f(y) / u'(y) = f(y) * y^gamma
+    return price
 end
