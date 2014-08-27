@@ -27,24 +27,33 @@ type RBLQ
     theta::Real
 end
 
-function RBLQ(Q::Matrix, R::Matrix, A::Matrix, B::Matrix, C::Matrix,
-              bet::Real, theta::Real)
+function RBLQ(Q::ScalarOrArray, R::ScalarOrArray, A::ScalarOrArray,
+              B::ScalarOrArray, C::ScalarOrArray, bet::Real, theta::Real)
     k = size(Q, 1)
     n = size(R, 1)
     j = size(C, 2)
+
+    # coerce sizes
+    A = reshape([A], n, n)
+    B = reshape([B], n, k)
+    C = reshape([C], n, j)
+    R = reshape([R], n, n)
+    Q = reshape([Q], k, k)
     RBLQ(A, B, C, Q, R, k, n, j, bet, theta)
 end
 
 
 function d_operator(rlq::RBLQ, P::Matrix)
     C, theta, I = rlq.C, rlq.theta, eye(rlq.j)
-    P + P*C*((theta.*I - C'*P*C) \ (C'P))
+    P + P*C*((theta.*I - C'*P*C) \ (C'*P))
 end
 
 
 function b_operator(rlq::RBLQ, P::Matrix)
     A, B, Q, R, bet = rlq.A, rlq.B, rlq.Q, rlq.R, rlq.bet
-    R - bet^2.*A'*P*B * ((Q+bet.*B'*P*B)\(B'*P*A)) + bet.*A'*P*A
+    F = (Q+bet.*B'*P*B)\(bet.*B'*P*A)
+    bP = R - bet.*A'*P*B * F + bet.*A'*P*A
+    F, bP
 end
 
 
@@ -67,21 +76,27 @@ function robust_rule(rlq::RBLQ)
     return F, K, P
 end
 
+
 function robust_rule_simple(rlq::RBLQ,
                             P::Matrix=zeros(Float64, rlq.n, rlq.n);
                             max_iter=80,
                             tol=1e-8)
+    # Simplify notation
     A, B, C, Q, R = rlq.A, rlq.B, rlq.C, rlq.Q, rlq.R
     bet, theta, k, j = rlq.bet, rlq.theta, rlq.k, rlq.j
     iterate, e = 0, tol + 1.0
 
-    F = similar(P)
+    F = similar(P)  # instantiate so available after loop
 
-    while iterate < max_iter && e > tol
+    while iterate <= max_iter && e > tol
         F, new_P = b_operator(rlq, d_operator(rlq, P))
-        e = norm(new_P - P)
+        e = sqrt(sum((new_P - P).^2))
         iterate += 1
         P = new_P
+    end
+
+    if iterate >= max_iter
+        warn("Maximum iterations in robust_rul_simple")
     end
 
     I = eye(j)
@@ -114,7 +129,7 @@ function K_to_F(rlq::RBLQ, K::Matrix)
     bet, theta = rlq.bet, rlq.theta
 
     A1, B1, Q1, R1 = A+C*K, B, Q, R-bet*theta.*K'*K
-    lq = LQ(Q1, R1, Q1, B1, bet=bet)
+    lq = LQ(Q1, R1, A1, B1, bet=bet)
 
     P, F, d = stationary_values(lq)
 
