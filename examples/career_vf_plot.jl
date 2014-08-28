@@ -11,7 +11,7 @@ References
 http://quant-econ.net/career.html
 =#
 using PyPlot
-using QuantEcon, Models
+using QuantEcon, QuantEcon.Models
 
 # Quick meshgrid function
 meshgrid(x::Vector, y::Vector) = (repmat(x, 1, length(y))',

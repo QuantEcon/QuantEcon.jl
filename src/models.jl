@@ -1,7 +1,7 @@
 module Models
 
 # Import all QuantEcon names
-using QuantEcon
+using ..QuantEcon
 
 # 3rd party dependencies
 using Distributions
