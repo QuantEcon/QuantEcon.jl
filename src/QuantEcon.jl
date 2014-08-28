@@ -39,8 +39,8 @@ export
     draw,
 
 # mc_tools
-    mc_compute_stationary,
-    mc_sample_path,
+    DMarkov,
+    mc_compute_stationary, mc_sample_path, mc_sample_path!,
 
 # mc_tools
     tauchen,
