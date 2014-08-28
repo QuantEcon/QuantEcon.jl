@@ -175,6 +175,9 @@ function qnwnorm(n::Int)
 
     weights ./= sqrt(pi)
     nodes *= sqrt(2)
+
+    nodes = size(nodes, 2) == 1 ? squeeze(nodes, 2) : nodes
+
     return nodes, weights
 end
 
@@ -465,46 +468,48 @@ function qnwnorm(n::Vector{Int}, mu::Vector, sig2::Matrix=eye(length(n)))
     weights = ckron(weights[end:-1:1]...)
     nodes = gridmake(nodes...)
 
-    new_sig2 = sqrtm(sig2)
+    new_sig2 = chol(sig2)
 
     nodes = nodes * new_sig2 .+ mu'
+
+    nodes = size(nodes, 2) == 1 ? squeeze(nodes, 2) : nodes
 
     return nodes, weights
 end
 
 # other types of args
 qnwnorm(n::Vector{Int}, mu::Vector, sig2::Real) =
-    qnwnorm(n, mu, diagm(fill(sig2, length(n))))
+    qnwnorm(n, mu, diagm(fill(convert(Float64, sig2), length(n))))
 
 qnwnorm(n::Vector{Int}, mu::Real, sig2::Matrix=eye(length(n))) =
     qnwnorm(n, fill(mu, length(n)), sig2)
 
 qnwnorm(n::Vector{Int}, mu::Real, sig2::Real) =
-    qnwnorm(n, fill(mu, length(n)), diagm(fill(sig2, length(n))))
+    qnwnorm(n, fill(mu, length(n)), diagm(fill(convert(Float64, sig2), length(n))))
 
 qnwnorm(n::Int, mu::Vector, sig2::Matrix=eye(length(mu))) =
     qnwnorm(fill(n, length(mu)), mu, sig2)
 
 qnwnorm(n::Int, mu::Vector, sig2::Real) =
-    qnwnorm(fill(n, length(mu)), mu, diagm(fill(sig2, length(mu))))
+    qnwnorm(fill(n, length(mu)), mu, diagm(fill(convert(Float64, sig2), length(mu))))
 
 qnwnorm(n::Int, mu::Real, sig2::Matrix=eye(length(mu))) =
     qnwnorm(fill(n, size(sig2, 1)), fill(mu, size(sig2, 1)), sig2)
 
 qnwnorm(n::Int, mu::Real, sig2::Real) =
-    qnwnorm([n], [mu], fill(sig2, 1, 1))
+    qnwnorm([n], [mu], fill(convert(Float64, sig2), 1, 1))
 
 qnwnorm(n::Vector{Int}, mu::Vector, sig2::Vector) =
-    qnwnorm(n, mu, diagm(sig2))
+    qnwnorm(n, mu, diagm(convert(Array{Float64}, sig2)))
 
 qnwnorm(n::Vector{Int}, mu::Real, sig2::Vector) =
-    qnwnorm(n, fill(mu, length(n)), diagm(sig2))
+    qnwnorm(n, fill(mu, length(n)), diagm(convert(Array{Float64}, sig2)))
 
 qnwnorm(n::Int, mu::Vector, sig2::Vector) =
-    qnwnorm(fill(n, length(mu)), mu, diagm(sig2))
+    qnwnorm(fill(n, length(mu)), mu, diagm(convert(Array{Float64}, sig2)))
 
 qnwnorm(n::Int, mu::Real, sig2::Vector) =
-    qnwnorm(fill(n, length(sig2)), fill(mu, length(sig2)), diagm(sig2))
+    qnwnorm(fill(n, length(sig2)), fill(mu, length(sig2)), diagm(convert(Array{Float64}, sig2)))
 
 
 ## Others based off the above
@@ -558,6 +563,8 @@ function qnwequi(n::Int, a::Vector, b::Vector, kind::String="N")
     r = b - a
     nodes = a' .+ nodes .* r'  # use broadcasting here.
     weights = fill((prod(r) / n), n)
+
+    nodes = size(nodes, 2) == 1 ? squeeze(nodes, 2) : nodes
 
     return nodes, weights
 end
