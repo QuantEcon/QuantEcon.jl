@@ -14,9 +14,11 @@ Miranda, Mario J, and Paul L Fackler. Applied Computational Economics
 and Finance, MIT Press, 2002.
 =#
 
-## Utilities
+## ---------------- ##
+#- Helper Functions -#
+## ---------------- ##
 
-function fix!{T <: Real}(x::Array{T}, out::Array{T})
+function fix!{T <: Real}(x::Array{T}, out::Array{Int})
     for i=1:length(x)  # use linear indexing
         out[i] = fix(x[i])
     end
@@ -53,41 +55,12 @@ function gridmake(arrays::Vector...)
     return out
 end
 
-# function gridmake2(x::Vector, y::Vector)
-#     return [repmat(x, length(y)) repeat(y, inner=[length(x)])]
-# end
 
-function make_multidim_func(one_d_func::Function, n, args...)
+## ------------------ ##
+#- Exported Functions -#
+## ------------------ ##
 
-    d = length(n)
-    num_args = length(args)
-    new_args = cell(num_args)
-    for i=1:num_args
-        if length(args[i]) == 1
-            new_args[i] = fill(args[i], d)
-        else
-            new_args[i] = args[i]
-        end
-    end
-
-    nodes = Vector{Float64}[]
-    weights = Vector{Float64}[]
-
-    for i=1:d
-        ai = [x[i] for x in args]
-        _1d = one_d_func(n[i], ai...)
-        push!(nodes, _1d[1])
-        push!(weights, _1d[2])
-    end
-
-    weights = ckron(weights[end:-1:1]...)
-    nodes = gridmake(nodes...)
-    return nodes, weights
-end
-
-
-## 1d Functions
-
+## 1d versions
 function qnwlege(n::Int, a::Real, b::Real)
     maxit = 10000
     m = fix((n + 1) / 2.0)
@@ -385,21 +358,232 @@ function qnwgamma(n::Int, a::Real=1.0, b::Real=1.0)
 end
 
 
+## Multidim versions
+for f in [:qnwlege, :qnwcheb, :qnwsimp, :qnwtrap, :qnwbeta, :qnwgamma]
+    @eval begin
+        function ($f)(n::Vector{Int}, a::Real, b::Real)
+            n_n = length(n)
+            ($f)(n, fill(a, n_n), fill(b, n_n))
+        end
+
+        function ($f)(n::Int, a::Vector, b::Real)
+            n_a = length(a)
+            ($f)(fill(n, n_a), a, fill(b, n_a))
+        end
+
+        function ($f)(n::Int, a::Real, b::Vector)
+            n_b = length(b)
+            ($f)(fill(n, n_b), fill(a, n_b), b)
+        end
+
+        function ($f)(n::Vector{Int}, a::Vector, b::Real)
+            n_n, n_a = length(n), length(a)
+            if n_n != n_a
+                msg = "Cannot construct nodes/weights. n and a have different"
+                msg *= " lengths"
+                error(msg)
+            end
+            ($f)(n, a, fill(b, n_a))
+        end
+
+        function ($f)(n::Vector{Int}, a::Real, b::Vector)
+            n_n, n_b = length(n), length(b)
+            if n_n != n_b
+                msg = "Cannot construct nodes/weights. n and b have different"
+                msg *= " lengths"
+                error(msg)
+            end
+            ($f)(n, fill(a, n_b), b)
+        end
+
+        function ($f)(n::Real, a::Vector, b::Vector)
+            n_a, n_b = length(a), length(b)
+            if n_a != n_b
+                msg = "Cannot construct nodes/weights. a and b have different"
+                msg *= " lengths"
+                error(msg)
+            end
+            ($f)(fill(n, n_a), a, b)
+        end
+
+        function ($f)(n::Vector{Int}, a::Vector, b::Vector)
+            n_n, n_a, n_b = length(n), length(a), length(b)
+
+            if !(n_n == n_a == n_b)
+                error("n, a, and b must have same number of elements")
+            end
+
+            nodes = Vector{Float64}[]
+            weights = Vector{Float64}[]
+
+            for i=1:n_n
+                _1d = $f(n[i], a[i], b[i])
+                push!(nodes, _1d[1])
+                push!(weights, _1d[2])
+            end
+            weights = ckron(weights[end:-1:1]...)
+            nodes = gridmake(nodes...)
+            return nodes, weights
+        end
+    end  # @eval
+end
+
+## Multidim version for qnworm
+#=
+    This function has many methods. I try to describe them here.
+
+    n or mu can be a vector or a scalar. If just one is a scalar the
+    other is repeated to match the length of the other. If both are
+    scalars, then the number of repeats is inferred from sig2.
+
+    sig2 can be a matrix, vector or scalar. If it is a matrix, it is
+    treated as the covariance matrix. If it is a vector, it is
+    considered the diagonal of a diagonal covariance matrix. If it is a
+    scalar it is repeated along the diagonal as many times as necessary,
+    where the number of repeats is determined by the length of either n
+    and/or mu (which ever is a vector).
+
+    If all 3 are scalars, then 1d nodes are computed. mu and sig2 are
+    treated as the mean and variance of a 1d normal distribution
+=#
+function qnwnorm(n::Vector{Int}, mu::Vector, sig2::Matrix=eye(length(n)))
+    n_n, n_mu = length(n), length(mu)
+
+    if !(n_n == n_mu)
+        error("n and mu must have same number of elements")
+    end
+
+    nodes = Vector{Float64}[]
+    weights = Vector{Float64}[]
+
+    for i=1:n_n
+        _1d = qnwnorm(n[i])
+        push!(nodes, _1d[1])
+        push!(weights, _1d[2])
+    end
+
+    weights = ckron(weights[end:-1:1]...)
+    nodes = gridmake(nodes...)
+
+    new_sig2 = sqrtm(sig2)
+
+    nodes = nodes * new_sig2 .+ mu'
+
+    return nodes, weights
+end
+
+# other types of args
+qnwnorm(n::Vector{Int}, mu::Vector, sig2::Real) =
+    qnwnorm(n, mu, diagm(fill(sig2, length(n))))
+
+qnwnorm(n::Vector{Int}, mu::Real, sig2::Matrix=eye(length(n))) =
+    qnwnorm(n, fill(mu, length(n)), sig2)
+
+qnwnorm(n::Vector{Int}, mu::Real, sig2::Real) =
+    qnwnorm(n, fill(mu, length(n)), diagm(fill(sig2, length(n))))
+
+qnwnorm(n::Int, mu::Vector, sig2::Matrix=eye(length(mu))) =
+    qnwnorm(fill(n, length(mu)), mu, sig2)
+
+qnwnorm(n::Int, mu::Vector, sig2::Real) =
+    qnwnorm(fill(n, length(mu)), mu, diagm(fill(sig2, length(mu))))
+
+qnwnorm(n::Int, mu::Real, sig2::Matrix=eye(length(mu))) =
+    qnwnorm(fill(n, size(sig2, 1)), fill(mu, size(sig2, 1)), sig2)
+
+qnwnorm(n::Int, mu::Real, sig2::Real) =
+    qnwnorm([n], [mu], fill(sig2, 1, 1))
+
+qnwnorm(n::Vector{Int}, mu::Vector, sig2::Vector) =
+    qnwnorm(n, mu, diagm(sig2))
+
+qnwnorm(n::Vector{Int}, mu::Real, sig2::Vector) =
+    qnwnorm(n, fill(mu, length(n)), diagm(sig2))
+
+qnwnorm(n::Int, mu::Vector, sig2::Vector) =
+    qnwnorm(fill(n, length(mu)), mu, diagm(sig2))
+
+qnwnorm(n::Int, mu::Real, sig2::Vector) =
+    qnwnorm(fill(n, length(sig2)), fill(mu, length(sig2)), diagm(sig2))
 
 
+## Others based off the above
+function qnwunif(n, a, b)
+    nodes, weights = qnwlege(n, a, b)
+    weights ./= prod(b - a)
+    return nodes, weights
+end
 
 
-#= in multidim macro define functions for
-n::Real, a::Vector, b::Real
-n::Real, a::Vector, b::Vector
-n::Vector, a::Vector, b::Real
-
-ect so that all combinations are covered =#
+function qnwlogn(n, mu, sig2)
+    nodes, weights = qnwnorm(n, mu, sig2)
+    return exp(nodes), weights
+end
 
 
+## qnwequi
+const equidist_pp = sqrt(primes(7920))  # good for d <= 1000
 
+function qnwequi(n::Int, a::Vector, b::Vector, kind::String="N")
+    # error checking
+    n_a, n_b = length(a), length(b)
+    if !(n_a == n_b)
+        error("a and b must have same number of elements")
+    end
 
-qnwlege(n, a, b) = make_multidim_func(qnwlege, n, a, b)
+    d = n_a
+    i = [1:n]''
+    if kind == "N"
+        j = 2.^((1:d)/(d+1))
+        nodes = i*j'
+        nodes -= fix(nodes)
+
+    elseif kind == "W"
+        j = equidist_pp[1:d]
+        nodes = i*j'
+        nodes -= fix(nodes)
+
+    elseif kind == "H"
+        j = equidist_pp[1:d]
+        nodes = (i.*(i+1)./2)*j'
+        nodes -= fix(nodes)
+
+    elseif kind == "R"
+        nodes = rand(n, d)
+
+    else
+        error("Unknown `kind` specified. Valid choices are N, W, H, R")
+    end
+
+    r = b - a
+    nodes = a' .+ nodes .* r'  # use broadcasting here.
+    weights = fill((prod(r) / n), n)
+
+    return nodes, weights
+end
+
+# Other argument types
+qnwequi(n::Vector{Int}, a::Vector, b::Vector, kind::String="N") =
+    qnwequi(prod(n), a, b, kind)
+
+qnwequi(n::Vector{Int}, a::Real, b::Vector, kind::String="N") =
+    qnwequi(prod(n), fill(a, length(b)), b, kind)
+
+qnwequi(n::Vector{Int}, a::Vector, b::Real, kind::String="N") =
+    qnwequi(prod(n), a, fill(b, length(a)), kind)
+
+qnwequi(n::Vector{Int}, a::Real, b::Real, kind::String="N") =
+    qnwequi(prod(n), fill(a, length(n)), fill(b, length(n)), kind)
+
+qnwequi(n::Int, a::Real, b::Vector, kind::String="N") =
+    qnwequi(n, fill(a, length(b)), b, kind)
+
+qnwequi(n::Int, a::Vector, b::Real, kind::String="N") =
+    qnwequi(n, a, fill(b, length(a)), kind)
+
+qnwequi(n::Int, a::Real, b::Real, kind::String="N") =
+    qnwequi(n, [a], [b], kind)
+
 
 
 ## Doing the quadrature
@@ -414,14 +598,31 @@ do_quad(f::Function, nodes::Array, weights::Vector) = dot(f(nodes), weights)
 function quadrect(f::Function, n, a, b, kind="lege", args...; kwargs...)
     if lowercase(kind)[1] == 'l'
         nodes, weights = qnwlege(n, a, b)
+    elseif lowercase(kind)[1] == 'c'
+        nodes, weights = qnwcheb(n, a, b)
+    elseif lowercase(kind)[1] == 't'
+        nodes, weights = qnwtrap(n, a, b)
+    elseif lowercase(kind)[1] == 's'
+        nodes, weights = qnwsimp(n, a, b)
+    else
+        nodes, weights = qnwequi(n, a, b, kind)
     end
 
     return do_quad(f, nodes, weights, args...; kwargs...)
 end
 
+
 function quadrect(f::Function, n, a, b, kind="lege")
     if lowercase(kind)[1] == 'l'
         nodes, weights = qnwlege(n, a, b)
+    elseif lowercase(kind)[1] == 'c'
+        nodes, weights = qnwcheb(n, a, b)
+    elseif lowercase(kind)[1] == 't'
+        nodes, weights = qnwtrap(n, a, b)
+    elseif lowercase(kind)[1] == 's'
+        nodes, weights = qnwsimp(n, a, b)
+    else
+        nodes, weights = qnwequi(n, a, b, kind)
     end
 
     return do_quad(f, nodes, weights)

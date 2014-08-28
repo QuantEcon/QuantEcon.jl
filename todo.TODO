@@ -49,6 +49,18 @@ Julia (other):
  ☐ Create a macro that takes a function with just positional arguments and creates one with only kwargs
  ✔ I use my meshgrid function a few places. maybe I should just write it once. @done (14-08-26 01:34)
  ☐ Finish writing quad routines
+ ☐ quad.jl
+    ✔ qnwcheb @done (14-08-27 17:02)
+    ✔ qnwequi
+    ✔ qnwlege @done (14-08-27 17:02)
+    ✔ qnwnorm @done (14-08-27 17:33)
+    ✔ qnwlogn @done (14-08-27 20:33)
+    ✔ qnwsimp @done (14-08-27 20:36)
+    ✔ qnwtrap @done (14-08-27 20:36)
+    ✔ qnwunif @done (14-08-27 20:36)
+    ✔ quadrect @done (14-08-27 20:36)
+    ✔ qnwbeta @done (14-08-27 20:36)
+    ✔ qnwgamma @done (14-08-27 20:36)
 
 Juila Tests:
    ☐ quadsum.jl
