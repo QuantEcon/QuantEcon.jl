@@ -1,23 +1,27 @@
+#=
+Provides a type called LQ for solving linear quadratic control
+problems.
+
+@author : Chase Coleman <ccoleman@stern.nyu.edu>
+
+@date : 2014-08-26
+
+=#
+
 function nnash(a, b1, b2, r1, r2, q1, q2, s1, s2, w1, w2, m1, m2;
                tol=1e-8, max_iter=1000)
 
     dd = 10
     its = 0
-    n = size(a)[1]
+    n = size(a, 1)
 
-    # Conditional checks
-    if ndims(b1) == 2
-        k_1 = size(b1)[2]
-    else
-        k_1 = 1
-    end
+    # NOTE: if b1/b2 has 2 dimensions, this is exactly what we want.
+    #       if b1/b2 has 1 dimension size(b, 2) returns a 1, so it is also
+    #       what we want
+    k_1 = size(b1, 2)
+    k_2 = size(b2, 2)
 
-    if ndims(b2) == 2
-        k_2 = size(b2)[2]
-    else
-        k_2 = 1
-    end
-
+    # initial values
     v1 = eye(k_1)
     v2 = eye(k_2)
     p1 = zeros(n, n)
