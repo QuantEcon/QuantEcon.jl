@@ -49,7 +49,7 @@ Julia (other):
  ☐ Create a macro that takes a function with just positional arguments and creates one with only kwargs
  ✔ I use my meshgrid function a few places. maybe I should just write it once. @done (14-08-26 01:34)
  ☐ Finish writing quad routines
- ☐ quad.jl
+ ✔ quad.jl @done (14-08-28 12:34)
     ✔ qnwcheb @done (14-08-27 17:02)
     ✔ qnwequi
     ✔ qnwlege @done (14-08-27 17:02)
@@ -72,8 +72,8 @@ Juila Tests:
    ✔  lucastree.jl @done (14-08-27 10:19)
    ✔  odu.jl @done (14-08-27 10:19)
    ✔  optgrowth.jl @done (14-08-27 10:19)
-   ☐  mc_tools.jl
-   ☐  quad.jl
+   ✔  mc_tools.jl @done (14-08-28 12:34)
+   ✔  quad.jl @done (14-08-28 12:34)
 
 Python:
    ☐ CompEcon
