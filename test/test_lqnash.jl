@@ -3,7 +3,6 @@ module TestLQNash
 using QuantEcon
 using Base.Test
 using FactCheck
-using DataStructures
 
 # set up
 a = [.95 0.
@@ -30,20 +29,19 @@ lq_obj = LQ(qlq, rlq, alq, blq, bet=1)
 p, f, d = stationary_values(lq_obj)
 
 
-facts("Checking the policies")
+facts("Testing lqnash.jl") do
 
-    @fact sum(f1) => roughly(sum(f2))
+    context("Checking the policies") do
 
-    @fact sum(f1) => roughly(sum(f))
+        @fact sum(f1) => roughly(sum(f2))
+        @fact sum(f1) => roughly(sum(f))
+    end
 
+    context("Checking the Value Function") do
+
+        @fact p1[1, 1] => roughly(p2[2, 2])
+        @fact p1[1, 1] => roughly(p[1])
+    end
 end
 
-
-facts("Checking the Value Function")
-
-    @fact p1[1, 1] => roughly(p2[2, 2])
-    @fact p1[1, 1] => roughly(p)
-
-end
-
-end
+end  # module

@@ -55,7 +55,7 @@ function LQ(Q::ScalarOrArray,
     end
 
     if Rf == nothing
-        Rf = zeros(R) * NaN
+        Rf = fill(NaN, size(R)...)
     end
 
     # Reshape arrays to make sure they are Matrix
