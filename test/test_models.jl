@@ -17,7 +17,7 @@ function set_up_data(cp::ConsumerProblem)
         v_init, c_init = init_values(cp)
         v_star = compute_fixed_point(x-> bellman_operator(cp, x), v_init,
                                      max_iter=1000, err_tol=1e-7,
-                                     verbose=false)
+                                     verbose=true, print_skip=10)
         write(f, "ifp/v_star", v_star)
     end
 
@@ -36,7 +36,7 @@ function set_up_data(cp::ConsumerProblem)
         v_init, c_init = init_values(cp)
         c_star = compute_fixed_point(x-> coleman_operator(cp, x), c_init,
                                      max_iter=1000, err_tol=1e-7,
-                                     verbose=false)
+                                     verbose=true, print_skip=10)
         write(f, "ifp/c_star", c_star)
     end
 
@@ -56,7 +56,7 @@ function set_up_data(jv::JvWorker)
         v_init = [jv.x_grid .* 0.5]
         v_star = compute_fixed_point(x-> bellman_operator(jv, x), v_init,
                                      max_iter=1000, err_tol=1e-7,
-                                     verbose=false)
+                                     verbose=true, print_skip=10)
         write(f, "jv/v_star", v_star)
     end
 
