@@ -1,13 +1,12 @@
 module QuantEcon
 
-using Distributions
-
 import Base: mean, std, var
+
+# 3rd party
+using Distributions
 import Distributions: pdf, skewness
-
 using DSP: TFFilter, freqz
-
-# using PyPlot  # TODO: Get rid of this
+using PyPlot  # TODO: Get rid of this
 
 # useful types
 typealias ScalarOrArray{T} Union(T, Array{T})
@@ -40,8 +39,8 @@ export
     draw,
 
 # mc_tools
-    mc_compute_stationary,
-    mc_sample_path,
+    DMarkov,
+    mc_compute_stationary, mc_sample_path, mc_sample_path!,
 
 # mc_tools
     tauchen,
@@ -89,7 +88,8 @@ export
     evaluate_F,
 
 # quad
-    qnwlege,
+    qnwlege, qnwcheb, qnwsimp, qnwtrap, qnwbeta, qnwgamma, qnwequi, qnwnorm,
+    qnwunif, qnwlogn,
     quadrect,
     gridmake,
     do_quad,
@@ -119,8 +119,8 @@ include("robustlq.jl")
 include("quad.jl")
 include("quadsums.jl")
 
+# include the models file/module
+include("Models.jl")
 
 end # module
 
-# include the models file/module
-include("models.jl")

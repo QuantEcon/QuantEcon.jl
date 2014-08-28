@@ -2,7 +2,7 @@ module TestModels
 
 include("util.jl")
 
-using QuantEcon, Models
+using QuantEcon, QuantEcon.Models
 using Distributions
 using Base.Test
 using FactCheck
