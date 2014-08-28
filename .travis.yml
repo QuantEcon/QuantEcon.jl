@@ -14,4 +14,7 @@ before_install:
   - sudo apt-get install libpcre3-dev julia -y
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
 script:
-  - julia -e 'Pkg.init(); Pkg.clone(pwd()); Pkg.test("QuantEcon")'
+  - julia -e 'Pkg.init(); Pkg.clone(pwd())'
+  - julia -e 'Pkg.test("QuantEcon"; coverage=true)'
+after_success:
+  - julia -e 'cd(Pkg.dir("QuantEcon")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'

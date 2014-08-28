@@ -6,7 +6,6 @@ import Base: mean, std, var
 using Distributions
 import Distributions: pdf, skewness
 using DSP: TFFilter, freqz
-using PyPlot  # TODO: Get rid of this
 
 # useful types
 typealias ScalarOrArray{T} Union(T, Array{T})

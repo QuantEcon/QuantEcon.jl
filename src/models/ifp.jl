@@ -17,8 +17,6 @@ http://quant-econ.net/ifp.html
 # @pyimport scipy.optimize as opt
 # brentq = opt.brentq
 
-using Debug
-
 type ConsumerProblem
     u::Function
     du::Function

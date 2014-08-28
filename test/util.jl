@@ -12,7 +12,7 @@ const data_path = joinpath(test_path, "data")
 const data_file_name = joinpath(data_path, "testing_data.jld")
 
 const quad_data_file_name = joinpath(data_path, "matlab_quad.mat")
-const ml_quad_data_url = "https://s3.amazonaws.com/quantecon-jl-data/matlab_quad.mat"
+const ml_quad_data_url = "https://github.com/spencerlyon2/QuantEcon.jl/releases/download/v0.0.1/matlab_quad.mat"
 
 if !(isfile(quad_data_file_name))
     try
