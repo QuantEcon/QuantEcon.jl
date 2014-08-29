@@ -58,6 +58,11 @@ facts("Testing mc_tools.jl") do
         @fact mc_compute_stationary(d4) => eye(2)
     end
 
+    context("test DMarkov throws errors") do
+        @fact_throws DMarkov(rand(4, 5))  # not square
+        @fact_throws DMarkov([0.0 0.5; 0.2 0.8])  # first row doesn't sum to 1
+    end
+
 
 
 end  # facts

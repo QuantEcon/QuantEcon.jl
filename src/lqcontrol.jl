@@ -185,8 +185,3 @@ function compute_sequence(lq::LQ, x0::ScalarOrArray, ts_length=100)
     x_path[:, T+1] = Ax .+ Bu .+ w_path[:, T+1]
     return x_path, u_path, w_path
 end
-
-
-
-
-
