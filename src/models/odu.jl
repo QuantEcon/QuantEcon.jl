@@ -13,7 +13,6 @@ References
 http://quant-econ.net/odu.html
 
 =#
-
 type SearchProblem
     bet::Real
     c::Real
@@ -28,6 +27,8 @@ type SearchProblem
     pi_min::Real
     pi_max::Real
     pi_grid::Union(Vector, Range)
+    quad_nodes::Vector
+    quad_weights::Vector
 end
 
 
@@ -48,9 +49,11 @@ function SearchProblem(bet=0.95, c=0.6, F_a=1, F_b=1, G_a=3, G_b=1.2,
     w_grid = linspace_range(0, w_max, w_grid_size)
     pi_grid = linspace_range(pi_min, pi_max, pi_grid_size)
 
+    nodes, weights = qnwlege(21, 0.0, w_max)
+
     SearchProblem(bet, c, F, G, f, g,
                   w_grid_size, w_max, w_grid,
-                  pi_grid_size, pi_min, pi_max, pi_grid)
+                  pi_grid_size, pi_min, pi_max, pi_grid, nodes, weights)
 end
 
 # make kwarg version
@@ -67,11 +70,11 @@ function q(sp::SearchProblem, w, pi_val)
     return clamp(new_pi, sp.pi_min, sp.pi_max)
 end
 
-
 function bellman_operator!(sp::SearchProblem, v::Matrix, out::Matrix;
                           ret_policy::Bool=false)
     # Simplify names
     f, g, bet, c = sp.f, sp.g, sp.bet, sp.c
+    nodes, weights = sp.quad_nodes, sp.quad_weights
 
     vf = CoordInterpGrid((sp.w_grid, sp.pi_grid), v, BCnan, InterpLinear)
 
@@ -88,8 +91,16 @@ function bellman_operator!(sp::SearchProblem, v::Matrix, out::Matrix;
             _pi = sp.pi_grid[pi_j]
 
             # calculate v2
-            integrand(m) = vf[m, q(sp, m, _pi)] * (_pi*f(m) + (1-_pi)*g(m))
-            integral, error = quadgk(integrand, 0, sp.w_max)
+            function integrand(m)
+                quad_out = similar(m)
+                for i=1:length(m)
+                    mm = m[i]
+                    quad_out[i] = vf[mm, q(sp, mm, _pi)] * (_pi*f(mm) +
+                                                            (1-_pi)*g(mm))
+                end
+                return quad_out
+            end
+            integral = do_quad(integrand, nodes, weights)
             # integral = do_quad(integrand, q_nodes, q_weights)
             v2 = c + bet * integral
 
