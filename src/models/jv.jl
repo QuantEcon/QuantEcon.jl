@@ -31,6 +31,8 @@ type JvWorker
     G::Function
     pi_func::Function
     F::UnivariateDistribution
+    quad_nodes::Vector
+    quad_weights::Vector
 end
 
 
@@ -38,6 +40,12 @@ function JvWorker(A=1.4, alpha=0.6, bet=0.96, grid_size=50)
     G(x, phi) = A .* (x .* phi).^alpha
     pi_func = sqrt
     F = Beta(2, 2)
+
+    # integration bounds
+    a, b, = quantile(F, 0.005), quantile(F, 0.995)
+
+    # quadrature nodes/weights
+    nodes, weights = qnwlege(21, a, b)
 
     # Set up grid over the state space for DP
     # Max of grid is the max of a large quantile value for F and the
@@ -48,7 +56,7 @@ function JvWorker(A=1.4, alpha=0.6, bet=0.96, grid_size=50)
     # CoordInterpGrid below
     x_grid = linspace_range(epsilon, grid_max, grid_size)
 
-    JvWorker(A, alpha, bet, x_grid, G, pi_func, F)
+    JvWorker(A, alpha, bet, x_grid, G, pi_func, F, nodes, weights)
 end
 
 # make kwarg version
@@ -69,12 +77,10 @@ function bellman_operator!(jv::JvWorker, V::Vector,
                            brute_force=true, ret_policies=false)
     # simplify notation
     G, pi_func, F, bet = jv.G, jv.pi_func, jv.F, jv.bet
+    nodes, weights = jv.quad_nodes, jv.quad_weights
 
     # prepare interpoland of value function
     Vf = CoordInterpGrid(jv.x_grid, V, BCnearest, InterpLinear)
-
-    # prepare integration bounds
-    a, b, = quantile(F, 0.005), quantile(F, 0.995)
 
     # instantiate variables so they are available outside loop and exist
     # within it
@@ -113,8 +119,8 @@ function bellman_operator!(jv::JvWorker, V::Vector,
 
         function w(z)
             s, phi = z
-            h(u) = Vf[max(G(x, phi), u)] * pdf(F, u)
-            integral, err = quadgk(h, a, b)
+            h(u) = Vf[max(G(x, phi), u)] .* pdf(F, u)
+            integral = do_quad(h, nodes, weights)
             q = pi_func(s) * integral + (1.0 - pi_func(s)) * Vf[G(x, phi)]
 
             return - x * (1.0 - phi - s) - bet * q
@@ -162,7 +168,6 @@ function bellman_operator(jv::JvWorker, V::Vector; brute_force=true,
                      ret_policies=ret_policies)
     return out
 end
-
 
 function get_greedy!(jv::JvWorker, V::Vector, out::(Vector, Vector);
                      brute_force=true)
