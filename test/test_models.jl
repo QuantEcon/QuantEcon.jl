@@ -291,7 +291,10 @@ facts("Testing lucastree.jl") do
     context("test integrate") do
         g(x) = x .* 0.0 + 1.0
         est = Models.integrate(lt, g)
-        exact = cdf(lt.phi, lt._int_max) - cdf(lt.phi, lt._int_min)
+
+        # Same as bounds in lucastree.jl
+        _int_min, _int_max = exp(-4 * σ), exp(4 * σ)
+        exact = cdf(lt.phi, _int_max) - cdf(lt.phi, _int_min)
 
         @fact abs(est - exact) <= 0.1 => true
     end

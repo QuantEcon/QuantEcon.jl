@@ -41,8 +41,8 @@ type LucasTree
     grid_min::Real
     grid_max::Real
     grid_size::Int
-    _int_min::Real
-    _int_max::Real
+    quad_nodes::Vector
+    quad_weights::Vector
     h::Vector
 
     # this needs to be an internal constructor because we need to incompletely
@@ -52,10 +52,11 @@ type LucasTree
         grid = make_grid(alpha, sigma)
         grid_min, grid_max, grid_size = minimum(grid), maximum(grid), length(grid)
         _int_min, _int_max = exp(-4 * sigma), exp(4 * sigma)
+        n, w = qnwlege(21, _int_min, _int_max)
 
         # create lt object without h
         lt = new(gam, bet, alpha, sigma, phi, grid, grid_min, grid_max, grid_size,
-                 _int_min, _int_max)
+                 n, w)
 
         # initialize h
         h = Array(Float64, grid_size)
@@ -86,19 +87,10 @@ function make_grid(alpha, sigma)
 end
 
 
-function integrate(lt::LucasTree, g::Function, int_min=nothing,
-                   int_max=nothing)
-    phi = lt.phi
-    if int_min == nothing
-        int_min = lt._int_min
-    end
-
-    if int_max == nothing
-        int_max = lt._int_max
-    end
-
-    int_func(x::Real) = g(x) * pdf(phi, x)
-    return quadgk(int_func, int_min, int_max)[1]
+function integrate(lt::LucasTree, g::Function, qn::Array=lt.quad_nodes,
+                   qw::Array=lt.quad_weights)
+    int_func(x) = g(x) .* pdf(lt.phi, x)
+    return do_quad(int_func, qn, qw)
 end
 
 
@@ -117,7 +109,7 @@ function lucas_operator(lt::LucasTree, f::Vector)
 end
 
 
-function compute_lt_price(lt::LucasTree,;kwargs...)
+function compute_lt_price(lt::LucasTree; kwargs...)
     # Simplify names, set up distribution phi
     grid, grid_size, gam = lt.grid, lt.grid_size, lt.gam
 
