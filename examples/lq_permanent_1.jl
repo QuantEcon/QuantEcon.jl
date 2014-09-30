@@ -40,11 +40,15 @@ for i=1:n_rows
 end
 bbox = [0.0, 1.02, 1.0, 0.102]
 
-axes[1][:plot](2:T+1, income, "g-", label="non-financial income", lw=2, alpha=0.7)
+# Make first plot
+axes[1][:plot](2:T+1, income, "g-", label="non-financial income", lw=2,
+               alpha=0.7)
 axes[1][:plot](1:T, c, "k-", label="consumption", lw=2, alpha=0.7)
 axes[1][:legend](ncol=2, bbox_to_anchor=bbox, loc=3, mode="expand")
 
-axes[2][:plot](2:T+1, cumsum(income .- mu), "r-", label="cumulative unanticipated income", lw=2, alpha=0.7)
+# Make second plot
+axes[2][:plot](2:T+1, cumsum(income .- mu), "r-",
+               label="cumulative unanticipated income", lw=2, alpha=0.7)
 axes[2][:plot](1:T+1, assets, "b-", label="assets", lw=2, alpha=0.7)
 axes[2][:plot](1:T, zeros(T), "k-")
 axes[2][:legend](ncol=2, bbox_to_anchor=bbox, loc=3, mode="expand")
