@@ -96,7 +96,7 @@ function bellman_operator!(jv::JvWorker, V::Vector,
         c2(z) = z[1] - epsilon
         c3(z) = z[2] - epsilon
         guess = (0.2, 0.2)
-        constraints = [{"type" => "ineq", "fun"=> i} for i in [c1, c2, c3]]
+        constraints = [@compat Dict("type" => "ineq", "fun"=> i) for i in [c1, c2, c3]]
         if typeof(out) <: Tuple
             msg = "Multiple output arrays given. There is only one value"
             msg = " function.\nDid you mean to pass ret_policies=true?"
@@ -140,9 +140,9 @@ function bellman_operator!(jv::JvWorker, V::Vector,
                 end
             end
         else
+            options = @compat Dict("disp"=>0)
             max_s, max_phi = minimize(w, guess, constraints=constraints,
-                                      options={"disp"=> 0},
-                                      method="SLSQP")["x"]
+                                      options, method="SLSQP")["x"]
 
             max_val = -w((max_s, max_phi), x, a, b, Vf, jv)
 
