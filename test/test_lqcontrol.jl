@@ -4,7 +4,7 @@ using QuantEcon
 using Base.Test
 using FactCheck
 
-rough_kwargs = {:atol => 1e-14, :rtol => 1e-4}
+rough_kwargs = {:atol => 1e-13, :rtol => 1e-4}
 
 # set up
 q = 1.
