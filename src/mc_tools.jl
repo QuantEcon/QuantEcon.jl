@@ -13,86 +13,140 @@ Simple port of the file quantecon.mc_tools
 http://quant-econ.net/finite_markov.html
 =#
 
-type DMarkov{T <: Real}
-    P::Matrix{T}
-    n::Int
-    pi_0::Vector
+using Graphs
+using Distributions
+import Base: isapprox, show
+#
+
+# new method to check if all elements of an array x are equal to p
+isapprox(x::Array,p::Number) = all([isapprox(x[i],p) for i=1:length(x)])
+isapprox(p::Number,x::Array) = isapprox(x,p)
+
+type MarkovChain
+    p::Matrix # valid stochastic matrix
+
+    function MarkovChain{T}(p::Matrix{T})
+        n,m = size(p)
+
+        n != m && throw(ArgumentError("stochastic matrix must be square"))
+        any(p .< 0) &&
+            throw(ArgumentError("stochastic matrix must have nonnegative elements"))
+        isapprox(sum(p,2),one(T)) ||
+            throw(ArgumentError("stochastic matrix rows must sum to 1"))
+        new(p)
+    end
+end
+
+n_states(mc::MarkovChain) = size(mc.p,1)
+
+function Base.show(io::IO, mc::MarkovChain)
+    println(io, "Discrete Markov Chain")
+    println(io, "stochastic matrix:")
+    println(io, mc.p)
 end
 
 
-function DMarkov(P::Matrix, pi_0::Vector=ones(size(P, 1))./size(P, 1))
-    n, m = size(P)
+# function to solve x(P-I)=0 by eigendecomposition
+function eigen_solve(p::Matrix)
+    ef = eigfact(p)
+    isunit = map(x->isapprox(x,1), ef.values)
+    x = ef.vectors[:, isunit]
+    x ./= norm(x,1) # normalisation
+    any(x .< 0) && throw("something has gone wrong with the eigen solve")
+    abs(x) # avoid entries like '-0' appearing
+end
 
-    if n != m
-        throw(ArgumentError("P must be a square matrix"))
+# function to solve x(P-I)=0 by lu decomposition
+function lu_solve{T}(p::Matrix{T})
+    n,m = size(p)
+    x   = vcat(Array(T,n-1),one(T))
+    u   = lufact(p - one(p))[:U]
+    for i = n-1:-1:1 # backsubstitution
+        x[i] = -sum([x[j]*u[i,j] for j=i:n])/u[i,i]
+    end
+    x ./= norm(x,1) # normalisation
+    for i = 1:length(x)
+        x[i] = isapprox(x[i],zero(T)) ? zero(T) : x[i]
+    end
+    any(x .< 0) && warn("something has gone wrong with the lu solve")
+    x
+end
+
+# find the reducible subsets of a markov chain
+function reducible_subsets(mc::MarkovChain)
+    p = bool(mc.p)
+    g = simple_graph(n_states(mc))
+    for i = 1:length(p)
+        j,k = ind2sub(size(p),i) # j: node from, k: node to
+        p[i] && add_edge!(g,j,k)
     end
 
-    if any(abs(sum(P, 2) - 1.0) .> 1e-14)
-        throw(ArgumentError("The rows of P must sum to 1"))
+    classes = strongly_connected_components(g)
+    length(classes) == 1 && return classes
+
+    sinks = Bool[] # which classes are sinks
+    for class in classes
+        sink = false
+        for vertex in class
+            targets = map(x->target(x,g),out_edges(vertex,g))
+            sink = sink|!any(map(x->x∉class,targets)) # are there any paths out class
+        end
+        push!(sinks,sink)
     end
-
-    DMarkov(P, n, pi_0)
+    return classes[sinks]
 end
 
+# mc_compute_stationary()
+# calculate the stationary distributions associated with a N-state markov chain
+# output is a N x M matrix where each column is a stationary distribution
+# currently using lu decomposition to solve p(P-I)=0
+function mc_compute_stationary(mc::MarkovChain)
+    p,T = mc.p,eltype(mc.p)
+    classes = reducible_subsets(mc)
 
-function mc_compute_stationary{T <: Real}(P::Matrix{T})
-    ef = eigfact(P')
-    unit_eigvecs = ef.vectors[:, abs(ef.values - 1.0) .< 1e-12]
-    unit_eigvecs ./ sum(unit_eigvecs, 1)
+    # irreducible mc
+    length(classes) == 1 && return lu_solve(p')
+
+    # reducible mc
+    stationary_dists = Array(T,n_states(mc),length(classes))
+    for i = 1:length(classes)
+        class  = classes[i]
+        dist   = zeros(T,n_states(mc))
+        temp_p = p[class,class]
+        dist[class] = lu_solve(temp_p')
+        stationary_dists[:,i] = dist
+    end
+    return stationary_dists
 end
 
+# mc_sample_path()
+# simulate a discrete markov chain starting from some initial value
+# mc::MarkovChain
+# init::Int initial state (default: choose an initial state at random)
+# sample_size::Int number of samples to output (default: 1000)
+function mc_sample_path(mc::MarkovChain,
+                        init::Int=rand(1:n_states(mc)),
+                        sample_size::Int=1000)
+    p       = float(mc.p) # ensure floating point input for Categorical()
+    dist    = [Categorical(vec(p[i,:])) for i=1:n_states(mc)]
+    samples = [init]
+    for t=2:sample_size
+        last = samples[end]
+        push!(samples,rand(dist[last]))
+    end
+    samples
+end
+
+# starting from unknown state, given a distribution
+function mc_sample_path(mc::MarkovChain,
+                        init::Vector,
+                        sample_size::Int=1000)
+    init = float(init) # ensure floating point input for Categorical()
+    mc_sample_path(mc,rand(Categorical(init)),sample_size)
+end
 
 # simulate markov chain starting from some initial value. In other words
 # out[1] is already defined as the user wants it
-function mc_sample_path!(P::Matrix, out::Vector)
-    # turn each row into a distribution
-    # In particular, let P_dist[i] be the distribution corresponding to
-    # the i-th row P[i,:]
-    n = size(P, 1)
-    PP = P'
-    P_dist = [DiscreteRV(PP[:, i]) for i=1:n]
-
-    for t=2:length(out)
-        out[t] = draw(P_dist[out[t-1]])
-    end
-    nothing
-end
-
-
-# function to match python interface
-function mc_sample_path(P::Matrix, init::Int=1, sample_size::Int=1000)
-    out = Array(Int, sample_size)
-    out[1] = init
-    mc_sample_path!(P, out)
-    out
-end
-
-
-# starting from unknown state, given a distribution
-function mc_sample_path(P::Matrix, init::Vector, sample_size::Int=1000)
-    out = Array(Int, sample_size)
-    out[1] = draw(DiscreteRV(init))
-    mc_sample_path!(P, out)
-    out
-end
-
-
-## ---------------- ##
-#- Methods for type -#
-## ---------------- ##
-mc_compute_stationary(dm::DMarkov) = mc_compute_stationary(dm.P)
-
-
-function mc_sample_path(dm::DMarkov, sample_size=1000)
-    mc_compute_stationary(dm.P, dm.pi_0, sample_size)
-end
-
-
-function mc_sample_path(dm::DMarkov, init::ScalarOrArray, sample_size::Int=1000)
-    mc_sample_path(dm.P, init, sample_size)
-end
-
-
-function mc_sample_path(dm::DMarkov, sample_size::Int=1000)
-    mc_sample_path(dm.P, dm.pi_0, sample_size)
+function mc_sample_path!(mc::MarkovChain, samples::Vector)
+    samples = mc_sample_path(mc,samples[1],samples)
 end
