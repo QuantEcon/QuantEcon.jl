@@ -6,6 +6,7 @@ import Base: mean, std, var
 using Distributions
 import Distributions: pdf, skewness
 using DSP: TFFilter, freqz
+using Compat
 
 # useful types
 typealias ScalarOrArray{T} Union(T, Array{T})
