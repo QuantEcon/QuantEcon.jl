@@ -13,11 +13,6 @@ Simple port of the file quantecon.mc_tools
 http://quant-econ.net/finite_markov.html
 =#
 
-using Graphs
-using Distributions
-import Base: isapprox, show
-#
-
 # new method to check if all elements of an array x are equal to p
 isapprox(x::Array,p::Number) = all([isapprox(x[i],p) for i=1:length(x)])
 isapprox(p::Number,x::Array) = isapprox(x,p)
@@ -44,7 +39,6 @@ function Base.show(io::IO, mc::MarkovChain)
     println(io, "stochastic matrix:")
     println(io, mc.p)
 end
-
 
 # function to solve x(P-I)=0 by eigendecomposition
 function eigen_solve(p::Matrix)
@@ -73,7 +67,7 @@ function lu_solve{T}(p::Matrix{T})
 end
 
 # find the reducible subsets of a markov chain
-function reducible_subsets(mc::MarkovChain)
+function irreducible_subsets(mc::MarkovChain)
     p = bool(mc.p)
     g = simple_graph(n_states(mc))
     for i = 1:length(p)
@@ -86,10 +80,15 @@ function reducible_subsets(mc::MarkovChain)
 
     sinks = Bool[] # which classes are sinks
     for class in classes
-        sink = false
-        for vertex in class
+        sink = true
+        for vertex in class # attempt to falsify class being a sink
             targets = map(x->target(x,g),out_edges(vertex,g))
-            sink = sink|!any(map(x->x∉class,targets)) # are there any paths out class
+            notsink = any(map(x->x∉class,targets))
+
+            if notsink # are there any paths out class?
+                sink = false
+                break # stop looking
+            end
         end
         push!(sinks,sink)
     end
@@ -102,7 +101,7 @@ end
 # currently using lu decomposition to solve p(P-I)=0
 function mc_compute_stationary(mc::MarkovChain)
     p,T = mc.p,eltype(mc.p)
-    classes = reducible_subsets(mc)
+    classes = irreducible_subsets(mc)
 
     # irreducible mc
     length(classes) == 1 && return lu_solve(p')
@@ -129,10 +128,11 @@ function mc_sample_path(mc::MarkovChain,
                         sample_size::Int=1000)
     p       = float(mc.p) # ensure floating point input for Categorical()
     dist    = [Categorical(vec(p[i,:])) for i=1:n_states(mc)]
-    samples = [init]
-    for t=2:sample_size
-        last = samples[end]
-        push!(samples,rand(dist[last]))
+    samples = Array(Int,sample_size+1) # +1 extra for the init
+    samples[1] = init
+    for t=2:length(samples)
+        last = samples[t-1]
+        samples[t]= rand(dist[last])
     end
     samples
 end
