@@ -1,12 +1,13 @@
 module QuantEcon
 
-import Base: mean, std, var
+import Base: mean, std, var, show, isapprox
 
 # 3rd party
-using Distributions
+using Distributions, Graphs
 import Distributions: pdf, skewness
 using DSP: TFFilter, freqz
 using Compat
+
 
 # useful types
 typealias ScalarOrArray{T} Union(T, Array{T})
@@ -39,7 +40,7 @@ export
     draw,
 
 # mc_tools
-    DMarkov,
+    MarkovChain,
     mc_compute_stationary, mc_sample_path, mc_sample_path!,
 
 # mc_tools

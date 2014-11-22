@@ -10,11 +10,21 @@ P1 = [1 0 0; .2 .5 .3; 0 0 1]
 P2 = [.7 .3 0; 0 .5 .5; 0 .9 .1]
 P3 = [0.4 0.6; 0.2 0.8]
 P4 = eye(2)
+P5 = [
+     0. 1. 0. 0. 0. 0.
+     1. 0. 0. 0. 0. 0.
+     0.5 0. 0. 0.5 0. 0.
+     0. 0. 0. 0. 1. 0.
+     0. 0. 0. 0. 0. 1.
+     0. 0. 0. 1. 0. 0.
+     ]
+P5_stationary = hcat([1/2, 1/2, 0, 0, 0, 0],[0, 0, 0, 1/3, 1/3, 1/3])
 
-d1 = DMarkov(P1)
-d2 = DMarkov(P2)
-d3 = DMarkov(P3)
-d4 = DMarkov(P4)
+d1 = MarkovChain(P1)
+d2 = MarkovChain(P2)
+d3 = MarkovChain(P3)
+d4 = MarkovChain(P4)
+d5 = MarkovChain(P5)
 
 function KMR_Markov_matrix_sequential(N, p, epsilon)
     """
@@ -44,28 +54,21 @@ end
 
 facts("Testing mc_tools.jl") do
 
-    context("test mc_compute_stationary works same on DMarkov and P") do
-        @fact mc_compute_stationary(d1) => mc_compute_stationary(P1)
-        @fact mc_compute_stationary(d2) => mc_compute_stationary(P2)
-        @fact mc_compute_stationary(d3) => mc_compute_stationary(P3)
-        @fact mc_compute_stationary(d4) => mc_compute_stationary(P4)
-    end
-
-    context("Text mc_compute_stationary using exact solutions") do
+    context("test mc_compute_stationary using exact solutions") do
         @fact mc_compute_stationary(d1) => eye(3)[:, [1, 3]]
-        @fact mc_compute_stationary(d2) => roughly([0 9/14 5/14]')
-        @fact mc_compute_stationary(d3) => roughly([1/4 3/4]')
+        @fact mc_compute_stationary(d2) => roughly([0, 9/14, 5/14])
+        @fact mc_compute_stationary(d3) => roughly([1/4, 3/4])
         @fact mc_compute_stationary(d4) => eye(2)
+        @fact mc_compute_stationary(d5) => roughly(P5_stationary)
     end
 
-    context("test DMarkov throws errors") do
-        @fact_throws DMarkov(rand(4, 5))  # not square
-        @fact_throws DMarkov([0.0 0.5; 0.2 0.8])  # first row doesn't sum to 1
+    context("test MarkovChain throws errors") do
+        @fact_throws MarkovChain(rand(4, 5))  # not square
+        @fact_throws MarkovChain([0.0 0.5; 0.2 0.8])  # first row doesn't sum to 1
+        @fact_throws MarkovChain([-1 1; 0.2 0.8])  # negative element, but sums to 1
     end
-
-
-
 end  # facts
+
 end  # module
 
 # TODO: P = KMR_Markov_matrix_sequential(27, 1/3, 1e-2) will fail without
