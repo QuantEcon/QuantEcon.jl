@@ -1,7 +1,6 @@
 module TestGTHSolve
 
-# using QuantEcon
-include ("gth_solve.jl")
+using QuantEcon
 using Base.Test
 using FactCheck
 
