@@ -46,7 +46,7 @@ export
 # gth_solve
     gth_solve,
 
-# mc_tools
+# markov_approx
     tauchen,
     rouwenhorst,
 
