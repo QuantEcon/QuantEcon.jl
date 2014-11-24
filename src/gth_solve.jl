@@ -18,20 +18,22 @@ References
 =#
 
 
-function gth_solve{T}(A::Matrix{T}, overwrite=false)
+function gth_solve{T}(A::Matrix{T})
     if ndims(A) != 2 || size(A, 1) != size(A, 2)
         throw(ArgumentError("matrix must be square"))
     end
 
-    if overwrite == false
-        A1 = copy(A)
+    if T <: Int
+        A1 = convert(AbstractMatrix{Float64}, A)
+        T_x = Float64
     else
-        A1 = A
+        A1 = copy(A)
+        T_x = T
     end
 
-    n = size(A, 1)
+    n = size(A1, 1)
 
-    x = zeros(T, n)
+    x = zeros(T_x, n)
 
     # === Reduction === #
     for k in 1:n-1

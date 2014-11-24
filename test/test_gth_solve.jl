@@ -10,8 +10,8 @@ P1 = [0.4 0.6; 0.2 0.8]
 P1_stationary = [0.25, 0.75]
 P2 = [1 0; 0 1]
 P2_stationary = [1, 0]  # Stationary dist whose support contains index 1
-P5 = [-1 1; 4 -4]  # Transition rate matrix
-P5_stationary = [0.8, 0.2]
+P5 = [-3 3; 4 -4]  # Transition rate matrix
+P5_stationary = [4/7, 3/7]
 
 
 function KMR_Markov_matrix_sequential(N, p, epsilon)
