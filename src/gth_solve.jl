@@ -18,7 +18,7 @@ References
 =#
 
 
-function gth_solve(A::Matrix, overwrite=false)
+function gth_solve{T}(A::Matrix{T}, overwrite=false)
     if ndims(A) != 2 || size(A, 1) != size(A, 2)
         throw(ArgumentError("matrix must be square"))
     end
@@ -31,7 +31,7 @@ function gth_solve(A::Matrix, overwrite=false)
 
     n = size(A, 1)
 
-    x = zeros(n)
+    x = zeros(T, n)
 
     # === Reduction === #
     for k in 1:n-1
