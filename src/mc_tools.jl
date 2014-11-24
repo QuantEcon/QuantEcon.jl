@@ -19,6 +19,7 @@ isapprox(p::Number,x::Array) = isapprox(x,p)
 
 type MarkovChain
     p::Matrix # valid stochastic matrix
+    n::Int    # no. of states
 
     function MarkovChain{T}(p::Matrix{T})
         n,m = size(p)
@@ -28,11 +29,9 @@ type MarkovChain
             throw(ArgumentError("stochastic matrix must have nonnegative elements"))
         isapprox(sum(p,2),one(T)) ||
             throw(ArgumentError("stochastic matrix rows must sum to 1"))
-        new(p)
+        new(p,n)
     end
 end
-
-n_states(mc::MarkovChain) = size(mc.p,1)
 
 function Base.show(io::IO, mc::MarkovChain)
     println(io, "Discrete Markov Chain")
@@ -69,7 +68,7 @@ end
 # find the reducible subsets of a markov chain
 function irreducible_subsets(mc::MarkovChain)
     p = bool(mc.p)
-    g = simple_graph(n_states(mc))
+    g = simple_graph(mc.n)
     for i = 1:length(p)
         j,k = ind2sub(size(p),i) # j: node from, k: node to
         p[i] && add_edge!(g,j,k)
@@ -107,10 +106,10 @@ function mc_compute_stationary(mc::MarkovChain)
     length(classes) == 1 && return lu_solve(p')
 
     # reducible mc
-    stationary_dists = Array(T,n_states(mc),length(classes))
+    stationary_dists = Array(T,mc.n,length(classes))
     for i = 1:length(classes)
         class  = classes[i]
-        dist   = zeros(T,n_states(mc))
+        dist   = zeros(T,mc.n)
         temp_p = p[class,class]
         dist[class] = lu_solve(temp_p')
         stationary_dists[:,i] = dist
@@ -124,10 +123,10 @@ end
 # init::Int initial state (default: choose an initial state at random)
 # sample_size::Int number of samples to output (default: 1000)
 function mc_sample_path(mc::MarkovChain,
-                        init::Int=rand(1:n_states(mc)),
+                        init::Int=rand(1:mc.n),
                         sample_size::Int=1000)
     p       = float(mc.p) # ensure floating point input for Categorical()
-    dist    = [Categorical(vec(p[i,:])) for i=1:n_states(mc)]
+    dist    = [Categorical(vec(p[i,:])) for i=1:mc.n]
     samples = Array(Int,sample_size+1) # +1 extra for the init
     samples[1] = init
     for t=2:length(samples)
@@ -148,5 +147,5 @@ end
 # simulate markov chain starting from some initial value. In other words
 # out[1] is already defined as the user wants it
 function mc_sample_path!(mc::MarkovChain, samples::Vector)
-    samples = mc_sample_path(mc,samples[1],samples)
+    samples = mc_sample_path(mc,samples[1],length(samples)-1)
 end
