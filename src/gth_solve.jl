@@ -19,7 +19,7 @@ References
 
 
 function gth_solve(A::Matrix, overwrite=false)
-    if ndims(A) != 2 || size(A)[1] != size(A)[2]
+    if ndims(A) != 2 || size(A, 1) != size(A, 2)
         throw(ArgumentError("matrix must be square"))
     end
 
@@ -29,7 +29,7 @@ function gth_solve(A::Matrix, overwrite=false)
         A1 = A
     end
 
-    n = size(A1)[1]
+    n = size(A, 1)
 
     x = zeros(n)
 
