@@ -67,7 +67,7 @@ facts("Testing gth_solve.jl") do
         end
     end
 
-    context("test gth_solve throws errors") do
+    context("test gth_solve throws errors properly for invalid inputs") do
         @fact_throws gth_solve([0.4, 0.6])  # not 2dim
         @fact_throws MarkovChain([0.4 0.6])  # not square
     end
