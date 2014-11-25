@@ -4,7 +4,7 @@ chain by the Grassmann-Taksar-Heyman (GTH) algorithm.
 
 @author : Daisuke Oyama
 
-@date: 11/23/2014
+@date: 11/25/2014
 
 References
 ----------
@@ -18,22 +18,18 @@ References
 =#
 
 
-function gth_solve{T}(A::Matrix{T})
-    if ndims(A) != 2 || size(A, 1) != size(A, 2)
+gth_solve{T<:Integer}(A::Matrix{T}) = gth_solve(float64(A))
+
+function gth_solve{T<:Real}(A::AbstractMatrix{T})
+    if size(A, 1) != size(A, 2)
         throw(ArgumentError("matrix must be square"))
     end
 
-    if T <: Int
-        A1 = convert(AbstractMatrix{Float64}, A)
-        T_x = Float64
-    else
-        A1 = copy(A)
-        T_x = T
-    end
+    A1 = copy(A)
 
     n = size(A1, 1)
 
-    x = zeros(T_x, n)
+    x = zeros(T, n)
 
     # === Reduction === #
     for k in 1:n-1
