@@ -12,6 +12,8 @@ P2 = [1 0; 0 1]
 P2_stationary = [1, 0]  # Stationary dist whose support contains index 1
 P5 = [-3 3; 4 -4]  # Transition rate matrix
 P5_stationary = [4/7, 3/7]
+P6 = [2//3 1//3; 1//4 3//4]  # Rational elements
+P6_stationary = [3//7, 4//7]
 
 
 function KMR_Markov_matrix_sequential(N, p, epsilon)
@@ -48,6 +50,7 @@ facts("Testing gth_solve.jl") do
         @fact gth_solve(P1) => roughly(P1_stationary)
         @fact gth_solve(P2) => roughly(P2_stationary)
         @fact gth_solve(P5) => roughly(P5_stationary)
+        @fact gth_solve(P6) => P6_stationary
     end
 
     context("test gth_solve with KMR matrices") do
