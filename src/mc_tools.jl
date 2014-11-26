@@ -72,7 +72,7 @@ end
 gth_solve{T<:Integer}(A::Matrix{T}) = gth_solve(float64(A))
 
 function gth_solve{T<:Real}(A::AbstractMatrix{T})
-    A1 = copy(A)
+    A1 = copy(A')
     n = size(A1, 1)
     x = zeros(T, n)
 
@@ -132,6 +132,8 @@ function irreducible_subsets(mc::MarkovChain)
     end
     return classes[sinks]
 end
+
+import QuantEcon.mc_compute_stationary
 
 # mc_compute_stationary()
 # calculate the stationary distributions associated with a N-state markov chain
