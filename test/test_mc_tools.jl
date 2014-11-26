@@ -76,7 +76,7 @@ facts("Testing mc_tools.jl") do
         @fact mc_compute_stationary(d3) => roughly([1/4, 3/4])
         @fact mc_compute_stationary(d4) => eye(2)
         @fact mc_compute_stationary(d5) => roughly(P5_stationary)
-        @fact mc_compute_stationary(d6) => roughly(P6_stationary)
+        @fact mc_compute_stationary(d6) => P6_stationary
         @fact mc_compute_stationary(d7) => roughly(P7_stationary)
     end
 
