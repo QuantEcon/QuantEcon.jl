@@ -67,6 +67,8 @@ P9 = kmr_markov_matrix_sequential(3, 1/3, 1e-14)
 d8 = MarkovChain(P8)
 d9 = MarkovChain(P9)
 
+tol = 1e-6
+
 facts("Testing mc_tools.jl") do
     context("test mc_compute_stationary using exact solutions") do
         @fact mc_compute_stationary(d1) => eye(3)[:, [1, 3]]
@@ -87,11 +89,11 @@ facts("Testing mc_tools.jl") do
 
             # Check elements are nonnegative
             for i in 1:length(x)
-                @fact x[i] => greater_than_or_equal(-1e-15)
+                @fact x[i] => greater_than_or_equal(-tol)
             end
 
             # Check x is a left eigenvector of P
-            @fact x' * d.p => roughly(x; atol=1e-15)
+            @fact vec(x'*d.p) => roughly(x; atol=1e-3)
         end
     end
 
