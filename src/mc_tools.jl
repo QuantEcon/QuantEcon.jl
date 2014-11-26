@@ -41,14 +41,17 @@ function Base.show(io::IO, mc::MarkovChain)
 end
 
 # function to solve x(P-I)=0 by eigendecomposition
-function eigen_solve(p::Matrix)
+function eigen_solve{T}(p::Matrix{T})
     info("using eigen_solve")
     ef = eigfact(p)
     isunit = map(x->isapprox(x,1), ef.values)
-    x = ef.vectors[:, isunit]
+    x = real(ef.vectors[:, isunit])
     x ./= norm(x,1) # normalisation
-    any(x .< 0) && throw("something has gone wrong with the eigen solve")
-    abs(x) # avoid entries like '-0' appearing
+    for i = 1:length(x)
+        x[i] = isapprox(x[i],zero(T)) ? zero(T) : x[i]
+    end
+    any(x .< 0) && warn("something has gone wrong with the lu solve")
+    x
 end
 
 # function to solve x(P-I)=0 by lu decomposition
@@ -145,9 +148,9 @@ end
 # calculate the stationary distributions associated with a N-state markov chain
 # output is a N x M matrix where each column is a stationary distribution
 # currently using lu decomposition to solve p(P-I)=0
-function mc_compute_stationary(mc::MarkovChain; algorithm=:gth)
+function mc_compute_stationary(mc::MarkovChain; method=:gth)
     solvers = Dict([:gth => gth_solve, :lu => lu_solve, :eigen => eigen_solve])
-    solve = solvers[algorithm]
+    solve = solvers[method]
 
     p,T = mc.p,eltype(mc.p)
     classes = irreducible_subsets(mc)
