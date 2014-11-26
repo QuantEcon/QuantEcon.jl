@@ -86,9 +86,8 @@ function gth_solve{T<:Real}(A::AbstractMatrix{T})
             n = k
             break
         end
-        for i in k+1:n
-            A1[i, k] /= scale
-        end
+        A1[k+1:n, k] ./= scale
+
         for j in k+1:n, i in k+1:n
             A1[i, j] += A1[i, k] * A1[k, j]
         end
