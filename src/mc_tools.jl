@@ -72,10 +72,6 @@ end
 gth_solve{T<:Integer}(A::Matrix{T}) = gth_solve(float64(A))
 
 function gth_solve{T<:Real}(A::AbstractMatrix{T})
-    if size(A, 1) != size(A, 2)
-        throw(ArgumentError("matrix must be square"))
-    end
-
     A1 = copy(A)
     n = size(A1, 1)
     x = zeros(T, n)
@@ -93,19 +89,15 @@ function gth_solve{T<:Real}(A::AbstractMatrix{T})
         for i in k+1:n
             A1[i, k] /= scale
         end
-        for j in k+1:n
-            for i in k+1:n
-                A1[i, j] += A1[i, k] * A1[k, j]
-            end
+        for j in k+1:n, i in k+1:n
+            A1[i, j] += A1[i, k] * A1[k, j]
         end
     end
 
     # === Backward substitution === #
     x[n] = 1
-    for k in n-1:-1:1
-        for i in k+1:n
-            x[k] += x[i] * A1[i, k]
-        end
+    for k in n-1:-1:1, i in k+1:n
+        x[k] += x[i] * A1[i, k]
     end
 
     # === Normalization === #
