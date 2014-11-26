@@ -97,7 +97,7 @@ function gth_solve{T<:Real}(A::AbstractMatrix{T})
     # === Backward substitution === #
     x[n] = 1
     for k in n-1:-1:1, i in k+1:n
-        x[k] += x[i] * A1[i, k]
+        x[k] = x[i] * A1[i, k]
     end
 
     # === Normalization === #
