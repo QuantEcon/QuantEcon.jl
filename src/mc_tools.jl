@@ -42,6 +42,7 @@ end
 
 # function to solve x(P-I)=0 by eigendecomposition
 function eigen_solve(p::Matrix)
+    info("using eigen_solve")
     ef = eigfact(p)
     isunit = map(x->isapprox(x,1), ef.values)
     x = ef.vectors[:, isunit]
@@ -52,6 +53,7 @@ end
 
 # function to solve x(P-I)=0 by lu decomposition
 function lu_solve{T}(p::Matrix{T})
+    info("using lu_solve")
     n,m = size(p)
     x   = vcat(Array(T,n-1),one(T))
     u   = lufact(p - one(p))[:U]
@@ -69,6 +71,7 @@ end
 gth_solve{T<:Integer}(A::Matrix{T}) = gth_solve(float64(A))
 
 function gth_solve{T<:Real}(A::AbstractMatrix{T})
+    info("using gth solve")
     if size(A, 1) != size(A, 2)
         throw(ArgumentError("matrix must be square"))
     end
@@ -142,12 +145,15 @@ end
 # calculate the stationary distributions associated with a N-state markov chain
 # output is a N x M matrix where each column is a stationary distribution
 # currently using lu decomposition to solve p(P-I)=0
-function mc_compute_stationary(mc::MarkovChain)
+function mc_compute_stationary(mc::MarkovChain; algorithm=:gth)
+    solvers = Dict([:gth => gth_solve, :lu => lu_solve, :eigen => eigen_solve])
+    solve = solvers[algorithm]
+
     p,T = mc.p,eltype(mc.p)
     classes = irreducible_subsets(mc)
 
     # irreducible mc
-    length(classes) == 1 && return lu_solve(p')
+    length(classes) == 1 && return solve(p')
 
     # reducible mc
     stationary_dists = Array(T,n_states(mc),length(classes))
@@ -155,7 +161,7 @@ function mc_compute_stationary(mc::MarkovChain)
         class  = classes[i]
         dist   = zeros(T,n_states(mc))
         temp_p = p[class,class]
-        dist[class] = lu_solve(temp_p')
+        dist[class] = solve(temp_p')
         stationary_dists[:,i] = dist
     end
     return stationary_dists
