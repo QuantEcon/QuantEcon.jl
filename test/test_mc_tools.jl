@@ -67,7 +67,7 @@ P9 = kmr_markov_matrix_sequential(3, 1/3, 1e-14)
 d8 = MarkovChain(P8)
 d9 = MarkovChain(P9)
 
-tol = 1e-6
+tol = 1e-15
 
 facts("Testing mc_tools.jl") do
     context("test mc_compute_stationary using exact solutions") do
