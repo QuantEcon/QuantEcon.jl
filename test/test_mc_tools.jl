@@ -24,7 +24,7 @@ P6 = [2//3 1//3; 1//4 3//4]  # Rational elements
 P6_stationary = [3//7, 4//7]
 
 P7 = [1 0; 0 1]
-P7_stationary = [1 0;0 1]  # Stationary dist whose support contains index 1
+P7_stationary = [1 0;0 1]
 
 d1 = MarkovChain(P1)
 d2 = MarkovChain(P2)
