@@ -42,7 +42,6 @@ end
 
 # function to solve x(P-I)=0 by eigendecomposition
 function eigen_solve{T}(p::Matrix{T})
-    info("using eigen_solve")
     ef = eigfact(p)
     isunit = map(x->isapprox(x,1), ef.values)
     x = real(ef.vectors[:, isunit])
@@ -56,7 +55,6 @@ end
 
 # function to solve x(P-I)=0 by lu decomposition
 function lu_solve{T}(p::Matrix{T})
-    info("using lu_solve")
     n,m = size(p)
     x   = vcat(Array(T,n-1),one(T))
     u   = lufact(p - one(p))[:U]
@@ -74,7 +72,6 @@ end
 gth_solve{T<:Integer}(A::Matrix{T}) = gth_solve(float64(A))
 
 function gth_solve{T<:Real}(A::AbstractMatrix{T})
-    info("using gth solve")
     if size(A, 1) != size(A, 2)
         throw(ArgumentError("matrix must be square"))
     end
