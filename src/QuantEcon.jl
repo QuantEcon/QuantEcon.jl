@@ -43,7 +43,10 @@ export
     MarkovChain,
     mc_compute_stationary, mc_sample_path, mc_sample_path!,
 
-# mc_tools
+# gth_solve
+    gth_solve,
+
+# markov_approx
     tauchen,
     rouwenhorst,
 
@@ -107,6 +110,7 @@ include("discrete_rv.jl")
 include("distributions.jl")
 include("ecdf.jl")
 include("estspec.jl")
+include("gth_solve.jl")
 include("kalman.jl")
 include("kalman.jl")
 include("lae.jl")
@@ -124,4 +128,3 @@ include("quadsums.jl")
 include("Models.jl")
 
 end # module
-
