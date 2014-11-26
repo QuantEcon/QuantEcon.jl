@@ -91,7 +91,7 @@ facts("Testing mc_tools.jl") do
             end
 
             # Check x is a left eigenvector of P
-            @fact x' * d.p => roughly(x; atol=tol)
+            @fact x' * d.p => roughly(x; atol=1e-15)
         end
     end
 
