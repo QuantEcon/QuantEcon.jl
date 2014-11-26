@@ -133,8 +133,6 @@ function irreducible_subsets(mc::MarkovChain)
     return classes[sinks]
 end
 
-# import QuantEcon.mc_compute_stationary
-
 # mc_compute_stationary()
 # calculate the stationary distributions associated with a N-state markov chain
 # output is a N x M matrix where each column is a stationary distribution
