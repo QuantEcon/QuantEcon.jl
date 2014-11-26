@@ -42,14 +42,14 @@ end
 
 # function to solve x(P-I)=0 by eigendecomposition
 function eigen_solve{T}(p::Matrix{T})
-    ef = eigfact(p)
+    ef = eigfact(p')
     isunit = map(x->isapprox(x,1), ef.values)
     x = real(ef.vectors[:, isunit])
-    x ./= norm(x,1) # normalisation
+    x ./= sum(x,1) # normalisation
     for i = 1:length(x)
         x[i] = isapprox(x[i],zero(T)) ? zero(T) : x[i]
     end
-    any(x .< 0) && warn("something has gone wrong with the lu solve")
+    any(x .< 0) && warn("something has gone wrong with the eigen solve")
     x
 end
 
@@ -57,7 +57,7 @@ end
 function lu_solve{T}(p::Matrix{T})
     n,m = size(p)
     x   = vcat(Array(T,n-1),one(T))
-    u   = lufact(p - one(p))[:U]
+    u   = lufact(p' - one(p))[:U]
     for i = n-1:-1:1 # backsubstitution
         x[i] = -sum([x[j]*u[i,j] for j=i:n])/u[i,i]
     end
@@ -72,7 +72,7 @@ end
 gth_solve{T<:Integer}(A::Matrix{T}) = gth_solve(float64(A))
 
 function gth_solve{T<:Real}(A::AbstractMatrix{T})
-    A1 = copy(A')
+    A1 = copy(A)
     n = size(A1, 1)
     x = zeros(T, n)
 
@@ -133,7 +133,7 @@ function irreducible_subsets(mc::MarkovChain)
     return classes[sinks]
 end
 
-import QuantEcon.mc_compute_stationary
+# import QuantEcon.mc_compute_stationary
 
 # mc_compute_stationary()
 # calculate the stationary distributions associated with a N-state markov chain
@@ -147,7 +147,7 @@ function mc_compute_stationary(mc::MarkovChain; method=:gth)
     classes = irreducible_subsets(mc)
 
     # irreducible mc
-    length(classes) == 1 && return solve(p')
+    length(classes) == 1 && return solve(p)
 
     # reducible mc
     stationary_dists = Array(T,n_states(mc),length(classes))
@@ -155,7 +155,7 @@ function mc_compute_stationary(mc::MarkovChain; method=:gth)
         class  = classes[i]
         dist   = zeros(T,n_states(mc))
         temp_p = p[class,class]
-        dist[class] = solve(temp_p')
+        dist[class] = solve(temp_p)
         stationary_dists[:,i] = dist
     end
     return stationary_dists
