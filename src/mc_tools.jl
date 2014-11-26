@@ -189,5 +189,7 @@ end
 # simulate markov chain starting from some initial value. In other words
 # out[1] is already defined as the user wants it
 function mc_sample_path!(mc::MarkovChain, samples::Vector)
-    samples = mc_sample_path(mc,samples[1],samples)
+    length(samples) < 2 &&
+        throw(ArgumentError("samples vector must have length greater than 2"))
+    samples = mc_sample_path(mc,samples[1],length(samples)-1)
 end
