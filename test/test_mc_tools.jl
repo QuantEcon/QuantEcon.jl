@@ -20,13 +20,22 @@ P5 = [
      ]
 P5_stationary = hcat([1/2, 1/2, 0, 0, 0, 0],[0, 0, 0, 1/3, 1/3, 1/3])
 
+P6 = [2//3 1//3; 1//4 3//4]  # Rational elements
+P6_stationary = [3//7, 4//7]
+
+P7 = [1 0; 0 1]
+P7_stationary = [1 0;0 1]
+
 d1 = MarkovChain(P1)
 d2 = MarkovChain(P2)
 d3 = MarkovChain(P3)
 d4 = MarkovChain(P4)
 d5 = MarkovChain(P5)
+d6 = MarkovChain(P6)
+d7 = MarkovChain(P7)
 
-function KMR_Markov_matrix_sequential(N, p, epsilon)
+
+function kmr_markov_matrix_sequential(N, p, epsilon)
     """
     Generate the Markov matrix for the KMR model with *sequential* move
 
@@ -52,14 +61,40 @@ function KMR_Markov_matrix_sequential(N, p, epsilon)
     return P
 end
 
-facts("Testing mc_tools.jl") do
+P8 = kmr_markov_matrix_sequential(27, 1/3, 1e-2)
+P9 = kmr_markov_matrix_sequential(3, 1/3, 1e-14)
 
+d8 = MarkovChain(P8)
+d9 = MarkovChain(P9)
+
+tol = 1e-15
+
+facts("Testing mc_tools.jl") do
     context("test mc_compute_stationary using exact solutions") do
         @fact mc_compute_stationary(d1) => eye(3)[:, [1, 3]]
         @fact mc_compute_stationary(d2) => roughly([0, 9/14, 5/14])
         @fact mc_compute_stationary(d3) => roughly([1/4, 3/4])
         @fact mc_compute_stationary(d4) => eye(2)
         @fact mc_compute_stationary(d5) => roughly(P5_stationary)
+        @fact mc_compute_stationary(d6) => P6_stationary
+        @fact mc_compute_stationary(d7) => roughly(P7_stationary)
+    end
+
+    context("test gth_solve with KMR matrices") do
+        for d in [d8,d9]
+            x = mc_compute_stationary(d)
+
+            # Check elements sum to one
+            @fact sum(x) => roughly(1; atol=tol)
+
+            # Check elements are nonnegative
+            for i in 1:length(x)
+                @fact x[i] => greater_than_or_equal(-tol)
+            end
+
+            # Check x is a left eigenvector of P
+            @fact vec(x'*d.p) => roughly(x; atol=tol)
+        end
     end
 
     context("test MarkovChain throws errors") do
@@ -70,6 +105,3 @@ facts("Testing mc_tools.jl") do
 end  # facts
 
 end  # module
-
-# TODO: P = KMR_Markov_matrix_sequential(27, 1/3, 1e-2) will fail without
-#       arbitrary precision linear algebra. Need to wait on Juila for this
