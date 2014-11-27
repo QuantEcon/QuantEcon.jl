@@ -102,6 +102,24 @@ facts("Testing mc_tools.jl") do
         @fact_throws MarkovChain([0.0 0.5; 0.2 0.8])  # first row doesn't sum to 1
         @fact_throws MarkovChain([-1 1; 0.2 0.8])  # negative element, but sums to 1
     end
-end  # facts
 
+    context("testing tauchen method") do
+    for n=3:25, m=1:4
+        rough_kwargs = {:atol => 1e-8, :rtol => 1e-8}
+
+        # set up
+        ρ, σ_u = rand(2)
+        μ = 0.0
+        x, P = tauchen(n, ρ, σ_u, μ, m)
+
+        @fact size(P, 1) => size(P, 2)
+        @fact ndims(x) => 1
+        @fact ndims(P) => 2
+        @fact sum(P, 2) => roughly(ones(n, 1); rough_kwargs...)
+        @fact all(P .>= 0.0) => true
+        @fact sum(x) => roughly(0.0; rough_kwargs...)
+        end
+    end  # context
+
+end  # facts
 end  # module
