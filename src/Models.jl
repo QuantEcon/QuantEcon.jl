@@ -14,7 +14,11 @@ abstract AbstractModel
 """
 Generic function to solve model via value function iteration.
 
-For this function to work
+For this function to work the model must have implemented the following:
+
+* `init_values(m::T)`, where `T <: AbstractModel` is the model's type
+* `bellman_operator(m::T, a::S)`, where `S` is the type returned from
+   init_values
 """
 
 function solve_vf(m::AbstractModel; kwargs...)
@@ -46,6 +50,23 @@ function solve_vf(m::AbstractModel, init; kwargs...)
     compute_fixed_point(f, init; kwargs...)
 end
 
+solve_pf(m::AbstractModel; kwargs...) = get_greedy(m, solve_vf(m; kwargs...))
+function solve_pf(m::AbstractModel, init; kwargs...)
+    get_greedy(m, init, solve_vf(m, init; kwargs...))
+end
+
+function solve_both(m::AbstractModel; kwargs...)
+    vf = solve_vf(m; kwargs...)
+    pf = get_greedy(m, vf)
+    (vf, pf)
+end
+
+function solve_both(m::AbstractModel, init; kwargs...)
+    vf = solve_vf(m, init; kwargs...)
+    pf = get_greedy(m, vf)
+    (vf, pf)
+end
+
 export
 # types
     AbstractModel,
@@ -64,7 +85,7 @@ export
     compute_lt_price, lucas_operator,      # lucastree
     res_wage_operator,                     # odu
     bellman_operator, bellman_operator!,   # career, ifp, jv, odu, optgrowth
-    solve_vf                               # career, ifp, jv, odu, optgrowth
+    solve_vf, solve_pf, solve_both         # career, ifp, jv, odu, optgrowth
 
 include("models/asset_pricing.jl")
 include("models/career.jl")
