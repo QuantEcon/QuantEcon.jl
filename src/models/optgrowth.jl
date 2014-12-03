@@ -22,7 +22,7 @@ http://quant-econ.net/dp_intro.html
 
     See the constructor below for details
 =#
-type GrowthModel
+type GrowthModel <: AbstractModel
     f::Function
     bet::Real
     u::Function
@@ -83,3 +83,6 @@ function get_greedy!(g::GrowthModel, w::Vector, out::Vector)
 end
 
 get_greedy(g::GrowthModel, w::Vector) = bellman_operator(g, w, ret_policy=true)
+
+# Initial condition for GrowthModel. See lecture for details
+init_values(g::GrowthModel) = 5 .* g.u([g.grid]) .- 25

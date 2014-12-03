@@ -13,7 +13,7 @@ References
 http://quant-econ.net/odu.html
 
 =#
-type SearchProblem
+type SearchProblem <: AbstractModel
     bet::Real
     c::Real
     F::Distribution
@@ -149,4 +149,14 @@ function res_wage_operator(sp::SearchProblem, phi::Vector)
     out = similar(phi)
     res_wage_operator!(sp, phi, out)
     return out
+end
+
+# Initial condition for SearchProblem. See lecture for details
+init_values(m::SearchProblem) = ones(m.n_pi)
+
+# Special solve function for SearchProblem b/c it doesn't implement
+# bellman_operator
+function solve_vf(m::SearchProblem, init=init_values(m); kwargs...)
+    f(x) = res_wage_operator(m, x)
+    compute_fixed_point(f, init; kwargs...)
 end

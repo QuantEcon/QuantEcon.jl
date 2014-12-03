@@ -26,12 +26,10 @@ References
 Simple port of the file quantecon.models.lucastree.py
 
 http://quant-econ.net/markov_asset.html
-
-TODO: refactor. Python is much cleaner.
 =#
 
 
-type LucasTree
+type LucasTree <: AbstractModel
     gam::Real
     bet::Real
     alpha::Real
