@@ -41,14 +41,8 @@ export
 
 # mc_tools
     MarkovChain,
-    mc_compute_stationary, mc_sample_path, mc_sample_path!,
-
-# gth_solve
-    gth_solve,
-
-# markov_approx
-    tauchen,
-    rouwenhorst,
+    mc_compute_stationary, mc_sample_path, mc_sample_path!, gth_solve,
+    tauchen, rouwenhorst,
 
 # lae
     LAE,
@@ -116,7 +110,6 @@ include("lae.jl")
 include("lqcontrol.jl")
 include("lqnash.jl")
 include("lss.jl")
-include("markov_approx.jl")
 include("matrix_eqn.jl")
 include("mc_tools.jl")
 include("robustlq.jl")
