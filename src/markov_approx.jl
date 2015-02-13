@@ -10,8 +10,8 @@ References
 
 http://quant-econ.net/finite_markov.html
 =#
-norm_cdf{T <: Real}(x::T) = 0.5 * erfc(-x/sqrt(2))
-norm_cdf{T <: Real}(x::Array{T}) = 0.5 .* erfc(-x./sqrt(2))
+std_norm_cdf{T <: Real}(x::T) = 0.5 * erfc(-x/sqrt(2))
+std_norm_cdf{T <: Real}(x::Array{T}) = 0.5 .* erfc(-x./sqrt(2))
 
 
 function tauchen(N::Int64, ρ::Real, σ::Real, μ::Real=0.0, n_std::Int64=3)
@@ -59,21 +59,21 @@ function tauchen(N::Int64, ρ::Real, σ::Real, μ::Real=0.0, n_std::Int64=3)
     Π = zeros(N, N)
     for row = 1:N
         # Do end points first
-        Π[row, 1] = norm_cdf((y[1] - ρ*y[row] + d/2) / σ)
-        Π[row, N] = 1 - norm_cdf((y[N] - ρ*y[row] - d/2) / σ)
+        Π[row, 1] = std_norm_cdf((y[1] - ρ*y[row] + d/2) / σ)
+        Π[row, N] = 1 - std_norm_cdf((y[N] - ρ*y[row] - d/2) / σ)
 
         # fill in the middle columns
         for col = 2:N-1
-            Π[row, col] = (norm_cdf((y[col] - ρ*y[row] + d/2) / σ) -
-                           norm_cdf((y[col] - ρ*y[row] - d/2) / σ))
+            Π[row, col] = (std_norm_cdf((y[col] - ρ*y[row] + d/2) / σ) -
+                           std_norm_cdf((y[col] - ρ*y[row] - d/2) / σ))
         end
     end
 
     # NOTE: I need to shift this vector after finding probabilities
-    #       because when finding the probabilities I use a function norm_cdf
-    #       that assumes its input argument is distributed N(0, 1). After
-    #       adding the mean E[y] is no longer 0, so I would be passing
-    #       elements with the wrong distribution.
+    #       because when finding the probabilities I use a function
+    #       std_norm_cdf that assumes its input argument is distributed
+    #       N(0, 1). After adding the mean E[y] is no longer 0, so
+    #       I would be passing elements with the wrong distribution.
     #
     #       It is ok to do after the fact because adding this constant to each
     #       term effectively shifts the entire distribution. Because the
@@ -83,6 +83,7 @@ function tauchen(N::Int64, ρ::Real, σ::Real, μ::Real=0.0, n_std::Int64=3)
     #       I could have shifted it before, but then I would need to evaluate
     #       the cdf with a function that allows the distribution of input
     #       arguments to be [μ/(1 - ρ), 1] instead of [0, 1]
+
     y .+= μ / (1 - ρ) # center process around its mean (wbar / (1 - rho))
 
     return y, Π
@@ -137,6 +138,8 @@ function rouwenhorst(N::Int, ρ::Real, σ::Real, μ::Real=0.0)
 
     ψ = sqrt(N-1) * σ_y
     w = linspace(-ψ, ψ, N)
+
     w .+= μ / (1 - ρ)  # center process around its mean (wbar / (1 - rho))
+
     return w, Θ
 end
