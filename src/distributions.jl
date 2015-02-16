@@ -42,6 +42,6 @@ end
 function pdf(d::BetaBinomial)
     n, a, b = d.n, d.a, d.b
     k = [0:n]
-    binoms = [binomial(n, i) for i in k]
+    binoms = Float64[binomial(n, i) for i in k]
     probs = binoms .* beta(k .+ a, n .- k .+ b) ./ beta(a, b)
 end
