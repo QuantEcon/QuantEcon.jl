@@ -125,21 +125,24 @@ function rouwenhorst(N::Int, ρ::Real, σ::Real, μ::Real=0.0)
     σ_y = σ / sqrt(1-ρ^2)
     p  = (1+ρ)/2
     Θ = [p 1-p; 1-p p]
-
-    for n = 3:N
-        z_vec = zeros(n-1,1)
-        z_vec_long = zeros(1, n)
-        Θ = p.*[Θ z_vec; z_vec_long] +
-            (1-p).*[z_vec Θ; z_vec_long] +
-            (1-p).*[z_vec_long; Θ z_vec] +
-            p.*[z_vec_long; z_vec Θ]
-        Θ[2:end-1,:] ./=  2.0
-    end
-
     ψ = sqrt(N-1) * σ_y
-    w = linspace(-ψ, ψ, N)
+    m = μ / (1 - ρ)
 
-    w .+= μ / (1 - ρ)  # center process around its mean (wbar / (1 - rho))
+    return rouwenhorst(p, p, m, ψ, N)
+end
 
-    return w, Θ
+function rouwenhorst(p::Float64, q::Float64, m::Float64, Δ::Float64, n::Int)
+    if n == 2
+        return Float64[m-Δ, m+Δ], [p 1-p; 1-q q]
+    else
+        _, θ_nm1 = rouwenhorst(p, q, m, Δ, n-1)
+        θN = p    *[θ_nm1 zeros(n-1, 1); zeros(1, n)] +
+             (1-p)*[zeros(n-1, 1) θ_nm1; zeros(1, n)] +
+             q    *[zeros(1, n); zeros(n-1, 1) θ_nm1] +
+             (1-q)*[zeros(1, n); θ_nm1 zeros(n-1, 1)]
+
+        θN[2:end-1, :] ./= 2
+
+        return linspace(m-Δ, m+Δ, n), θN
+    end
 end
