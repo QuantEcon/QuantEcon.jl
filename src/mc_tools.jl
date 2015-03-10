@@ -165,7 +165,8 @@ end
 # sample_size::Int number of samples to output (default: 1000)
 function mc_sample_path(mc::MarkovChain,
                         init::Int=rand(1:n_states(mc)),
-                        sample_size::Int=1000)
+                        sample_size::Int=1000;
+                        burn::Int=0)
     p       = float(mc.p) # ensure floating point input for Categorical()
     dist    = [Categorical(vec(p[i,:])) for i=1:n_states(mc)]
     samples = Array(Int,sample_size+1) # +1 extra for the init
@@ -174,15 +175,15 @@ function mc_sample_path(mc::MarkovChain,
         last = samples[t-1]
         samples[t]= rand(dist[last])
     end
-    samples
+    samples[burn+1:end]
 end
 
 # starting from unknown state, given a distribution
 function mc_sample_path(mc::MarkovChain,
                         init::Vector,
-                        sample_size::Int=1000)
+                        sample_size::Int=1000; burn::Int=0)
     init = float(init) # ensure floating point input for Categorical()
-    mc_sample_path(mc,rand(Categorical(init)),sample_size)
+    mc_sample_path(mc, rand(Categorical(init)), sample_size, burn=burn)
 end
 
 # simulate markov chain starting from some initial value. In other words
