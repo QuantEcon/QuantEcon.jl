@@ -91,7 +91,7 @@ function set_up_data(lt::LucasTree)
     if exists(f, "lt/prices")
         prices = read(f, "lt/prices")
     else
-        prices = compute_lt_price(lt, err_tol=1e-4, max_iter=1000)
+        prices = compute_lt_price(lt, err_tol=1e-12, max_iter=10000)
         write(f, "lt/prices", prices)
     end
 
@@ -286,7 +286,7 @@ facts("Testing lucastree.jl") do
     lt = LucasTree(γ, β, α, σ)
     prices = set_up_data(lt)
 
-    @fact size(prices) => size([lt.grid])
+    @fact size(prices) => size(lt.grid)
 
     context("test integrate") do
         g(x) = x .* 0.0 + 1.0
