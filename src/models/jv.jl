@@ -73,7 +73,7 @@ JvWorker(;A=1.4, alpha=0.6, bet=0.96, grid_size=50) = JvWorker(A, alpha, bet,
 #       depending on the value of ret_policies. This is probably not a
 #       huge deal, but it is something to be aware of
 function bellman_operator!(jv::JvWorker, V::Vector,
-                           out::Union(Vector, Tuple{Vector, Vector});
+                           out::Union(Vector, @compat Tuple{Vector, Vector});
                            brute_force=true, ret_policies=false)
     # simplify notation
     G, pi_func, F, bet = jv.G, jv.pi_func, jv.F, jv.bet
@@ -169,7 +169,7 @@ function bellman_operator(jv::JvWorker, V::Vector; brute_force=true,
     return out
 end
 
-function get_greedy!(jv::JvWorker, V::Vector, out::Tuple{Vector, Vector};
+function get_greedy!(jv::JvWorker, V::Vector, out::@compat Tuple{Vector, Vector};
                      brute_force=true)
     bellman_operator!(jv, V, out, ret_policies=true)
 end
