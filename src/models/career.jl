@@ -15,7 +15,7 @@ http://quant-econ.net/career.html
 =#
 
 
-type CareerWorkerProblem
+type CareerWorkerProblem <: AbstractModel
     beta::Real
     N::Int
     B::Real
@@ -97,3 +97,6 @@ end
 function get_greedy(cp::CareerWorkerProblem, v::Array)
     bellman_operator(cp, v, ret_policy=true)
 end
+
+# Initial condition for CareerWorkerProblem. See lecture for details
+init_values(m::CareerWorkerProblem) = fill(100.0, m.N, m.N)

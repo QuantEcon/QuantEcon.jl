@@ -23,6 +23,7 @@ http://quant-econ.net/dp_intro.html
 =#
 function compute_fixed_point(T::Function, v; err_tol=1e-3, max_iter=50,
                              verbose=true, print_skip=10)
+    t = time()
     iterate = 0
     err = err_tol + 1
     while iterate < max_iter && err > err_tol
@@ -31,7 +32,10 @@ function compute_fixed_point(T::Function, v; err_tol=1e-3, max_iter=50,
         err = Base.maxabs(new_v - v)
         if verbose
             if iterate % print_skip == 0
-                println("Compute iterate $iterate with error $err")
+                tot_time = time() - t
+                msg = @sprintf "Compute iterate %i with error %2.3e" iterate err
+                msg *= @sprintf " (total time elapsed: %3.3f seconds)" tot_time
+                println(msg)
             end
         end
         v = new_v

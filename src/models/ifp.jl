@@ -17,7 +17,7 @@ http://quant-econ.net/ifp.html
 # @pyimport scipy.optimize as opt
 # brentq = opt.brentq
 
-type ConsumerProblem
+type ConsumerProblem <: AbstractModel
     u::Function
     du::Function
     r::Real
@@ -161,4 +161,11 @@ function init_values(cp::ConsumerProblem)
     end
 
     return V, c
+end
+
+# Special solve function for ConsumerProblem to use more efficient
+# coleman_operator
+function solve_vf(m::ConsumerProblem, init=init_values(m)[2]; kwargs...)
+    f(x) = coleman_operator(m, x)
+    compute_fixed_point(f, init; kwargs...)
 end

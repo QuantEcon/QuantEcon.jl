@@ -17,7 +17,7 @@ Simple port of the file quantecon.models.asset_pricing.py
 http://quant-econ.net/markov_asset.html
 =#
 
-type AssetPrices
+type AssetPrices <: AbstractModel
     bet::Real
     P::Matrix
     s::Vector

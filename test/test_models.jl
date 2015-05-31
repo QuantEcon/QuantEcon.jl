@@ -137,6 +137,7 @@ function set_up_data(sp::SearchProblem)
     return v_star, phi_vfi, phi_pfi
 end
 
+
 function set_up_data(gm::GrowthModel)
     f = get_data_file()
 
@@ -155,6 +156,19 @@ function set_up_data(gm::GrowthModel)
     return v_star
 end
 
+
+function _f_runs(m::AbstractModel, f::Function)
+    try
+        solve_vf(m, err_tol=Inf, verbose=false)
+        return true
+    catch
+        return false
+    end
+end
+
+solve_vf_runs(m::AbstractModel) = _f_runs(m, solve_vf)
+solve_pf_runs(m::AbstractModel) = _f_runs(m, solve_vf)
+solve_both_runs(m::AbstractModel) = _f_runs(m, solve_both)
 
 facts("Testing asset_pricing.jl") do
     n = 5
@@ -201,6 +215,12 @@ facts("Testing asset_pricing.jl") do
         w_bars = call_option(ap, ζ, p_s, [5, 7])[2]
         @fact length(w_bars) => 2
     end
+
+    context("Test solve_(vf|pf|both) doesn't run") do
+        @fact solve_vf_runs(ap) => false
+        @fact solve_pf_runs(ap) => false
+        @fact solve_both_runs(ap) => false
+    end
 end  # facts
 
 facts("Testing career.jl") do
@@ -228,6 +248,12 @@ facts("Testing career.jl") do
             @fact greedy[end, end] => 1
         end
     end
+
+    context("Test solve_(vf|pf|both) runs") do
+        @fact solve_vf_runs(cp) => true
+        @fact solve_pf_runs(cp) => true
+        @fact solve_both_runs(cp) => true
+    end
 end  # facts
 
 facts("Testing ifp.jl") do
@@ -248,6 +274,12 @@ facts("Testing ifp.jl") do
     shapes = (length(cp.asset_grid), length(cp.z_vals))
     @fact size(v_init) => shapes
     @fact size(c_init) => shapes
+
+    context("Test solve_(vf|pf|both) runs") do
+        @fact solve_vf_runs(cp) => true
+        @fact solve_pf_runs(cp) => true
+        @fact solve_both_runs(cp) => true
+    end
 end  # facts
 
 facts("Testing jv.jl") do
@@ -274,6 +306,12 @@ facts("Testing jv.jl") do
 
     # solution to bellman is fixed point
     @fact v_star => roughly(bellman_operator(jv, v_star); atol=1e-6)
+
+    context("Test solve_(vf|pf|both) runs") do
+        @fact solve_vf_runs(jv) => true
+        @fact solve_pf_runs(jv) => true
+        @fact solve_both_runs(jv) => true
+    end
 end  # facts
 
 facts("Testing lucastree.jl") do
@@ -309,6 +347,12 @@ facts("Testing lucastree.jl") do
 
     context("test prices increasing in y") do
         @fact prices => sort(prices)
+    end
+
+    context("Test solve_(vf|pf|both) doesn't run") do
+        @fact solve_vf_runs(lt) => false
+        @fact solve_pf_runs(lt) => false
+        @fact solve_both_runs(lt) => false
     end
 end  # facts
 
@@ -359,6 +403,12 @@ facts("Testing odu.jl") do
 
     # phi_pfi fixed_point?
     @fact phi_pfi => roughly(res_wage_operator(sp, phi_pfi); atol=1e-5)
+
+    context("Test solve_(vf|pf|both) runs") do
+        @fact solve_vf_runs(sp) => true
+        @fact solve_pf_runs(sp) => true
+        @fact solve_both_runs(sp) => true
+    end
 end  # facts
 
 facts("Testing optgrowth.jl") do
@@ -394,6 +444,12 @@ facts("Testing optgrowth.jl") do
     # test v_star fixed point.
     @fact v_star[2:end] => roughly(bellman_operator(gm, v_star)[2:end];
                                    atol=5e-2)
+
+    context("Test solve_(vf|pf|both) runs") do
+        @fact solve_vf_runs(gm) => true
+        @fact solve_pf_runs(gm) => true
+        @fact solve_both_runs(gm) => true
+    end
 end  # facts
 
 

@@ -23,7 +23,7 @@ http://quant-econ.net/jv.html
 
 epsilon = 1e-4  # a small number, used in optimization routine
 
-type JvWorker
+type JvWorker <: AbstractModel
     A::Real
     alpha::Real
     bet::Real
@@ -177,3 +177,6 @@ end
 function get_greedy(jv::JvWorker, V::Vector; brute_force=true)
     bellman_operator(jv, V, ret_policies=true)
 end
+
+# Initial condition for JvWorker. See lecture for details
+init_values(m::JvWorker) = [m.x_grid * 0.5]
