@@ -26,7 +26,8 @@ To install the package, open a Julia session and type
 
 ### License
 
-Copyright © 2013, 2014 Thomas J. Sargent and John Stachurski: BSD-3
+
+Copyright © 2013, 2014, 2015 Spencer Lyon, Thomas J. Sargent, and John Stachurski: BSD-3
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
