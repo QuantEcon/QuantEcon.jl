@@ -137,7 +137,7 @@ end
 # output is a N x M matrix where each column is a stationary distribution
 # currently using lu decomposition to solve p(P-I)=0
 function mc_compute_stationary(mc::MarkovChain; method=:gth)
-    solvers = Dict([:gth => gth_solve, :lu => lu_solve, :eigen => eigen_solve])
+    @compat solvers = Dict(:gth => gth_solve, :lu => lu_solve, :eigen => eigen_solve)
     solve = solvers[method]
 
     p,T = mc.p,eltype(mc.p)
