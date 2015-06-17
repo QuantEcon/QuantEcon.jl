@@ -1,4 +1,4 @@
-module TestQuandsum
+module TestQuadsum
 
 using QuantEcon
 using Base.Test

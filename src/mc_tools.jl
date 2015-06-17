@@ -41,20 +41,23 @@ function Base.show(io::IO, mc::MarkovChain)
 end
 
 # function to solve x(P-I)=0 by eigendecomposition
-function eigen_solve(p::Matrix)
-    ef = eigfact(p)
+function eigen_solve{T}(p::Matrix{T})
+    ef = eigfact(p')
     isunit = map(x->isapprox(x,1), ef.values)
-    x = ef.vectors[:, isunit]
-    x ./= norm(x,1) # normalisation
-    any(x .< 0) && throw("something has gone wrong with the eigen solve")
-    abs(x) # avoid entries like '-0' appearing
+    x = real(ef.vectors[:, isunit])
+    x ./= sum(x,1) # normalisation
+    for i = 1:length(x)
+        x[i] = isapprox(x[i],zero(T)) ? zero(T) : x[i]
+    end
+    any(x .< 0) && warn("something has gone wrong with the eigen solve")
+    x
 end
 
 # function to solve x(P-I)=0 by lu decomposition
 function lu_solve{T}(p::Matrix{T})
     n,m = size(p)
     x   = vcat(Array(T,n-1),one(T))
-    u   = lufact(p - one(p))[:U]
+    u   = lufact(p' - one(p))[:U]
     for i = n-1:-1:1 # backsubstitution
         x[i] = -sum([x[j]*u[i,j] for j=i:n])/u[i,i]
     end
@@ -64,6 +67,40 @@ function lu_solve{T}(p::Matrix{T})
     end
     any(x .< 0) && warn("something has gone wrong with the lu solve")
     x
+end
+
+gth_solve{T<:Integer}(A::Matrix{T}) = gth_solve(float64(A))
+
+function gth_solve{T<:Real}(A::AbstractMatrix{T})
+    A1 = copy(A)
+    n = size(A1, 1)
+    x = zeros(T, n)
+
+    # === Reduction === #
+    for k in 1:n-1
+        scale = sum(A1[k, k+1:n])
+        if scale <= 0
+            # There is one (and only one) recurrent class contained in
+            # {1, ..., k};
+            # compute the solution associated with that recurrent class.
+            n = k
+            break
+        end
+        A1[k+1:n, k] ./= scale
+
+        for j in k+1:n, i in k+1:n
+            A1[i, j] += A1[i, k] * A1[k, j]
+        end
+    end
+
+    # === Backward substitution === #
+    x[end] = 1
+    for k in n-1:-1:1, i in k+1:n
+        x[k] += x[i] * A1[i, k]
+    end
+
+    # === Normalization === #
+    x / sum(x)
 end
 
 # find the reducible subsets of a markov chain
@@ -99,12 +136,15 @@ end
 # calculate the stationary distributions associated with a N-state markov chain
 # output is a N x M matrix where each column is a stationary distribution
 # currently using lu decomposition to solve p(P-I)=0
-function mc_compute_stationary(mc::MarkovChain)
+function mc_compute_stationary(mc::MarkovChain; method=:gth)
+    @compat solvers = Dict(:gth => gth_solve, :lu => lu_solve, :eigen => eigen_solve)
+    solve = solvers[method]
+
     p,T = mc.p,eltype(mc.p)
     classes = irreducible_subsets(mc)
 
     # irreducible mc
-    length(classes) == 1 && return lu_solve(p')
+    length(classes) == 1 && return solve(p)
 
     # reducible mc
     stationary_dists = Array(T,n_states(mc),length(classes))
@@ -112,7 +152,7 @@ function mc_compute_stationary(mc::MarkovChain)
         class  = classes[i]
         dist   = zeros(T,n_states(mc))
         temp_p = p[class,class]
-        dist[class] = lu_solve(temp_p')
+        dist[class] = solve(temp_p)
         stationary_dists[:,i] = dist
     end
     return stationary_dists
@@ -125,7 +165,8 @@ end
 # sample_size::Int number of samples to output (default: 1000)
 function mc_sample_path(mc::MarkovChain,
                         init::Int=rand(1:n_states(mc)),
-                        sample_size::Int=1000)
+                        sample_size::Int=1000;
+                        burn::Int=0)
     p       = float(mc.p) # ensure floating point input for Categorical()
     dist    = [Categorical(vec(p[i,:])) for i=1:n_states(mc)]
     samples = Array(Int,sample_size+1) # +1 extra for the init
@@ -134,19 +175,21 @@ function mc_sample_path(mc::MarkovChain,
         last = samples[t-1]
         samples[t]= rand(dist[last])
     end
-    samples
+    samples[burn+1:end]
 end
 
 # starting from unknown state, given a distribution
 function mc_sample_path(mc::MarkovChain,
                         init::Vector,
-                        sample_size::Int=1000)
+                        sample_size::Int=1000; burn::Int=0)
     init = float(init) # ensure floating point input for Categorical()
-    mc_sample_path(mc,rand(Categorical(init)),sample_size)
+    mc_sample_path(mc, rand(Categorical(init)), sample_size, burn=burn)
 end
 
 # simulate markov chain starting from some initial value. In other words
 # out[1] is already defined as the user wants it
 function mc_sample_path!(mc::MarkovChain, samples::Vector)
-    samples = mc_sample_path(mc,samples[1],samples)
+    length(samples) < 2 &&
+        throw(ArgumentError("samples vector must have length greater than 2"))
+    samples = mc_sample_path(mc,samples[1],length(samples)-1)
 end

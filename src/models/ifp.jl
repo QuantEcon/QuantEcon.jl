@@ -93,7 +93,7 @@ end
 
 
 function get_greedy!(cp::ConsumerProblem, V::Matrix, out::Matrix)
-    bellman_operator!(cp, v, out, ret_policy=true)
+    bellman_operator!(cp, V, out, ret_policy=true)
 end
 
 

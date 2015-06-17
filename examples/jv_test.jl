@@ -1,4 +1,5 @@
 using QuantEcon
+using QuantEcon.Models
 using PyPlot
 
 wp = JvWorker(grid_size=25)
