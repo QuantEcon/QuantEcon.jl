@@ -27,7 +27,7 @@ end
 
 fix{T <: Real}(x::Array{T}) = fix!(x, similar(x, Int))
 
-fix{T <: Real}(x::T) = int(x >= 0 ? floor(x) : ceil(x))
+fix{T <: Real}(x::T) = round(Int, x >= 0 ? floor(x) : ceil(x))
 
 ckron(A::Array, B::Array) = kron(A, B)
 ckron(arrays::Array...) = reduce(kron, arrays)
@@ -49,7 +49,7 @@ function gridmake(arrays::Vector...)
     for i=1:n
         arr = arrays[i]
         outer = repititions[i]
-        inner = int(floor(l / (outer * size(arr, 1))))
+        inner = round(Int, floor(l / (outer * size(arr, 1))))
         out[:, i] = repeat(arrays[i], inner=[inner], outer=[outer])
     end
     return out
@@ -122,7 +122,7 @@ end
 function qnwnorm(n::Int)
     maxit = 100
     pim4 = 1 / pi^(0.25)
-    m = fix((n + 1) / 2)
+    m = floor(Int, (n + 1) / 2)
     nodes = zeros(n)
     weights = zeros(n)
 
@@ -176,7 +176,7 @@ function qnwnorm(n::Int)
     weights ./= sqrt(pi)
     nodes *= sqrt(2)
 
-    nodes = size(nodes, 2) == 1 ? squeeze(nodes, 2) : nodes
+    nodes = ndims(nodes) == 2 && size(nodes, 2) == 1 ? squeeze(nodes, 2): nodes
 
     return nodes, weights
 end
