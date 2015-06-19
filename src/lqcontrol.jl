@@ -24,9 +24,6 @@ type LQ
     bet::Real
     term::Union(Int, Nothing) # terminal period
     Rf::ScalarOrArray
-    k::Int
-    n::Int
-    j::Int
     P::ScalarOrArray
     d::Real
     F::ScalarOrArray # policy rule
@@ -62,7 +59,7 @@ function LQ(Q::ScalarOrArray,
     P = copy(Rf)
     d = 0.0
 
-    LQ(Q, R, A, B, C, bet, term, Rf, k, n, j, P, d, F)
+    LQ(Q, R, A, B, C, bet, term, Rf, P, d, F)
 end
 
 # make kwarg version
