@@ -8,42 +8,35 @@ using Compat
 rough_kwargs = @compat Dict(:atol => 1e-13, :rtol => 1e-4)
 
 # set up
-q = 1.
-r = 1.
-rf = 1.
-a = .95
-b = -1.
-c = .05
-β = .95
-T = 1
-lq_scalar = LQ(q, r, a, b, c, β, T, rf)
+q    = 1.
+r    = 1.
+rf   = 1.
+a    = .95
+b    = -1.
+c    = .05
+β    = .95
+n    = 0.
+term = 1
+lq_scalar = LQ(q, r, a, b, c, n, β, term, rf)
 
-Q = [0. 0.; 0. 1]
-R = [1. 0.; 0. 0]
-RF = eye(2) .* 100
-A = fill(0.95, 2, 2)
-B = fill(-1.0, 2, 2)
-lq_mat = LQ(Q, R, A, B, bet=β, T=T, Rf=RF)
-
+Q  = [0. 0.; 0. 1]
+R  = [1. 0.; 0. 0]
+rf = eye(2) .* 100
+A  = fill(0.95, 2, 2)
+B  = fill(-1.0, 2, 2)
+lq_mat = LQ(Q, R, A, B, bet=β, term=term, rf=rf)
 
 facts("Testing lqcontrol.jl") do
-    # Make sure to test values come out of the constructor properly
-    context("test constructor convert fields to matrix") do
-        for f in [:Q, :R, :B, :B], l in [lq_scalar, lq_mat]
-            @fact typeof(getfield(l, f)) <: Matrix => true
-        end
-    end
-
     context("Test scalar sequences with exact by hand solution") do
         x0 = 2.0
         x_seq, u_seq, w_seq = compute_sequence(lq_scalar, x0)
         # solve by hand
-        u_0 = (-2.*lq_scalar.A.*lq_scalar.B.*lq_scalar.bet.*lq_scalar.Rf) /
-           (2.*lq_scalar.Q+lq_scalar.bet.*lq_scalar.Rf.*2lq_scalar.B.^2).*x0
+        u_0 = (-2.*lq_scalar.A*lq_scalar.B*lq_scalar.bet*lq_scalar.rf) /
+           (2.*lq_scalar.Q+lq_scalar.bet*lq_scalar.rf*2lq_scalar.B^2)*x0
         x_1 = lq_scalar.A * x0 + lq_scalar.B * u_0 + w_seq[1, end]
 
-        @fact u_0[1] => roughly(u_seq[1, end]; rough_kwargs...)
-        @fact x_1[1] => roughly(x_seq[1, end]; rough_kwargs...)
+        @fact u_0[1] => roughly(u_seq[end]; rough_kwargs...)
+        @fact x_1[1] => roughly(x_seq[end]; rough_kwargs...)
     end
 
     context("test matrix solutions") do

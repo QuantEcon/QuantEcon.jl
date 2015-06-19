@@ -20,10 +20,11 @@ type LQ
     R::ScalarOrArray
     A::ScalarOrArray
     B::ScalarOrArray
-    C::Union(Nothing, ScalarOrArray)
+    C::ScalarOrArray
+    N::ScalarOrArray
     bet::Real
     term::Union(Int, Nothing) # terminal period
-    Rf::ScalarOrArray
+    rf::ScalarOrArray
     P::ScalarOrArray
     d::Real
     F::ScalarOrArray # policy rule
@@ -33,54 +34,41 @@ function LQ(Q::ScalarOrArray,
             R::ScalarOrArray,
             A::ScalarOrArray,
             B::ScalarOrArray,
-            C::Union(Nothing, ScalarOrArray)=nothing,
-            bet::ScalarOrArray=1.0,
-            term::Union(Int, Nothing)=nothing,
-            Rf::Union(Nothing, ScalarOrArray)=nothing)
+			C::ScalarOrArray          = zeros(size(R,1)),
+			N::ScalarOrArray          = zero(B'A),
+			bet::ScalarOrArray        = 1.0,
+			term::Union(Int, Nothing) = nothing,
+			rf::ScalarOrArray         = fill(NaN, size(R)...))
+    
     k = size(Q, 1)
     n = size(R, 1)
-
-    if C == nothing
-        j = 1
-        C = zeros(n, j)
-    else
-        j = size(C, 2)
-        if j == 1
-            C = reshape([C], n, j)  # make sure C is a Matrix
-        end
-    end
-
-    if Rf == nothing
-        Rf = fill(NaN, size(R)...)
-    end
-
-    # Reshape arrays to make sure they are Matrix
     F = k==n==1 ? zero(Float64) : zeros(Float64, k, n)
-    P = copy(Rf)
+    P = copy(rf)
     d = 0.0
 
-    LQ(Q, R, A, B, C, bet, term, Rf, P, d, F)
+    LQ(Q, R, A, B, C, N, bet, term, rf, P, d, F)
 end
 
 # make kwarg version
 function LQ(Q::ScalarOrArray,
-            R::ScalarOrArray,
-            A::ScalarOrArray,
-            B::ScalarOrArray;
-            C::Union(Nothing, ScalarOrArray)=nothing,
-            bet::ScalarOrArray=1.0,
-            term::Union(Int, Nothing)=nothing,
-            Rf::Union(Nothing, ScalarOrArray)=nothing)
-    LQ(Q, R, A, B, C, bet, term, Rf)
+			R::ScalarOrArray,
+			A::ScalarOrArray,
+			B::ScalarOrArray,
+			C::ScalarOrArray          = zeros(size(R,1)),
+			N::ScalarOrArray          = zero(B'A);
+			bet::ScalarOrArray        = 1.0,
+			term::Union(Int, Nothing) = nothing,
+			rf::ScalarOrArray         = fill(NaN, size(R)...))
+	LQ(Q, R, A, B, C, N, bet, term, rf)
 end
 
 function update_values!(lq::LQ)
     # Simplify notation
-    Q, R, A, B, C, P, d = lq.Q, lq.R, lq.A, lq.B, lq.C, lq.P, lq.d
+    Q, R, A, B, N, C, P, d = lq.Q, lq.R, lq.A, lq.B, lq.N, lq.C, lq.P, lq.d
 
     # Some useful matrices
     s1 = Q + lq.bet * (B'P*B)
-    s2 = lq.bet * (B'P*A)
+    s2 = lq.bet * (B'P*A) + N
     s3 = lq.bet * (A'P*A)
 
     # Compute F as (Q + B'PB)^{-1} (beta B'PA)
@@ -99,16 +87,16 @@ end
 
 function stationary_values!(lq::LQ)
     # simplify notation
-    Q, R, A, B, C = lq.Q, lq.R, lq.A, lq.B, lq.C
+    Q, R, A, B, N, C = lq.Q, lq.R, lq.A, lq.B, lq.N, lq.C
 
     # solve Riccati equation, obtain P
     A0, B0 = sqrt(lq.bet) * A, sqrt(lq.bet) * B
-    P = solve_discrete_riccati(A0, B0, R, Q)
+    P = solve_discrete_riccati(A0, B0, R, Q, N)
 
     # Compute F
-    S1 = Q + lq.bet * (B' * P * B)
-    S2 = lq.bet * (B' * P * A)
-    F = S1 \ S2
+    s1 = Q + lq.bet * (B' * P * B)
+    s2 = lq.bet * (B' * P * A) + N
+    F = s1 \ s2
 
     # Compute d
     d = lq.bet * trace(P * C * C') / (1 - lq.bet)
@@ -117,18 +105,20 @@ function stationary_values!(lq::LQ)
     lq.P, lq.F, lq.d = P, F, d
 end
 
-function stationary_values(_lq::LQ)
-	lq = LQ(
-		copy(_lq.Q), 
-		copy(_lq.R), 
-		copy(_lq.A), 
-		copy(_lq.B), 
-		copy(_lq.C), 
-		copy(_lq.bet), 
-		_lq.term,
-		copy(_lq.Rf))
-    stationary_values!(lq)
-    return lq.P, lq.F, lq.d
+function stationary_values(lq::LQ)
+	_lq = LQ(
+			copy(lq.Q), 
+			copy(lq.R), 
+			copy(lq.A), 
+			copy(lq.B), 
+			copy(lq.C), 
+			copy(lq.N),
+			copy(lq.bet), 
+			lq.term,
+			copy(lq.rf))
+
+    stationary_values!(_lq)
+    return _lq.P, _lq.F, _lq.d
 end
 
 function compute_sequence(lq::LQ, x0::ScalarOrArray, ts_length=100)
@@ -139,7 +129,7 @@ function compute_sequence(lq::LQ, x0::ScalarOrArray, ts_length=100)
     if lq.term != nothing
         # finite horizon case
         term = min(ts_length, lq.term)
-        lq.P, lq.d = lq.Rf, 0.0
+        lq.P, lq.d = lq.rf, 0.0
     else
         # infinite horizon case
         term = ts_length
@@ -155,10 +145,11 @@ function compute_sequence(lq::LQ, x0::ScalarOrArray, ts_length=100)
         policies[t] = lq.F
     end
 
-    # Set up initial condition and arrays to store paths
-    x_path = Array(typeof(x0), term+1)
-    u_path = Array(typeof(x0), term)
-
+	# Set up initial condition and arrays to store paths
+	T      = typeof(x0)
+	x_path = Array(T, term+1)
+	u_path = Array(T, term)
+	
 	x_path[1] = x0
 	u_path[1] = -(first(policies)*x0)
 	w_path    = C .* randn(term+1)
@@ -173,5 +164,10 @@ function compute_sequence(lq::LQ, x0::ScalarOrArray, ts_length=100)
     Ax, Bu = A*x_path[term], B*u_path[term]
     x_path[end] = Ax + Bu + w_path[end]
 
-    return hcat(x_path...), hcat(u_path...), hcat(w_path...)
+    # This is very ugly
+    if T == Number
+		return x_path, u_path, w_path
+	else
+		return hcat(x_path...), hcat(u_path...), hcat(w_path...)
+	end
 end
