@@ -164,10 +164,9 @@ function compute_sequence(lq::LQ, x0::ScalarOrArray, ts_length=100)
     Ax, Bu = A*x_path[term], B*u_path[term]
     x_path[end] = Ax + Bu + w_path[end]
 
-    # This is very ugly
-    if T == Number
-		return x_path, u_path, w_path
-	else
-		return hcat(x_path...), hcat(u_path...), hcat(w_path...)
-	end
+    # This is very ugly, ideally should dispatch on Number versus Array
+    # would improve performance as well
+    isa(T,Number) && return x_path, u_path, w_path
+	
+	return hcat(x_path...), hcat(u_path...), hcat(w_path...)
 end
