@@ -1,7 +1,7 @@
 #=
 Tools for working with Markov Chains
 
-@author : Spencer Lyon
+@author : Spencer Lyon, Zac Cranko
 
 @date: 07/10/2014
 
@@ -137,10 +137,11 @@ end
 # output is a N x M matrix where each column is a stationary distribution
 # currently using lu decomposition to solve p(P-I)=0
 function mc_compute_stationary(mc::MarkovChain; method=:gth)
-    @compat solvers = Dict(:gth => gth_solve, :lu => lu_solve, :eigen => eigen_solve)
+    @compat solvers = Dict(:gth => gth_solve, :lu => lu_solve,
+                           :eigen => eigen_solve)
     solve = solvers[method]
 
-    p,T = mc.p,eltype(mc.p)
+    p, T = mc.p, eltype(mc.p)
     classes = irreducible_subsets(mc)
 
     # irreducible mc
