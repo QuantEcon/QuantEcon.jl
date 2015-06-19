@@ -121,11 +121,47 @@ function stationary_values(lq::LQ)
     return _lq.P, _lq.F, _lq.d
 end
 
-function compute_sequence(lq::LQ, x0::ScalarOrArray, ts_length=100)
-    # simplify notation
-    Q, R, A, B, C = lq.Q, lq.R, lq.A, lq.B, lq.C
+# dispatch for a scalar problem
+function _compute_sequence{T}(lq::LQ, x0::T, policies)
+	term = length(policies)
+	x_path = Array(T, term+1)
+	u_path = Array(T, term)
+	
+	x_path[1] = x0
+	u_path[1] = -(first(policies)*x0)
+	w_path    = lq.C .* randn(term+1)
 
-    # Preliminaries,
+    for t = 2:term
+        f = policies[t]
+        x_path[t] = lq.A*x_path[t-1] + lq.B*u_path[t-1] + w_path[t]
+        u_path[t] = -(f*x_path[t])
+    end
+    x_path[end] = lq.A*x_path[term] + lq.B*u_path[term] + w_path[end]
+
+    x_path, u_path, w_path
+end
+
+# dispatch for a vector problem
+function _compute_sequence{T}(lq::LQ, x0::Vector{T}, policies)
+	n, term = length(x0), length(policies)
+	x_path = Array(T, n, term+1)
+	u_path = Array(T, n, term)
+	
+	x_path[:,1] = x0
+	u_path[:,1] = -(first(policies)*x0)
+	w_path    = lq.C .* randn(term+1)
+
+    for t = 2:term
+        f = policies[t]
+        x_path[:,t] = lq.A*x_path[t-1] + lq.B*u_path[t-1] + w_path[t]
+        u_path[:,t] = -(f*x_path[t])
+    end
+    x_path[:,end] = lq.A*x_path[:,term] + lq.B*u_path[:,term] + w_path[end]
+
+    x_path, u_path, w_path
+end
+
+function compute_sequence(lq::LQ, x0::ScalarOrArray, ts_length=100)
     if lq.term != nothing
         # finite horizon case
         term = min(ts_length, lq.term)
@@ -145,28 +181,5 @@ function compute_sequence(lq::LQ, x0::ScalarOrArray, ts_length=100)
         policies[t] = lq.F
     end
 
-	# Set up initial condition and arrays to store paths
-	T      = typeof(x0)
-	x_path = Array(T, term+1)
-	u_path = Array(T, term)
-	
-	x_path[1] = x0
-	u_path[1] = -(first(policies)*x0)
-	w_path    = C .* randn(term+1)
-
-    for t = 2:term
-        F = policies[t]
-        Ax, Bu = A*x_path[t-1], B*u_path[t-1]
-        x_path[t] = Ax + Bu + w_path[t]
-        u_path[t] = -(F*x_path[t])
-    end
-
-    Ax, Bu = A*x_path[term], B*u_path[term]
-    x_path[end] = Ax + Bu + w_path[end]
-
-    # This is very ugly, ideally should dispatch on Number versus Array
-    # would improve performance as well
-    isa(T,Number) && return x_path, u_path, w_path
-	
-	return hcat(x_path...), hcat(u_path...), hcat(w_path...)
+	_compute_sequence(lq, x0, policies)
 end
