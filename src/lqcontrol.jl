@@ -16,22 +16,21 @@ http://quant-econ.net/lqcontrol.html
 =#
 
 type LQ
-    Q::Matrix
-    R::Matrix
-    A::Matrix
-    B::Matrix
-    C::Union(Nothing, Matrix)
+    Q::ScalarOrArray
+    R::ScalarOrArray
+    A::ScalarOrArray
+    B::ScalarOrArray
+    C::Union(Nothing, ScalarOrArray)
     bet::Real
-    T::Union(Int, Nothing)
-    Rf::Matrix
+    term::Union(Int, Nothing) # terminal period
+    Rf::ScalarOrArray
     k::Int
     n::Int
     j::Int
-    P::Matrix
+    P::ScalarOrArray
     d::Real
-    F::Matrix
+    F::ScalarOrArray # policy rule
 end
-
 
 function LQ(Q::ScalarOrArray,
             R::ScalarOrArray,
@@ -39,7 +38,7 @@ function LQ(Q::ScalarOrArray,
             B::ScalarOrArray,
             C::Union(Nothing, ScalarOrArray)=nothing,
             bet::ScalarOrArray=1.0,
-            T::Union(Int, Nothing)=nothing,
+            term::Union(Int, Nothing)=nothing,
             Rf::Union(Nothing, ScalarOrArray)=nothing)
     k = size(Q, 1)
     n = size(R, 1)
@@ -59,17 +58,11 @@ function LQ(Q::ScalarOrArray,
     end
 
     # Reshape arrays to make sure they are Matrix
-    Q = reshape([Q], k, k)
-    R = reshape([R], n, n)
-    A = reshape([A], n, n)
-    B = reshape([B], n, k)
-    Rf = reshape([Rf], n, n)
-
-    F = zeros(Float64, k, n)
+    F = k==n==1 ? zero(Float64) : zeros(Float64, k, n)
     P = copy(Rf)
     d = 0.0
 
-    LQ(Q, R, A, B, C, bet, T, Rf, k, n, j, P, d, F)
+    LQ(Q, R, A, B, C, bet, term, Rf, k, n, j, P, d, F)
 end
 
 # make kwarg version
@@ -79,27 +72,25 @@ function LQ(Q::ScalarOrArray,
             B::ScalarOrArray;
             C::Union(Nothing, ScalarOrArray)=nothing,
             bet::ScalarOrArray=1.0,
-            T::Union(Int, Nothing)=nothing,
+            term::Union(Int, Nothing)=nothing,
             Rf::Union(Nothing, ScalarOrArray)=nothing)
-    LQ(Q, R, A, B, C, bet, T, Rf)
+    LQ(Q, R, A, B, C, bet, term, Rf)
 end
-
-
 
 function update_values!(lq::LQ)
     # Simplify notation
     Q, R, A, B, C, P, d = lq.Q, lq.R, lq.A, lq.B, lq.C, lq.P, lq.d
 
     # Some useful matrices
-    S1 = Q .+ lq.bet .* (B' * P * B)
-    S2 = lq.bet .* (B' * P * A)
-    S3 = lq.bet .* (A' * P * A)
+    s1 = Q + lq.bet * (B'P*B)
+    s2 = lq.bet * (B'P*A)
+    s3 = lq.bet * (A'P*A)
 
     # Compute F as (Q + B'PB)^{-1} (beta B'PA)
-    lq.F = S1 \ S2
+    lq.F = s1 \ s2
 
     # Shift P back in time one step
-    new_P = R - S2'*lq.F + S3
+    new_P = R - s2'lq.F + s3
 
     # Recalling that trace(AB) = trace(BA)
     new_d = lq.bet * (d + trace(P * C * C'))
@@ -107,81 +98,83 @@ function update_values!(lq::LQ)
     # Set new state
     lq.P = new_P
     lq.d = new_d
-    return nothing
 end
-
 
 function stationary_values!(lq::LQ)
     # simplify notation
     Q, R, A, B, C = lq.Q, lq.R, lq.A, lq.B, lq.C
 
     # solve Riccati equation, obtain P
-    A0, B0 = sqrt(lq.bet) .* A, sqrt(lq.bet) .* B
+    A0, B0 = sqrt(lq.bet) * A, sqrt(lq.bet) * B
     P = solve_discrete_riccati(A0, B0, R, Q)
 
     # Compute F
-    S1 = Q .+ lq.bet .* (B' * P * B)
-    S2 = lq.bet .* (B' * P * A)
+    S1 = Q + lq.bet * (B' * P * B)
+    S2 = lq.bet * (B' * P * A)
     F = S1 \ S2
 
     # Compute d
-    d = lq.bet .* trace(P * C * C') / (1 - lq.bet)
+    d = lq.bet * trace(P * C * C') / (1 - lq.bet)
 
     # Bind states
     lq.P, lq.F, lq.d = P, F, d
-    nothing
 end
 
-function stationary_values(lq::LQ)
+function stationary_values(_lq::LQ)
+	lq = LQ(
+		copy(_lq.Q), 
+		copy(_lq.R), 
+		copy(_lq.A), 
+		copy(_lq.B), 
+		copy(_lq.C), 
+		copy(_lq.bet), 
+		_lq.term,
+		copy(_lq.Rf))
     stationary_values!(lq)
     return lq.P, lq.F, lq.d
 end
-
 
 function compute_sequence(lq::LQ, x0::ScalarOrArray, ts_length=100)
     # simplify notation
     Q, R, A, B, C = lq.Q, lq.R, lq.A, lq.B, lq.C
 
     # Preliminaries,
-    if lq.T != nothing
+    if lq.term != nothing
         # finite horizon case
-        T = min(ts_length, lq.T)
+        term = min(ts_length, lq.term)
         lq.P, lq.d = lq.Rf, 0.0
     else
         # infinite horizon case
-        T = ts_length
+        term = ts_length
         stationary_values!(lq)
     end
 
-    # Set up initial condition and arrays to store paths
-    x0 = reshape([x0], lq.n, 1)  # make sure x0 is a column vector
-    x_path = Array(eltype(x0), lq.n, T+1)
-    u_path = Array(eltype(x0), lq.k, T)
-    w_path = C * randn(lq.j, T+1)
-
     # Compute and record the sequence of policies
-    policies = Array(typeof(lq.F), T)
-
-    for t=1:T
-        if lq.T != nothing
+    policies = Array(typeof(lq.F), term)
+    for t = 1:term
+        if lq.term != nothing
             update_values!(lq)
         end
         policies[t] = lq.F
     end
 
-    # Use policy sequence to generate states and controls
-    F = pop!(policies)
-    x_path[:, 1] = x0
-    u_path[:, 1] = - (F * x0)
+    # Set up initial condition and arrays to store paths
+    x_path = Array(typeof(x0), term+1)
+    u_path = Array(typeof(x0), term)
 
-    for t=2:T
-        F = pop!(policies)
-        Ax, Bu = A * x_path[:, t-1], B * u_path[:, t-1]
-        x_path[:, t] = Ax .+ Bu .+ w_path[:, t]
-        u_path[:, t] = - (F * x_path[:, t])
+	x_path[1] = x0
+	u_path[1] = -(first(policies)*x0)
+	w_path    = C .* randn(term+1)
+
+    for t = 2:term
+        F = policies[t]
+        Ax, Bu = A*x_path[t-1], B*u_path[t-1]
+        x_path[t] = Ax + Bu + w_path[t]
+        u_path[t] = -(F*x_path[t])
     end
 
-    Ax, Bu = A * x_path[:, T], B * u_path[:, T]
-    x_path[:, T+1] = Ax .+ Bu .+ w_path[:, T+1]
-    return x_path, u_path, w_path
+    Ax, Bu = A*x_path[term], B*u_path[term]
+    x_path[end] = Ax + Bu + w_path[end]
+
+    return hcat(x_path...), hcat(u_path...), hcat(w_path...)
 end
