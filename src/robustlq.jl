@@ -27,50 +27,6 @@ type RBLQ
     theta::Real
 end
 
-@doc doc"""
-Provides methods for analysing infinite horizon robust LQ control
-problems of the form
-
-.. math::
-
-    min_{u_t}  sum_t beta^t {x_t' R x_t + u_t' Q u_t }
-
-subject to
-
-.. math::
-
-    x_{t+1} = A x_t + B u_t + C w_{t+1}
-
-and with model misspecification parameter theta.
-
-Parameters
-----------
-Q : array_like(float, ndim=2)
-    The cost(payoff) matrix for the controls.  See above for more.
-    Q should be k x k and symmetric and positive definite
-R : array_like(float, ndim=2)
-    The cost(payoff) matrix for the state.  See above for more. R
-    should be n x n and symmetric and non-negative definite
-A : array_like(float, ndim=2)
-    The matrix that corresponds with the state in the state space
-    system.  A should be n x n
-B : array_like(float, ndim=2)
-    The matrix that corresponds with the control in the state space
-    system.  B should be n x k
-C : array_like(float, ndim=2)
-    The matrix that corresponds with the random process in the
-    state space system.  C should be n x j
-beta : scalar(float)
-    The discount factor in the robust control problem
-theta : scalar(float)
-    The robustness factor in the robust control problem
-
-Attributes
-----------
-Q, R, A, B, C, beta, theta : see Parameters
-k, n, j : scalar(int)
-    The dimensions of the matrices
-""" ->
 function RBLQ(Q::ScalarOrArray, R::ScalarOrArray, A::ScalarOrArray,
               B::ScalarOrArray, C::ScalarOrArray, bet::Real, theta::Real)
     k = size(Q, 1)
@@ -86,24 +42,6 @@ function RBLQ(Q::ScalarOrArray, R::ScalarOrArray, A::ScalarOrArray,
     RBLQ(A, B, C, Q, R, k, n, j, bet, theta)
 end
 
-
-@doc doc"""
-The D operator, mapping P into
-
-.. math::
-
-    D(P) := P + PC(theta I - C'PC)^{-1} C'P.
-
-Parameters
-----------
-P : array_like(float, ndim=2)
-    A matrix that should be n x n
-
-Returns
--------
-dP : array_like(float, ndim=2)
-    The matrix P after applying the D operator
-""" ->
 function d_operator(rlq::RBLQ, P::Matrix)
     C, theta, I = rlq.C, rlq.theta, eye(rlq.j)
     S1 = P*C
@@ -112,32 +50,6 @@ function d_operator(rlq::RBLQ, P::Matrix)
     return dP
 end
 
-
-@doc doc"""
-The B operator, mapping P into
-
-.. math::
-
-    B(P) := R - beta^2 A'PB(Q + beta B'PB)^{-1}B'PA + beta A'PA
-
-and also returning
-
-.. math::
-
-    F := (Q + beta B'PB)^{-1} beta B'PA
-
-Parameters
-----------
-P : array_like(float, ndim=2)
-    A matrix that should be n x n
-
-Returns
--------
-F : array_like(float, ndim=2)
-    The F matrix as defined above
-new_p : array_like(float, ndim=2)
-    The matrix P after applying the B operator
-""" ->
 function b_operator(rlq::RBLQ, P::Matrix)
     A, B, Q, R, bet = rlq.A, rlq.B, rlq.Q, rlq.R, rlq.bet
 
@@ -151,30 +63,6 @@ function b_operator(rlq::RBLQ, P::Matrix)
     return F, new_P
 end
 
-
-@doc doc"""
-This method solves the robust control problem by tricking it
-into a stacked LQ problem, as described in chapter 2 of Hansen-
-Sargent's text "Robustness."  The optimal control with observed
-state is
-
-.. math::
-
-    u_t = - F x_t
-
-And the value function is -x'Px
-
-Returns
--------
-F : array_like(float, ndim=2)
-    The optimal control matrix from above
-P : array_like(float, ndim=2)
-    The positive semi-definite matrix defining the value
-    function
-K : array_like(float, ndim=2)
-    the worst-case shock matrix K, where
-        :math:`w_{t+1} = K x_t` is the worst case shock
-""" ->
 function robust_rule(rlq::RBLQ)
     A, B, C, Q, R = rlq.A, rlq.B, rlq.C, rlq.Q, rlq.R
     bet, theta, k, j = rlq.bet, rlq.theta, rlq.k, rlq.j
@@ -195,37 +83,6 @@ function robust_rule(rlq::RBLQ)
     return F, K, P
 end
 
-
-@doc doc"""
-A simple algorithm for computing the robust policy F and the
-corresponding value function P, based around straightforward
-iteration with the robust Bellman operator.  This function is
-easier to understand but one or two orders of magnitude slower
-than self.robust_rule().  For more information see the docstring
-of that method.
-
-Parameters
-----------
-P_init : array_like(float, ndim=2), optional(default=None)
-    The initial guess for the value function matrix.  It will
-    be a matrix of zeros if no guess is given
-max_iter : scalar(int), optional(default=80)
-    The maximum number of iterations that are allowed
-tol : scalar(float), optional(default=1e-8)
-    The tolerance for convergence
-
-Returns
--------
-F : array_like(float, ndim=2)
-    The optimal control matrix from above
-P : array_like(float, ndim=2)
-    The positive semi-definite matrix defining the value
-    function
-K : array_like(float, ndim=2)
-    the worst-case shock matrix K, where
-    :math:`w_{t+1} = K x_t` is the worst case shock
-
-""" ->
 function robust_rule_simple(rlq::RBLQ,
                             P::Matrix=zeros(Float64, rlq.n, rlq.n);
                             max_iter=80,
@@ -254,22 +111,6 @@ function robust_rule_simple(rlq::RBLQ,
     return F, K, P
 end
 
-
-@doc doc"""
-Compute agent 2's best cost-minimizing response K, given F.
-
-Parameters
-----------
-F : array_like(float, ndim=2)
-    A k x n array
-
-Returns
--------
-K : array_like(float, ndim=2)
-    Agent's best cost minimizing response for a given F
-P : array_like(float, ndim=2)
-    The value function for a given F
-""" ->
 function F_to_K(rlq::RBLQ, F::Matrix)
     # simplify notation
     R, Q, A, B, C = rlq.R, rlq.Q, rlq.A, rlq.B, rlq.C
@@ -287,22 +128,6 @@ function F_to_K(rlq::RBLQ, F::Matrix)
     return -neg_K, -neg_P
 end
 
-
-@doc doc"""
-Compute agent 1's best value-maximizing response F, given K.
-
-Parameters
-----------
-K : array_like(float, ndim=2)
-    A j x n array
-
-Returns
--------
-F : array_like(float, ndim=2)
-    The policy function for a given K
-P : array_like(float, ndim=2)
-        The value function for a given K
-""" ->
 function K_to_F(rlq::RBLQ, K::Matrix)
     R, Q, A, B, C = rlq.R, rlq.Q, rlq.A, rlq.B, rlq.C
     bet, theta = rlq.bet, rlq.theta
@@ -315,25 +140,6 @@ function K_to_F(rlq::RBLQ, K::Matrix)
     return F, P
 end
 
-
-@doc doc"""
-Given K and F, compute the value of deterministic entropy, which
-is sum_t beta^t x_t' K'K x_t with x_{t+1} = (A - BF + CK) x_t.
-
-Parameters
-----------
-F : array_like(float, ndim=2)
-    The policy function, a k x n array
-K : array_like(float, ndim=2)
-    The worst case matrix, a j x n array
-x0 : array_like(float, ndim=1)
-    The initial condition for state
-
-Returns
--------
-e : scalar(int)
-    The deterministic entropy
-""" ->
 function compute_deterministic_entropy(rlq::RBLQ, F, K, x0)
     B, C, bet = rlq.B, rlq.C, rlq.bet
     H0 = K'*K
@@ -342,30 +148,6 @@ function compute_deterministic_entropy(rlq::RBLQ, F, K, x0)
     return var_quadratic_sum(A0, C0, H0, bet, x0)
 end
 
-
-@doc doc"""
-Given a fixed policy F, with the interpretation u = -F x, this
-function computes the matrix P_F and constant d_F associated
-with discounted cost J_F(x) = x' P_F x + d_F.
-
-Parameters
-----------
-F : array_like(float, ndim=2)
-    The policy function, a k x n array
-
-Returns
--------
-P_F : array_like(float, ndim=2)
-    Matrix for discounted cost
-d_F : scalar(float)
-    Constant for discounted cost
-K_F : array_like(float, ndim=2)
-    Worst case policy
-O_F : array_like(float, ndim=2)
-    Matrix for discounted entropy
-o_F : scalar(float)
-    Constant for discounted entropy
-""" ->
 function evaluate_F(rlq::RBLQ, F::Matrix)
     R, Q, A, B, C = rlq.R, rlq.Q, rlq.A, rlq.B, rlq.C
     bet, theta, j = rlq.bet, rlq.theta, rlq.j
@@ -386,4 +168,3 @@ function evaluate_F(rlq::RBLQ, F::Matrix)
 
     return K_F, P_F, d_F, O_F, o_F
 end
-

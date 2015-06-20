@@ -8,6 +8,8 @@ import Distributions: pdf, skewness
 using DSP: TFFilter, freqz
 using Compat
 
+VERSION < v"0.4-" && using Docile
+
 
 # useful types
 typealias ScalarOrArray{T} Union(T, Array{T})
