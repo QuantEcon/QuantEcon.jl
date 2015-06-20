@@ -129,7 +129,7 @@ function _compute_sequence{T}(lq::LQ, x0::T, policies)
 	
 	x_path[1] = x0
 	u_path[1] = -(first(policies)*x0)
-	w_path    = lq.C .* randn(term+1)
+	w_path    = lq.C * randn(term+1)
 
     for t = 2:term
         f = policies[t]
@@ -143,13 +143,13 @@ end
 
 # dispatch for a vector problem
 function _compute_sequence{T}(lq::LQ, x0::Vector{T}, policies)
-	n, term = length(x0), length(policies)
+	n, j, term = length(x0), length(lq.C), length(policies)
 	x_path = Array(T, n, term+1)
 	u_path = Array(T, n, term)
 	
 	x_path[:,1] = x0
 	u_path[:,1] = -(first(policies)*x0)
-	w_path    = lq.C .* randn(term+1)
+	w_path      =  [dot(lq.C,randn(j)) for i=1:(term+1)]
 
     for t = 2:term
         f = policies[t]
