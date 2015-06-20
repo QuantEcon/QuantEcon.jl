@@ -33,18 +33,18 @@ facts("Testing lqcontrol.jl") do
         # solve by hand
         u_0 = (-2.*lq_scalar.A*lq_scalar.B*lq_scalar.bet*lq_scalar.rf) /
            (2.*lq_scalar.Q+lq_scalar.bet*lq_scalar.rf*2lq_scalar.B^2)*x0
-        x_1 = lq_scalar.A * x0 + lq_scalar.B * u_0 + w_seq[1, end]
+        x_1 = lq_scalar.A * x0 + lq_scalar.B * u_0 + w_seq[end]
 
         @fact u_0[1] => roughly(u_seq[end]; rough_kwargs...)
         @fact x_1[1] => roughly(x_seq[end]; rough_kwargs...)
     end
 
     context("test matrix solutions") do
-        x0 = randn(2) .* 25
+        x0 = randn(2) * 25
         x_seq, u_seq, w_seq = compute_sequence(lq_mat, x0)
 
         @fact sum(u_seq) => roughly(0.95 * sum(x0); rough_kwargs...)
-        @fact x_seq[:, end] => roughly(zeros(x0); rough_kwargs...)
+        @fact x_seq[:,end] => roughly(zeros(x0); rough_kwargs...)
     end
 
     context("test stationary matrix") do
