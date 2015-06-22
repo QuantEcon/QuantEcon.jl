@@ -3,8 +3,9 @@ module TestMarkovApprox
 using QuantEcon
 using Base.Test
 using FactCheck
+using Compat
 
-rough_kwargs = {:atol => 1e-8, :rtol => 1e-8}
+rough_kwargs = @compat Dict(:atol => 1e-8, :rtol => 1e-8)
 
 # set up
 ρ, σ_u = rand(2)
@@ -23,4 +24,3 @@ facts("Testing markov_approx.jl") do
     end
 end  # facts
 end  # module
-

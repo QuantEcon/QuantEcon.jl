@@ -40,14 +40,14 @@ ARMA(phi::Real, theta::Real=0.0, sigma::Real=1.0) = ARMA([phi], [theta], sigma)
 ARMA(phi::Real, theta::Vector=[0.0], sigma::Real=1.0) = ARMA([phi], theta, sigma)
 ARMA(phi::Vector, theta::Real=0.0, sigma::Real=1.0) = ARMA(phi, theta, sigma)
 
-function ARMA(phi::Vector, theta::Vector=[0.0], sigma::Real=1.0)
+function ARMA(phi::AbstractVector, theta::AbstractVector=[0.0], sigma::Real=1.0)
     # == Record dimensions == #
     p = length(phi)
     q = length(theta)
 
     # == Build filtering representation of polynomials == #
-    ma_poly = [1.0, theta]
-    ar_poly = [1.0, -phi]
+    ma_poly = [1.0; theta]
+    ar_poly = [1.0; -phi]
     return ARMA(phi, theta, p, q, sigma, ma_poly, ar_poly)
 end
 
@@ -75,7 +75,7 @@ function impulse_response(arma::ARMA; impulse_length=30)
     err_msg = "Impulse length must be greater than number of AR coefficients"
     @assert impulse_length >= arma.p err_msg
     # == Pad theta with zeros at the end == #
-    theta = [arma.theta, zeros(impulse_length - arma.q)]
+    theta = [arma.theta; zeros(impulse_length - arma.q)]
     psi_zero = 1.0
     psi = Array(Float64, impulse_length)
     for j = 1:impulse_length
@@ -84,7 +84,7 @@ function impulse_response(arma::ARMA; impulse_length=30)
             psi[j] += arma.phi[i] * (j-i > 0 ? psi[j-i] : psi_zero)
         end
     end
-    return [psi_zero, psi[1:end-1]]
+    return [psi_zero; psi[1:end-1]]
 end
 
 function simulation(arma::ARMA; ts_length=90, impulse_length=30)

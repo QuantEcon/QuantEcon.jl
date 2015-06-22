@@ -13,19 +13,19 @@ facts("Testing estspec") do
 
     context("testing output sizes of periodogram and ar_periodogram") do
     # test shapes of periodogram and ar_periodogram functions
-        for x in {x_20, x_21}
+        for x in Any[x_20, x_21]
             w, I_w = periodogram(x)
             n_w, n_Iw, n_x = length(w), length(I_w), length(x)
 
-            @fact n_w => int(floor(n_x / 2 + 1))
-            @fact n_Iw => int(floor(n_x / 2 + 1))
+            @fact n_w => floor(Int, n_x / 2 + 1)
+            @fact n_Iw => floor(Int, n_x / 2 + 1)
 
             w, I_w = ar_periodogram(x)
             n_w, n_Iw, n_x = length(w), length(I_w), length(x)
 
             # when x is even we get 10 elements back
-            @fact n_w => iseven(n_x) ? int(floor(n_x / 2)) : int(floor(n_x / 2 + 1))
-            @fact n_Iw => iseven(n_x) ? int(floor(n_x / 2)) : int(floor(n_x / 2 + 1))
+            @fact n_w => iseven(n_x) ? floor(Int, n_x / 2) : floor(Int, n_x / 2 + 1)
+            @fact n_Iw => iseven(n_x) ? floor(Int, n_x / 2) : floor(Int, n_x / 2 + 1)
         end
     end  # context
 

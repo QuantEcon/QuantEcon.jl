@@ -37,7 +37,7 @@ type LucasTree
     alpha::Real
     sigma::Real
     phi::Distribution
-    grid::Union(FloatRange, Vector)
+    grid::AbstractVector
     grid_min::Real
     grid_max::Real
     grid_size::Int
@@ -95,7 +95,7 @@ end
 
 
 # Set up the Lucas operator T
-function lucas_operator(lt::LucasTree, f::Vector)
+function lucas_operator(lt::LucasTree, f::AbstractVector)
     grid, h, alpha, bet = lt.grid, lt.h, lt.alpha, lt.bet
 
     Tf = similar(f)

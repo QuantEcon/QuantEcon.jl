@@ -85,7 +85,7 @@ function bellman_operator!(jv::JvWorker, V::Vector,
     # instantiate variables so they are available outside loop and exist
     # within it
     if ret_policies
-        if !(typeof(out) <: (Vector, Vector))
+        if !(typeof(out) <: @compat Tuple{Vector, Vector})
             msg = "You asked for policies, but only provided one output array"
             msg *= "\nthere are two policies so two arrays must be given"
             error(msg)

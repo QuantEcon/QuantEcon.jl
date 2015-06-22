@@ -347,7 +347,7 @@ facts("Testing lucastree.jl") do
     end
 
     context("test lucas_operator fp") do
-        old_f = prices ./ ([lt.grid].^γ)
+        old_f = prices ./ (lt.grid.^γ)
         new_f = lucas_operator(lt, old_f)
         new_p = new_f .* lt.grid.^γ
 
@@ -443,7 +443,7 @@ facts("Testing optgrowth.jl") do
     sigma = get_greedy(gm, v_star)
 
     # compute true policy rule
-    true_sigma = (1 - α*β) .* [gm.grid].^α
+    true_sigma = (1 - α*β) .* gm.grid.^α
 
     # compute true value function
     ab = α * β
@@ -479,4 +479,3 @@ end  # facts
 
 
 end  # module
-

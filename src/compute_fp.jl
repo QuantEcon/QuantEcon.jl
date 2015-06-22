@@ -43,11 +43,11 @@ be an approximation to the fixed point of `T`.
 ```julia
 using QuantEcon
 T(x, μ) = 4.0 * μ * x * (1.0 - x)
-x_star = compte_fixed_point(x->T(x, 0.3), 0.4)  # (4μ - 1)/(4μ)
+x_star = compute_fixed_point(x->T(x, 0.3), 0.4)  # (4μ - 1)/(4μ)
 ```
 
 """ ->
-function compte_fixed_point{TV}(T::Function, v::TV; err_tol=1e-3,
+function compute_fixed_point{TV}(T::Function, v::TV; err_tol=1e-3,
                                 max_iter=50, verbose=true, print_skip=10)
     iterate = 0
     err = err_tol + 1

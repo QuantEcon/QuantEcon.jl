@@ -125,7 +125,7 @@ function coleman_operator!(cp::ConsumerProblem, c::Matrix, out::Matrix)
         for (i_a, a) in enumerate(asset_grid)
             function h(t)
                 cf!(R*a+z-t, vals)  # update vals
-                expectation = dot(du(vals), Pi[i_z, :])
+                expectation = dot(du(vals), vec(Pi[i_z, :]))
                 return abs(du(t) - max(gam * expectation, du(R*a+z+b)))
             end
 

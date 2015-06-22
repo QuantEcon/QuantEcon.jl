@@ -25,14 +25,14 @@ type LAE
     p::Function
     X::Matrix
 
-    function LAE(p::Function, X::Array)
+    function LAE(p::Function, X::AbstractArray)
         n = length(X)
         new(p, reshape(X, n, 1))
     end
 end
 
 
-function lae_est{T}(l::LAE, y::Array{T})
+function lae_est{T}(l::LAE, y::AbstractArray{T})
     k = length(y)
     v = l.p(l.X, reshape(y, 1, k))
     psi_vals = mean(v, 1)

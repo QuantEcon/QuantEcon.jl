@@ -3,8 +3,9 @@ module TestLQcontrol
 using QuantEcon
 using Base.Test
 using FactCheck
+using Compat
 
-rough_kwargs = {:atol => 1e-13, :rtol => 1e-4}
+rough_kwargs = @compat Dict(:atol => 1e-13, :rtol => 1e-4)
 
 # set up
 q = 1.
@@ -70,4 +71,3 @@ facts("Testing lqcontrol.jl") do
 
 end  # facts
 end  # module
-

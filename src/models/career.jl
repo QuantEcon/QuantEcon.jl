@@ -19,10 +19,10 @@ type CareerWorkerProblem
     beta::Real
     N::Int
     B::Real
-    theta::Vector
-    epsilon::Vector
-    F_probs::Vector
-    G_probs::Vector
+    theta::AbstractVector
+    epsilon::AbstractVector
+    F_probs::AbstractVector
+    G_probs::AbstractVector
     F_mean::Real
     G_mean::Real
 end

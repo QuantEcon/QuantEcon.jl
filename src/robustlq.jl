@@ -34,11 +34,11 @@ function RBLQ(Q::ScalarOrArray, R::ScalarOrArray, A::ScalarOrArray,
     j = size(C, 2)
 
     # coerce sizes
-    A = reshape([A], n, n)
-    B = reshape([B], n, k)
-    C = reshape([C], n, j)
-    R = reshape([R], n, n)
-    Q = reshape([Q], k, k)
+    A = reshape([A;], n, n)
+    B = reshape([B;], n, k)
+    C = reshape([C;], n, j)
+    R = reshape([R;], n, n)
+    Q = reshape([Q;], k, k)
     RBLQ(A, B, C, Q, R, k, n, j, bet, theta)
 end
 

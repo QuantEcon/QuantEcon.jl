@@ -38,10 +38,10 @@ function smooth(x::Array, window_len::Int=7, window::String="hanning")
                )
 
     # Reflect x around x[0] and x[-1] prior to convolution
-    k = int(window_len / 2)
+    k = round(Int, window_len / 2)
     xb = x[1:k]   # First k elements
     xt = x[end-k+1:end]  # Last k elements
-    s = [reverse(xb), x, reverse(xt)]
+    s = [reverse(xb); x; reverse(xt)]
 
     # === Select window values === #
     if !haskey(windows, window)
@@ -64,11 +64,11 @@ end
 function periodogram(x::Vector)
     n = length(x)
     I_w = abs(fft(x)).^2 ./ n
-    w = 2pi * [0:n-1] ./ n  # Fourier frequencies
+    w = 2pi * (0:n-1) ./ n  # Fourier frequencies
 
     # int rounds to nearest integer. We want to round up or take 1/2 + 1 to
     # make sure we get the whole interval from [0, pi]
-    ind = iseven(n) ? int(n / 2  + 1) : int(n / 2)
+    ind = iseven(n) ? round(Int, n / 2  + 1) : ceil(Int, n / 2)
     w, I_w = w[1:ind], I_w[1:ind]
     return w, I_w
 end

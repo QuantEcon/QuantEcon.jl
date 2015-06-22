@@ -1,15 +1,14 @@
 # matrix_eqn.jl
 
-typealias ScalarOrArray{T} Union(T, Array{T})
-
+# function solve_discrete_lyapunov()
 
 function solve_discrete_lyapunov(A::ScalarOrArray,
                                  B::ScalarOrArray,
                                  max_it::Int=50)
     # TODO: Implement Bartels-Stewardt
     n = size(A, 2)
-    alpha0 = reshape([A], n, n)
-    gamma0 = reshape([B], n, n)
+    alpha0 = reshape([A;], n, n)
+    gamma0 = reshape([B;], n, n)
 
     alpha1 = zeros(alpha0)
     gamma1 = zeros(gamma0)
@@ -29,14 +28,12 @@ function solve_discrete_lyapunov(A::ScalarOrArray,
         n_its += 1
 
         if n_its > max_it
-            msg = "Exceeded maximum iterations, check input matrices"
-            error(msg)
+            error("Exceeded maximum iterations, check input matrices")
         end
     end
 
     return gamma1
 end
-
 
 function solve_discrete_riccati(A::ScalarOrArray, B::ScalarOrArray,
                                 Q::ScalarOrArray,

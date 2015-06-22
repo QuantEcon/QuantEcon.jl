@@ -3,6 +3,7 @@ module TestKalman
 using QuantEcon
 using Base.Test
 using FactCheck
+using Compat
 
 # set up
 A = [.95 0; 0. .95]
@@ -11,7 +12,7 @@ G = eye(2) .* .5
 R = eye(2) .* 0.2
 kf = Kalman(A, G, Q, R)
 
-rough_kwargs = {:atol => 1e-2, :rtol => 1e-4}
+rough_kwargs = @compat Dict(:atol => 1e-2, :rtol => 1e-4)
 
 sig_inf, kal_gain = stationary_values(kf)
 
@@ -47,4 +48,3 @@ facts("Testing kalman.jl") do
 
 end  # facts
 end  # module
-

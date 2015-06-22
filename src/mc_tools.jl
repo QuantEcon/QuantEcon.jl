@@ -69,7 +69,7 @@ function lu_solve{T}(p::Matrix{T})
     x
 end
 
-gth_solve{T<:Integer}(A::Matrix{T}) = gth_solve(float64(A))
+gth_solve{T<:Integer}(A::Matrix{T}) = gth_solve(convert(Array{Float64, 2},A))
 
 function gth_solve{T<:Real}(A::AbstractMatrix{T})
     A1 = copy(A)
@@ -105,7 +105,7 @@ end
 
 # find the reducible subsets of a markov chain
 function irreducible_subsets(mc::MarkovChain)
-    p = bool(mc.p)
+    p = similar(mc.p, Bool)
     g = simple_graph(n_states(mc))
     for i = 1:length(p)
         j,k = ind2sub(size(p),i) # j: node from, k: node to
@@ -137,7 +137,8 @@ end
 # output is a N x M matrix where each column is a stationary distribution
 # currently using lu decomposition to solve p(P-I)=0
 function mc_compute_stationary(mc::MarkovChain; method=:gth)
-    @compat solvers = Dict(:gth => gth_solve, :lu => lu_solve,
+    @compat solvers = Dict(:gth => gth_solve,
+                           :lu => lu_solve,
                            :eigen => eigen_solve)
     solve = solvers[method]
 
