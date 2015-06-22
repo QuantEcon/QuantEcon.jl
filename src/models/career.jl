@@ -8,13 +8,28 @@ A type to solve the career / job choice model due to Derek Neal.
 References
 ----------
 
-http://quant-econ.net/career.html
+http://quant-econ.net/jl/career.html
 
-..  [Neal1999] Neal, D. (1999). The Complexity of Job Mobility among
-    Young Men, Journal of Labor Economics, 17(2), 237-261.
+[Neal1999] Neal, D. (1999). The Complexity of Job Mobility among Young Men,
+Journal of Labor Economics, 17(2), 237-261.
 =#
 
+"""
+Career/job choice model fo Derek Neal (1999)
 
+### Fields
+
+- `beta::Real` : Discount factor in (0, 1)
+- `N::Int` : Number of possible realizations of both epsilon and theta
+- `B::Real` : upper bound for both epsilon and theta
+- `theta::AbstractVector` : A grid of values on [0, B]
+- `epsilon::AbstractVector` : A grid of values on [0, B]
+- `F_probs::AbstractVector` : The pdf of each value associated with of F
+- `G_probs::AbstractVector` : The pdf of each value associated with of G
+- `F_mean::Real` : The mean of the distribution F
+- `G_mean::Real` : The mean of the distribution G
+
+"""
 type CareerWorkerProblem
     beta::Real
     N::Int
@@ -27,7 +42,21 @@ type CareerWorkerProblem
     G_mean::Real
 end
 
+"""
+Constructor with default values for `CareerWorkerProblem`
 
+### Arguments
+
+- `beta::Real(0.95)` : Discount factor in (0, 1)
+- `B::Real(5.0)` : upper bound for both epsilon and theta
+- `N::Real(50)` : Number of possible realizations of both epsilon and theta
+- `F_a::Real(1), F_b::Real(1)` : Parameters of the distribution F
+- `G_a::Real(1), G_b::Real(1)` : Parameters of the distribution F
+
+### Notes
+
+$(____kwarg_note)
+"""
 function CareerWorkerProblem(beta::Real=0.95, B::Real=5.0, N::Real=50,
                              F_a::Real=1, F_b::Real=1, G_a::Real=1,
                              G_b::Real=1)
@@ -48,7 +77,22 @@ function CareerWorkerProblem(;beta::Real=0.95, B::Real=5.0, N::Real=50,
     CareerWorkerProblem(beta, B, N, F_a, F_b, G_a, G_b)
 end
 
+"""
+$(____bellman_main_docstring).
 
+### Arguments
+
+- `cp::CareerWorkerProblem` : Instance of `CareerWorkerProblem`
+- `v::Matrix`: Current guess for the value function
+- `out::Matrix` : Storage for output
+- `;ret_policy::Bool(false)`: Toggles return of value or policy functions
+
+### Returns
+
+None, `out` is updated in place. If `ret_policy == true` out is filled with the
+policy function, otherwise the value function is stored in `out`.
+
+"""
 function bellman_operator!(cp::CareerWorkerProblem, v::Array, out::Array;
                            ret_policy=false)
     # new life. This is a function of the distribution parameters and is
@@ -88,7 +132,20 @@ function bellman_operator(cp::CareerWorkerProblem, v::Array; ret_policy=false)
     return out
 end
 
+"""
+$(____greedy_main_docstring).
 
+### Arguments
+
+- `cp::CareerWorkerProblem` : Instance of `CareerWorkerProblem`
+- `v::Matrix`: Current guess for the value function
+- `out::Matrix` : Storage for output
+
+### Returns
+
+None, `out` is updated in place to hold the policy function
+
+"""
 function get_greedy!(cp::CareerWorkerProblem, v::Array, out::Array)
     bellman_operator!(cp, v, out, ret_policy=true)
 end

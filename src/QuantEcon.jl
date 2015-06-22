@@ -7,8 +7,7 @@ using Distributions, Graphs
 import Distributions: pdf, skewness
 using DSP: TFFilter, freqz
 using Compat
-
-VERSION < v"0.4-" && using Docile
+using Docile
 
 
 # useful types

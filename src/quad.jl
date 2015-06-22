@@ -60,6 +60,44 @@ end
 #- Exported Functions -#
 ## ------------------ ##
 
+const qnw_func_notes = """
+### Notes
+
+If any of the parameters to this function are scalars while others are
+`Vector`s of length `n`, the the scalar parameter is repeated `n` times.
+"""
+
+const qnw_returns = """
+### Returns
+
+- `nodes::Array{Float64}` : An array of quadrature nodes
+- `weights::Array{Float64}` : An array of corresponding quadrature weights
+"""
+
+const qnw_refs = """
+### References
+
+Miranda, Mario J, and Paul L Fackler. Applied Computational Economics and
+Finance, MIT Press, 2002.
+"""
+
+"""
+Computes multivariate Guass-Legendre  quadrature nodes and weights.
+
+### Arguments
+
+- `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
+- `a::Union(Real, Vector{Real})` : Lower endpoint along each dimension
+- `b::Union(Real, Vector{Real})` : Upper endpoint along each dimension
+
+$(qnw_returns)
+
+$(qnw_func_notes)
+
+$(qnw_refs)
+"""
+:qnwlege
+
 ## 1d versions
 function qnwlege(n::Int, a::Real, b::Real)
     maxit = 10000
@@ -111,6 +149,23 @@ function qnwlege(n::Int, a::Real, b::Real)
 end
 
 
+"""
+Computes multivariate Guass-Checbychev quadrature nodes and weights.
+
+### Arguments
+
+- `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
+- `a::Union(Real, Vector{Real})` : Lower endpoint along each dimension
+- `b::Union(Real, Vector{Real})` : Upper endpoint along each dimension
+
+$(qnw_returns)
+
+$(qnw_func_notes)
+
+$(qnw_refs)
+"""
+:qnwcheb
+
 function qnwcheb(n::Int, a::Real, b::Real)
     nodes = (b+a)/2 - (b-a)/2 .* cos(pi/n .* (0.5:(n-0.5)))
     weights = ((b-a)/n) .* (cos(pi/n .* ([1:n]-0.5)*[0:2:n-1]')
@@ -118,6 +173,38 @@ function qnwcheb(n::Int, a::Real, b::Real)
     return nodes, weights
 end
 
+"""
+Computes nodes and weights for multivariate normal distribution
+
+### Arguments
+
+- `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
+- `mu::Union(Real, Vector{Real})` : Mean along each dimension
+- `sig2::Union(Real, Vector{Real}, Matrix{Real})(eye(length(n)))` : Covariance
+structure
+
+$(qnw_returns)
+
+### Notes
+
+This function has many methods. I try to describe them here.
+
+`n` or `mu` can be a vector or a scalar. If just one is a scalar the other is
+repeated to match the length of the other. If both are scalars, then the number
+of repeats is inferred from `sig2`.
+
+`sig2` can be a matrix, vector or scalar. If it is a matrix, it is treated as
+the covariance matrix. If it is a vector, it is considered the diagonal of a
+diagonal covariance matrix. If it is a scalar it is repeated along the diagonal
+as many times as necessary, where the number of repeats is determined by the
+length of either n and/or mu (which ever is a vector).
+
+If all 3 are scalars, then 1d nodes are computed. `mu` and `sig2` are treated as
+the mean and variance of a 1d normal distribution
+
+$(qnw_refs)
+"""
+:qnwnorm
 
 function qnwnorm(n::Int)
     maxit = 100
@@ -181,6 +268,22 @@ function qnwnorm(n::Int)
     return nodes, weights
 end
 
+"""
+Computes multivariate Simpson quadrature nodes and weights.
+
+### Arguments
+
+- `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
+- `a::Union(Real, Vector{Real})` : Lower endpoint along each dimension
+- `b::Union(Real, Vector{Real})` : Upper endpoint along each dimension
+
+$(qnw_returns)
+
+$(qnw_func_notes)
+
+$(qnw_refs)
+"""
+:qnwsimp
 
 function qnwsimp(n::Int, a::Real, b::Real)
     if n<=1
@@ -202,6 +305,22 @@ function qnwsimp(n::Int, a::Real, b::Real)
     return nodes, weights
 end
 
+"""
+Computes multivariate trapezoid quadrature nodes and weights.
+
+### Arguments
+
+- `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
+- `a::Union(Real, Vector{Real})` : Lower endpoint along each dimension
+- `b::Union(Real, Vector{Real})` : Upper endpoint along each dimension
+
+$(qnw_returns)
+
+$(qnw_func_notes)
+
+$(qnw_refs)
+"""
+:qnwtrap
 
 function qnwtrap(n::Int, a::Real, b::Real)
     if n < 1
@@ -215,6 +334,24 @@ function qnwtrap(n::Int, a::Real, b::Real)
     return nodes, weights
 end
 
+"""
+Computes nodes and weights for beta distribution
+
+### Arguments
+
+- `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
+- `a::Union(Real, Vector{Real})` : First parameter of the beta distribution,
+along each dimension
+- `b::Union(Real, Vector{Real})` : Second parameter of the beta distribution,
+along each dimension
+
+$(qnw_returns)
+
+$(qnw_func_notes)
+
+$(qnw_refs)
+"""
+:qnwbeta
 
 function qnwbeta(n::Int, a::Real, b::Real)
     a -= 1
@@ -307,6 +444,24 @@ function qnwbeta(n::Int, a::Real, b::Real)
     return x, w
 end
 
+"""
+Computes nodes and weights for beta distribution
+
+### Arguments
+
+- `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
+- `a::Union(Real, Vector{Real})` : First parameter of the gamma distribution,
+along each dimension
+- `b::Union(Real, Vector{Real})` : Second parameter of the gamma distribution,
+along each dimension
+
+$(qnw_returns)
+
+$(qnw_func_notes)
+
+$(qnw_refs)
+"""
+:qnwgamma
 
 function qnwgamma(n::Int, a::Real=1.0, b::Real=1.0)
     a < 0 && error("shape parameter must be positive")
@@ -432,23 +587,6 @@ for f in [:qnwlege, :qnwcheb, :qnwsimp, :qnwtrap, :qnwbeta, :qnwgamma]
 end
 
 ## Multidim version for qnworm
-#=
-    This function has many methods. I try to describe them here.
-
-    n or mu can be a vector or a scalar. If just one is a scalar the
-    other is repeated to match the length of the other. If both are
-    scalars, then the number of repeats is inferred from sig2.
-
-    sig2 can be a matrix, vector or scalar. If it is a matrix, it is
-    treated as the covariance matrix. If it is a vector, it is
-    considered the diagonal of a diagonal covariance matrix. If it is a
-    scalar it is repeated along the diagonal as many times as necessary,
-    where the number of repeats is determined by the length of either n
-    and/or mu (which ever is a vector).
-
-    If all 3 are scalars, then 1d nodes are computed. mu and sig2 are
-    treated as the mean and variance of a 1d normal distribution
-=#
 function qnwnorm(n::Vector{Int}, mu::Vector, sig2::Matrix=eye(length(n)))
     n_n, n_mu = length(n), length(mu)
 
@@ -512,14 +650,46 @@ qnwnorm(n::Int, mu::Real, sig2::Vector) =
     qnwnorm(fill(n, length(sig2)), fill(mu, length(sig2)), diagm(convert(Array{Float64}, sig2)))
 
 
-## Others based off the above
+"""
+Computes quadrature nodes and weights for multivariate uniform distribution
+
+### Arguments
+
+- `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
+- `a::Union(Real, Vector{Real})` : Lower endpoint along each dimension
+- `b::Union(Real, Vector{Real})` : Upper endpoint along each dimension
+
+$(qnw_returns)
+
+$(qnw_func_notes)
+
+$(qnw_refs)
+"""
 function qnwunif(n, a, b)
     nodes, weights = qnwlege(n, a, b)
     weights ./= prod(b - a)
     return nodes, weights
 end
 
+"""
+Computes quadrature nodes and weights for multivariate uniform distribution
 
+### Arguments
+
+- `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
+- `mu::Union(Real, Vector{Real})` : Mean along each dimension
+- `sig2::Union(Real, Vector{Real}, Matrix{Real})(eye(length(n)))` : Covariance
+structure
+
+
+$(qnw_returns)
+
+### Notes
+
+See also the documentation for `qnwnorm`
+
+$(qnw_refs)
+"""
 function qnwlogn(n, mu, sig2)
     nodes, weights = qnwnorm(n, mu, sig2)
     return exp(nodes), weights
@@ -528,6 +698,32 @@ end
 
 ## qnwequi
 const equidist_pp = sqrt(primes(7920))  # good for d <= 1000
+
+
+"""
+Generates equidistributed sequences with property that averages
+value of integrable function evaluated over the sequence converges
+to the integral as n goes to infinity.
+
+### Arguments
+
+- `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
+- `a::Union(Real, Vector{Real})` : Lower endpoint along each dimension
+- `b::Union(Real, Vector{Real})` : Upper endpoint along each dimension
+- `kind::String("N")`: One of the following:
+    - N - Neiderreiter (default)
+    - W - Weyl
+    - H - Haber
+    - R - pseudo Random
+
+$(qnw_returns)
+
+$(qnw_func_notes)
+
+$(qnw_refs)
+
+"""
+:qnwequi
 
 function qnwequi(n::Int, a::Vector, b::Vector, kind::String="N")
     # error checking
@@ -594,12 +790,67 @@ qnwequi(n::Int, a::Real, b::Real, kind::String="N") =
 
 
 ## Doing the quadrature
+"""
+Approximate the integral of `f`, given quadrature `nodes` and `weights`
+
+### Arguments
+
+- `f::Function`: A callable function that is to be approximated over the domain
+spanned by `nodes`.
+- `nodes::Array`: Quadrature nodes
+- `weights::Array`: Quadrature nodes
+- `;args...`: additional positional arguments to pass to `f`
+- `;kwargs...`: additional keyword arguments to pass to `f`
+
+### Returns
+
+- `out::Float64` : The scalar that approximates integral of `f` on the hypercube
+formed by `[a, b]`
+
+"""
+:do_quad
 
 function do_quad(f::Function, nodes::Array, weights::Vector, args...;
                  kwargs...)
     return dot(f(nodes, args...; kwargs...), weights)
 end
 do_quad(f::Function, nodes::Array, weights::Vector) = dot(f(nodes), weights)
+
+"""
+Integrate the d-dimensional function f on a rectangle with lower and upper bound
+for dimension i defined by a[i] and b[i], respectively; using n[i] points.
+
+### Arguments
+
+- `f::Function` The function to integrate over. This should be a function that
+accepts as its first argument a matrix representing points along each dimension
+(each dimension is a column). Other arguments that need to be passed to the
+function are caught by `args...` and `kwargs...``
+- `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
+- `a::Union(Real, Vector{Real})` : Lower endpoint along each dimension
+- `b::Union(Real, Vector{Real})` : Upper endpoint along each dimension
+- `kind::String("lege")` Specifies which type of integration to perform. Valid
+values are:
+    - `"lege"` : Gauss-Legendre
+    - `"cheb"` : Gauss-Chebyshev
+    - `"trap"` : trapezoid rule
+    - `"simp"` : Simpson rule
+    - `"N"` : Neiderreiter equidistributed sequence
+    - `"W"` : Weyl equidistributed sequence
+    - `"H"` : Haber  equidistributed sequence
+    - `"R"` : Monte Carlo
+- `;args...`: additional positional arguments to pass to `f`
+- `;kwargs...`: additional keyword arguments to pass to `f`
+
+### Returns
+
+- `out::Float64` : The scalar that approximates integral of `f` on the hypercube
+formed by `[a, b]`
+
+$(qnw_refs)
+
+"""
+:quadrect
 
 
 function quadrect(f::Function, n, a, b, kind="lege", args...; kwargs...)

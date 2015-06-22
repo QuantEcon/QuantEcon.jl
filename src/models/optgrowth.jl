@@ -22,6 +22,19 @@ http://quant-econ.net/dp_intro.html
 
     See the constructor below for details
 =#
+"""
+Neoclassical growth model
+
+### Fields
+
+- `f::Function` : Production function
+- `bet::Real` : Discount factor in (0, 1)
+- `u::Function` : Utility function
+- `grid_max::Int` : Maximum for grid over savings values
+- `grid_size::Int` : Number of points in grid for savings values
+- `grid::FloatRange` : The grid for savings values
+
+"""
 type GrowthModel
     f::Function
     bet::Real
@@ -35,20 +48,42 @@ end
 default_f(k) = k^0.65
 default_u(c) = log(c)
 
+"""
+Constructor of `GrowthModel`
 
-function GrowthModel(f=default_f, bet=0.95, u=default_u,
-                     grid_max=2, grid_size=150)
+### Arguments
+
+- `f::Function(k->k^0.65)` : Production function
+- `bet::Real(0.95)` : Discount factor in (0, 1)
+- `u::Function(log)` : Utility function
+- `grid_max::Int(2)` : Maximum for grid over savings values
+- `grid_size::Int(150)` : Number of points in grid for savings values
+
+"""
+function GrowthModel(f=default_f, bet=0.95, u=default_u, grid_max=2,
+                     grid_size=150)
     grid = linspace_range(1e-6, grid_max, grid_size)
     return GrowthModel(f, bet, u, grid_max, grid_size, grid)
 end
 
-#=
-    The approximate Bellman operator, which computes and returns the
-    updated value function Tw on the grid points. Could also return the
-    policy function instead if asked.
-=#
+"""
+$(____bellman_main_docstring).
+
+### Arguments
+
+- `g::GrowthModel` : Instance of `GrowthModel`
+- `w::Vector`: Current guess for the value function
+- `out::Vector` : Storage for output.
+- `;ret_policy::Bool(false)`: Toggles return of value or policy functions
+
+### Returns
+
+None, `out` is updated in place. If `ret_policy == true` out is filled with the
+policy function, otherwise the value function is stored in `out`.
+
+"""
 function bellman_operator!(g::GrowthModel, w::Vector, out::Vector;
-                          ret_policy::Bool=false)
+                           ret_policy::Bool=false)
     # Apply linear interpolation to w
     Aw = CoordInterpGrid(g.grid, w, BCnan, InterpLinear)
 
@@ -75,9 +110,20 @@ function bellman_operator(g::GrowthModel, w::Vector;
     bellman_operator!(g, w, out, ret_policy=ret_policy)
 end
 
-#=
-    Compute the w-greedy policy on the grid points.
-=#
+"""
+$(____greedy_main_docstring).
+
+### Arguments
+
+- `g::GrowthModel` : Instance of `GrowthModel`
+- `w::Vector`: Current guess for the value function
+- `out::Vector` : Storage for output
+
+### Returns
+
+None, `out` is updated in place to hold the policy function
+
+"""
 function get_greedy!(g::GrowthModel, w::Vector, out::Vector)
     bellman_operator!(g, w, out, ret_policy=true)
 end

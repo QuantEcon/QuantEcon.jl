@@ -8,9 +8,10 @@ Implements the Kalman filter for a linear Gaussian state space model.
 References
 ----------
 
-Simple port of the file quantecon.kalman
+http://quant-econ.net/jl/kalman.html
 
-http://quant-econ.net/kalman.html
+
+TODO: Do docstrings here after implementing LinerStateSpace
 =#
 
 type Kalman

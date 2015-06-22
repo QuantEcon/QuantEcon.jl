@@ -27,6 +27,7 @@ export
     res_wage_operator, res_wage_operator!,            # odu
     bellman_operator, bellman_operator!               # many
 
+include("models/docstrings.jl")
 include("models/asset_pricing.jl")
 include("models/career.jl")
 include("models/ifp.jl")

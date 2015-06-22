@@ -9,7 +9,7 @@ References
 
 Simple port of the file quantecon.models.jv
 
-http://quant-econ.net/jv.html
+http://quant-econ.net/jl/jv.html
 =#
 
 # TODO: the three lines below will allow us to use the non brute-force
@@ -23,6 +23,43 @@ http://quant-econ.net/jv.html
 
 epsilon = 1e-4  # a small number, used in optimization routine
 
+"""
+A Jovanovic-type model of employment with on-the-job search.
+
+The value function is given by
+
+    V(x) = max_{phi, s} w(x, phi, s)
+
+for
+
+    w(x, phi, s) := x(1 - phi - s) + beta (1 - pi(s)) V(G(x, phi)) +
+                    beta pi(s) E V[ max(G(x, phi), U)
+
+where
+
+* `x`: : human capital
+* `s` : search effort
+* `phi` : investment in human capital
+* `pi(s)` : probability of new offer given search level s
+* `x(1 - \phi - s)` : wage
+* `G(x, \phi)` : new human capital when current job retained
+* `U` : Random variable with distribution F -- new draw of human capita
+
+### Fields
+
+- `A::Real` : Parameter in human capital transition function
+- `alpha::Real` : Parameter in human capital transition function
+- `bet::Real` : Discount factor in (0, 1)
+- `x_grid::FloatRange` : Grid for potential levels of x
+- `G::Function` : Transition `function` for human captial
+- `pi_func::Function` : `function` mapping search effort to the probability of
+getting a new job offer
+- `F::UnivariateDistribution` : A univariate distribution from which the value
+of new job offers is drawn
+- `quad_nodes::Vector` : Quadrature nodes for integrating over phi
+- `quad_weights::Vector` : Quadrature weights for integrating over phi
+
+"""
 type JvWorker
     A::Real
     alpha::Real
@@ -35,7 +72,21 @@ type JvWorker
     quad_weights::Vector
 end
 
+"""
+Constructor with default values for `JvWorker`
 
+### Arguments
+
+ - `A::Real(1.4)` : Parameter in human capital transition function
+ - `alpha::Real(0.6)` : Parameter in human capital transition function
+ - `bet::Real(0.96)` : Discount factor in (0, 1)
+ - `grid_size::Int(50)` : Number of points in discrete grid for `x`
+
+### Notes
+
+$(____kwarg_note)
+
+"""
 function JvWorker(A=1.4, alpha=0.6, bet=0.96, grid_size=50)
     G(x, phi) = A .* (x .* phi).^alpha
     pi_func = sqrt
@@ -64,7 +115,7 @@ JvWorker(;A=1.4, alpha=0.6, bet=0.96, grid_size=50) = JvWorker(A, alpha, bet,
                                                                grid_size)
 
 
-# TODO: as of 2014-08-13 there is no simple constrained optimizer in Julia
+# TODO: as of 2014-08-14 there is no simple constrained optimizer in Julia
 #       so, we default to the brute force gridsearch approach for this
 #       problem
 
@@ -72,9 +123,40 @@ JvWorker(;A=1.4, alpha=0.6, bet=0.96, grid_size=50) = JvWorker(A, alpha, bet,
 #       Array{Float64, 2} or (Array{Float64, 2}, Array{Float64, 2})
 #       depending on the value of ret_policies. This is probably not a
 #       huge deal, but it is something to be aware of
+"""
+$(____bellman_main_docstring).
+
+### Arguments
+
+- `jv::JvWorker` : Instance of `JvWorker`
+- `V::Vector`: Current guess for the value function
+- `out::Union(Vector, Tuple{Vector, Vector})` : Storage for output. Note that
+there are two policy rules, but one value function
+- `;brute_force::Bool(true)`: Whether to use a brute force grid search
+algorithm or a solver from scipy.
+- `;ret_policy::Bool(false)`: Toggles return of value or policy functions
+
+### Returns
+
+None, `out` is updated in place. If `ret_policy == true` out is filled with the
+policy function, otherwise the value function is stored in `out`.
+
+### Notes
+
+Currently, the `brute_force` parameter must be `true`. We are waiting for a
+constrained optimization routine to emerge in pure Julia. Once that happens,
+we will re-activate this option.
+
+"""
 function bellman_operator!(jv::JvWorker, V::Vector,
                            out::Union(Vector, @compat Tuple{Vector, Vector});
                            brute_force=true, ret_policies=false)
+
+    if !(brute_force)
+        m = "Only brute_force method active now. Waiting on a pure julia"
+        m *+ " constrained optimization routine to disable"
+        error(m)
+    end
     # simplify notation
     G, pi_func, F, bet = jv.G, jv.pi_func, jv.F, jv.bet
     nodes, weights = jv.quad_nodes, jv.quad_weights
@@ -140,9 +222,8 @@ function bellman_operator!(jv::JvWorker, V::Vector,
                 end
             end
         else
-            options = @compat Dict("disp"=>0)
-            max_s, max_phi = minimize(w, guess, constraints=constraints,
-                                      options, method="SLSQP")["x"]
+            max_s, max_phi = minimize(w, guess, constraints=constraints;
+                                      disp=0, method="SLSQP")["x"]
 
             max_val = -w((max_s, max_phi), x, a, b, Vf, jv)
 
@@ -169,6 +250,20 @@ function bellman_operator(jv::JvWorker, V::Vector; brute_force=true,
     return out
 end
 
+"""
+$(____greedy_main_docstring).
+
+### Arguments
+
+- `cp::CareerWorkerProblem` : Instance of `CareerWorkerProblem`
+- `v::Vector`: Current guess for the value function
+- `out::Tuple(Vector, Vector)` : Storage for output of policy rule
+
+### Returns
+
+None, `out` is updated in place to hold the policy function
+
+"""
 function get_greedy!(jv::JvWorker, V::Vector, out::@compat Tuple{Vector, Vector};
                      brute_force=true)
     bellman_operator!(jv, V, out, ret_policies=true)
