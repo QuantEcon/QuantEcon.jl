@@ -13,6 +13,8 @@ To install the package, open a Julia session and type
 
 	Pkg.add("QuantEcon")
 
+Documentation for the library: [quantecon.github.io/QuantEcon.jl/](http://quantecon.github.io/QuantEcon.jl/)
+
 #### Current Build and Coverage Status:
 
 [![Build Status](https://travis-ci.org/QuantEcon/QuantEcon.jl.svg?branch=master)](https://travis-ci.org/spencerlyon2/QuantEcon.jl)
