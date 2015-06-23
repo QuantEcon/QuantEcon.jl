@@ -121,9 +121,10 @@ function stationary_values(lq::LQ)
     return _lq.P, _lq.F, _lq.d
 end
 
-# dispatch for a scalar problem
+# Dispatch for a scalar problem
 function _compute_sequence{T}(lq::LQ, x0::T, policies)
 	term = length(policies)
+
 	x_path = Array(T, term+1)
 	u_path = Array(T, term)
 	
@@ -141,15 +142,19 @@ function _compute_sequence{T}(lq::LQ, x0::T, policies)
     x_path, u_path, w_path
 end
 
-# dispatch for a vector problem
+# Dispatch for a vector problem
 function _compute_sequence{T}(lq::LQ, x0::Vector{T}, policies)
-	n, j, term = length(x0), length(lq.C), length(policies)
-	x_path = Array(T, n, term+1)
-	u_path = Array(T, n, term)
+    n, j = size(lq.C,1), size(lq.C,2)
+	term = length(policies)
+
+    x_path = Array(T, n, term+1)
+    u_path = Array(T, n, term)
+
+    C = reshape(lq.C,n,j) # Ensure correct dimensionality for w_path
+    w_path = [vec(C*randn(j)) for i=1:(term+1)]
 	
 	x_path[:,1] = x0
 	u_path[:,1] = -(first(policies)*x0)
-	w_path      = [dot(lq.C,randn(j)) for i=1:(term+1)]
 
     for t = 2:term
         f = policies[t]
@@ -162,24 +167,18 @@ function _compute_sequence{T}(lq::LQ, x0::Vector{T}, policies)
 end
 
 function compute_sequence(lq::LQ, x0::ScalarOrArray, ts_length=100)
-    if lq.term != nothing
-        # finite horizon case
-        term = min(ts_length, lq.term)
-        lq.P, lq.d = lq.rf, 0.0
-    else
-        # infinite horizon case
-        term = ts_length
-        stationary_values!(lq)
-    end
+    term = min(ts_length, lq.term)
 
     # Compute and record the sequence of policies
-    policies = Array(typeof(lq.F), term)
-    for t = 1:term
-        if lq.term != nothing
+    if lq.term == nothing
+        stationary_values!(lq)
+        policies = fill(lq.F,term)
+    else
+        policies = Array(typeof(lq.F), term)
+        for t = 1:term
             update_values!(lq)
+            policies[t] = lq.F
         end
-        policies[t] = lq.F
     end
-
 	_compute_sequence(lq, x0, policies)
 end
