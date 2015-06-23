@@ -47,7 +47,7 @@ cd(dirname(dirname(@__FILE__))) do
     docs_dir: 'docs'
     site_dir: 'site'
     repo_url: https://github.com/QuantEcon/QuantEcon.jl/
-    google_analytics: ['UA-64434120-1', 'http://quantecon.github.io/QuantEcon.jl/']
+    google_analytics: ['UA-64434120-1', 'auto']
 
     pages:
     - Home: 'index.md'
