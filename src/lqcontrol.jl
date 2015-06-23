@@ -170,7 +170,7 @@ function compute_sequence(lq::LQ, x0::ScalarOrArray, ts_length=100)
     term = min(ts_length, lq.term)
 
     # Compute and record the sequence of policies
-    if lq.term == nothing
+    if isa(lq.term,nothing)
         stationary_values!(lq)
         policies = fill(lq.F,term)
     else
@@ -180,5 +180,6 @@ function compute_sequence(lq::LQ, x0::ScalarOrArray, ts_length=100)
             policies[t] = lq.F
         end
     end
+
 	_compute_sequence(lq, x0, policies)
 end
