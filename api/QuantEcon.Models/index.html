@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Models - QuantEcon.jl</title>
+  
+
+  <link rel="shortcut icon" href="../../favicon.ico">
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/highlight.css">
+  <link href="../../css/github.css" rel="stylesheet">
+
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Models";
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js"></script>
+  <script src="../../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../../js/highlight.pack.js"></script>
+  <script src="../../js/theme.js"></script> 
+
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> QuantEcon.jl</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        <ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../..">Home</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../">Overview</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <ul class="subnav">
+    <li><span>API Docs</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../QuantEcon/">QuantEcon</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 current">
+        <a class="current" href="./">Models</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#quanteconmodels">QuantEcon.Models</a></li>
+                
+                    <li><a class="toctree-l4" href="#exported">Exported</a></li>
+                
+                    <li><a class="toctree-l4" href="#internal">Internal</a></li>
+                
+            
+            </ul>
+        
+    </li>
+
+        
+    </ul>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">QuantEcon.jl</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>API Docs &raquo;</li>
+        
+      
+    
+    <li>Models</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        
+          <a href="https://github.com/QuantEcon/QuantEcon.jl/" class="icon icon-github"> Edit on GitHub</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="quanteconmodels">QuantEcon.Models</h1>
+<h2 id="exported">Exported</h2>
+<hr />
+<p><a id="function__bellman_operator.1" class="lexicon_definition"></a></p>
+<h4 id="bellman_operator">bellman_operator <a href="#function__bellman_operator.1">¶</a></h4>
+<p>Apply the Bellman operator for a given model and initial value
+. See the specific methods of the mutating function for more details on arguments</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/Models.jl#L63">QuantEcon/src/Models.jl:63</a></p>
+<hr />
+<p><a id="function__bellman_operator.2" class="lexicon_definition"></a></p>
+<h4 id="bellman_operator_1">bellman_operator! <a href="#function__bellman_operator.2">¶</a></h4>
+<p>Apply the Bellman operator for a given model and initial value
+. See the specific methods of the mutating function for more details on arguments</p>
+<p>The last positional argument passed to this function will be over-written</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/Models.jl#L70">QuantEcon/src/Models.jl:70</a></p>
+<hr />
+<p><a id="function__get_greedy.1" class="lexicon_definition"></a></p>
+<h4 id="get_greedy">get_greedy <a href="#function__get_greedy.1">¶</a></h4>
+<p>Extract the greedy policy (policy function) of the model
+. See the specific methods of the mutating function for more details on arguments</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/Models.jl#L75">QuantEcon/src/Models.jl:75</a></p>
+<hr />
+<p><a id="function__get_greedy.2" class="lexicon_definition"></a></p>
+<h4 id="get_greedy_1">get_greedy! <a href="#function__get_greedy.2">¶</a></h4>
+<p>Extract the greedy policy (policy function) of the model
+. See the specific methods of the mutating function for more details on arguments</p>
+<p>The last positional argument passed to this function will be over-written</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/Models.jl#L82">QuantEcon/src/Models.jl:82</a></p>
+<hr />
+<p><a id="method__bellman_operator.1" class="lexicon_definition"></a></p>
+<h4 id="bellman_operatorcpquanteconmodelscareerworkerproblem-varrayt-n-outarrayt-n">bellman_operator!(cp::QuantEcon.Models.CareerWorkerProblem,  v::Array{T, N},  out::Array{T, N}) <a href="#method__bellman_operator.1">¶</a></h4>
+<p>Apply the Bellman operator for a given model and initial value
+.</p>
+<h5 id="arguments">Arguments</h5>
+<ul>
+<li><code>cp::CareerWorkerProblem</code> : Instance of <code>CareerWorkerProblem</code></li>
+<li><code>v::Matrix</code>: Current guess for the value function</li>
+<li><code>out::Matrix</code> : Storage for output</li>
+<li><code>;ret_policy::Bool(false)</code>: Toggles return of value or policy functions</li>
+</ul>
+<h5 id="returns">Returns</h5>
+<p>None, <code>out</code> is updated in place. If <code>ret_policy == true</code> out is filled with the
+policy function, otherwise the value function is stored in <code>out</code>.</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/career.jl#L96">QuantEcon/src/models/career.jl:96</a></p>
+<hr />
+<p><a id="method__bellman_operator.2" class="lexicon_definition"></a></p>
+<h4 id="bellman_operatorcpquanteconmodelsconsumerproblem-varrayt-2-outarrayt-2">bellman_operator!(cp::QuantEcon.Models.ConsumerProblem,  V::Array{T, 2},  out::Array{T, 2}) <a href="#method__bellman_operator.2">¶</a></h4>
+<p>Apply the Bellman operator for a given model and initial value
+.</p>
+<h5 id="arguments_1">Arguments</h5>
+<ul>
+<li><code>cp::ConsumerProblem</code> : Instance of <code>ConsumerProblem</code></li>
+<li><code>v::Matrix</code>: Current guess for the value function</li>
+<li><code>out::Matrix</code> : Storage for output</li>
+<li><code>;ret_policy::Bool(false)</code>: Toggles return of value or policy functions</li>
+</ul>
+<h5 id="returns_1">Returns</h5>
+<p>None, <code>out</code> is updated in place. If <code>ret_policy == true</code> out is filled with the
+policy function, otherwise the value function is stored in <code>out</code>.</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L103">QuantEcon/src/models/ifp.jl:103</a></p>
+<hr />
+<p><a id="method__bellman_operator.3" class="lexicon_definition"></a></p>
+<h4 id="bellman_operatorgquanteconmodelsgrowthmodel-warrayt-1-outarrayt-1">bellman_operator!(g::QuantEcon.Models.GrowthModel,  w::Array{T, 1},  out::Array{T, 1}) <a href="#method__bellman_operator.3">¶</a></h4>
+<p>Apply the Bellman operator for a given model and initial value
+.</p>
+<h5 id="arguments_2">Arguments</h5>
+<ul>
+<li><code>g::GrowthModel</code> : Instance of <code>GrowthModel</code></li>
+<li><code>w::Vector</code>: Current guess for the value function</li>
+<li><code>out::Vector</code> : Storage for output.</li>
+<li><code>;ret_policy::Bool(false)</code>: Toggles return of value or policy functions</li>
+</ul>
+<h5 id="returns_2">Returns</h5>
+<p>None, <code>out</code> is updated in place. If <code>ret_policy == true</code> out is filled with the
+policy function, otherwise the value function is stored in <code>out</code>.</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/optgrowth.jl#L85">QuantEcon/src/models/optgrowth.jl:85</a></p>
+<hr />
+<p><a id="method__bellman_operator.4" class="lexicon_definition"></a></p>
+<h4 id="bellman_operatorjvquanteconmodelsjvworker-varrayt-1-outuniontuplearrayt-1-arrayt-1-arrayt-1">bellman_operator!(jv::QuantEcon.Models.JvWorker,  V::Array{T, 1},  out::Union{Tuple{Array{T, 1}, Array{T, 1}}, Array{T, 1}}) <a href="#method__bellman_operator.4">¶</a></h4>
+<p>Apply the Bellman operator for a given model and initial value
+.</p>
+<h5 id="arguments_3">Arguments</h5>
+<ul>
+<li><code>jv::JvWorker</code> : Instance of <code>JvWorker</code></li>
+<li><code>V::Vector</code>: Current guess for the value function</li>
+<li><code>out::Union(Vector, Tuple{Vector, Vector})</code> : Storage for output. Note that
+there are two policy rules, but one value function</li>
+<li><code>;brute_force::Bool(true)</code>: Whether to use a brute force grid search
+algorithm or a solver from scipy.</li>
+<li><code>;ret_policy::Bool(false)</code>: Toggles return of value or policy functions</li>
+</ul>
+<h5 id="returns_3">Returns</h5>
+<p>None, <code>out</code> is updated in place. If <code>ret_policy == true</code> out is filled with the
+policy function, otherwise the value function is stored in <code>out</code>.</p>
+<h5 id="notes">Notes</h5>
+<p>Currently, the <code>brute_force</code> parameter must be <code>true</code>. We are waiting for a
+constrained optimization routine to emerge in pure Julia. Once that happens,
+we will re-activate this option.</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/jv.jl#L151">QuantEcon/src/models/jv.jl:151</a></p>
+<hr />
+<p><a id="method__bellman_operator.5" class="lexicon_definition"></a></p>
+<h4 id="bellman_operatorspquanteconmodelssearchproblem-varrayt-2-outarrayt-2">bellman_operator!(sp::QuantEcon.Models.SearchProblem,  v::Array{T, 2},  out::Array{T, 2}) <a href="#method__bellman_operator.5">¶</a></h4>
+<p>Apply the Bellman operator for a given model and initial value
+.</p>
+<h5 id="arguments_4">Arguments</h5>
+<ul>
+<li><code>sp::SearchProblem</code> : Instance of <code>SearchProblem</code></li>
+<li><code>v::Matrix</code>: Current guess for the value function</li>
+<li><code>out::Matrix</code> : Storage for output.</li>
+<li><code>;ret_policy::Bool(false)</code>: Toggles return of value or policy functions</li>
+</ul>
+<h5 id="returns_4">Returns</h5>
+<p>None, <code>out</code> is updated in place. If <code>ret_policy == true</code> out is filled with the
+policy function, otherwise the value function is stored in <code>out</code>.</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/odu.jl#L130">QuantEcon/src/models/odu.jl:130</a></p>
+<hr />
+<p><a id="method__call_option.1" class="lexicon_definition"></a></p>
+<h4 id="call_optionapquanteconmodelsassetprices-zetreal-p_sreal">call_option(ap::QuantEcon.Models.AssetPrices,  zet::Real,  p_s::Real) <a href="#method__call_option.1">¶</a></h4>
+<p>Computes price of a call option on a consol bond, both finite and infinite
+horizon</p>
+<h5 id="arguments_5">Arguments</h5>
+<ul>
+<li><code>zeta::Float64</code> : Coupon of the console</li>
+<li><code>p_s::Float64</code> : Strike price</li>
+<li><code>T::Vector{Int}(Int[])</code>: Time periods for which to store the price in the
+finite horizon version</li>
+<li><code>epsilon::Float64</code> : Tolerance for infinite horizon problem</li>
+</ul>
+<h5 id="returns_5">Returns</h5>
+<ul>
+<li><code>w_bar::Vector{Float64}</code> Infinite horizon call option prices</li>
+<li><code>w_bars::Dict{Int, Vector{Float64}}</code> A dictionary of key-value pairs {t: vec},
+where t is one of the dates in the list T and vec is the option prices at that
+date</li>
+</ul>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/asset_pricing.jl#L121">QuantEcon/src/models/asset_pricing.jl:121</a></p>
+<hr />
+<p><a id="method__call_option.2" class="lexicon_definition"></a></p>
+<h4 id="call_optionapquanteconmodelsassetprices-zetreal-p_sreal-tarrayint64-1">call_option(ap::QuantEcon.Models.AssetPrices,  zet::Real,  p_s::Real,  T::Array{Int64, 1}) <a href="#method__call_option.2">¶</a></h4>
+<p>Computes price of a call option on a consol bond, both finite and infinite
+horizon</p>
+<h5 id="arguments_6">Arguments</h5>
+<ul>
+<li><code>zeta::Float64</code> : Coupon of the console</li>
+<li><code>p_s::Float64</code> : Strike price</li>
+<li><code>T::Vector{Int}(Int[])</code>: Time periods for which to store the price in the
+finite horizon version</li>
+<li><code>epsilon::Float64</code> : Tolerance for infinite horizon problem</li>
+</ul>
+<h5 id="returns_6">Returns</h5>
+<ul>
+<li><code>w_bar::Vector{Float64}</code> Infinite horizon call option prices</li>
+<li><code>w_bars::Dict{Int, Vector{Float64}}</code> A dictionary of key-value pairs {t: vec},
+where t is one of the dates in the list T and vec is the option prices at that
+date</li>
+</ul>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/asset_pricing.jl#L121">QuantEcon/src/models/asset_pricing.jl:121</a></p>
+<hr />
+<p><a id="method__call_option.3" class="lexicon_definition"></a></p>
+<h4 id="call_optionapquanteconmodelsassetprices-zetreal-p_sreal-tarrayint64-1-epsilon">call_option(ap::QuantEcon.Models.AssetPrices,  zet::Real,  p_s::Real,  T::Array{Int64, 1},  epsilon) <a href="#method__call_option.3">¶</a></h4>
+<p>Computes price of a call option on a consol bond, both finite and infinite
+horizon</p>
+<h5 id="arguments_7">Arguments</h5>
+<ul>
+<li><code>zeta::Float64</code> : Coupon of the console</li>
+<li><code>p_s::Float64</code> : Strike price</li>
+<li><code>T::Vector{Int}(Int[])</code>: Time periods for which to store the price in the
+finite horizon version</li>
+<li><code>epsilon::Float64</code> : Tolerance for infinite horizon problem</li>
+</ul>
+<h5 id="returns_7">Returns</h5>
+<ul>
+<li><code>w_bar::Vector{Float64}</code> Infinite horizon call option prices</li>
+<li><code>w_bars::Dict{Int, Vector{Float64}}</code> A dictionary of key-value pairs {t: vec},
+where t is one of the dates in the list T and vec is the option prices at that
+date</li>
+</ul>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/asset_pricing.jl#L121">QuantEcon/src/models/asset_pricing.jl:121</a></p>
+<hr />
+<p><a id="method__coleman_operator.1" class="lexicon_definition"></a></p>
+<h4 id="coleman_operatorcpquanteconmodelsconsumerproblem-carrayt-2-outarrayt-2">coleman_operator!(cp::QuantEcon.Models.ConsumerProblem,  c::Array{T, 2},  out::Array{T, 2}) <a href="#method__coleman_operator.1">¶</a></h4>
+<p>The approximate Coleman operator.</p>
+<p>Iteration with this operator corresponds to policy function
+iteration. Computes and returns the updated consumption policy
+c.  The array c is replaced with a function cf that implements
+univariate linear interpolation over the asset grid for each
+possible value of z.</p>
+<h5 id="arguments_8">Arguments</h5>
+<ul>
+<li><code>cp::CareerWorkerProblem</code> : Instance of <code>CareerWorkerProblem</code></li>
+<li><code>c::Matrix</code>: Current guess for the policy function</li>
+<li><code>out::Matrix</code> : Storage for output</li>
+</ul>
+<h5 id="returns_8">Returns</h5>
+<p>None, <code>out</code> is updated in place to hold the policy function</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L190">QuantEcon/src/models/ifp.jl:190</a></p>
+<hr />
+<p><a id="method__coleman_operator.2" class="lexicon_definition"></a></p>
+<h4 id="coleman_operatorcpquanteconmodelsconsumerproblem-carrayt-2">coleman_operator(cp::QuantEcon.Models.ConsumerProblem,  c::Array{T, 2}) <a href="#method__coleman_operator.2">¶</a></h4>
+<p>Apply the Coleman operator for a given model and initial value</p>
+<p>See the specific methods of the mutating version of this function for more
+details on arguments</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L231">QuantEcon/src/models/ifp.jl:231</a></p>
+<hr />
+<p><a id="method__compute_lt_price.1" class="lexicon_definition"></a></p>
+<h4 id="compute_lt_priceltquanteconmodelslucastree">compute_lt_price(lt::QuantEcon.Models.LucasTree) <a href="#method__compute_lt_price.1">¶</a></h4>
+<p>Compute the equilibrium price function associated with Lucas tree <code>lt</code></p>
+<h5 id="arguments_9">Arguments</h5>
+<ul>
+<li><code>lt::LucasTree</code> : An instance of the <code>LucasTree</code> type</li>
+<li><code>;kwargs...</code> : other arguments to be passed to <code>compute_fixed_point</code></li>
+</ul>
+<h5 id="returns_9">Returns</h5>
+<ul>
+<li><code>price::Vector{Float64}</code> : The price at each point in <code>lt.grid</code></li>
+</ul>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/lucastree.jl#L169">QuantEcon/src/models/lucastree.jl:169</a></p>
+<hr />
+<p><a id="method__consol_price.1" class="lexicon_definition"></a></p>
+<h4 id="consol_priceapquanteconmodelsassetprices-zetreal">consol_price(ap::QuantEcon.Models.AssetPrices,  zet::Real) <a href="#method__consol_price.1">¶</a></h4>
+<p>Computes price of a consol bond with payoff zeta</p>
+<h5 id="arguments_10">Arguments</h5>
+<ul>
+<li><code>ap::AssetPrices</code> : An instance of the <code>AssetPrices</code> type</li>
+<li><code>zeta::Float64</code> : Per period payoff of the consol</li>
+</ul>
+<h5 id="returns_10">Returns</h5>
+<ul>
+<li><code>pbar::Vector{Float64}</code> : the pricing function for the lucas tree</li>
+</ul>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/asset_pricing.jl#L90">QuantEcon/src/models/asset_pricing.jl:90</a></p>
+<hr />
+<p><a id="method__get_greedy.1" class="lexicon_definition"></a></p>
+<h4 id="get_greedycpquanteconmodelscareerworkerproblem-varrayt-n-outarrayt-n">get_greedy!(cp::QuantEcon.Models.CareerWorkerProblem,  v::Array{T, N},  out::Array{T, N}) <a href="#method__get_greedy.1">¶</a></h4>
+<p>Extract the greedy policy (policy function) of the model
+.</p>
+<h5 id="arguments_11">Arguments</h5>
+<ul>
+<li><code>cp::CareerWorkerProblem</code> : Instance of <code>CareerWorkerProblem</code></li>
+<li><code>v::Matrix</code>: Current guess for the value function</li>
+<li><code>out::Matrix</code> : Storage for output</li>
+</ul>
+<h5 id="returns_11">Returns</h5>
+<p>None, <code>out</code> is updated in place to hold the policy function</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/career.jl#L149">QuantEcon/src/models/career.jl:149</a></p>
+<hr />
+<p><a id="method__get_greedy.2" class="lexicon_definition"></a></p>
+<h4 id="get_greedycpquanteconmodelsconsumerproblem-varrayt-2-outarrayt-2">get_greedy!(cp::QuantEcon.Models.ConsumerProblem,  V::Array{T, 2},  out::Array{T, 2}) <a href="#method__get_greedy.2">¶</a></h4>
+<p>Extract the greedy policy (policy function) of the model
+.</p>
+<h5 id="arguments_12">Arguments</h5>
+<ul>
+<li><code>cp::CareerWorkerProblem</code> : Instance of <code>CareerWorkerProblem</code></li>
+<li><code>v::Matrix</code>: Current guess for the value function</li>
+<li><code>out::Matrix</code> : Storage for output</li>
+</ul>
+<h5 id="returns_12">Returns</h5>
+<p>None, <code>out</code> is updated in place to hold the policy function</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L160">QuantEcon/src/models/ifp.jl:160</a></p>
+<hr />
+<p><a id="method__get_greedy.3" class="lexicon_definition"></a></p>
+<h4 id="get_greedygquanteconmodelsgrowthmodel-warrayt-1-outarrayt-1">get_greedy!(g::QuantEcon.Models.GrowthModel,  w::Array{T, 1},  out::Array{T, 1}) <a href="#method__get_greedy.3">¶</a></h4>
+<p>Extract the greedy policy (policy function) of the model
+.</p>
+<h5 id="arguments_13">Arguments</h5>
+<ul>
+<li><code>g::GrowthModel</code> : Instance of <code>GrowthModel</code></li>
+<li><code>w::Vector</code>: Current guess for the value function</li>
+<li><code>out::Vector</code> : Storage for output</li>
+</ul>
+<h5 id="returns_13">Returns</h5>
+<p>None, <code>out</code> is updated in place to hold the policy function</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/optgrowth.jl#L127">QuantEcon/src/models/optgrowth.jl:127</a></p>
+<hr />
+<p><a id="method__get_greedy.4" class="lexicon_definition"></a></p>
+<h4 id="get_greedyjvquanteconmodelsjvworker-varrayt-1-outtuplearrayt-1-arrayt-1">get_greedy!(jv::QuantEcon.Models.JvWorker,  V::Array{T, 1},  out::Tuple{Array{T, 1}, Array{T, 1}}) <a href="#method__get_greedy.4">¶</a></h4>
+<p>Extract the greedy policy (policy function) of the model
+.</p>
+<h5 id="arguments_14">Arguments</h5>
+<ul>
+<li><code>cp::CareerWorkerProblem</code> : Instance of <code>CareerWorkerProblem</code></li>
+<li><code>v::Vector</code>: Current guess for the value function</li>
+<li><code>out::Tuple(Vector, Vector)</code> : Storage for output of policy rule</li>
+</ul>
+<h5 id="returns_14">Returns</h5>
+<p>None, <code>out</code> is updated in place to hold the policy function</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/jv.jl#L267">QuantEcon/src/models/jv.jl:267</a></p>
+<hr />
+<p><a id="method__get_greedy.5" class="lexicon_definition"></a></p>
+<h4 id="get_greedyspquanteconmodelssearchproblem-varrayt-2-outarrayt-2">get_greedy!(sp::QuantEcon.Models.SearchProblem,  v::Array{T, 2},  out::Array{T, 2}) <a href="#method__get_greedy.5">¶</a></h4>
+<p>Extract the greedy policy (policy function) of the model
+.</p>
+<h5 id="arguments_15">Arguments</h5>
+<ul>
+<li><code>sp::SearchProblem</code> : Instance of <code>SearchProblem</code></li>
+<li><code>v::Matrix</code>: Current guess for the value function</li>
+<li><code>out::Matrix</code> : Storage for output</li>
+</ul>
+<h5 id="returns_15">Returns</h5>
+<p>None, <code>out</code> is updated in place to hold the policy function</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/odu.jl#L193">QuantEcon/src/models/odu.jl:193</a></p>
+<hr />
+<p><a id="method__lucas_operator.1" class="lexicon_definition"></a></p>
+<h4 id="lucas_operatorltquanteconmodelslucastree-fabstractarrayt-1">lucas_operator(lt::QuantEcon.Models.LucasTree,  f::AbstractArray{T, 1}) <a href="#method__lucas_operator.1">¶</a></h4>
+<p>The approximate Lucas operator, which computes and returns the updated function
+Tf on the grid points.</p>
+<h5 id="arguments_16">Arguments</h5>
+<ul>
+<li><code>lt::LucasTree</code> : An instance of the <code>LucasTree</code> type</li>
+<li><code>f::Vector{Float64}</code> : A candidate function on R_+ represented as points on a
+grid. It should be the same size as <code>lt.grid</code></li>
+</ul>
+<h5 id="returns_16">Returns</h5>
+<ul>
+<li><code>Tf::Vector{Float64}</code> : The updated function Tf</li>
+</ul>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/lucastree.jl#L142">QuantEcon/src/models/lucastree.jl:142</a></p>
+<hr />
+<p><a id="method__res_wage_operator.1" class="lexicon_definition"></a></p>
+<h4 id="res_wage_operatorspquanteconmodelssearchproblem-phiarrayt-1-outarrayt-1">res_wage_operator!(sp::QuantEcon.Models.SearchProblem,  phi::Array{T, 1},  out::Array{T, 1}) <a href="#method__res_wage_operator.1">¶</a></h4>
+<p>Updates the reservation wage function guess phi via the operator Q.</p>
+<h5 id="arguments_17">Arguments</h5>
+<ul>
+<li><code>sp::SearchProblem</code> : Instance of <code>SearchProblem</code></li>
+<li><code>phi::Vector</code>: Current guess for phi</li>
+<li><code>out::Vector</code> : Storage for output</li>
+</ul>
+<h5 id="returns_17">Returns</h5>
+<p>None, <code>out</code> is updated in place to hold the updated levels of phi</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/odu.jl#L214">QuantEcon/src/models/odu.jl:214</a></p>
+<hr />
+<p><a id="method__res_wage_operator.2" class="lexicon_definition"></a></p>
+<h4 id="res_wage_operatorspquanteconmodelssearchproblem-phiarrayt-1">res_wage_operator(sp::QuantEcon.Models.SearchProblem,  phi::Array{T, 1}) <a href="#method__res_wage_operator.2">¶</a></h4>
+<p>Updates the reservation wage function guess phi via the operator Q.</p>
+<p>See the documentation for the mutating method of this function for more details
+on arguments</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/odu.jl#L237">QuantEcon/src/models/odu.jl:237</a></p>
+<hr />
+<p><a id="method__tree_price.1" class="lexicon_definition"></a></p>
+<h4 id="tree_priceapquanteconmodelsassetprices">tree_price(ap::QuantEcon.Models.AssetPrices) <a href="#method__tree_price.1">¶</a></h4>
+<p>Computes the function v such that the price of the lucas tree is v(lambda)C_t</p>
+<h5 id="arguments_18">Arguments</h5>
+<ul>
+<li><code>ap::AssetPrices</code> : An instance of the <code>AssetPrices</code> type</li>
+</ul>
+<h5 id="returns_18">Returns</h5>
+<ul>
+<li><code>v::Vector{Float64}</code> : the pricing function for the lucas tree</li>
+</ul>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/asset_pricing.jl#L66">QuantEcon/src/models/asset_pricing.jl:66</a></p>
+<hr />
+<p><a id="type__assetprices.1" class="lexicon_definition"></a></p>
+<h4 id="quanteconmodelsassetprices">QuantEcon.Models.AssetPrices <a href="#type__assetprices.1">¶</a></h4>
+<p>A class to compute asset prices when the endowment follows a finite Markov chain</p>
+<h5 id="fields">Fields</h5>
+<ul>
+<li><code>bet::Float64</code> : Discount factor in (0, 1)</li>
+<li><code>P::Matrix{Float64}</code> A valid stochastic matrix</li>
+<li><code>s::Vector{Float64}</code> : Growth rate of consumption in each state</li>
+<li><code>gamma::Float64</code> : Coefficient of risk aversion</li>
+<li><code>n::Int(size(P, 1))</code>: The numberof states</li>
+<li><code>P_tilde::Matrix{Float64}</code> : modified transition matrix used in computing the
+price of the lucas tree</li>
+<li><code>P_check::Matrix{Float64}</code> : modified transition matrix used in computing the
+price of the consol</li>
+</ul>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/asset_pricing.jl#L34">QuantEcon/src/models/asset_pricing.jl:34</a></p>
+<hr />
+<p><a id="type__careerworkerproblem.1" class="lexicon_definition"></a></p>
+<h4 id="quanteconmodelscareerworkerproblem">QuantEcon.Models.CareerWorkerProblem <a href="#type__careerworkerproblem.1">¶</a></h4>
+<p>Career/job choice model fo Derek Neal (1999)</p>
+<h5 id="fields_1">Fields</h5>
+<ul>
+<li><code>beta::Real</code> : Discount factor in (0, 1)</li>
+<li><code>N::Int</code> : Number of possible realizations of both epsilon and theta</li>
+<li><code>B::Real</code> : upper bound for both epsilon and theta</li>
+<li><code>theta::AbstractVector</code> : A grid of values on [0, B]</li>
+<li><code>epsilon::AbstractVector</code> : A grid of values on [0, B]</li>
+<li><code>F_probs::AbstractVector</code> : The pdf of each value associated with of F</li>
+<li><code>G_probs::AbstractVector</code> : The pdf of each value associated with of G</li>
+<li><code>F_mean::Real</code> : The mean of the distribution F</li>
+<li><code>G_mean::Real</code> : The mean of the distribution G</li>
+</ul>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/career.jl#L33">QuantEcon/src/models/career.jl:33</a></p>
+<hr />
+<p><a id="type__consumerproblem.1" class="lexicon_definition"></a></p>
+<h4 id="quanteconmodelsconsumerproblem">QuantEcon.Models.ConsumerProblem <a href="#type__consumerproblem.1">¶</a></h4>
+<p>Income fluctuation problem</p>
+<h5 id="fields_2">Fields</h5>
+<ul>
+<li><code>u::Function</code> : Utility <code>function</code></li>
+<li><code>du::Function</code> : Marginal utility <code>function</code></li>
+<li><code>r::Real</code> : Strictly positive interest rate</li>
+<li><code>R::Real</code> : The interest rate plus 1 (strictly greater than 1)</li>
+<li><code>bet::Real</code> : Discount rate in (0, 1)</li>
+<li><code>b::Real</code> :  The borrowing constraint</li>
+<li><code>Pi::Matrix</code> : Transition matrix for <code>z</code></li>
+<li><code>z_vals::Vector</code> : Levels of productivity</li>
+<li><code>asset_grid::AbstractVector</code> : Grid of asset values</li>
+</ul>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L36">QuantEcon/src/models/ifp.jl:36</a></p>
+<hr />
+<p><a id="type__growthmodel.1" class="lexicon_definition"></a></p>
+<h4 id="quanteconmodelsgrowthmodel">QuantEcon.Models.GrowthModel <a href="#type__growthmodel.1">¶</a></h4>
+<p>Neoclassical growth model</p>
+<h5 id="fields_3">Fields</h5>
+<ul>
+<li><code>f::Function</code> : Production function</li>
+<li><code>bet::Real</code> : Discount factor in (0, 1)</li>
+<li><code>u::Function</code> : Utility function</li>
+<li><code>grid_max::Int</code> : Maximum for grid over savings values</li>
+<li><code>grid_size::Int</code> : Number of points in grid for savings values</li>
+<li><code>grid::FloatRange</code> : The grid for savings values</li>
+</ul>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/optgrowth.jl#L38">QuantEcon/src/models/optgrowth.jl:38</a></p>
+<hr />
+<p><a id="type__jvworker.1" class="lexicon_definition"></a></p>
+<h4 id="quanteconmodelsjvworker">QuantEcon.Models.JvWorker <a href="#type__jvworker.1">¶</a></h4>
+<p>A Jovanovic-type model of employment with on-the-job search.</p>
+<p>The value function is given by</p>
+<p>[V(x) = \max_{\phi, s} w(x, \phi, s)]</p>
+<p>for</p>
+<pre><code>w(x, phi, s) := x(1 - phi - s) + beta (1 - pi(s)) V(G(x, phi)) +
+                beta pi(s) E V[ max(G(x, phi), U)
+</code></pre>
+<p>where</p>
+<ul>
+<li><code>x</code>: : human capital</li>
+<li><code>s</code> : search effort</li>
+<li><code>phi</code> : investment in human capital</li>
+<li><code>pi(s)</code> : probability of new offer given search level s</li>
+<li><code>x(1 - phi - s)</code> : wage</li>
+<li><code>G(x, phi)</code> : new human capital when current job retained</li>
+<li><code>U</code> : Random variable with distribution F -- new draw of human capita</li>
+</ul>
+<h5 id="fields_4">Fields</h5>
+<ul>
+<li><code>A::Real</code> : Parameter in human capital transition function</li>
+<li><code>alpha::Real</code> : Parameter in human capital transition function</li>
+<li><code>bet::Real</code> : Discount factor in (0, 1)</li>
+<li><code>x_grid::FloatRange</code> : Grid for potential levels of x</li>
+<li><code>G::Function</code> : Transition <code>function</code> for human captial</li>
+<li><code>pi_func::Function</code> : <code>function</code> mapping search effort to the probability of
+getting a new job offer</li>
+<li><code>F::UnivariateDistribution</code> : A univariate distribution from which the value
+of new job offers is drawn</li>
+<li><code>quad_nodes::Vector</code> : Quadrature nodes for integrating over phi</li>
+<li><code>quad_weights::Vector</code> : Quadrature weights for integrating over phi</li>
+</ul>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/jv.jl#L63">QuantEcon/src/models/jv.jl:63</a></p>
+<hr />
+<p><a id="type__lucastree.1" class="lexicon_definition"></a></p>
+<h4 id="quanteconmodelslucastree">QuantEcon.Models.LucasTree <a href="#type__lucastree.1">¶</a></h4>
+<p>The Lucas asset pricing model</p>
+<h5 id="fields_5">Fields</h5>
+<ul>
+<li><code>gam::Real</code> : coefficient of risk aversion in the CRRA utility function</li>
+<li><code>bet::Real</code> : Discount factor in (0, 1)</li>
+<li><code>alpha::Real</code> : Correlation coefficient in the shock process</li>
+<li><code>sigma::Real</code> : Volatility of shock process</li>
+<li><code>phi::Distribution</code> : Distribution for shock process</li>
+<li><code>grid::AbstractVector</code> : Grid of points on which to evaluate the prices. Each
+point should be non-negative</li>
+<li><code>grid_min::Real</code> : Lower bound on grid</li>
+<li><code>grid_max::Real</code> : Upper bound on grid</li>
+<li><code>grid_size::Int</code> : Number of points in the grid</li>
+<li><code>quad_nodes::Vector</code> : Quadrature nodes for integrating over the shock</li>
+<li><code>quad_weights::Vector</code> : Quadrature weights for integrating over the shock</li>
+<li><code>h::Vector</code> : Storage array for the <code>h</code> vector in the lucas operator</li>
+</ul>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/lucastree.jl#L50">QuantEcon/src/models/lucastree.jl:50</a></p>
+<hr />
+<p><a id="type__searchproblem.1" class="lexicon_definition"></a></p>
+<h4 id="quanteconmodelssearchproblem">QuantEcon.Models.SearchProblem <a href="#type__searchproblem.1">¶</a></h4>
+<p>Unemployment/search problem where offer distribution is unknown</p>
+<h5 id="fields_6">Fields</h5>
+<ul>
+<li><code>bet::Real</code> : Discount factor on (0, 1)</li>
+<li><code>c::Real</code> : Unemployment compensation</li>
+<li><code>F::Distribution</code> : Offer distribution <code>F</code></li>
+<li><code>G::Distribution</code> : Offer distribution <code>G</code></li>
+<li><code>f::Function</code> : The pdf of <code>F</code></li>
+<li><code>g::Function</code> : The pdf of <code>G</code></li>
+<li><code>n_w::Int</code> : Number of points on the grid for w</li>
+<li><code>w_max::Real</code> : Maximum wage offer</li>
+<li><code>w_grid::AbstractVector</code> : Grid of wage offers w</li>
+<li><code>n_pi::Int</code> : Number of points on grid for pi</li>
+<li><code>pi_min::Real</code> : Minimum of pi grid</li>
+<li><code>pi_max::Real</code> : Maximum of pi grid</li>
+<li><code>pi_grid::AbstractVector</code> : Grid of probabilities pi</li>
+<li><code>quad_nodes::Vector</code> : Notes for quadrature ofer offers</li>
+<li><code>quad_weights::Vector</code> : Weights for quadrature ofer offers</li>
+</ul>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/odu.jl#L40">QuantEcon/src/models/odu.jl:40</a></p>
+<h2 id="internal">Internal</h2>
+<hr />
+<p><a id="method__call.1" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelsassetprices-betreal-parrayt-2-sarrayt-1-gammreal">call(::Type{QuantEcon.Models.AssetPrices},  bet::Real,  P::Array{T, 2},  s::Array{T, 1},  gamm::Real) <a href="#method__call.1">¶</a></h4>
+<p>Construct an instance of <code>AssetPrices</code>, where <code>n</code>, <code>P_tilde</code>, and <code>P_check</code> are
+computed automatically for you. See also the documentation for the type itself</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/asset_pricing.jl#L48">QuantEcon/src/models/asset_pricing.jl:48</a></p>
+<hr />
+<p><a id="method__call.2" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelscareerworkerproblem-betareal">call(::Type{QuantEcon.Models.CareerWorkerProblem},  beta::Real) <a href="#method__call.2">¶</a></h4>
+<p>Constructor with default values for <code>CareerWorkerProblem</code></p>
+<h5 id="arguments_19">Arguments</h5>
+<ul>
+<li><code>beta::Real(0.95)</code> : Discount factor in (0, 1)</li>
+<li><code>B::Real(5.0)</code> : upper bound for both epsilon and theta</li>
+<li><code>N::Real(50)</code> : Number of possible realizations of both epsilon and theta</li>
+<li><code>F_a::Real(1), F_b::Real(1)</code> : Parameters of the distribution F</li>
+<li><code>G_a::Real(1), G_b::Real(1)</code> : Parameters of the distribution F</li>
+</ul>
+<h5 id="notes_1">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/career.jl#L60">QuantEcon/src/models/career.jl:60</a></p>
+<hr />
+<p><a id="method__call.3" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelscareerworkerproblem-betareal-breal">call(::Type{QuantEcon.Models.CareerWorkerProblem},  beta::Real,  B::Real) <a href="#method__call.3">¶</a></h4>
+<p>Constructor with default values for <code>CareerWorkerProblem</code></p>
+<h5 id="arguments_20">Arguments</h5>
+<ul>
+<li><code>beta::Real(0.95)</code> : Discount factor in (0, 1)</li>
+<li><code>B::Real(5.0)</code> : upper bound for both epsilon and theta</li>
+<li><code>N::Real(50)</code> : Number of possible realizations of both epsilon and theta</li>
+<li><code>F_a::Real(1), F_b::Real(1)</code> : Parameters of the distribution F</li>
+<li><code>G_a::Real(1), G_b::Real(1)</code> : Parameters of the distribution F</li>
+</ul>
+<h5 id="notes_2">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/career.jl#L60">QuantEcon/src/models/career.jl:60</a></p>
+<hr />
+<p><a id="method__call.4" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelscareerworkerproblem-betareal-breal-nreal">call(::Type{QuantEcon.Models.CareerWorkerProblem},  beta::Real,  B::Real,  N::Real) <a href="#method__call.4">¶</a></h4>
+<p>Constructor with default values for <code>CareerWorkerProblem</code></p>
+<h5 id="arguments_21">Arguments</h5>
+<ul>
+<li><code>beta::Real(0.95)</code> : Discount factor in (0, 1)</li>
+<li><code>B::Real(5.0)</code> : upper bound for both epsilon and theta</li>
+<li><code>N::Real(50)</code> : Number of possible realizations of both epsilon and theta</li>
+<li><code>F_a::Real(1), F_b::Real(1)</code> : Parameters of the distribution F</li>
+<li><code>G_a::Real(1), G_b::Real(1)</code> : Parameters of the distribution F</li>
+</ul>
+<h5 id="notes_3">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/career.jl#L60">QuantEcon/src/models/career.jl:60</a></p>
+<hr />
+<p><a id="method__call.5" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelscareerworkerproblem-betareal-breal-nreal-f_areal">call(::Type{QuantEcon.Models.CareerWorkerProblem},  beta::Real,  B::Real,  N::Real,  F_a::Real) <a href="#method__call.5">¶</a></h4>
+<p>Constructor with default values for <code>CareerWorkerProblem</code></p>
+<h5 id="arguments_22">Arguments</h5>
+<ul>
+<li><code>beta::Real(0.95)</code> : Discount factor in (0, 1)</li>
+<li><code>B::Real(5.0)</code> : upper bound for both epsilon and theta</li>
+<li><code>N::Real(50)</code> : Number of possible realizations of both epsilon and theta</li>
+<li><code>F_a::Real(1), F_b::Real(1)</code> : Parameters of the distribution F</li>
+<li><code>G_a::Real(1), G_b::Real(1)</code> : Parameters of the distribution F</li>
+</ul>
+<h5 id="notes_4">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/career.jl#L60">QuantEcon/src/models/career.jl:60</a></p>
+<hr />
+<p><a id="method__call.6" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelscareerworkerproblem-betareal-breal-nreal-f_areal-f_breal">call(::Type{QuantEcon.Models.CareerWorkerProblem},  beta::Real,  B::Real,  N::Real,  F_a::Real,  F_b::Real) <a href="#method__call.6">¶</a></h4>
+<p>Constructor with default values for <code>CareerWorkerProblem</code></p>
+<h5 id="arguments_23">Arguments</h5>
+<ul>
+<li><code>beta::Real(0.95)</code> : Discount factor in (0, 1)</li>
+<li><code>B::Real(5.0)</code> : upper bound for both epsilon and theta</li>
+<li><code>N::Real(50)</code> : Number of possible realizations of both epsilon and theta</li>
+<li><code>F_a::Real(1), F_b::Real(1)</code> : Parameters of the distribution F</li>
+<li><code>G_a::Real(1), G_b::Real(1)</code> : Parameters of the distribution F</li>
+</ul>
+<h5 id="notes_5">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/career.jl#L60">QuantEcon/src/models/career.jl:60</a></p>
+<hr />
+<p><a id="method__call.7" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelscareerworkerproblem-betareal-breal-nreal-f_areal-f_breal-g_areal">call(::Type{QuantEcon.Models.CareerWorkerProblem},  beta::Real,  B::Real,  N::Real,  F_a::Real,  F_b::Real,  G_a::Real) <a href="#method__call.7">¶</a></h4>
+<p>Constructor with default values for <code>CareerWorkerProblem</code></p>
+<h5 id="arguments_24">Arguments</h5>
+<ul>
+<li><code>beta::Real(0.95)</code> : Discount factor in (0, 1)</li>
+<li><code>B::Real(5.0)</code> : upper bound for both epsilon and theta</li>
+<li><code>N::Real(50)</code> : Number of possible realizations of both epsilon and theta</li>
+<li><code>F_a::Real(1), F_b::Real(1)</code> : Parameters of the distribution F</li>
+<li><code>G_a::Real(1), G_b::Real(1)</code> : Parameters of the distribution F</li>
+</ul>
+<h5 id="notes_6">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/career.jl#L60">QuantEcon/src/models/career.jl:60</a></p>
+<hr />
+<p><a id="method__call.8" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelscareerworkerproblem-betareal-breal-nreal-f_areal-f_breal-g_areal-g_breal">call(::Type{QuantEcon.Models.CareerWorkerProblem},  beta::Real,  B::Real,  N::Real,  F_a::Real,  F_b::Real,  G_a::Real,  G_b::Real) <a href="#method__call.8">¶</a></h4>
+<p>Constructor with default values for <code>CareerWorkerProblem</code></p>
+<h5 id="arguments_25">Arguments</h5>
+<ul>
+<li><code>beta::Real(0.95)</code> : Discount factor in (0, 1)</li>
+<li><code>B::Real(5.0)</code> : upper bound for both epsilon and theta</li>
+<li><code>N::Real(50)</code> : Number of possible realizations of both epsilon and theta</li>
+<li><code>F_a::Real(1), F_b::Real(1)</code> : Parameters of the distribution F</li>
+<li><code>G_a::Real(1), G_b::Real(1)</code> : Parameters of the distribution F</li>
+</ul>
+<h5 id="notes_7">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/career.jl#L60">QuantEcon/src/models/career.jl:60</a></p>
+<hr />
+<p><a id="method__call.9" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelsconsumerproblem-r">call(::Type{QuantEcon.Models.ConsumerProblem},  r) <a href="#method__call.9">¶</a></h4>
+<p>Constructor with default values for <code>ConsumerProblem</code></p>
+<h5 id="arguments_26">Arguments</h5>
+<ul>
+<li><code>r::Real(0.01)</code> : Strictly positive interest rate</li>
+<li><code>bet::Real(0.96)</code> : Discount rate in (0, 1)</li>
+<li><code>Pi::Matrix{Float64}([0.6 0.4; 0.05 0.95])</code> : Transition matrix for <code>z</code></li>
+<li><code>z_vals::Vector{Float64}([0.5, 1.0])</code> : Levels of productivity</li>
+<li><code>b::Real(0.0)</code> : Borrowing constraint</li>
+<li><code>grid_max::Real(16)</code> : Maximum in grid for asset holdings</li>
+<li><code>grid_size::Int(50)</code> : Number of points in grid for asset holdings</li>
+<li><code>u::Function(log)</code> : Utility <code>function</code></li>
+<li><code>du::Function(x-&gt;1/x)</code> : Marginal utility <code>function</code></li>
+</ul>
+<h5 id="notes_8">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L71">QuantEcon/src/models/ifp.jl:71</a></p>
+<hr />
+<p><a id="method__call.10" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelsconsumerproblem-r-bet">call(::Type{QuantEcon.Models.ConsumerProblem},  r,  bet) <a href="#method__call.10">¶</a></h4>
+<p>Constructor with default values for <code>ConsumerProblem</code></p>
+<h5 id="arguments_27">Arguments</h5>
+<ul>
+<li><code>r::Real(0.01)</code> : Strictly positive interest rate</li>
+<li><code>bet::Real(0.96)</code> : Discount rate in (0, 1)</li>
+<li><code>Pi::Matrix{Float64}([0.6 0.4; 0.05 0.95])</code> : Transition matrix for <code>z</code></li>
+<li><code>z_vals::Vector{Float64}([0.5, 1.0])</code> : Levels of productivity</li>
+<li><code>b::Real(0.0)</code> : Borrowing constraint</li>
+<li><code>grid_max::Real(16)</code> : Maximum in grid for asset holdings</li>
+<li><code>grid_size::Int(50)</code> : Number of points in grid for asset holdings</li>
+<li><code>u::Function(log)</code> : Utility <code>function</code></li>
+<li><code>du::Function(x-&gt;1/x)</code> : Marginal utility <code>function</code></li>
+</ul>
+<h5 id="notes_9">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L71">QuantEcon/src/models/ifp.jl:71</a></p>
+<hr />
+<p><a id="method__call.11" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelsconsumerproblem-r-bet-pi">call(::Type{QuantEcon.Models.ConsumerProblem},  r,  bet,  Pi) <a href="#method__call.11">¶</a></h4>
+<p>Constructor with default values for <code>ConsumerProblem</code></p>
+<h5 id="arguments_28">Arguments</h5>
+<ul>
+<li><code>r::Real(0.01)</code> : Strictly positive interest rate</li>
+<li><code>bet::Real(0.96)</code> : Discount rate in (0, 1)</li>
+<li><code>Pi::Matrix{Float64}([0.6 0.4; 0.05 0.95])</code> : Transition matrix for <code>z</code></li>
+<li><code>z_vals::Vector{Float64}([0.5, 1.0])</code> : Levels of productivity</li>
+<li><code>b::Real(0.0)</code> : Borrowing constraint</li>
+<li><code>grid_max::Real(16)</code> : Maximum in grid for asset holdings</li>
+<li><code>grid_size::Int(50)</code> : Number of points in grid for asset holdings</li>
+<li><code>u::Function(log)</code> : Utility <code>function</code></li>
+<li><code>du::Function(x-&gt;1/x)</code> : Marginal utility <code>function</code></li>
+</ul>
+<h5 id="notes_10">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L71">QuantEcon/src/models/ifp.jl:71</a></p>
+<hr />
+<p><a id="method__call.12" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelsconsumerproblem-r-bet-pi-z_vals">call(::Type{QuantEcon.Models.ConsumerProblem},  r,  bet,  Pi,  z_vals) <a href="#method__call.12">¶</a></h4>
+<p>Constructor with default values for <code>ConsumerProblem</code></p>
+<h5 id="arguments_29">Arguments</h5>
+<ul>
+<li><code>r::Real(0.01)</code> : Strictly positive interest rate</li>
+<li><code>bet::Real(0.96)</code> : Discount rate in (0, 1)</li>
+<li><code>Pi::Matrix{Float64}([0.6 0.4; 0.05 0.95])</code> : Transition matrix for <code>z</code></li>
+<li><code>z_vals::Vector{Float64}([0.5, 1.0])</code> : Levels of productivity</li>
+<li><code>b::Real(0.0)</code> : Borrowing constraint</li>
+<li><code>grid_max::Real(16)</code> : Maximum in grid for asset holdings</li>
+<li><code>grid_size::Int(50)</code> : Number of points in grid for asset holdings</li>
+<li><code>u::Function(log)</code> : Utility <code>function</code></li>
+<li><code>du::Function(x-&gt;1/x)</code> : Marginal utility <code>function</code></li>
+</ul>
+<h5 id="notes_11">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L71">QuantEcon/src/models/ifp.jl:71</a></p>
+<hr />
+<p><a id="method__call.13" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelsconsumerproblem-r-bet-pi-z_vals-b">call(::Type{QuantEcon.Models.ConsumerProblem},  r,  bet,  Pi,  z_vals,  b) <a href="#method__call.13">¶</a></h4>
+<p>Constructor with default values for <code>ConsumerProblem</code></p>
+<h5 id="arguments_30">Arguments</h5>
+<ul>
+<li><code>r::Real(0.01)</code> : Strictly positive interest rate</li>
+<li><code>bet::Real(0.96)</code> : Discount rate in (0, 1)</li>
+<li><code>Pi::Matrix{Float64}([0.6 0.4; 0.05 0.95])</code> : Transition matrix for <code>z</code></li>
+<li><code>z_vals::Vector{Float64}([0.5, 1.0])</code> : Levels of productivity</li>
+<li><code>b::Real(0.0)</code> : Borrowing constraint</li>
+<li><code>grid_max::Real(16)</code> : Maximum in grid for asset holdings</li>
+<li><code>grid_size::Int(50)</code> : Number of points in grid for asset holdings</li>
+<li><code>u::Function(log)</code> : Utility <code>function</code></li>
+<li><code>du::Function(x-&gt;1/x)</code> : Marginal utility <code>function</code></li>
+</ul>
+<h5 id="notes_12">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L71">QuantEcon/src/models/ifp.jl:71</a></p>
+<hr />
+<p><a id="method__call.14" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelsconsumerproblem-r-bet-pi-z_vals-b-grid_max">call(::Type{QuantEcon.Models.ConsumerProblem},  r,  bet,  Pi,  z_vals,  b,  grid_max) <a href="#method__call.14">¶</a></h4>
+<p>Constructor with default values for <code>ConsumerProblem</code></p>
+<h5 id="arguments_31">Arguments</h5>
+<ul>
+<li><code>r::Real(0.01)</code> : Strictly positive interest rate</li>
+<li><code>bet::Real(0.96)</code> : Discount rate in (0, 1)</li>
+<li><code>Pi::Matrix{Float64}([0.6 0.4; 0.05 0.95])</code> : Transition matrix for <code>z</code></li>
+<li><code>z_vals::Vector{Float64}([0.5, 1.0])</code> : Levels of productivity</li>
+<li><code>b::Real(0.0)</code> : Borrowing constraint</li>
+<li><code>grid_max::Real(16)</code> : Maximum in grid for asset holdings</li>
+<li><code>grid_size::Int(50)</code> : Number of points in grid for asset holdings</li>
+<li><code>u::Function(log)</code> : Utility <code>function</code></li>
+<li><code>du::Function(x-&gt;1/x)</code> : Marginal utility <code>function</code></li>
+</ul>
+<h5 id="notes_13">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L71">QuantEcon/src/models/ifp.jl:71</a></p>
+<hr />
+<p><a id="method__call.15" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelsconsumerproblem-r-bet-pi-z_vals-b-grid_max-grid_size">call(::Type{QuantEcon.Models.ConsumerProblem},  r,  bet,  Pi,  z_vals,  b,  grid_max,  grid_size) <a href="#method__call.15">¶</a></h4>
+<p>Constructor with default values for <code>ConsumerProblem</code></p>
+<h5 id="arguments_32">Arguments</h5>
+<ul>
+<li><code>r::Real(0.01)</code> : Strictly positive interest rate</li>
+<li><code>bet::Real(0.96)</code> : Discount rate in (0, 1)</li>
+<li><code>Pi::Matrix{Float64}([0.6 0.4; 0.05 0.95])</code> : Transition matrix for <code>z</code></li>
+<li><code>z_vals::Vector{Float64}([0.5, 1.0])</code> : Levels of productivity</li>
+<li><code>b::Real(0.0)</code> : Borrowing constraint</li>
+<li><code>grid_max::Real(16)</code> : Maximum in grid for asset holdings</li>
+<li><code>grid_size::Int(50)</code> : Number of points in grid for asset holdings</li>
+<li><code>u::Function(log)</code> : Utility <code>function</code></li>
+<li><code>du::Function(x-&gt;1/x)</code> : Marginal utility <code>function</code></li>
+</ul>
+<h5 id="notes_14">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L71">QuantEcon/src/models/ifp.jl:71</a></p>
+<hr />
+<p><a id="method__call.16" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelsconsumerproblem-r-bet-pi-z_vals-b-grid_max-grid_size-u">call(::Type{QuantEcon.Models.ConsumerProblem},  r,  bet,  Pi,  z_vals,  b,  grid_max,  grid_size,  u) <a href="#method__call.16">¶</a></h4>
+<p>Constructor with default values for <code>ConsumerProblem</code></p>
+<h5 id="arguments_33">Arguments</h5>
+<ul>
+<li><code>r::Real(0.01)</code> : Strictly positive interest rate</li>
+<li><code>bet::Real(0.96)</code> : Discount rate in (0, 1)</li>
+<li><code>Pi::Matrix{Float64}([0.6 0.4; 0.05 0.95])</code> : Transition matrix for <code>z</code></li>
+<li><code>z_vals::Vector{Float64}([0.5, 1.0])</code> : Levels of productivity</li>
+<li><code>b::Real(0.0)</code> : Borrowing constraint</li>
+<li><code>grid_max::Real(16)</code> : Maximum in grid for asset holdings</li>
+<li><code>grid_size::Int(50)</code> : Number of points in grid for asset holdings</li>
+<li><code>u::Function(log)</code> : Utility <code>function</code></li>
+<li><code>du::Function(x-&gt;1/x)</code> : Marginal utility <code>function</code></li>
+</ul>
+<h5 id="notes_15">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L71">QuantEcon/src/models/ifp.jl:71</a></p>
+<hr />
+<p><a id="method__call.17" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelsconsumerproblem-r-bet-pi-z_vals-b-grid_max-grid_size-u-du">call(::Type{QuantEcon.Models.ConsumerProblem},  r,  bet,  Pi,  z_vals,  b,  grid_max,  grid_size,  u,  du) <a href="#method__call.17">¶</a></h4>
+<p>Constructor with default values for <code>ConsumerProblem</code></p>
+<h5 id="arguments_34">Arguments</h5>
+<ul>
+<li><code>r::Real(0.01)</code> : Strictly positive interest rate</li>
+<li><code>bet::Real(0.96)</code> : Discount rate in (0, 1)</li>
+<li><code>Pi::Matrix{Float64}([0.6 0.4; 0.05 0.95])</code> : Transition matrix for <code>z</code></li>
+<li><code>z_vals::Vector{Float64}([0.5, 1.0])</code> : Levels of productivity</li>
+<li><code>b::Real(0.0)</code> : Borrowing constraint</li>
+<li><code>grid_max::Real(16)</code> : Maximum in grid for asset holdings</li>
+<li><code>grid_size::Int(50)</code> : Number of points in grid for asset holdings</li>
+<li><code>u::Function(log)</code> : Utility <code>function</code></li>
+<li><code>du::Function(x-&gt;1/x)</code> : Marginal utility <code>function</code></li>
+</ul>
+<h5 id="notes_16">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L71">QuantEcon/src/models/ifp.jl:71</a></p>
+<hr />
+<p><a id="method__call.18" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelsgrowthmodel">call(::Type{QuantEcon.Models.GrowthModel}) <a href="#method__call.18">¶</a></h4>
+<p>Constructor of <code>GrowthModel</code></p>
+<h5 id="arguments_35">Arguments</h5>
+<ul>
+<li><code>f::Function(k-&gt;k^0.65)</code> : Production function</li>
+<li><code>bet::Real(0.95)</code> : Discount factor in (0, 1)</li>
+<li><code>u::Function(log)</code> : Utility function</li>
+<li><code>grid_max::Int(2)</code> : Maximum for grid over savings values</li>
+<li><code>grid_size::Int(150)</code> : Number of points in grid for savings values</li>
+</ul>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/optgrowth.jl#L63">QuantEcon/src/models/optgrowth.jl:63</a></p>
+<hr />
+<p><a id="method__call.19" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelsgrowthmodel-f">call(::Type{QuantEcon.Models.GrowthModel},  f) <a href="#method__call.19">¶</a></h4>
+<p>Constructor of <code>GrowthModel</code></p>
+<h5 id="arguments_36">Arguments</h5>
+<ul>
+<li><code>f::Function(k-&gt;k^0.65)</code> : Production function</li>
+<li><code>bet::Real(0.95)</code> : Discount factor in (0, 1)</li>
+<li><code>u::Function(log)</code> : Utility function</li>
+<li><code>grid_max::Int(2)</code> : Maximum for grid over savings values</li>
+<li><code>grid_size::Int(150)</code> : Number of points in grid for savings values</li>
+</ul>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/optgrowth.jl#L63">QuantEcon/src/models/optgrowth.jl:63</a></p>
+<hr />
+<p><a id="method__call.20" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelsgrowthmodel-f-bet">call(::Type{QuantEcon.Models.GrowthModel},  f,  bet) <a href="#method__call.20">¶</a></h4>
+<p>Constructor of <code>GrowthModel</code></p>
+<h5 id="arguments_37">Arguments</h5>
+<ul>
+<li><code>f::Function(k-&gt;k^0.65)</code> : Production function</li>
+<li><code>bet::Real(0.95)</code> : Discount factor in (0, 1)</li>
+<li><code>u::Function(log)</code> : Utility function</li>
+<li><code>grid_max::Int(2)</code> : Maximum for grid over savings values</li>
+<li><code>grid_size::Int(150)</code> : Number of points in grid for savings values</li>
+</ul>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/optgrowth.jl#L63">QuantEcon/src/models/optgrowth.jl:63</a></p>
+<hr />
+<p><a id="method__call.21" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelsgrowthmodel-f-bet-u">call(::Type{QuantEcon.Models.GrowthModel},  f,  bet,  u) <a href="#method__call.21">¶</a></h4>
+<p>Constructor of <code>GrowthModel</code></p>
+<h5 id="arguments_38">Arguments</h5>
+<ul>
+<li><code>f::Function(k-&gt;k^0.65)</code> : Production function</li>
+<li><code>bet::Real(0.95)</code> : Discount factor in (0, 1)</li>
+<li><code>u::Function(log)</code> : Utility function</li>
+<li><code>grid_max::Int(2)</code> : Maximum for grid over savings values</li>
+<li><code>grid_size::Int(150)</code> : Number of points in grid for savings values</li>
+</ul>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/optgrowth.jl#L63">QuantEcon/src/models/optgrowth.jl:63</a></p>
+<hr />
+<p><a id="method__call.22" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelsgrowthmodel-f-bet-u-grid_max">call(::Type{QuantEcon.Models.GrowthModel},  f,  bet,  u,  grid_max) <a href="#method__call.22">¶</a></h4>
+<p>Constructor of <code>GrowthModel</code></p>
+<h5 id="arguments_39">Arguments</h5>
+<ul>
+<li><code>f::Function(k-&gt;k^0.65)</code> : Production function</li>
+<li><code>bet::Real(0.95)</code> : Discount factor in (0, 1)</li>
+<li><code>u::Function(log)</code> : Utility function</li>
+<li><code>grid_max::Int(2)</code> : Maximum for grid over savings values</li>
+<li><code>grid_size::Int(150)</code> : Number of points in grid for savings values</li>
+</ul>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/optgrowth.jl#L63">QuantEcon/src/models/optgrowth.jl:63</a></p>
+<hr />
+<p><a id="method__call.23" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelsgrowthmodel-f-bet-u-grid_max-grid_size">call(::Type{QuantEcon.Models.GrowthModel},  f,  bet,  u,  grid_max,  grid_size) <a href="#method__call.23">¶</a></h4>
+<p>Constructor of <code>GrowthModel</code></p>
+<h5 id="arguments_40">Arguments</h5>
+<ul>
+<li><code>f::Function(k-&gt;k^0.65)</code> : Production function</li>
+<li><code>bet::Real(0.95)</code> : Discount factor in (0, 1)</li>
+<li><code>u::Function(log)</code> : Utility function</li>
+<li><code>grid_max::Int(2)</code> : Maximum for grid over savings values</li>
+<li><code>grid_size::Int(150)</code> : Number of points in grid for savings values</li>
+</ul>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/optgrowth.jl#L63">QuantEcon/src/models/optgrowth.jl:63</a></p>
+<hr />
+<p><a id="method__call.24" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelsjvworker-a">call(::Type{QuantEcon.Models.JvWorker},  A) <a href="#method__call.24">¶</a></h4>
+<p>Constructor with default values for <code>JvWorker</code></p>
+<h5 id="arguments_41">Arguments</h5>
+<ul>
+<li><code>A::Real(1.4)</code> : Parameter in human capital transition function</li>
+<li><code>alpha::Real(0.6)</code> : Parameter in human capital transition function</li>
+<li><code>bet::Real(0.96)</code> : Discount factor in (0, 1)</li>
+<li><code>grid_size::Int(50)</code> : Number of points in discrete grid for <code>x</code></li>
+</ul>
+<h5 id="notes_17">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/jv.jl#L90">QuantEcon/src/models/jv.jl:90</a></p>
+<hr />
+<p><a id="method__call.25" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelsjvworker-a-alpha">call(::Type{QuantEcon.Models.JvWorker},  A,  alpha) <a href="#method__call.25">¶</a></h4>
+<p>Constructor with default values for <code>JvWorker</code></p>
+<h5 id="arguments_42">Arguments</h5>
+<ul>
+<li><code>A::Real(1.4)</code> : Parameter in human capital transition function</li>
+<li><code>alpha::Real(0.6)</code> : Parameter in human capital transition function</li>
+<li><code>bet::Real(0.96)</code> : Discount factor in (0, 1)</li>
+<li><code>grid_size::Int(50)</code> : Number of points in discrete grid for <code>x</code></li>
+</ul>
+<h5 id="notes_18">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/jv.jl#L90">QuantEcon/src/models/jv.jl:90</a></p>
+<hr />
+<p><a id="method__call.26" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelsjvworker-a-alpha-bet">call(::Type{QuantEcon.Models.JvWorker},  A,  alpha,  bet) <a href="#method__call.26">¶</a></h4>
+<p>Constructor with default values for <code>JvWorker</code></p>
+<h5 id="arguments_43">Arguments</h5>
+<ul>
+<li><code>A::Real(1.4)</code> : Parameter in human capital transition function</li>
+<li><code>alpha::Real(0.6)</code> : Parameter in human capital transition function</li>
+<li><code>bet::Real(0.96)</code> : Discount factor in (0, 1)</li>
+<li><code>grid_size::Int(50)</code> : Number of points in discrete grid for <code>x</code></li>
+</ul>
+<h5 id="notes_19">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/jv.jl#L90">QuantEcon/src/models/jv.jl:90</a></p>
+<hr />
+<p><a id="method__call.27" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelsjvworker-a-alpha-bet-grid_size">call(::Type{QuantEcon.Models.JvWorker},  A,  alpha,  bet,  grid_size) <a href="#method__call.27">¶</a></h4>
+<p>Constructor with default values for <code>JvWorker</code></p>
+<h5 id="arguments_44">Arguments</h5>
+<ul>
+<li><code>A::Real(1.4)</code> : Parameter in human capital transition function</li>
+<li><code>alpha::Real(0.6)</code> : Parameter in human capital transition function</li>
+<li><code>bet::Real(0.96)</code> : Discount factor in (0, 1)</li>
+<li><code>grid_size::Int(50)</code> : Number of points in discrete grid for <code>x</code></li>
+</ul>
+<h5 id="notes_20">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/jv.jl#L90">QuantEcon/src/models/jv.jl:90</a></p>
+<hr />
+<p><a id="method__call.28" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelslucastree-gamreal-betreal-alphareal-sigmareal">call(::Type{QuantEcon.Models.LucasTree},  gam::Real,  bet::Real,  alpha::Real,  sigma::Real) <a href="#method__call.28">¶</a></h4>
+<p>Constructor for LucasTree</p>
+<h5 id="arguments_45">Arguments</h5>
+<ul>
+<li><code>gam::Real</code> : coefficient of risk aversion in the CRRA utility function</li>
+<li><code>bet::Real</code> : Discount factor in (0, 1)</li>
+<li><code>alpha::Real</code> : Correlation coefficient in the shock process</li>
+<li><code>sigma::Real</code> : Volatility of shock process</li>
+</ul>
+<h5 id="notes_21">Notes</h5>
+<p>All other fields of the type are instantiated within the constructor</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/lucastree.jl#L80">QuantEcon/src/models/lucastree.jl:80</a></p>
+<hr />
+<p><a id="method__call.29" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelssearchproblem-bet">call(::Type{QuantEcon.Models.SearchProblem},  bet) <a href="#method__call.29">¶</a></h4>
+<p>Constructor for <code>SearchProblem</code> with default values</p>
+<h5 id="arguments_46">Arguments</h5>
+<ul>
+<li><code>bet::Real(0.95)</code> : Discount factor in (0, 1)</li>
+<li><code>c::Real(0.6)</code> : Unemployment compensation</li>
+<li><code>F_a::Real(1), F_b::Real(1)</code> : Parameters of <code>Beta</code> distribution for <code>F</code></li>
+<li><code>G_a::Real(3), G_b::Real(1.2)</code> : Parameters of <code>Beta</code> distribution for <code>G</code></li>
+<li><code>w_max::Real(2)</code> : Maximum of wage offer grid</li>
+<li><code>w_grid_size::Int(40)</code> : Number of points in wage offer grid</li>
+<li><code>pi_grid_size::Int(40)</code> : Number of points in probability grid</li>
+</ul>
+<h5 id="notes_22">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/odu.jl#L76">QuantEcon/src/models/odu.jl:76</a></p>
+<hr />
+<p><a id="method__call.30" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelssearchproblem-bet-c">call(::Type{QuantEcon.Models.SearchProblem},  bet,  c) <a href="#method__call.30">¶</a></h4>
+<p>Constructor for <code>SearchProblem</code> with default values</p>
+<h5 id="arguments_47">Arguments</h5>
+<ul>
+<li><code>bet::Real(0.95)</code> : Discount factor in (0, 1)</li>
+<li><code>c::Real(0.6)</code> : Unemployment compensation</li>
+<li><code>F_a::Real(1), F_b::Real(1)</code> : Parameters of <code>Beta</code> distribution for <code>F</code></li>
+<li><code>G_a::Real(3), G_b::Real(1.2)</code> : Parameters of <code>Beta</code> distribution for <code>G</code></li>
+<li><code>w_max::Real(2)</code> : Maximum of wage offer grid</li>
+<li><code>w_grid_size::Int(40)</code> : Number of points in wage offer grid</li>
+<li><code>pi_grid_size::Int(40)</code> : Number of points in probability grid</li>
+</ul>
+<h5 id="notes_23">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/odu.jl#L76">QuantEcon/src/models/odu.jl:76</a></p>
+<hr />
+<p><a id="method__call.31" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelssearchproblem-bet-c-f_a">call(::Type{QuantEcon.Models.SearchProblem},  bet,  c,  F_a) <a href="#method__call.31">¶</a></h4>
+<p>Constructor for <code>SearchProblem</code> with default values</p>
+<h5 id="arguments_48">Arguments</h5>
+<ul>
+<li><code>bet::Real(0.95)</code> : Discount factor in (0, 1)</li>
+<li><code>c::Real(0.6)</code> : Unemployment compensation</li>
+<li><code>F_a::Real(1), F_b::Real(1)</code> : Parameters of <code>Beta</code> distribution for <code>F</code></li>
+<li><code>G_a::Real(3), G_b::Real(1.2)</code> : Parameters of <code>Beta</code> distribution for <code>G</code></li>
+<li><code>w_max::Real(2)</code> : Maximum of wage offer grid</li>
+<li><code>w_grid_size::Int(40)</code> : Number of points in wage offer grid</li>
+<li><code>pi_grid_size::Int(40)</code> : Number of points in probability grid</li>
+</ul>
+<h5 id="notes_24">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/odu.jl#L76">QuantEcon/src/models/odu.jl:76</a></p>
+<hr />
+<p><a id="method__call.32" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelssearchproblem-bet-c-f_a-f_b">call(::Type{QuantEcon.Models.SearchProblem},  bet,  c,  F_a,  F_b) <a href="#method__call.32">¶</a></h4>
+<p>Constructor for <code>SearchProblem</code> with default values</p>
+<h5 id="arguments_49">Arguments</h5>
+<ul>
+<li><code>bet::Real(0.95)</code> : Discount factor in (0, 1)</li>
+<li><code>c::Real(0.6)</code> : Unemployment compensation</li>
+<li><code>F_a::Real(1), F_b::Real(1)</code> : Parameters of <code>Beta</code> distribution for <code>F</code></li>
+<li><code>G_a::Real(3), G_b::Real(1.2)</code> : Parameters of <code>Beta</code> distribution for <code>G</code></li>
+<li><code>w_max::Real(2)</code> : Maximum of wage offer grid</li>
+<li><code>w_grid_size::Int(40)</code> : Number of points in wage offer grid</li>
+<li><code>pi_grid_size::Int(40)</code> : Number of points in probability grid</li>
+</ul>
+<h5 id="notes_25">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/odu.jl#L76">QuantEcon/src/models/odu.jl:76</a></p>
+<hr />
+<p><a id="method__call.33" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelssearchproblem-bet-c-f_a-f_b-g_a">call(::Type{QuantEcon.Models.SearchProblem},  bet,  c,  F_a,  F_b,  G_a) <a href="#method__call.33">¶</a></h4>
+<p>Constructor for <code>SearchProblem</code> with default values</p>
+<h5 id="arguments_50">Arguments</h5>
+<ul>
+<li><code>bet::Real(0.95)</code> : Discount factor in (0, 1)</li>
+<li><code>c::Real(0.6)</code> : Unemployment compensation</li>
+<li><code>F_a::Real(1), F_b::Real(1)</code> : Parameters of <code>Beta</code> distribution for <code>F</code></li>
+<li><code>G_a::Real(3), G_b::Real(1.2)</code> : Parameters of <code>Beta</code> distribution for <code>G</code></li>
+<li><code>w_max::Real(2)</code> : Maximum of wage offer grid</li>
+<li><code>w_grid_size::Int(40)</code> : Number of points in wage offer grid</li>
+<li><code>pi_grid_size::Int(40)</code> : Number of points in probability grid</li>
+</ul>
+<h5 id="notes_26">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/odu.jl#L76">QuantEcon/src/models/odu.jl:76</a></p>
+<hr />
+<p><a id="method__call.34" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelssearchproblem-bet-c-f_a-f_b-g_a-g_b">call(::Type{QuantEcon.Models.SearchProblem},  bet,  c,  F_a,  F_b,  G_a,  G_b) <a href="#method__call.34">¶</a></h4>
+<p>Constructor for <code>SearchProblem</code> with default values</p>
+<h5 id="arguments_51">Arguments</h5>
+<ul>
+<li><code>bet::Real(0.95)</code> : Discount factor in (0, 1)</li>
+<li><code>c::Real(0.6)</code> : Unemployment compensation</li>
+<li><code>F_a::Real(1), F_b::Real(1)</code> : Parameters of <code>Beta</code> distribution for <code>F</code></li>
+<li><code>G_a::Real(3), G_b::Real(1.2)</code> : Parameters of <code>Beta</code> distribution for <code>G</code></li>
+<li><code>w_max::Real(2)</code> : Maximum of wage offer grid</li>
+<li><code>w_grid_size::Int(40)</code> : Number of points in wage offer grid</li>
+<li><code>pi_grid_size::Int(40)</code> : Number of points in probability grid</li>
+</ul>
+<h5 id="notes_27">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/odu.jl#L76">QuantEcon/src/models/odu.jl:76</a></p>
+<hr />
+<p><a id="method__call.35" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelssearchproblem-bet-c-f_a-f_b-g_a-g_b-w_max">call(::Type{QuantEcon.Models.SearchProblem},  bet,  c,  F_a,  F_b,  G_a,  G_b,  w_max) <a href="#method__call.35">¶</a></h4>
+<p>Constructor for <code>SearchProblem</code> with default values</p>
+<h5 id="arguments_52">Arguments</h5>
+<ul>
+<li><code>bet::Real(0.95)</code> : Discount factor in (0, 1)</li>
+<li><code>c::Real(0.6)</code> : Unemployment compensation</li>
+<li><code>F_a::Real(1), F_b::Real(1)</code> : Parameters of <code>Beta</code> distribution for <code>F</code></li>
+<li><code>G_a::Real(3), G_b::Real(1.2)</code> : Parameters of <code>Beta</code> distribution for <code>G</code></li>
+<li><code>w_max::Real(2)</code> : Maximum of wage offer grid</li>
+<li><code>w_grid_size::Int(40)</code> : Number of points in wage offer grid</li>
+<li><code>pi_grid_size::Int(40)</code> : Number of points in probability grid</li>
+</ul>
+<h5 id="notes_28">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/odu.jl#L76">QuantEcon/src/models/odu.jl:76</a></p>
+<hr />
+<p><a id="method__call.36" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelssearchproblem-bet-c-f_a-f_b-g_a-g_b-w_max-w_grid_size">call(::Type{QuantEcon.Models.SearchProblem},  bet,  c,  F_a,  F_b,  G_a,  G_b,  w_max,  w_grid_size) <a href="#method__call.36">¶</a></h4>
+<p>Constructor for <code>SearchProblem</code> with default values</p>
+<h5 id="arguments_53">Arguments</h5>
+<ul>
+<li><code>bet::Real(0.95)</code> : Discount factor in (0, 1)</li>
+<li><code>c::Real(0.6)</code> : Unemployment compensation</li>
+<li><code>F_a::Real(1), F_b::Real(1)</code> : Parameters of <code>Beta</code> distribution for <code>F</code></li>
+<li><code>G_a::Real(3), G_b::Real(1.2)</code> : Parameters of <code>Beta</code> distribution for <code>G</code></li>
+<li><code>w_max::Real(2)</code> : Maximum of wage offer grid</li>
+<li><code>w_grid_size::Int(40)</code> : Number of points in wage offer grid</li>
+<li><code>pi_grid_size::Int(40)</code> : Number of points in probability grid</li>
+</ul>
+<h5 id="notes_29">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/odu.jl#L76">QuantEcon/src/models/odu.jl:76</a></p>
+<hr />
+<p><a id="method__call.37" class="lexicon_definition"></a></p>
+<h4 id="calltypequanteconmodelssearchproblem-bet-c-f_a-f_b-g_a-g_b-w_max-w_grid_size-pi_grid_size">call(::Type{QuantEcon.Models.SearchProblem},  bet,  c,  F_a,  F_b,  G_a,  G_b,  w_max,  w_grid_size,  pi_grid_size) <a href="#method__call.37">¶</a></h4>
+<p>Constructor for <code>SearchProblem</code> with default values</p>
+<h5 id="arguments_54">Arguments</h5>
+<ul>
+<li><code>bet::Real(0.95)</code> : Discount factor in (0, 1)</li>
+<li><code>c::Real(0.6)</code> : Unemployment compensation</li>
+<li><code>F_a::Real(1), F_b::Real(1)</code> : Parameters of <code>Beta</code> distribution for <code>F</code></li>
+<li><code>G_a::Real(3), G_b::Real(1.2)</code> : Parameters of <code>Beta</code> distribution for <code>G</code></li>
+<li><code>w_max::Real(2)</code> : Maximum of wage offer grid</li>
+<li><code>w_grid_size::Int(40)</code> : Number of points in wage offer grid</li>
+<li><code>pi_grid_size::Int(40)</code> : Number of points in probability grid</li>
+</ul>
+<h5 id="notes_30">Notes</h5>
+<p>There is also a version of this function that accepts keyword arguments for
+each parameter</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/odu.jl#L76">QuantEcon/src/models/odu.jl:76</a></p>
+<hr />
+<p><a id="method__default_du.1" class="lexicon_definition"></a></p>
+<h4 id="default_dutrealxtreal">default_du{T&lt;:Real}(x::T&lt;:Real) <a href="#method__default_du.1">¶</a></h4>
+<p>Marginal utility for log utility function</p>
+<p><em>source:</em>
+<a href="https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L49">QuantEcon/src/models/ifp.jl:49</a></p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../QuantEcon/" class="btn btn-neutral" title="QuantEcon"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../QuantEcon/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+    </span>
+</div>
+
+</body>
+</html>
