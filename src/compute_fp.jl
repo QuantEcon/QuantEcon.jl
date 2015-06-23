@@ -13,7 +13,7 @@ http://quant-econ.net/jl/dp_intro.html
 =#
 
 
-@doc doc"""
+"""
 Repeatedly apply a function to search for a fixed point
 
 Approximates `T^∞ v`, where `T` is an operator (function) and `v` is an initial
@@ -23,7 +23,7 @@ err_tol` or `max_iter` iterations has been exceeded.
 Provided that `T` is a contraction mapping or similar,  the return value will
 be an approximation to the fixed point of `T`.
 
-### Arguments
+##### Arguments
 
 * `T`: A function representing the operator `T`
 * `v::TV`: The initial condition. An object of type `TV`
@@ -33,12 +33,12 @@ be an approximation to the fixed point of `T`.
 * `;print_skip(10)` : if `verbose` is true, how many iterations to apply between
   print messages
 
-### Returns
+##### Returns
 ---
 
 * '::TV': The fixed point of the operator `T`. Has type `TV`
 
-### Example
+##### Example
 
 ```julia
 using QuantEcon
@@ -46,7 +46,7 @@ T(x, μ) = 4.0 * μ * x * (1.0 - x)
 x_star = compute_fixed_point(x->T(x, 0.3), 0.4)  # (4μ - 1)/(4μ)
 ```
 
-""" ->
+"""
 function compute_fixed_point{TV}(T::Function, v::TV; err_tol=1e-3,
                                 max_iter=50, verbose=true, print_skip=10)
     iterate = 0

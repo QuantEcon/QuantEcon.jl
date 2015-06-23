@@ -10,9 +10,7 @@ specified vector of probabilities.
 References
 ----------
 
-Simple port of the file quantecon.discrete_rv
-
-http://quant-econ.net/finite_markov.html?highlight=discrete_rv
+http://quant-econ.net/jl/finite_markov.html?highlight=discrete_rv
 
 
 TODO: as of 07/10/2014 it is not possible to define the property
@@ -20,30 +18,49 @@ TODO: as of 07/10/2014 it is not possible to define the property
       the main Julia repository is resolved, we can revisit this and
       implement that feature.
 =#
-import Distributions: Uniform
 
+"""
+Generates an array of draws from a discrete random variable with
+vector of probabilities given by q.
 
-#=
-    Generates an array of draws from a discrete random variable with
-    vector of probabilities given by q.
-=#
-type DiscreteRV{T <: Real}
+##### Fields
+
+- `q::Vector{T<:Real}`: A vector of non-negative probabilities that sum to 1
+- `Q::Vector{T<:Real}`: The cumulative sum of q
+"""
+type DiscreteRV{T<:Real}
     q::Vector{T}
     Q::Vector{T}
+    DiscreteRV(x::Vector{T}) = new(x, cumsum(x))
 end
 
+# outer constructor so people don't have to put {T} themselves
+DiscreteRV{T<:Real}(x::Vector{T}) = DiscreteRV{T}(x)
 
-DiscreteRV{T <: Real}(x::Vector{T}) = DiscreteRV(x, cumsum(x))
+"""
+Make a single draw from the discrete distribution
 
+##### Arguments
 
-# handle scalar case as a single argument function
+- `d::DiscreteRV`: The `DiscreteRV` type represetning the distribution
+
+##### Returns
+
+- `out::Int`: One draw from the discrete distribution
+"""
 draw(d::DiscreteRV) = searchsortedfirst(d.Q, rand())
 
-# multiple draw case
-function draw(d::DiscreteRV, k::Int)
-    out = Array(Int, k)
-    for i=1:k
-        out[i] = searchsortedfirst(d.Q, rand())
-    end
-    return out
-end
+"""
+Make multiple draws from the discrete distribution represented by a
+`DiscreteRV` instance
+
+##### Arguments
+
+- `d::DiscreteRV`: The `DiscreteRV` type representing the distribution
+- `k::Int`:
+
+##### Returns
+
+- `out::Vector{Int}`: `k` draws from `d`
+"""
+draw{T}(d::DiscreteRV{T}, k::Int) = Int[draw(d) for i=1:k]

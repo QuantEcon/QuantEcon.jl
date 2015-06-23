@@ -1,7 +1,32 @@
 # matrix_eqn.jl
 
-# function solve_discrete_lyapunov()
+"""
+Solves the discrete lyapunov equation.
 
+The problem is given by
+
+    AXA' - X + B = 0
+
+`X` is computed by using a doubling algorithm. In particular, we iterate to
+convergence on `X_j` with the following recursions for j = 1, 2,...
+starting from X_0 = B, a_0 = A:
+
+    a_j = a_{j-1} a_{j-1}
+    X_j = X_{j-1} + a_{j-1} X_{j-1} a_{j-1}'
+
+##### Arguments
+
+- `A::Matrix{Float64}` : An n x n matrix as described above.  We assume in order
+for  convergence that the eigenvalues of `A` have moduli bounded by unity
+- `B::Matrix{Float64}` :  An n x n matrix as described above.  We assume in order
+for convergence that the eigenvalues of `B` have moduli bounded by unity
+- `max_it::Int(50)` :  Maximum number of iterations
+
+##### Returns
+
+- `gamma1::Matrix{Float64}` Represents the value X
+
+"""
 function solve_discrete_lyapunov(A::ScalarOrArray,
                                  B::ScalarOrArray,
                                  max_it::Int=50)
@@ -35,10 +60,43 @@ function solve_discrete_lyapunov(A::ScalarOrArray,
     return gamma1
 end
 
+"""
+Solves the discrete-time algebraic Riccati equation
+
+The prolem is defined as
+
+    X = A'XA - (N + B'XA)'(B'XB + R)^{-1}(N + B'XA) + Q
+
+via a modified structured doubling algorithm.  An explanation of the algorithm
+can be found in the reference below.
+
+##### Arguments
+
+- `A` : k x k array.
+- `B` : k x n array
+- `R` : n x n, should be symmetric and positive definite
+- `Q` : k x k, should be symmetric and non-negative definite
+- `N::Matrix{Float64}(zeros(size(R, 1), size(Q, 1)))` : n x k array
+- `tolerance::Float64(1e-10)` Tolerance level for convergence
+- `max_iter::Int(50)` : The maximum number of iterations allowed
+
+Note that `A, B, R, Q` can either be real (i.e. k, n = 1) or matrices.
+
+##### Returns
+- `X::Matrix{Float64}` The fixed point of the Riccati equation; a  k x k array
+representing the approximate solution
+
+##### References
+
+Chiang, Chun-Yueh, Hung-Yuan Fan, and Wen-Wei Lin. "STRUCTURED DOUBLING
+ALGORITHM FOR DISCRETE-TIME ALGEBRAIC RICCATI EQUATIONS WITH SINGULAR CONTROL
+WEIGHTING MATRICES." Taiwanese Journal of Mathematics 14, no. 3A (2010): pp-935.
+
+"""
 function solve_discrete_riccati(A::ScalarOrArray, B::ScalarOrArray,
                                 Q::ScalarOrArray,
                                 R::ScalarOrArray,
-                                C::ScalarOrArray=zeros(size(R, 1), size(Q, 1));
+                                N::ScalarOrArray=zeros(size(R, 1), size(Q, 1));
                                 tolerance::Float64=1e-10,
                                 max_it::Int=50)
     # Set up
@@ -58,9 +116,9 @@ function solve_discrete_riccati(A::ScalarOrArray, B::ScalarOrArray,
         Z = R + gamma .* BB
         cn = cond(Z)
         if isfinite(cn)
-            Q_tilde = -Q + C' * (Z \ (C + gamma .* BTA)) + gamma .* I
+            Q_tilde = -Q + N' * (Z \ (N + gamma .* BTA)) + gamma .* I
             G0 = B * (Z \ B')
-            A0 = (I - gamma .* G0) * A - B * (Z \ C)
+            A0 = (I - gamma .* G0) * A - B * (Z \ N)
             H0 = gamma .* (A' * A0) - Q_tilde
             f1 = cond(Z, Inf)
             f2 = gamma .* f1
@@ -83,9 +141,9 @@ function solve_discrete_riccati(A::ScalarOrArray, B::ScalarOrArray,
     R_hat = R + gamma .* BB
 
     # Initial conditions
-    Q_tilde = - Q + C' * (R_hat\(C + gamma .* BTA)) + gamma .* I
+    Q_tilde = - Q + N' * (R_hat\(N + gamma .* BTA)) + gamma .* I
     G0 = B * (R_hat\B')
-    A0 = (I - gamma .* G0) * A - B * (R_hat\C)
+    A0 = (I - gamma .* G0) * A - B * (R_hat\N)
     H0 = gamma .* A'*A0 - Q_tilde
     i = 1
 

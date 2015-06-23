@@ -10,9 +10,33 @@ quantecon lecture.
 References
 ----------
 
-http://quant-econ.net/odu.html
+http://quant-econ.net/jl/odu.html
 
 =#
+
+
+"""
+Unemployment/search problem where offer distribution is unknown
+
+##### Fields
+
+- `bet::Real` : Discount factor on (0, 1)
+- `c::Real` : Unemployment compensation
+- `F::Distribution` : Offer distribution `F`
+- `G::Distribution` : Offer distribution `G`
+- `f::Function` : The pdf of `F`
+- `g::Function` : The pdf of `G`
+- `n_w::Int` : Number of points on the grid for w
+- `w_max::Real` : Maximum wage offer
+- `w_grid::AbstractVector` : Grid of wage offers w
+- `n_pi::Int` : Number of points on grid for pi
+- `pi_min::Real` : Minimum of pi grid
+- `pi_max::Real` : Maximum of pi grid
+- `pi_grid::AbstractVector` : Grid of probabilities pi
+- `quad_nodes::Vector` : Notes for quadrature ofer offers
+- `quad_weights::Vector` : Weights for quadrature ofer offers
+
+"""
 type SearchProblem
     bet::Real
     c::Real
@@ -22,16 +46,33 @@ type SearchProblem
     g::Function
     n_w::Int
     w_max::Real
-    w_grid::Union(Vector, Range)
+    w_grid::AbstractVector
     n_pi::Int
     pi_min::Real
     pi_max::Real
-    pi_grid::Union(Vector, Range)
+    pi_grid::AbstractVector
     quad_nodes::Vector
     quad_weights::Vector
 end
 
+"""
+Constructor for `SearchProblem` with default values
 
+##### Arguments
+
+- `bet::Real(0.95)` : Discount factor in (0, 1)
+- `c::Real(0.6)` : Unemployment compensation
+- `F_a::Real(1), F_b::Real(1)` : Parameters of `Beta` distribution for `F`
+- `G_a::Real(3), G_b::Real(1.2)` : Parameters of `Beta` distribution for `G`
+- `w_max::Real(2)` : Maximum of wage offer grid
+- `w_grid_size::Int(40)` : Number of points in wage offer grid
+- `pi_grid_size::Int(40)` : Number of points in probability grid
+
+##### Notes
+
+$(____kwarg_note)
+
+"""
 function SearchProblem(bet=0.95, c=0.6, F_a=1, F_b=1, G_a=3, G_b=1.2,
                        w_max=2, w_grid_size=40, pi_grid_size=40)
 
@@ -70,6 +111,22 @@ function q(sp::SearchProblem, w, pi_val)
     return clamp(new_pi, sp.pi_min, sp.pi_max)
 end
 
+"""
+$(____bellman_main_docstring).
+
+##### Arguments
+
+- `sp::SearchProblem` : Instance of `SearchProblem`
+- `v::Matrix`: Current guess for the value function
+- `out::Matrix` : Storage for output.
+- `;ret_policy::Bool(false)`: Toggles return of value or policy functions
+
+##### Returns
+
+None, `out` is updated in place. If `ret_policy == true` out is filled with the
+policy function, otherwise the value function is stored in `out`.
+
+"""
 function bellman_operator!(sp::SearchProblem, v::Matrix, out::Matrix;
                           ret_policy::Bool=false)
     # Simplify names
@@ -119,6 +176,20 @@ function bellman_operator(sp::SearchProblem, v::Matrix;
 end
 
 
+"""
+$(____greedy_main_docstring).
+
+##### Arguments
+
+- `sp::SearchProblem` : Instance of `SearchProblem`
+- `v::Matrix`: Current guess for the value function
+- `out::Matrix` : Storage for output
+
+##### Returns
+
+None, `out` is updated in place to hold the policy function
+
+"""
 function get_greedy!(sp::SearchProblem, v::Matrix, out::Matrix)
     bellman_operator!(sp, v, out, ret_policy=true)
 end
@@ -127,6 +198,19 @@ get_greedy(sp::SearchProblem, v::Matrix) = bellman_operator(sp, v,
                                                             ret_policy=true)
 
 
+"""
+Updates the reservation wage function guess phi via the operator Q.
+
+##### Arguments
+
+- `sp::SearchProblem` : Instance of `SearchProblem`
+- `phi::Vector`: Current guess for phi
+- `out::Vector` : Storage for output
+
+##### Returns
+
+None, `out` is updated in place to hold the updated levels of phi
+"""
 function res_wage_operator!(sp::SearchProblem, phi::Vector, out::Vector)
     # Simplify name
     f, g, bet, c = sp.f, sp.g, sp.bet, sp.c
@@ -144,7 +228,12 @@ function res_wage_operator!(sp::SearchProblem, phi::Vector, out::Vector)
     end
 end
 
+"""
+Updates the reservation wage function guess phi via the operator Q.
 
+See the documentation for the mutating method of this function for more details
+on arguments
+"""
 function res_wage_operator(sp::SearchProblem, phi::Vector)
     out = similar(phi)
     res_wage_operator!(sp, phi, out)
