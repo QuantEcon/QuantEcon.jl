@@ -48,7 +48,6 @@ There is also a version of this function that accepts keyword arguments for
 each parameter
 """
 
-# include("models/docstrings.jl")
 include("models/asset_pricing.jl")
 include("models/career.jl")
 include("models/ifp.jl")

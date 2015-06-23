@@ -1,4 +1,5 @@
 .ipynb_checkpoints/
+site/
 *.DS_Store
 *.cov
 *.juliahistory
