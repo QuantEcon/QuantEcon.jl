@@ -61,21 +61,21 @@ end
 ## ------------------ ##
 
 const qnw_func_notes = """
-### Notes
+##### Notes
 
 If any of the parameters to this function are scalars while others are
 `Vector`s of length `n`, the the scalar parameter is repeated `n` times.
 """
 
 const qnw_returns = """
-### Returns
+##### Returns
 
 - `nodes::Array{Float64}` : An array of quadrature nodes
 - `weights::Array{Float64}` : An array of corresponding quadrature weights
 """
 
 const qnw_refs = """
-### References
+##### References
 
 Miranda, Mario J, and Paul L Fackler. Applied Computational Economics and
 Finance, MIT Press, 2002.
@@ -84,7 +84,7 @@ Finance, MIT Press, 2002.
 """
 Computes multivariate Guass-Legendre  quadrature nodes and weights.
 
-### Arguments
+##### Arguments
 
 - `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
 - `a::Union(Real, Vector{Real})` : Lower endpoint along each dimension
@@ -152,7 +152,7 @@ end
 """
 Computes multivariate Guass-Checbychev quadrature nodes and weights.
 
-### Arguments
+##### Arguments
 
 - `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
 - `a::Union(Real, Vector{Real})` : Lower endpoint along each dimension
@@ -176,7 +176,7 @@ end
 """
 Computes nodes and weights for multivariate normal distribution
 
-### Arguments
+##### Arguments
 
 - `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
 - `mu::Union(Real, Vector{Real})` : Mean along each dimension
@@ -185,7 +185,7 @@ structure
 
 $(qnw_returns)
 
-### Notes
+##### Notes
 
 This function has many methods. I try to describe them here.
 
@@ -271,7 +271,7 @@ end
 """
 Computes multivariate Simpson quadrature nodes and weights.
 
-### Arguments
+##### Arguments
 
 - `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
 - `a::Union(Real, Vector{Real})` : Lower endpoint along each dimension
@@ -308,7 +308,7 @@ end
 """
 Computes multivariate trapezoid quadrature nodes and weights.
 
-### Arguments
+##### Arguments
 
 - `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
 - `a::Union(Real, Vector{Real})` : Lower endpoint along each dimension
@@ -337,7 +337,7 @@ end
 """
 Computes nodes and weights for beta distribution
 
-### Arguments
+##### Arguments
 
 - `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
 - `a::Union(Real, Vector{Real})` : First parameter of the beta distribution,
@@ -447,7 +447,7 @@ end
 """
 Computes nodes and weights for beta distribution
 
-### Arguments
+##### Arguments
 
 - `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
 - `a::Union(Real, Vector{Real})` : First parameter of the gamma distribution,
@@ -653,7 +653,7 @@ qnwnorm(n::Int, mu::Real, sig2::Vector) =
 """
 Computes quadrature nodes and weights for multivariate uniform distribution
 
-### Arguments
+##### Arguments
 
 - `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
 - `a::Union(Real, Vector{Real})` : Lower endpoint along each dimension
@@ -674,7 +674,7 @@ end
 """
 Computes quadrature nodes and weights for multivariate uniform distribution
 
-### Arguments
+##### Arguments
 
 - `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
 - `mu::Union(Real, Vector{Real})` : Mean along each dimension
@@ -684,7 +684,7 @@ structure
 
 $(qnw_returns)
 
-### Notes
+##### Notes
 
 See also the documentation for `qnwnorm`
 
@@ -705,7 +705,7 @@ Generates equidistributed sequences with property that averages
 value of integrable function evaluated over the sequence converges
 to the integral as n goes to infinity.
 
-### Arguments
+##### Arguments
 
 - `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
 - `a::Union(Real, Vector{Real})` : Lower endpoint along each dimension
@@ -793,7 +793,7 @@ qnwequi(n::Int, a::Real, b::Real, kind::String="N") =
 """
 Approximate the integral of `f`, given quadrature `nodes` and `weights`
 
-### Arguments
+##### Arguments
 
 - `f::Function`: A callable function that is to be approximated over the domain
 spanned by `nodes`.
@@ -802,7 +802,7 @@ spanned by `nodes`.
 - `;args...`: additional positional arguments to pass to `f`
 - `;kwargs...`: additional keyword arguments to pass to `f`
 
-### Returns
+##### Returns
 
 - `out::Float64` : The scalar that approximates integral of `f` on the hypercube
 formed by `[a, b]`
@@ -820,7 +820,7 @@ do_quad(f::Function, nodes::Array, weights::Vector) = dot(f(nodes), weights)
 Integrate the d-dimensional function f on a rectangle with lower and upper bound
 for dimension i defined by a[i] and b[i], respectively; using n[i] points.
 
-### Arguments
+##### Arguments
 
 - `f::Function` The function to integrate over. This should be a function that
 accepts as its first argument a matrix representing points along each dimension
@@ -842,7 +842,7 @@ values are:
 - `;args...`: additional positional arguments to pass to `f`
 - `;kwargs...`: additional keyword arguments to pass to `f`
 
-### Returns
+##### Returns
 
 - `out::Float64` : The scalar that approximates integral of `f` on the hypercube
 formed by `[a, b]`

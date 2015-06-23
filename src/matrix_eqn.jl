@@ -14,7 +14,7 @@ starting from X_0 = B, a_0 = A:
     a_j = a_{j-1} a_{j-1}
     X_j = X_{j-1} + a_{j-1} X_{j-1} a_{j-1}'
 
-### Arguments
+##### Arguments
 
 - `A::Matrix{Float64}` : An n x n matrix as described above.  We assume in order
 for  convergence that the eigenvalues of `A` have moduli bounded by unity
@@ -22,7 +22,7 @@ for  convergence that the eigenvalues of `A` have moduli bounded by unity
 for convergence that the eigenvalues of `B` have moduli bounded by unity
 - `max_it::Int(50)` :  Maximum number of iterations
 
-### Returns
+##### Returns
 
 - `gamma1::Matrix{Float64}` Represents the value X
 
@@ -70,7 +70,7 @@ The prolem is defined as
 via a modified structured doubling algorithm.  An explanation of the algorithm
 can be found in the reference below.
 
-### Arguments
+##### Arguments
 
 - `A` : k x k array.
 - `B` : k x n array
@@ -82,11 +82,11 @@ can be found in the reference below.
 
 Note that `A, B, R, Q` can either be real (i.e. k, n = 1) or matrices.
 
-### Returns
+##### Returns
 - `X::Matrix{Float64}` The fixed point of the Riccati equation; a  k x k array
 representing the approximate solution
 
-### References
+##### References
 
 Chiang, Chun-Yueh, Hung-Yuan Fan, and Wen-Wei Lin. "STRUCTURED DOUBLING
 ALGORITHM FOR DISCRETE-TIME ALGEBRAIC RICCATI EQUATIONS WITH SINGULAR CONTROL

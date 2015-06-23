@@ -23,7 +23,7 @@ The process follows
 
 where ε_t ~ N (0, σ^2)
 
-### Arguments
+##### Arguments
 
 - `N::Int`: Number of points in markov process
 - `ρ::Real` : Persistence parameter in AR(1) process
@@ -32,7 +32,7 @@ where ε_t ~ N (0, σ^2)
 - `n_std::Int(3)` : The number of standard deviations to each side the process
 should span
 
-### Returns
+##### Returns
 
 - `y::Vector{Float64}` : Nodes in the state space
 - `Π::Matrix{Float64}` Matrix transition probabilities for Markov Process
@@ -88,13 +88,13 @@ The process follows
 
 where ε_t ~ N (0, σ^2)
 
-### Arguments
+##### Arguments
 - `N::Int` : Number of points in markov process
 - `ρ::Real` : Persistence parameter in AR(1) process
 - `σ::Real` : Standard deviation of random component of AR(1) process
 - `μ::Real(0.0)` :  Mean of AR(1) process
 
-### Returns
+##### Returns
 
 - `y::Vector{Float64}` : Nodes in the state space
 - `Θ::Matrix{Float64}` Matrix transition probabilities for Markov Process

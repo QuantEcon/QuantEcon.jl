@@ -39,7 +39,7 @@ where
 * theta = (theta_1, theta_2,..., theta_q)
 * sigma is a scalar, the standard deviation of the white noise
 
-### Fields
+##### Fields
 
  - `phi::Vector` : AR parameters phi_1, ..., phi_p
  - `theta::Vector` : MA parameters theta_1, ..., theta_q
@@ -49,7 +49,7 @@ where
  - `ma_poly::Vector` : MA polynomial --- filtering representatoin
  - `ar_poly::Vector` : AR polynomial --- filtering representation
 
-### Examples
+##### Examples
 
 ```julia
 using QuantEcon
@@ -98,7 +98,7 @@ autocovariance function. In particular,
 where gamma is the autocovariance function and the sum is over
 the set of all integers.
 
-### Arguments
+##### Arguments
 
 - `arma::ARMA`: Instance of `ARMA` type
 - `;two_pi::Bool(true)`: Compute the spectral density function over [0, pi] if
@@ -108,7 +108,7 @@ the set of all integers.
 then the function computes the response at the frequencies given by the array
 
 
-### Returns
+##### Returns
 - `w::Vector{Float64}`: The normalized frequencies at which h was computed, in
   radians/sample
 - `spect::Vector{Float64}` : The frequency response
@@ -128,7 +128,7 @@ Compute the autocovariance function from the ARMA parameters
 over the integers range(num_autocov) using the spectral density
 and the inverse Fourier transform.
 
-### Arguments
+##### Arguments
 
 - `arma::ARMA`: Instance of `ARMA` type
 - `;num_autocov::Integer(16)` : The number of autocovariances to calculate
@@ -146,14 +146,14 @@ end
 """
 Get the impulse response corresponding to our model.
 
-### Arguments
+##### Arguments
 
 - `arma::ARMA`: Instance of `ARMA` type
 - `;impulse_length::Integer(30)`: Length of horizon for calucluating impulse
 reponse. Must be at least as long as the `p` fields of `arma`
 
 
-### Returns
+##### Returns
 
 - `psi::Vector{Float64}`: `psi[j]` is the response at lag j of the impulse
 response. We take psi[1] as unity.
@@ -179,14 +179,14 @@ end
 """
 Compute a simulated sample path assuming Gaussian shocks.
 
-### Arguments
+##### Arguments
 
 - `arma::ARMA`: Instance of `ARMA` type
 - `;ts_length::Integer(90)`: Length of simulation
 - `;impulse_length::Integer(30)`: Horizon for calculating impulse response
 (see also docstring for `impulse_response`)
 
-### Returns
+##### Returns
 
 - `X::Vector{Float64}`: Simulation of the ARMA model `arma`
 

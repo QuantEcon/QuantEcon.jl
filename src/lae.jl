@@ -23,7 +23,7 @@ http://quant-econ.net/jl/stationary_densities.html
 A look ahead estimator associated with a given stochastic kernel p and a vector
 of observations X.
 
-### Fields
+##### Fields
 
 - `p::Function`: The stochastic kernel. Signature is `p(x, y)` and it should be
 vectorized in both inputs
@@ -45,12 +45,12 @@ end
 A vectorized function that returns the value of the look ahead estimate at the
 values in the array y.
 
-### Arguments
+##### Arguments
 
 - `l::LAE`: Instance of `LAE` type
 - `y::Array`: Array that becomes the `y` in `l.p(l.x, y)`
 
-### Returns
+##### Returns
 
 - `psi_vals::Vector`: Density at `(x, y)`
 

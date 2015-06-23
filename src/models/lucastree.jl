@@ -31,7 +31,7 @@ TODO: refactor. Python is much cleaner.
 """
 The Lucas asset pricing model
 
-### Fields
+##### Fields
 
 -  `gam::Real` : coefficient of risk aversion in the CRRA utility function
 -  `bet::Real` : Discount factor in (0, 1)
@@ -66,14 +66,14 @@ type LucasTree
     """
     Constructor for LucasTree
 
-    ### Arguments
+    ##### Arguments
 
     -  `gam::Real` : coefficient of risk aversion in the CRRA utility function
     -  `bet::Real` : Discount factor in (0, 1)
     -  `alpha::Real` : Correlation coefficient in the shock process
     -  `sigma::Real` : Volatility of shock process
 
-    ### Notes
+    ##### Notes
 
     All other fields of the type are instantiated within the constructor
     """
@@ -128,13 +128,13 @@ end
 The approximate Lucas operator, which computes and returns the updated function
 Tf on the grid points.
 
-### Arguments
+##### Arguments
 
 - `lt::LucasTree` : An instance of the `LucasTree` type
 - `f::Vector{Float64}` : A candidate function on R_+ represented as points on a
 grid. It should be the same size as `lt.grid`
 
-### Returns
+##### Returns
 
 - `Tf::Vector{Float64}` : The updated function Tf
 
@@ -156,12 +156,12 @@ end
 """
 Compute the equilibrium price function associated with Lucas tree `lt`
 
-### Arguments
+##### Arguments
 
 - `lt::LucasTree` : An instance of the `LucasTree` type
 - `;kwargs...` : other arguments to be passed to `compute_fixed_point`
 
-### Returns
+##### Returns
 
 - `price::Vector{Float64}` : The price at each point in `lt.grid`
 

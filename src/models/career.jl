@@ -17,7 +17,7 @@ Journal of Labor Economics, 17(2), 237-261.
 """
 Career/job choice model fo Derek Neal (1999)
 
-### Fields
+##### Fields
 
 - `beta::Real` : Discount factor in (0, 1)
 - `N::Int` : Number of possible realizations of both epsilon and theta
@@ -45,7 +45,7 @@ end
 """
 Constructor with default values for `CareerWorkerProblem`
 
-### Arguments
+##### Arguments
 
 - `beta::Real(0.95)` : Discount factor in (0, 1)
 - `B::Real(5.0)` : upper bound for both epsilon and theta
@@ -53,7 +53,7 @@ Constructor with default values for `CareerWorkerProblem`
 - `F_a::Real(1), F_b::Real(1)` : Parameters of the distribution F
 - `G_a::Real(1), G_b::Real(1)` : Parameters of the distribution F
 
-### Notes
+##### Notes
 
 $(____kwarg_note)
 """
@@ -80,14 +80,14 @@ end
 """
 $(____bellman_main_docstring).
 
-### Arguments
+##### Arguments
 
 - `cp::CareerWorkerProblem` : Instance of `CareerWorkerProblem`
 - `v::Matrix`: Current guess for the value function
 - `out::Matrix` : Storage for output
 - `;ret_policy::Bool(false)`: Toggles return of value or policy functions
 
-### Returns
+##### Returns
 
 None, `out` is updated in place. If `ret_policy == true` out is filled with the
 policy function, otherwise the value function is stored in `out`.
@@ -135,13 +135,13 @@ end
 """
 $(____greedy_main_docstring).
 
-### Arguments
+##### Arguments
 
 - `cp::CareerWorkerProblem` : Instance of `CareerWorkerProblem`
 - `v::Matrix`: Current guess for the value function
 - `out::Matrix` : Storage for output
 
-### Returns
+##### Returns
 
 None, `out` is updated in place to hold the policy function
 

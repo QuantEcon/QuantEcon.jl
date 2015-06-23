@@ -23,7 +23,7 @@ subject to
 
 and with model misspecification parameter theta.
 
-### Fields
+##### Fields
 
 - `Q::Matrix{Float64}` :  The cost(payoff) matrix for the controls. See above
 for more. `Q` should be k x k and symmetric and positive definite
@@ -74,12 +74,12 @@ The D operator, mapping P into
 
     D(P) := P + PC(theta I - C'PC)^{-1} C'P.
 
-### Arguments
+##### Arguments
 
 - `rlq::RBLQ`: Instance of `RBLQ` type
 - `P::Matrix{Float64}` : `size` is n x n
 
-### Returns
+##### Returns
 
 - `dP::Matrix{Float64}` : The matrix P after applying the D operator
 
@@ -102,12 +102,12 @@ and also returning
     F := (Q + beta B'PB)^{-1} beta B'PA
 
 
-### Arguments
+##### Arguments
 
 - `rlq::RBLQ`: Instance of `RBLQ` type
 - `P::Matrix{Float64}` : `size` is n x n
 
-### Returns
+##### Returns
 
 - `F::Matrix{Float64}` : The F matrix as defined above
 - `new_p::Matrix{Float64}` : The matrix P after applying the B operator
@@ -137,12 +137,12 @@ observed state is
 
 And the value function is -x'Px
 
-### Arguments
+##### Arguments
 
 - `rlq::RBLQ`: Instance of `RBLQ` type
 
 
-### Returns
+##### Returns
 
 - `F::Matrix{Float64}` : The optimal control matrix from above
 - `P::Matrix{Float64}` : The positive semi-definite matrix defining the value
@@ -182,7 +182,7 @@ easier to understand but one or two orders of magnitude slower
 than self.robust_rule().  For more information see the docstring
 of that method.
 
-### Arguments
+##### Arguments
 
 - `rlq::RBLQ`: Instance of `RBLQ` type
 - `P_init::Matrix{Float64}(zeros(rlq.n, rlq.n))` : The initial guess for the
@@ -190,7 +190,7 @@ value function matrix
 - `;max_iter::Int(80)`: Maximum number of iterations that are allowed
 - `;tol::Real(1e-8)` The tolerance for convergence
 
-### Returns
+##### Returns
 
 - `F::Matrix{Float64}` : The optimal control matrix from above
 - `P::Matrix{Float64}` : The positive semi-definite matrix defining the value
@@ -230,12 +230,12 @@ end
 """
 Compute agent 2's best cost-minimizing response `K`, given `F`.
 
-### Arguments
+##### Arguments
 
 - `rlq::RBLQ`: Instance of `RBLQ` type
 - `F::Matrix{Float64}`: A k x n array representing agent 1's policy
 
-### Returns
+##### Returns
 
 - `K::Matrix{Float64}` : Agent's best cost minimizing response corresponding to
 `F`
@@ -262,12 +262,12 @@ end
 """
 Compute agent 1's best cost-minimizing response `K`, given `F`.
 
-### Arguments
+##### Arguments
 
 - `rlq::RBLQ`: Instance of `RBLQ` type
 - `K::Matrix{Float64}`: A k x n array representing the worst case matrix
 
-### Returns
+##### Returns
 
 - `F::Matrix{Float64}` : Agent's best cost minimizing response corresponding to
 `K`
@@ -290,14 +290,14 @@ end
 Given `K` and `F`, compute the value of deterministic entropy, which is sum_t
 beta^t x_t' K'K x_t with x_{t+1} = (A - BF + CK) x_t.
 
-### Arguments
+##### Arguments
 
 - `rlq::RBLQ`: Instance of `RBLQ` type
 - `F::Matrix{Float64}` The policy function, a k x n array
 - `K::Matrix{Float64}` The worst case matrix, a j x n array
 - `x0::Vector{Float64}` : The initial condition for state
 
-### Returns
+##### Returns
 
 - `e::Float64` The deterministic entropy
 
@@ -315,12 +315,12 @@ Given a fixed policy `F`, with the interpretation u = -F x, this function
 computes the matrix P_F and constant d_F associated with discounted cost J_F(x) =
 x' P_F x + d_F.
 
-### Arguments
+##### Arguments
 
 - `rlq::RBLQ`: Instance of `RBLQ` type
 - `F::Matrix{Float64}` :  The policy function, a k x n array
 
-### Returns
+##### Returns
 
 - `P_F::Matrix{Float64}` : Matrix for discounted cost
 - `d_F::Float64` : Constant for discounted cost

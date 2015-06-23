@@ -13,7 +13,7 @@ of observations.
 One-dimensional empirical distribution function given a vector of
 observations.
 
-### Fields
+##### Fields
 
 - `observations::Vector`: The vector of observations
 """
@@ -27,7 +27,7 @@ ecdf(e::ECDF, x::Array) = map(i->ecdf(e, i), x)
 """
 Evaluate the empirical cdf at one or more points
 
-### Arguments
+##### Arguments
 
 - `e::ECDF`: The `ECDF` instance
 - `x::Union{Real, Array}`: The point(s) at which to evaluate the ECDF

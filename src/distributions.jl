@@ -15,11 +15,11 @@ http://en.wikipedia.org/wiki/Beta-binomial_distribution
 """
 The Beta-Binomial distribution
 
-### Fields
+##### Fields
 
 - `n, a, b::Float64` The three paramters to the distribution
 
-### Notes
+##### Notes
 
 See also http://en.wikipedia.org/wiki/Beta-binomial_distribution
 
@@ -52,11 +52,11 @@ end
 """
 Evaluate the pdf of the distributions at the points 0, 1, ..., k
 
-### Arguments
+##### Arguments
 
 `d::BetaBinomial`: Instance of `BetaBinomial` type
 
-### Returns
+##### Returns
 
 - `probs::vector{Float64}`: pdf of the distribution `d`, at `0:d.k`
 

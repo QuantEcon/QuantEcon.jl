@@ -15,7 +15,7 @@ Computes the expected discounted quadratic sum
 Here {x_t} is the VAR process x_{t+1} = A x_t + C w_t with {w_t}
 standard normal and x_0 the initial condition.
 
-### Arguments
+##### Arguments
 - `A::Union(Float64, Matrix{Float64})` The n x n matrix described above (scalar)
 if n = 1
 - `C::Union(Float64, Matrix{Float64})` The n x n matrix described above (scalar)
@@ -26,11 +26,11 @@ if n = 1
 - `x_0::Union(Float64, Vector{Float64})` The initial condtion. A conformable
 array (of length n) or a scalar if n=1
 
-### Returns
+##### Returns
 
 - `q0::Float64` : Represents the value q(x_0)
 
-### Notes
+##### Notes
 
 The formula for computing q(x_0) is q(x_0) = x_0' Q x_0 + v where
 
@@ -65,7 +65,7 @@ V is computed by solving the corresponding discrete lyapunov equation using the
 doubling algorithm.  See the documentation of `solve_discrete_lyapunov` for
 more information.
 
-### Arguments
+##### Arguments
 
 - `A::Matrix{Float64}` : An n x n matrix as described above.  We assume in order
 for convergence that the eigenvalues of A have moduli bounded by unity
@@ -73,7 +73,7 @@ for convergence that the eigenvalues of A have moduli bounded by unity
 for convergence that the eigenvalues of B have moduli bounded by unity
 - `max_it::Int(50)` : Maximum number of iterations
 
-### Returns
+##### Returns
 
 - `gamma1::Matrix{Float64}` : Represents the value V
 

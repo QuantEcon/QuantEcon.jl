@@ -28,7 +28,7 @@ A Jovanovic-type model of employment with on-the-job search.
 
 The value function is given by
 
-    V(x) = max_{phi, s} w(x, phi, s)
+\\[V(x) = \\max_{\\phi, s} w(x, \\phi, s)\\]
 
 for
 
@@ -45,7 +45,7 @@ where
 * `G(x, \phi)` : new human capital when current job retained
 * `U` : Random variable with distribution F -- new draw of human capita
 
-### Fields
+##### Fields
 
 - `A::Real` : Parameter in human capital transition function
 - `alpha::Real` : Parameter in human capital transition function
@@ -75,14 +75,14 @@ end
 """
 Constructor with default values for `JvWorker`
 
-### Arguments
+##### Arguments
 
  - `A::Real(1.4)` : Parameter in human capital transition function
  - `alpha::Real(0.6)` : Parameter in human capital transition function
  - `bet::Real(0.96)` : Discount factor in (0, 1)
  - `grid_size::Int(50)` : Number of points in discrete grid for `x`
 
-### Notes
+##### Notes
 
 $(____kwarg_note)
 
@@ -126,7 +126,7 @@ JvWorker(;A=1.4, alpha=0.6, bet=0.96, grid_size=50) = JvWorker(A, alpha, bet,
 """
 $(____bellman_main_docstring).
 
-### Arguments
+##### Arguments
 
 - `jv::JvWorker` : Instance of `JvWorker`
 - `V::Vector`: Current guess for the value function
@@ -136,12 +136,12 @@ there are two policy rules, but one value function
 algorithm or a solver from scipy.
 - `;ret_policy::Bool(false)`: Toggles return of value or policy functions
 
-### Returns
+##### Returns
 
 None, `out` is updated in place. If `ret_policy == true` out is filled with the
 policy function, otherwise the value function is stored in `out`.
 
-### Notes
+##### Notes
 
 Currently, the `brute_force` parameter must be `true`. We are waiting for a
 constrained optimization routine to emerge in pure Julia. Once that happens,
@@ -253,13 +253,13 @@ end
 """
 $(____greedy_main_docstring).
 
-### Arguments
+##### Arguments
 
 - `cp::CareerWorkerProblem` : Instance of `CareerWorkerProblem`
 - `v::Vector`: Current guess for the value function
 - `out::Tuple(Vector, Vector)` : Storage for output of policy rule
 
-### Returns
+##### Returns
 
 None, `out` is updated in place to hold the policy function
 

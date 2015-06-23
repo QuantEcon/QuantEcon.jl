@@ -22,7 +22,7 @@ It stores useful information such as the stationary distributions, and
 communication, recurrent, and cyclic classes, and allows simulation of state
 transitions.
 
-### Fields
+##### Fields
 
 - `p::Matrix` The transition matrix. Must be square, all elements must be
 positive, and all rows must sum to unity
@@ -117,15 +117,15 @@ end
 solve x(P-I)=0 using either an eigendecomposition, lu factorization, or an
 algorithm presented by Grassmann-Taksar-Heyman (GTH)
 
-### Arguments
+##### Arguments
 
 - `p::Matrix` : valid stochastic matrix
 
-### Returns
+##### Returns
 
 - `x::Matrix`: A matrix whose columns contain stationary vectors of `p`
 
-### References
+##### References
 
 The following references were consulted for the GTH algorithm
 
@@ -141,11 +141,11 @@ University Press, 2009.
 """
 Find the irreducible subsets of the `MarkovChain`
 
-### Arguments
+##### Arguments
 
 - `mc::MarkovChain` : MarkovChain instance containing a valid stochastic matrix
 
-### Returns
+##### Returns
 
 - `x::Vector{Vector}`: A `Vector` containing `Vector{Int}`s that describe the
 irreducible subsets of the transition matrix for p
@@ -182,13 +182,13 @@ end
 """
 calculate the stationary distributions associated with a N-state markov chain
 
-### Arguments
+##### Arguments
 
 - `mc::MarkovChain` : MarkovChain instance containing a valid stochastic matrix
 - `;method::Symbol(:gth)`: One of `gth`, `lu`, and `eigen`; specifying which
 of the three `_solve` methods to use.
 
-### Returns
+##### Returns
 
 - `dists::Matrix{Float64}`: N x M matrix where each column is a stationary
 distribution of `mc.p`
@@ -221,7 +221,7 @@ end
 """
 Simulate a Markov chain starting from an initial state
 
-### Arguments
+##### Arguments
 
 - `mc::MarkovChain` : MarkovChain instance containing a valid stochastic matrix
 - `init::Int(rand(1:n_states(mc)))` : The index of the initial state. This should
@@ -230,7 +230,7 @@ be an integer between 1 and `n_states(mc)`
 - `;burn::Int(0)`: The burn in length. Routine drops first `burn` of the
 `sample_size` total samples collected
 
-### Returns
+##### Returns
 
 - `samples::Vector{Int}`: Vector of simulated states
 
@@ -248,7 +248,7 @@ end
 """
 Simulate a Markov chain starting from an initial distribution
 
-### Arguments
+##### Arguments
 
 - `mc::MarkovChain` : MarkovChain instance containing a valid stochastic matrix
 - `init::Vector` : A vector of length `n_state(mc)` specifying the number
@@ -257,7 +257,7 @@ probability of being in seach state in the initial period
 - `;burn::Int(0)`: The burn in length. Routine drops first `burn` of the
 `sample_size` total samples collected
 
-### Returns
+##### Returns
 
 - `samples::Vector{Int}`: Vector of simulated states
 
@@ -272,14 +272,14 @@ end
 """
 Fill `samples` with samples from the Markov chain `mc`
 
-### Arguments
+##### Arguments
 
 - `mc::MarkovChain` : MarkovChain instance containing a valid stochastic matrix
 - `samples::Array{Int}` : Pre-allocated vector of integers to be filled with
 samples from the markov chain `mc`. The first element will be used as the
 initial state and all other elements will be over-written.
 
-### Returns
+##### Returns
 
 None modifies `samples` in place
 """

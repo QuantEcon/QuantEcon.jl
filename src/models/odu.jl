@@ -18,7 +18,7 @@ http://quant-econ.net/jl/odu.html
 """
 Unemployment/search problem where offer distribution is unknown
 
-### Fields
+##### Fields
 
 - `bet::Real` : Discount factor on (0, 1)
 - `c::Real` : Unemployment compensation
@@ -58,7 +58,7 @@ end
 """
 Constructor for `SearchProblem` with default values
 
-### Arguments
+##### Arguments
 
 - `bet::Real(0.95)` : Discount factor in (0, 1)
 - `c::Real(0.6)` : Unemployment compensation
@@ -68,7 +68,7 @@ Constructor for `SearchProblem` with default values
 - `w_grid_size::Int(40)` : Number of points in wage offer grid
 - `pi_grid_size::Int(40)` : Number of points in probability grid
 
-### Notes
+##### Notes
 
 $(____kwarg_note)
 
@@ -114,14 +114,14 @@ end
 """
 $(____bellman_main_docstring).
 
-### Arguments
+##### Arguments
 
 - `sp::SearchProblem` : Instance of `SearchProblem`
 - `v::Matrix`: Current guess for the value function
 - `out::Matrix` : Storage for output.
 - `;ret_policy::Bool(false)`: Toggles return of value or policy functions
 
-### Returns
+##### Returns
 
 None, `out` is updated in place. If `ret_policy == true` out is filled with the
 policy function, otherwise the value function is stored in `out`.
@@ -179,13 +179,13 @@ end
 """
 $(____greedy_main_docstring).
 
-### Arguments
+##### Arguments
 
 - `sp::SearchProblem` : Instance of `SearchProblem`
 - `v::Matrix`: Current guess for the value function
 - `out::Matrix` : Storage for output
 
-### Returns
+##### Returns
 
 None, `out` is updated in place to hold the policy function
 
@@ -201,13 +201,13 @@ get_greedy(sp::SearchProblem, v::Matrix) = bellman_operator(sp, v,
 """
 Updates the reservation wage function guess phi via the operator Q.
 
-### Arguments
+##### Arguments
 
 - `sp::SearchProblem` : Instance of `SearchProblem`
 - `phi::Vector`: Current guess for phi
 - `out::Vector` : Storage for output
 
-### Returns
+##### Returns
 
 None, `out` is updated in place to hold the updated levels of phi
 """

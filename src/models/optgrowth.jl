@@ -10,7 +10,7 @@ References
 
 Simple port of the file quantecon.models.optgrowth
 
-http://quant-econ.net/dp_intro.html
+http://quant-econ.net/jl/dp_intro.html
 =#
 
 #=
@@ -25,7 +25,7 @@ http://quant-econ.net/dp_intro.html
 """
 Neoclassical growth model
 
-### Fields
+##### Fields
 
 - `f::Function` : Production function
 - `bet::Real` : Discount factor in (0, 1)
@@ -51,7 +51,7 @@ default_u(c) = log(c)
 """
 Constructor of `GrowthModel`
 
-### Arguments
+##### Arguments
 
 - `f::Function(k->k^0.65)` : Production function
 - `bet::Real(0.95)` : Discount factor in (0, 1)
@@ -69,14 +69,14 @@ end
 """
 $(____bellman_main_docstring).
 
-### Arguments
+##### Arguments
 
 - `g::GrowthModel` : Instance of `GrowthModel`
 - `w::Vector`: Current guess for the value function
 - `out::Vector` : Storage for output.
 - `;ret_policy::Bool(false)`: Toggles return of value or policy functions
 
-### Returns
+##### Returns
 
 None, `out` is updated in place. If `ret_policy == true` out is filled with the
 policy function, otherwise the value function is stored in `out`.
@@ -113,13 +113,13 @@ end
 """
 $(____greedy_main_docstring).
 
-### Arguments
+##### Arguments
 
 - `g::GrowthModel` : Instance of `GrowthModel`
 - `w::Vector`: Current guess for the value function
 - `out::Vector` : Storage for output
 
-### Returns
+##### Returns
 
 None, `out` is updated in place to hold the policy function
 

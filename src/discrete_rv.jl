@@ -23,7 +23,7 @@ TODO: as of 07/10/2014 it is not possible to define the property
 Generates an array of draws from a discrete random variable with
 vector of probabilities given by q.
 
-### Fields
+##### Fields
 
 - `q::Vector{T<:Real}`: A vector of non-negative probabilities that sum to 1
 - `Q::Vector{T<:Real}`: The cumulative sum of q
@@ -40,11 +40,11 @@ DiscreteRV{T<:Real}(x::Vector{T}) = DiscreteRV{T}(x)
 """
 Make a single draw from the discrete distribution
 
-### Arguments
+##### Arguments
 
 - `d::DiscreteRV`: The `DiscreteRV` type represetning the distribution
 
-### Returns
+##### Returns
 
 - `out::Int`: One draw from the discrete distribution
 """
@@ -54,12 +54,12 @@ draw(d::DiscreteRV) = searchsortedfirst(d.Q, rand())
 Make multiple draws from the discrete distribution represented by a
 `DiscreteRV` instance
 
-### Arguments
+##### Arguments
 
 - `d::DiscreteRV`: The `DiscreteRV` type representing the distribution
 - `k::Int`:
 
-### Returns
+##### Returns
 
 - `out::Vector{Int}`: `k` draws from `d`
 """

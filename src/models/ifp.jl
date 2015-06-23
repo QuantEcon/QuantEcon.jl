@@ -21,7 +21,7 @@ http://quant-econ.net/jl/ifp.html
 """
 Income fluctuation problem
 
-### Fields
+##### Fields
 
 - `u::Function` : Utility `function`
 - `du::Function` : Marginal utility `function`
@@ -51,7 +51,7 @@ default_du{T <: Real}(x::T) = 1.0 / x
 """
 Constructor with default values for `ConsumerProblem`
 
-### Arguments
+##### Arguments
 
 - `r::Real(0.01)` : Strictly positive interest rate
 - `bet::Real(0.96)` : Discount rate in (0, 1)
@@ -63,7 +63,7 @@ Constructor with default values for `ConsumerProblem`
 - `u::Function(log)` : Utility `function`
 - `du::Function(x->1/x)` : Marginal utility `function`
 
-### Notes
+##### Notes
 
 $(____kwarg_note)
 
@@ -87,14 +87,14 @@ end
 """
 $(____bellman_main_docstring).
 
-### Arguments
+##### Arguments
 
 - `cp::ConsumerProblem` : Instance of `ConsumerProblem`
 - `v::Matrix`: Current guess for the value function
 - `out::Matrix` : Storage for output
 - `;ret_policy::Bool(false)`: Toggles return of value or policy functions
 
-### Returns
+##### Returns
 
 None, `out` is updated in place. If `ret_policy == true` out is filled with the
 policy function, otherwise the value function is stored in `out`.
@@ -146,13 +146,13 @@ end
 """
 $(____greedy_main_docstring).
 
-### Arguments
+##### Arguments
 
 - `cp::CareerWorkerProblem` : Instance of `CareerWorkerProblem`
 - `v::Matrix`: Current guess for the value function
 - `out::Matrix` : Storage for output
 
-### Returns
+##### Returns
 
 None, `out` is updated in place to hold the policy function
 
@@ -175,13 +175,13 @@ c.  The array c is replaced with a function cf that implements
 univariate linear interpolation over the asset grid for each
 possible value of z.
 
-### Arguments
+##### Arguments
 
 - `cp::CareerWorkerProblem` : Instance of `CareerWorkerProblem`
 - `c::Matrix`: Current guess for the policy function
 - `out::Matrix` : Storage for output
 
-### Returns
+##### Returns
 
 None, `out` is updated in place to hold the policy function
 
@@ -205,7 +205,7 @@ function coleman_operator!(cp::ConsumerProblem, c::Matrix, out::Matrix)
     end
 
     # compute lower_bound for optimization
-    opt_lb = minimum(z_vals) - 1e-5
+    opt_lb = minimum(z_vals) - 1e-2
     for (i_z, z) in enumerate(z_vals)
         for (i_a, a) in enumerate(asset_grid)
             function h(t)
@@ -213,8 +213,8 @@ function coleman_operator!(cp::ConsumerProblem, c::Matrix, out::Matrix)
                 expectation = dot(du(vals), vec(Pi[i_z, :]))
                 return abs(du(t) - max(gam * expectation, du(R*a+z+b)))
             end
-
-            res = optimize(h, opt_lb, R*a + z + b, method=:brent)
+            opt_ub = R*a + z + b  # addresses issue #8 on github
+            res = optimize(h, min(opt_lb, opt_ub - 1e-2), opt_ub, method=:brent)
             out[i_a, i_z] = res.minimum
         end
     end

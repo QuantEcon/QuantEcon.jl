@@ -38,9 +38,3 @@ $(____greedy_main_docstring). $(____see_methods_docstring)
 $(____mutate_last_positional_docstring)
 """
 :get_greedy!
-
-
-____kwarg_note = """
-There is also a version of this function that accepts keyword arguments for
-each parameter
-"""

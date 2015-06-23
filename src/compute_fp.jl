@@ -23,7 +23,7 @@ err_tol` or `max_iter` iterations has been exceeded.
 Provided that `T` is a contraction mapping or similar,  the return value will
 be an approximation to the fixed point of `T`.
 
-### Arguments
+##### Arguments
 
 * `T`: A function representing the operator `T`
 * `v::TV`: The initial condition. An object of type `TV`
@@ -33,12 +33,12 @@ be an approximation to the fixed point of `T`.
 * `;print_skip(10)` : if `verbose` is true, how many iterations to apply between
   print messages
 
-### Returns
+##### Returns
 ---
 
 * '::TV': The fixed point of the operator `T`. Has type `TV`
 
-### Example
+##### Example
 
 ```julia
 using QuantEcon

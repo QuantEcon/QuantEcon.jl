@@ -27,7 +27,7 @@ and a perceived control law :math:`u_j(t) = - f_j x_t` for the other player.
 The solution computed in this routine is the `f_i` and `p_i` of the associated
 double optimal linear regulator problem.
 
-### Arguments
+##### Arguments
 
 - `A` : Corresponds to the above equation, should be of size (n, n)
 - `B1` : As above, size (n, k_1)
@@ -46,7 +46,7 @@ double optimal linear regulator problem.
 - `;tol::Float64(1e-8)` : Tolerance level for convergence
 - `;max_iter::Int(1000)` : Maximum number of iterations allowed
 
-### Returns
+##### Returns
 
 - `F1::Matrix{Float64}`: (k_1, n) matrix representing feedback law for agent 1
 - `F2::Matrix{Float64}`: (k_2, n) matrix representing feedback law for agent 2

@@ -18,7 +18,7 @@ http://quant-econ.net/jl/markov_asset.html
 """
 A class to compute asset prices when the endowment follows a finite Markov chain
 
-### Fields
+##### Fields
 
 - `bet::Float64` : Discount factor in (0, 1)
 - `P::Matrix{Float64}` A valid stochastic matrix
@@ -54,11 +54,11 @@ end
 """
 Computes the function v such that the price of the lucas tree is v(lambda)C_t
 
-### Arguments
+##### Arguments
 
 - `ap::AssetPrices` : An instance of the `AssetPrices` type
 
-### Returns
+##### Returns
 
 - `v::Vector{Float64}` : the pricing function for the lucas tree
 
@@ -77,12 +77,12 @@ end
 """
 Computes price of a consol bond with payoff zeta
 
-### Arguments
+##### Arguments
 
 - `ap::AssetPrices` : An instance of the `AssetPrices` type
 - `zeta::Float64` : Per period payoff of the consol
 
-### Returns
+##### Returns
 
 - `pbar::Vector{Float64}` : the pricing function for the lucas tree
 
@@ -102,7 +102,7 @@ end
 Computes price of a call option on a consol bond, both finite and infinite
 horizon
 
-### Arguments
+##### Arguments
 
 - `zeta::Float64` : Coupon of the console
 - `p_s::Float64` : Strike price
@@ -110,7 +110,7 @@ horizon
 finite horizon version
 - `epsilon::Float64` : Tolerance for infinite horizon problem
 
-### Returns
+##### Returns
 
 - `w_bar::Vector{Float64}` Infinite horizon call option prices
 - `w_bars::Dict{Int, Vector{Float64}}` A dictionary of key-value pairs {t: vec},
