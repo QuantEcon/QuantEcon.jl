@@ -799,8 +799,8 @@ Approximate the integral of `f`, given quadrature `nodes` and `weights`
 spanned by `nodes`.
 - `nodes::Array`: Quadrature nodes
 - `weights::Array`: Quadrature nodes
-- `;args...`: additional positional arguments to pass to `f`
-- `;kwargs...`: additional keyword arguments to pass to `f`
+- `args...(nothing)`: additional positional arguments to pass to `f`
+- `;kwargs...(nothing)`: additional keyword arguments to pass to `f`
 
 ##### Returns
 
@@ -839,8 +839,8 @@ values are:
     - `"W"` : Weyl equidistributed sequence
     - `"H"` : Haber  equidistributed sequence
     - `"R"` : Monte Carlo
-- `;args...`: additional positional arguments to pass to `f`
-- `;kwargs...`: additional keyword arguments to pass to `f`
+    - `args...(nothing)`: additional positional arguments to pass to `f`
+    - `;kwargs...(nothing)`: additional keyword arguments to pass to `f`
 
 ##### Returns
 

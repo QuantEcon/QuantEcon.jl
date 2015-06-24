@@ -48,7 +48,7 @@ x_star = compute_fixed_point(x->T(x, 0.3), 0.4)  # (4μ - 1)/(4μ)
 
 """
 function compute_fixed_point{TV}(T::Function, v::TV; err_tol=1e-3,
-                                max_iter=50, verbose=true, print_skip=10)
+                                 max_iter=50, verbose=true, print_skip=10)
     iterate = 0
     err = err_tol + 1
     while iterate < max_iter && err > err_tol

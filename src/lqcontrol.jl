@@ -3,18 +3,67 @@ Provides a type called LQ for solving linear quadratic control
 problems.
 
 @author : Spencer Lyon <spencer.lyon@nyu.edu>
+@author : Zac Cranko <zaccranko@gmail.com>
 
 @date : 2014-07-05
 
 References
 ----------
 
-Simple port of the file quantecon.lqcontrol
-
-http://quant-econ.net/lqcontrol.html
+http://quant-econ.net/jl/lqcontrol.html
 
 =#
 
+"""
+Linear quadratic optimal control of either infinite or finite horizon
+
+The infinite horizon problem can be written
+
+    min E sum_{t=0}^{infty} beta^t r(x_t, u_t)
+
+with
+
+    r(x_t, u_t) := x_t' R x_t + u_t' Q u_t + 2 u_t' N x_t
+
+The finite horizon form is
+
+    min E sum_{t=0}^{T-1} beta^t r(x_t, u_t) + beta^T x_T' R_f x_T
+
+Both are minimized subject to the law of motion
+
+    x_{t+1} = A x_t + B u_t + C w_{t+1}
+
+Here x is n x 1, u is k x 1, w is j x 1 and the matrices are conformable for
+these dimensions.  The sequence {w_t} is assumed to be white noise, with zero
+mean and E w_t w_t' = I, the j x j identity.
+
+For this model, the time t value (i.e., cost-to-go) function V_t takes the form
+
+    x' P_T x + d_T
+
+and the optimal policy is of the form u_T = -F_T x_T.  In the infinite horizon
+case, V, P, d and F are all stationary.
+
+##### Fields
+
+- `Q::ScalarOrArray` : k x k payoff coefficient for control variable u. Must be
+symmetric and nonnegative definite
+- `R::ScalarOrArray` : n x n payoff coefficient matrix for state variable x.
+Must be symmetric and nonnegative definite
+- `A::ScalarOrArray` : n x n coefficient on state in state transition
+- `B::ScalarOrArray` : n x k coefficient on control in state transition
+- `C::ScalarOrArray` : n x j coefficient on random shock in state transition
+- `N::ScalarOrArray` : k x n cross product in payoff equation
+- `bet::Real` : Discount factor in [0, 1]
+- `capT::Union(Int, Nothing)` : Terminal period in finite horizon problem
+- `rf::ScalarOrArray` : n x n terminal payoff in finite horizon problem. Must be
+symmetric and nonnegative definite
+- `P::ScalarOrArray` : n x n matrix in value function representation
+V(x) = x'Px + d
+- `d::Real` : Constant in value function representation
+- `F::ScalarOrArray` : Policy rule that specifies optimal control in each period
+
+"""
 type LQ
     Q::ScalarOrArray
     R::ScalarOrArray
@@ -30,6 +79,31 @@ type LQ
     F::ScalarOrArray # policy rule
 end
 
+"""
+Main constructor for LQ type
+
+Specifies default argumets for all fields not part of the payoff function or
+transition equation.
+
+##### Arguments
+
+- `Q::ScalarOrArray` : k x k payoff coefficient for control variable u. Must be
+symmetric and nonnegative definite
+- `R::ScalarOrArray` : n x n payoff coefficient matrix for state variable x.
+Must be symmetric and nonnegative definite
+- `A::ScalarOrArray` : n x n coefficient on state in state transition
+- `B::ScalarOrArray` : n x k coefficient on control in state transition
+- `;C::ScalarOrArray(zeros(size(R, 1)))` : n x j coefficient on random shock in
+state transition
+- `;N::ScalarOrArray(zeros(size(B,1), size(A, 2)))` : k x n cross product in
+payoff equation
+- `;bet::Real(1.0)` : Discount factor in [0, 1]
+- `capT::Union(Int, Nothing)(nothing)` : Terminal period in finite horizon
+problem
+- `rf::ScalarOrArray(fill(NaN, size(R)...))` : n x n terminal payoff in finite
+horizon problem. Must be symmetric and nonnegative definite.
+
+"""
 function LQ(Q::ScalarOrArray,
             R::ScalarOrArray,
             A::ScalarOrArray,
@@ -50,7 +124,10 @@ function LQ(Q::ScalarOrArray,
 end
 
 
-# make kwarg version
+"""
+Version of default constuctor making `bet` `capT` `rf` keyword arguments
+
+"""
 function LQ(Q::ScalarOrArray,
             R::ScalarOrArray,
             A::ScalarOrArray,
@@ -63,6 +140,25 @@ function LQ(Q::ScalarOrArray,
     LQ(Q, R, A, B, C, N, bet, capT, rf)
 end
 
+"""
+Update `P` and `d` from the value function representation in finite horizon case
+
+##### Arguments
+
+- `lq::LQ` : instance of `LQ` type
+
+##### Returns
+
+- `P::ScalarOrArray` : n x n matrix in value function representation
+V(x) = x'Px + d
+- `d::Real` : Constant in value function representation
+
+##### Notes
+
+This function updates the `P` and `d` fields on the `lq` instance in addition to
+returning them
+
+"""
 function update_values!(lq::LQ)
     # Simplify notation
     Q, R, A, B, N, C, P, d = lq.Q, lq.R, lq.A, lq.B, lq.N, lq.C, lq.P, lq.d
@@ -82,10 +178,29 @@ function update_values!(lq::LQ)
     new_d = lq.bet * (d + trace(P * C * C'))
 
     # Set new state
-    lq.P = new_P
-    lq.d = new_d
+    lq.P lq.d = new_P, new_d
 end
 
+"""
+Computes value and policy functions in infinite horizon model
+
+##### Arguments
+
+- `lq::LQ` : instance of `LQ` type
+
+##### Returns
+
+- `P::ScalarOrArray` : n x n matrix in value function representation
+V(x) = x'Px + d
+- `d::Real` : Constant in value function representation
+- `F::ScalarOrArray` : Policy rule that specifies optimal control in each period
+
+##### Notes
+
+This function updates the `P`, `d`, and `F` fields on the `lq` instance in
+addition to returning them
+
+"""
 function stationary_values!(lq::LQ)
     # simplify notation
     Q, R, A, B, N, C = lq.Q, lq.R, lq.A, lq.B, lq.N, lq.C
@@ -106,6 +221,11 @@ function stationary_values!(lq::LQ)
     lq.P, lq.F, lq.d = P, F, d
 end
 
+"""
+Non-mutating routine for solving for `P`, `d`, and `F` in infinite horizon model
+
+See docstring for stationary_values! for more explanation
+"""
 function stationary_values(lq::LQ)
     _lq = LQ(copy(lq.Q),
              copy(lq.R),
@@ -121,7 +241,9 @@ function stationary_values(lq::LQ)
     return _lq.P, _lq.F, _lq.d
 end
 
-# Dispatch for a scalar problem
+"""
+Private method implementing `compute_sequence` when state is a scalar
+"""
 function _compute_sequence{T}(lq::LQ, x0::T, policies)
     capT = length(policies)
 
@@ -142,7 +264,9 @@ function _compute_sequence{T}(lq::LQ, x0::T, policies)
     x_path, u_path, w_path
 end
 
-# Dispatch for a vector problem
+"""
+Private method implementing `compute_sequence` when state is a scalar
+"""
 function _compute_sequence{T}(lq::LQ, x0::Vector{T}, policies)
     # Ensure correct dimensionality
     n, j, k = size(lq.C, 1), size(lq.C, 2), size(lq.B, 2)
@@ -167,7 +291,28 @@ function _compute_sequence{T}(lq::LQ, x0::Vector{T}, policies)
     x_path, u_path, w_path
 end
 
-function compute_sequence(lq::LQ, x0::ScalarOrArray, ts_length=100)
+"""
+Compute and return the optimal state and control sequence, assuming w ∼ N(0,1)
+
+##### Arguments
+
+- `lq::LQ` : instance of `LQ` type
+- `x0::ScalarOrArray`: initial state
+- `ts_length::Integer(100)` : maximum number of periods for which to return
+process. If `lq` instance is finite horizon type, the sequenes are returned
+only for `min(ts_length, lq.capT)`
+
+##### Returns
+
+- `x_path::Matrix{Float64}` : An n x T+1 matrix, where the t-th column
+represents `x_t`
+- `u_path::Matrix{Float64}` : A k x T matrix, where the t-th column represents
+`u_t`
+- `w_path::Matrix{Float64}` : A j x T+1 matrix, where the t-th column represents
+`lq.C*w_t`
+
+"""
+function compute_sequence(lq::LQ, x0::ScalarOrArray, ts_length::Integer=100)
     capT = min(ts_length, lq.capT)
 
     # Compute and record the sequence of policies
