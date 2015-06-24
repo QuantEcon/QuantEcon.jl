@@ -16,15 +16,15 @@ b    = -1.
 c    = .05
 β    = .95
 n    = 0.
-term = 1
-lq_scalar = LQ(q, r, a, b, c, n, β, term, rf)
+capT = 1
+lq_scalar = LQ(q, r, a, b, c, n, β, capT, rf)
 
 Q  = [0. 0.; 0. 1]
 R  = [1. 0.; 0. 0]
 rf = eye(2) .* 100
 A  = fill(0.95, 2, 2)
 B  = fill(-1.0, 2, 2)
-lq_mat = LQ(Q, R, A, B, bet=β, term=term, rf=rf)
+lq_mat = LQ(Q, R, A, B, bet=β, capT=capT, rf=rf)
 
 facts("Testing lqcontrol.jl") do
     context("Test scalar sequences with exact by hand solution") do
