@@ -23,7 +23,7 @@ type LQ
     C::ScalarOrArray
     N::ScalarOrArray
     bet::Real
-    capT::Union(Int, Nothing) # capTinal period
+    capT::Union(Int, Nothing) # terminal period
     rf::ScalarOrArray
     P::ScalarOrArray
     d::Real
@@ -39,7 +39,7 @@ function LQ(Q::ScalarOrArray,
 			bet::ScalarOrArray        = 1.0,
 			capT::Union(Int, Nothing) = nothing,
 			rf::ScalarOrArray         = fill(NaN, size(R)...))
-    
+
     k = size(Q, 1)
     n = size(R, 1)
     F = k==n==1 ? zero(Float64) : zeros(Float64, k, n)
@@ -48,6 +48,7 @@ function LQ(Q::ScalarOrArray,
 
     LQ(Q, R, A, B, C, N, bet, capT, rf, P, d, F)
 end
+
 
 # make kwarg version
 function LQ(Q::ScalarOrArray,
@@ -160,7 +161,7 @@ function _compute_sequence{T}(lq::LQ, x0::Vector{T}, policies)
     for t = 2:capT
         f = policies[t]
         x_path[:,t] = lq.A*x_path[:,t-1] + lq.B*u_path[:,t-1] + w_path[t]
-        u_path[:,t] = -(f*x_path[t])
+        u_path[:,t] = -(f*x_path[:,t])
     end
     x_path[:,end] = lq.A*x_path[:,capT] + lq.B*u_path[:,capT] + w_path[end]
 
