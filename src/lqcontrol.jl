@@ -178,7 +178,7 @@ function update_values!(lq::LQ)
     new_d = lq.bet * (d + trace(P * C * C'))
 
     # Set new state
-    lq.P lq.d = new_P, new_d
+    lq.P, lq.d = new_P, new_d
 end
 
 """
