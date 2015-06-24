@@ -145,14 +145,14 @@ end
 
 # Dispatch for a vector problem
 function _compute_sequence{T}(lq::LQ, x0::Vector{T}, policies)
+    # Ensure correct dimensionality
     n, j, k = size(lq.C,1), size(lq.C,2), size(lq.B,1)
-	capT = length(policies)
+    capT = length(policies)
 
+    A, B, C = lq.A, reshape(lq.B,n,k), reshape(lq.C,n,j) 
+	
     x_path = Array(T, n, capT+1)
     u_path = Array(T, n, capT)
-
-    # Ensure correct dimensionality
-    B, C = reshape(lq.B,n,k), reshape(lq.C,n,j) 
     w_path = [vec(C*randn(j)) for i=1:(capT+1)]
 	
 	x_path[:,1] = x0
@@ -160,10 +160,10 @@ function _compute_sequence{T}(lq::LQ, x0::Vector{T}, policies)
 
     for t = 2:capT
         f = policies[t]
-        x_path[:,t] = lq.A*x_path[:,t-1] + lq.B*u_path[:,t-1] + w_path[t]
+        x_path[:,t] = A*x_path[:,t-1] + B*u_path[:,t-1] + w_path[t]
         u_path[:,t] = -(f*x_path[:,t])
     end
-    x_path[:,end] = lq.A*x_path[:,capT] + lq.B*u_path[:,capT] + w_path[end]
+    x_path[:,end] = A*x_path[:,capT] + B*u_path[:,capT] + w_path[end]
 
     x_path, u_path, w_path
 end
