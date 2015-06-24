@@ -23,7 +23,7 @@ type LQ
     C::ScalarOrArray
     N::ScalarOrArray
     bet::Real
-    term::Union(Int, Nothing) # terminal period
+    capT::Union(Int, Nothing) # capTinal period
     rf::ScalarOrArray
     P::ScalarOrArray
     d::Real
@@ -37,7 +37,7 @@ function LQ(Q::ScalarOrArray,
 			C::ScalarOrArray          = zeros(size(R,1)),
 			N::ScalarOrArray          = zero(B'A),
 			bet::ScalarOrArray        = 1.0,
-			term::Union(Int, Nothing) = nothing,
+			capT::Union(Int, Nothing) = nothing,
 			rf::ScalarOrArray         = fill(NaN, size(R)...))
     
     k = size(Q, 1)
@@ -46,7 +46,7 @@ function LQ(Q::ScalarOrArray,
     P = copy(rf)
     d = 0.0
 
-    LQ(Q, R, A, B, C, N, bet, term, rf, P, d, F)
+    LQ(Q, R, A, B, C, N, bet, capT, rf, P, d, F)
 end
 
 # make kwarg version
@@ -57,9 +57,9 @@ function LQ(Q::ScalarOrArray,
 			C::ScalarOrArray          = zeros(size(R,1)),
 			N::ScalarOrArray          = zero(B'A);
 			bet::ScalarOrArray        = 1.0,
-			term::Union(Int, Nothing) = nothing,
+			capT::Union(Int, Nothing) = nothing,
 			rf::ScalarOrArray         = fill(NaN, size(R)...))
-	LQ(Q, R, A, B, C, N, bet, term, rf)
+	LQ(Q, R, A, B, C, N, bet, capT, rf)
 end
 
 function update_values!(lq::LQ)
@@ -114,7 +114,7 @@ function stationary_values(lq::LQ)
 			copy(lq.C), 
 			copy(lq.N),
 			copy(lq.bet), 
-			lq.term,
+			lq.capT,
 			copy(lq.rf))
 
     stationary_values!(_lq)
@@ -123,21 +123,21 @@ end
 
 # Dispatch for a scalar problem
 function _compute_sequence{T}(lq::LQ, x0::T, policies)
-	term = length(policies)
+	capT = length(policies)
 
-	x_path = Array(T, term+1)
-	u_path = Array(T, term)
+	x_path = Array(T, capT+1)
+	u_path = Array(T, capT)
 	
 	x_path[1] = x0
 	u_path[1] = -(first(policies)*x0)
-	w_path    = lq.C * randn(term+1)
+	w_path    = lq.C * randn(capT+1)
 
-    for t = 2:term
+    for t = 2:capT
         f = policies[t]
         x_path[t] = lq.A*x_path[t-1] + lq.B*u_path[t-1] + w_path[t]
         u_path[t] = -(f*x_path[t])
     end
-    x_path[end] = lq.A*x_path[term] + lq.B*u_path[term] + w_path[end]
+    x_path[end] = lq.A*x_path[capT] + lq.B*u_path[capT] + w_path[end]
 
     x_path, u_path, w_path
 end
@@ -145,38 +145,38 @@ end
 # Dispatch for a vector problem
 function _compute_sequence{T}(lq::LQ, x0::Vector{T}, policies)
     n, j, k = size(lq.C,1), size(lq.C,2), size(lq.B,1)
-	term = length(policies)
+	capT = length(policies)
 
-    x_path = Array(T, n, term+1)
-    u_path = Array(T, n, term)
+    x_path = Array(T, n, capT+1)
+    u_path = Array(T, n, capT)
 
     # Ensure correct dimensionality
     B, C = reshape(lq.B,n,k), reshape(lq.C,n,j) 
-    w_path = [vec(C*randn(j)) for i=1:(term+1)]
+    w_path = [vec(C*randn(j)) for i=1:(capT+1)]
 	
 	x_path[:,1] = x0
 	u_path[:,1] = -(first(policies)*x0)
 
-    for t = 2:term
+    for t = 2:capT
         f = policies[t]
         x_path[:,t] = lq.A*x_path[:,t-1] + lq.B*u_path[:,t-1] + w_path[t]
         u_path[:,t] = -(f*x_path[t])
     end
-    x_path[:,end] = lq.A*x_path[:,term] + lq.B*u_path[:,term] + w_path[end]
+    x_path[:,end] = lq.A*x_path[:,capT] + lq.B*u_path[:,capT] + w_path[end]
 
     x_path, u_path, w_path
 end
 
 function compute_sequence(lq::LQ, x0::ScalarOrArray, ts_length=100)
-    term = min(ts_length, lq.term)
+    capT = min(ts_length, lq.capT)
 
     # Compute and record the sequence of policies
-    if isa(lq.term,Nothing)
+    if isa(lq.capT,Nothing)
         stationary_values!(lq)
-        policies = fill(lq.F,term)
+        policies = fill(lq.F,capT)
     else
-        policies = Array(typeof(lq.F), term)
-        for t = 1:term
+        policies = Array(typeof(lq.F), capT)
+        for t = 1:capT
             update_values!(lq)
             policies[t] = lq.F
         end
