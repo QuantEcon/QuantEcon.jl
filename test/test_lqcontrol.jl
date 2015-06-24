@@ -62,5 +62,31 @@ facts("Testing lqcontrol.jl") do
         @fact p_answer => roughly(P; rough_kwargs...)
     end
 
+    context("test runs a (n,k,j) = (2,1,1) model") do
+        # == Model parameters == #
+        r = 0.05
+        bet = 1 / (1 + r)
+        T = 45
+        c_bar = 2.0
+        sigma = 0.25
+        mu = 1.0
+        q = 1e6
+
+        # == Formulate as an LQ problem == #
+        Q = 1.0
+        R = zeros(2, 2)
+        Rf = zeros(2, 2); Rf[1, 1] = q
+        A = [1.0+r -c_bar+mu;
+             0.0 1.0]
+        B = [-1.0, 0.0]
+        C = [sigma, 0.0]
+
+        # == Compute solutions and simulate == #
+        lq = LQ(Q, R, A, B, C; bet=bet, capT=T, rf=Rf)
+        x0 = [0.0, 1.0]
+        xp, up, wp = compute_sequence(lq, x0)
+        @fact true => true  # just assert true if we made it to this point
+    end
+
 end  # facts
 end  # module
