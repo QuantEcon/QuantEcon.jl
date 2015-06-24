@@ -55,6 +55,10 @@
 
 [compute_fixed_point{TV}(T::Function,  v::TV)](QuantEcon.md#method__compute_fixed_point.1)  Repeatedly apply a function to search for a fixed point
 
+[compute_sequence(lq::QuantEcon.LQ,  x0::Union{T, Array{T, N}})](QuantEcon.md#method__compute_sequence.1)  Compute and return the optimal state and control sequence, assuming w ∼ N(0,1)
+
+[compute_sequence(lq::QuantEcon.LQ,  x0::Union{T, Array{T, N}},  ts_length::Integer)](QuantEcon.md#method__compute_sequence.2)  Compute and return the optimal state and control sequence, assuming w ∼ N(0,1)
+
 [d_operator(rlq::QuantEcon.RBLQ,  P::Array{T, 2})](QuantEcon.md#method__d_operator.1)  The D operator, mapping P into
 
 [draw(d::QuantEcon.DiscreteRV{T<:Real})](QuantEcon.md#method__draw.1)  Make a single draw from the discrete distribution
@@ -119,11 +123,17 @@
 
 [spectral_density(arma::QuantEcon.ARMA)](QuantEcon.md#method__spectral_density.1)  Compute the spectral density function.
 
+[stationary_values!(lq::QuantEcon.LQ)](QuantEcon.md#method__stationary_values.1)  Computes value and policy functions in infinite horizon model
+
+[stationary_values(lq::QuantEcon.LQ)](QuantEcon.md#method__stationary_values.2)  Non-mutating routine for solving for `P`, `d`, and `F` in infinite horizon model
+
 [tauchen(N::Int64,  ρ::Real,  σ::Real)](QuantEcon.md#method__tauchen.1)  Tauchen's (1996) method for approximating AR(1) process with finite markov chain
 
 [tauchen(N::Int64,  ρ::Real,  σ::Real,  μ::Real)](QuantEcon.md#method__tauchen.2)  Tauchen's (1996) method for approximating AR(1) process with finite markov chain
 
 [tauchen(N::Int64,  ρ::Real,  σ::Real,  μ::Real,  n_std::Int64)](QuantEcon.md#method__tauchen.3)  Tauchen's (1996) method for approximating AR(1) process with finite markov chain
+
+[update_values!(lq::QuantEcon.LQ)](QuantEcon.md#method__update_values.1)  Update `P` and `d` from the value function representation in finite horizon case
 
 [var_quadratic_sum(A::Union{T, Array{T, N}},  C::Union{T, Array{T, N}},  H::Union{T, Array{T, N}},  bet::Real,  x0::Union{T, Array{T, N}})](QuantEcon.md#method__var_quadratic_sum.1)  Computes the expected discounted quadratic sum
 
@@ -141,6 +151,8 @@
 
 [QuantEcon.LAE](QuantEcon.md#type__lae.1)  A look ahead estimator associated with a given stochastic kernel p and a vector
 
+[QuantEcon.LQ](QuantEcon.md#type__lq.1)  Linear quadratic optimal control of either infinite or finite horizon
+
 [QuantEcon.MarkovChain](QuantEcon.md#type__markovchain.1)  Finite-state discrete-time Markov chain.
 
 [QuantEcon.RBLQ](QuantEcon.md#type__rblq.1)  Represents infinite horizon robust LQ control problems of the form
@@ -156,6 +168,22 @@
 ---
 
 ## Methods [Internal]
+
+[_compute_sequence{T}(lq::QuantEcon.LQ,  x0::Array{T, 1},  policies)](QuantEcon.md#method___compute_sequence.1)  Private method implementing `compute_sequence` when state is a scalar
+
+[_compute_sequence{T}(lq::QuantEcon.LQ,  x0::T,  policies)](QuantEcon.md#method___compute_sequence.2)  Private method implementing `compute_sequence` when state is a scalar
+
+[call(::Type{QuantEcon.LQ},  Q::Union{T, Array{T, N}},  R::Union{T, Array{T, N}},  A::Union{T, Array{T, N}},  B::Union{T, Array{T, N}})](QuantEcon.md#method__call.1)  Version of default constuctor making `bet` `capT` `rf` keyword arguments
+
+[call(::Type{QuantEcon.LQ},  Q::Union{T, Array{T, N}},  R::Union{T, Array{T, N}},  A::Union{T, Array{T, N}},  B::Union{T, Array{T, N}},  C::Union{T, Array{T, N}})](QuantEcon.md#method__call.2)  Version of default constuctor making `bet` `capT` `rf` keyword arguments
+
+[call(::Type{QuantEcon.LQ},  Q::Union{T, Array{T, N}},  R::Union{T, Array{T, N}},  A::Union{T, Array{T, N}},  B::Union{T, Array{T, N}},  C::Union{T, Array{T, N}},  N::Union{T, Array{T, N}})](QuantEcon.md#method__call.3)  Version of default constuctor making `bet` `capT` `rf` keyword arguments
+
+[call(::Type{QuantEcon.LQ},  Q::Union{T, Array{T, N}},  R::Union{T, Array{T, N}},  A::Union{T, Array{T, N}},  B::Union{T, Array{T, N}},  C::Union{T, Array{T, N}},  N::Union{T, Array{T, N}},  bet::Union{T, Array{T, N}})](QuantEcon.md#method__call.4)  Main constructor for LQ type
+
+[call(::Type{QuantEcon.LQ},  Q::Union{T, Array{T, N}},  R::Union{T, Array{T, N}},  A::Union{T, Array{T, N}},  B::Union{T, Array{T, N}},  C::Union{T, Array{T, N}},  N::Union{T, Array{T, N}},  bet::Union{T, Array{T, N}},  capT::Union{Int64, Void})](QuantEcon.md#method__call.5)  Main constructor for LQ type
+
+[call(::Type{QuantEcon.LQ},  Q::Union{T, Array{T, N}},  R::Union{T, Array{T, N}},  A::Union{T, Array{T, N}},  B::Union{T, Array{T, N}},  C::Union{T, Array{T, N}},  N::Union{T, Array{T, N}},  bet::Union{T, Array{T, N}},  capT::Union{Int64, Void},  rf::Union{T, Array{T, N}})](QuantEcon.md#method__call.6)  Main constructor for LQ type
 
 [irreducible_subsets(mc::QuantEcon.MarkovChain)](QuantEcon.md#method__irreducible_subsets.1)  Find the irreducible subsets of the `MarkovChain`
 

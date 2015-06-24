@@ -12,7 +12,7 @@ Apply the Bellman operator for a given model and initial value
 
 
 *source:*
-[QuantEcon/src/Models.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/Models.jl#L63)
+[QuantEcon/src/Models.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/Models.jl#L63)
 
 ---
 
@@ -27,7 +27,7 @@ The last positional argument passed to this function will be over-written
 
 
 *source:*
-[QuantEcon/src/Models.jl:70](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/Models.jl#L70)
+[QuantEcon/src/Models.jl:70](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/Models.jl#L70)
 
 ---
 
@@ -39,7 +39,7 @@ Extract the greedy policy (policy function) of the model
 
 
 *source:*
-[QuantEcon/src/Models.jl:75](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/Models.jl#L75)
+[QuantEcon/src/Models.jl:75](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/Models.jl#L75)
 
 ---
 
@@ -54,7 +54,7 @@ The last positional argument passed to this function will be over-written
 
 
 *source:*
-[QuantEcon/src/Models.jl:82](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/Models.jl#L82)
+[QuantEcon/src/Models.jl:82](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/Models.jl#L82)
 
 ---
 
@@ -78,7 +78,7 @@ policy function, otherwise the value function is stored in `out`.
 
 
 *source:*
-[QuantEcon/src/models/career.jl:96](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/career.jl#L96)
+[QuantEcon/src/models/career.jl:96](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/career.jl#L96)
 
 ---
 
@@ -102,7 +102,7 @@ policy function, otherwise the value function is stored in `out`.
 
 
 *source:*
-[QuantEcon/src/models/ifp.jl:103](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L103)
+[QuantEcon/src/models/ifp.jl:103](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L103)
 
 ---
 
@@ -126,7 +126,7 @@ policy function, otherwise the value function is stored in `out`.
 
 
 *source:*
-[QuantEcon/src/models/optgrowth.jl:85](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/optgrowth.jl#L85)
+[QuantEcon/src/models/optgrowth.jl:85](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/optgrowth.jl#L85)
 
 ---
 
@@ -159,7 +159,7 @@ we will re-activate this option.
 
 
 *source:*
-[QuantEcon/src/models/jv.jl:151](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/jv.jl#L151)
+[QuantEcon/src/models/jv.jl:151](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/jv.jl#L151)
 
 ---
 
@@ -183,7 +183,7 @@ policy function, otherwise the value function is stored in `out`.
 
 
 *source:*
-[QuantEcon/src/models/odu.jl:130](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/odu.jl#L130)
+[QuantEcon/src/models/odu.jl:130](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/odu.jl#L130)
 
 ---
 
@@ -210,7 +210,7 @@ date
 
 
 *source:*
-[QuantEcon/src/models/asset_pricing.jl:121](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/asset_pricing.jl#L121)
+[QuantEcon/src/models/asset_pricing.jl:121](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/asset_pricing.jl#L121)
 
 ---
 
@@ -237,7 +237,7 @@ date
 
 
 *source:*
-[QuantEcon/src/models/asset_pricing.jl:121](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/asset_pricing.jl#L121)
+[QuantEcon/src/models/asset_pricing.jl:121](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/asset_pricing.jl#L121)
 
 ---
 
@@ -264,7 +264,7 @@ date
 
 
 *source:*
-[QuantEcon/src/models/asset_pricing.jl:121](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/asset_pricing.jl#L121)
+[QuantEcon/src/models/asset_pricing.jl:121](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/asset_pricing.jl#L121)
 
 ---
 
@@ -292,7 +292,7 @@ None, `out` is updated in place to hold the policy function
 
 
 *source:*
-[QuantEcon/src/models/ifp.jl:190](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L190)
+[QuantEcon/src/models/ifp.jl:190](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L190)
 
 ---
 
@@ -305,7 +305,7 @@ details on arguments
 
 
 *source:*
-[QuantEcon/src/models/ifp.jl:231](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L231)
+[QuantEcon/src/models/ifp.jl:231](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L231)
 
 ---
 
@@ -325,7 +325,7 @@ Compute the equilibrium price function associated with Lucas tree `lt`
 
 
 *source:*
-[QuantEcon/src/models/lucastree.jl:169](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/lucastree.jl#L169)
+[QuantEcon/src/models/lucastree.jl:169](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/lucastree.jl#L169)
 
 ---
 
@@ -345,7 +345,7 @@ Computes price of a consol bond with payoff zeta
 
 
 *source:*
-[QuantEcon/src/models/asset_pricing.jl:90](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/asset_pricing.jl#L90)
+[QuantEcon/src/models/asset_pricing.jl:90](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/asset_pricing.jl#L90)
 
 ---
 
@@ -367,7 +367,7 @@ None, `out` is updated in place to hold the policy function
 
 
 *source:*
-[QuantEcon/src/models/career.jl:149](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/career.jl#L149)
+[QuantEcon/src/models/career.jl:149](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/career.jl#L149)
 
 ---
 
@@ -389,7 +389,7 @@ None, `out` is updated in place to hold the policy function
 
 
 *source:*
-[QuantEcon/src/models/ifp.jl:160](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L160)
+[QuantEcon/src/models/ifp.jl:160](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L160)
 
 ---
 
@@ -411,7 +411,7 @@ None, `out` is updated in place to hold the policy function
 
 
 *source:*
-[QuantEcon/src/models/optgrowth.jl:127](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/optgrowth.jl#L127)
+[QuantEcon/src/models/optgrowth.jl:127](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/optgrowth.jl#L127)
 
 ---
 
@@ -433,7 +433,7 @@ None, `out` is updated in place to hold the policy function
 
 
 *source:*
-[QuantEcon/src/models/jv.jl:267](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/jv.jl#L267)
+[QuantEcon/src/models/jv.jl:267](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/jv.jl#L267)
 
 ---
 
@@ -455,7 +455,7 @@ None, `out` is updated in place to hold the policy function
 
 
 *source:*
-[QuantEcon/src/models/odu.jl:193](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/odu.jl#L193)
+[QuantEcon/src/models/odu.jl:193](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/odu.jl#L193)
 
 ---
 
@@ -477,7 +477,7 @@ grid. It should be the same size as `lt.grid`
 
 
 *source:*
-[QuantEcon/src/models/lucastree.jl:142](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/lucastree.jl#L142)
+[QuantEcon/src/models/lucastree.jl:142](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/lucastree.jl#L142)
 
 ---
 
@@ -497,7 +497,7 @@ None, `out` is updated in place to hold the updated levels of phi
 
 
 *source:*
-[QuantEcon/src/models/odu.jl:214](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/odu.jl#L214)
+[QuantEcon/src/models/odu.jl:214](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/odu.jl#L214)
 
 ---
 
@@ -510,7 +510,7 @@ on arguments
 
 
 *source:*
-[QuantEcon/src/models/odu.jl:237](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/odu.jl#L237)
+[QuantEcon/src/models/odu.jl:237](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/odu.jl#L237)
 
 ---
 
@@ -529,7 +529,7 @@ Computes the function v such that the price of the lucas tree is v(lambda)C_t
 
 
 *source:*
-[QuantEcon/src/models/asset_pricing.jl:66](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/asset_pricing.jl#L66)
+[QuantEcon/src/models/asset_pricing.jl:66](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/asset_pricing.jl#L66)
 
 ---
 
@@ -552,7 +552,7 @@ price of the consol
 
 
 *source:*
-[QuantEcon/src/models/asset_pricing.jl:34](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/asset_pricing.jl#L34)
+[QuantEcon/src/models/asset_pricing.jl:34](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/asset_pricing.jl#L34)
 
 ---
 
@@ -575,7 +575,7 @@ Career/job choice model fo Derek Neal (1999)
 
 
 *source:*
-[QuantEcon/src/models/career.jl:33](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/career.jl#L33)
+[QuantEcon/src/models/career.jl:33](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/career.jl#L33)
 
 ---
 
@@ -597,7 +597,7 @@ Income fluctuation problem
 
 
 *source:*
-[QuantEcon/src/models/ifp.jl:36](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L36)
+[QuantEcon/src/models/ifp.jl:36](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L36)
 
 ---
 
@@ -617,7 +617,7 @@ Neoclassical growth model
 
 
 *source:*
-[QuantEcon/src/models/optgrowth.jl:38](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/optgrowth.jl#L38)
+[QuantEcon/src/models/optgrowth.jl:38](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/optgrowth.jl#L38)
 
 ---
 
@@ -661,7 +661,7 @@ of new job offers is drawn
 
 
 *source:*
-[QuantEcon/src/models/jv.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/jv.jl#L63)
+[QuantEcon/src/models/jv.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/jv.jl#L63)
 
 ---
 
@@ -687,7 +687,7 @@ point should be non-negative
 
 
 *source:*
-[QuantEcon/src/models/lucastree.jl:50](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/lucastree.jl#L50)
+[QuantEcon/src/models/lucastree.jl:50](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/lucastree.jl#L50)
 
 ---
 
@@ -716,7 +716,7 @@ Unemployment/search problem where offer distribution is unknown
 
 
 *source:*
-[QuantEcon/src/models/odu.jl:40](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/odu.jl#L40)
+[QuantEcon/src/models/odu.jl:40](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/odu.jl#L40)
 
 ## Internal
 
@@ -729,7 +729,7 @@ computed automatically for you. See also the documentation for the type itself
 
 
 *source:*
-[QuantEcon/src/models/asset_pricing.jl:48](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/asset_pricing.jl#L48)
+[QuantEcon/src/models/asset_pricing.jl:48](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/asset_pricing.jl#L48)
 
 ---
 
@@ -753,7 +753,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/career.jl:60](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/career.jl#L60)
+[QuantEcon/src/models/career.jl:60](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/career.jl#L60)
 
 ---
 
@@ -777,7 +777,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/career.jl:60](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/career.jl#L60)
+[QuantEcon/src/models/career.jl:60](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/career.jl#L60)
 
 ---
 
@@ -801,7 +801,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/career.jl:60](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/career.jl#L60)
+[QuantEcon/src/models/career.jl:60](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/career.jl#L60)
 
 ---
 
@@ -825,7 +825,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/career.jl:60](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/career.jl#L60)
+[QuantEcon/src/models/career.jl:60](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/career.jl#L60)
 
 ---
 
@@ -849,7 +849,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/career.jl:60](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/career.jl#L60)
+[QuantEcon/src/models/career.jl:60](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/career.jl#L60)
 
 ---
 
@@ -873,7 +873,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/career.jl:60](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/career.jl#L60)
+[QuantEcon/src/models/career.jl:60](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/career.jl#L60)
 
 ---
 
@@ -897,7 +897,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/career.jl:60](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/career.jl#L60)
+[QuantEcon/src/models/career.jl:60](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/career.jl#L60)
 
 ---
 
@@ -926,7 +926,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/ifp.jl:71](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L71)
+[QuantEcon/src/models/ifp.jl:71](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L71)
 
 ---
 
@@ -955,7 +955,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/ifp.jl:71](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L71)
+[QuantEcon/src/models/ifp.jl:71](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L71)
 
 ---
 
@@ -984,7 +984,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/ifp.jl:71](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L71)
+[QuantEcon/src/models/ifp.jl:71](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L71)
 
 ---
 
@@ -1013,7 +1013,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/ifp.jl:71](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L71)
+[QuantEcon/src/models/ifp.jl:71](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L71)
 
 ---
 
@@ -1042,7 +1042,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/ifp.jl:71](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L71)
+[QuantEcon/src/models/ifp.jl:71](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L71)
 
 ---
 
@@ -1071,7 +1071,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/ifp.jl:71](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L71)
+[QuantEcon/src/models/ifp.jl:71](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L71)
 
 ---
 
@@ -1100,7 +1100,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/ifp.jl:71](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L71)
+[QuantEcon/src/models/ifp.jl:71](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L71)
 
 ---
 
@@ -1129,7 +1129,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/ifp.jl:71](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L71)
+[QuantEcon/src/models/ifp.jl:71](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L71)
 
 ---
 
@@ -1158,7 +1158,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/ifp.jl:71](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L71)
+[QuantEcon/src/models/ifp.jl:71](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L71)
 
 ---
 
@@ -1177,7 +1177,7 @@ Constructor of `GrowthModel`
 
 
 *source:*
-[QuantEcon/src/models/optgrowth.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/optgrowth.jl#L63)
+[QuantEcon/src/models/optgrowth.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/optgrowth.jl#L63)
 
 ---
 
@@ -1196,7 +1196,7 @@ Constructor of `GrowthModel`
 
 
 *source:*
-[QuantEcon/src/models/optgrowth.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/optgrowth.jl#L63)
+[QuantEcon/src/models/optgrowth.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/optgrowth.jl#L63)
 
 ---
 
@@ -1215,7 +1215,7 @@ Constructor of `GrowthModel`
 
 
 *source:*
-[QuantEcon/src/models/optgrowth.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/optgrowth.jl#L63)
+[QuantEcon/src/models/optgrowth.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/optgrowth.jl#L63)
 
 ---
 
@@ -1234,7 +1234,7 @@ Constructor of `GrowthModel`
 
 
 *source:*
-[QuantEcon/src/models/optgrowth.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/optgrowth.jl#L63)
+[QuantEcon/src/models/optgrowth.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/optgrowth.jl#L63)
 
 ---
 
@@ -1253,7 +1253,7 @@ Constructor of `GrowthModel`
 
 
 *source:*
-[QuantEcon/src/models/optgrowth.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/optgrowth.jl#L63)
+[QuantEcon/src/models/optgrowth.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/optgrowth.jl#L63)
 
 ---
 
@@ -1272,7 +1272,7 @@ Constructor of `GrowthModel`
 
 
 *source:*
-[QuantEcon/src/models/optgrowth.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/optgrowth.jl#L63)
+[QuantEcon/src/models/optgrowth.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/optgrowth.jl#L63)
 
 ---
 
@@ -1296,7 +1296,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/jv.jl:90](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/jv.jl#L90)
+[QuantEcon/src/models/jv.jl:90](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/jv.jl#L90)
 
 ---
 
@@ -1320,7 +1320,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/jv.jl:90](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/jv.jl#L90)
+[QuantEcon/src/models/jv.jl:90](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/jv.jl#L90)
 
 ---
 
@@ -1344,7 +1344,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/jv.jl:90](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/jv.jl#L90)
+[QuantEcon/src/models/jv.jl:90](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/jv.jl#L90)
 
 ---
 
@@ -1368,7 +1368,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/jv.jl:90](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/jv.jl#L90)
+[QuantEcon/src/models/jv.jl:90](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/jv.jl#L90)
 
 ---
 
@@ -1389,7 +1389,7 @@ All other fields of the type are instantiated within the constructor
 
 
 *source:*
-[QuantEcon/src/models/lucastree.jl:80](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/lucastree.jl#L80)
+[QuantEcon/src/models/lucastree.jl:80](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/lucastree.jl#L80)
 
 ---
 
@@ -1416,7 +1416,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/odu.jl:76](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/odu.jl#L76)
+[QuantEcon/src/models/odu.jl:76](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/odu.jl#L76)
 
 ---
 
@@ -1443,7 +1443,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/odu.jl:76](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/odu.jl#L76)
+[QuantEcon/src/models/odu.jl:76](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/odu.jl#L76)
 
 ---
 
@@ -1470,7 +1470,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/odu.jl:76](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/odu.jl#L76)
+[QuantEcon/src/models/odu.jl:76](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/odu.jl#L76)
 
 ---
 
@@ -1497,7 +1497,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/odu.jl:76](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/odu.jl#L76)
+[QuantEcon/src/models/odu.jl:76](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/odu.jl#L76)
 
 ---
 
@@ -1524,7 +1524,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/odu.jl:76](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/odu.jl#L76)
+[QuantEcon/src/models/odu.jl:76](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/odu.jl#L76)
 
 ---
 
@@ -1551,7 +1551,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/odu.jl:76](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/odu.jl#L76)
+[QuantEcon/src/models/odu.jl:76](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/odu.jl#L76)
 
 ---
 
@@ -1578,7 +1578,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/odu.jl:76](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/odu.jl#L76)
+[QuantEcon/src/models/odu.jl:76](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/odu.jl#L76)
 
 ---
 
@@ -1605,7 +1605,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/odu.jl:76](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/odu.jl#L76)
+[QuantEcon/src/models/odu.jl:76](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/odu.jl#L76)
 
 ---
 
@@ -1632,7 +1632,7 @@ each parameter
 
 
 *source:*
-[QuantEcon/src/models/odu.jl:76](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/odu.jl#L76)
+[QuantEcon/src/models/odu.jl:76](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/odu.jl#L76)
 
 ---
 
@@ -1641,5 +1641,5 @@ each parameter
 Marginal utility for log utility function
 
 *source:*
-[QuantEcon/src/models/ifp.jl:49](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/models/ifp.jl#L49)
+[QuantEcon/src/models/ifp.jl:49](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L49)
 

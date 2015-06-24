@@ -14,8 +14,8 @@ Approximate the integral of `f`, given quadrature `nodes` and `weights`
 spanned by `nodes`.
 - `nodes::Array`: Quadrature nodes
 - `weights::Array`: Quadrature nodes
-- `;args...`: additional positional arguments to pass to `f`
-- `;kwargs...`: additional keyword arguments to pass to `f`
+- `args...(nothing)`: additional positional arguments to pass to `f`
+- `;kwargs...(nothing)`: additional keyword arguments to pass to `f`
 
 ##### Returns
 
@@ -25,7 +25,7 @@ formed by `[a, b]`
 
 
 *source:*
-[QuantEcon/src/quad.jl:811](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/quad.jl#L811)
+[QuantEcon/src/quad.jl:811](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/quad.jl#L811)
 
 ---
 
@@ -40,7 +40,7 @@ Evaluate the empirical cdf at one or more points
 
 
 *source:*
-[QuantEcon/src/ecdf.jl:35](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/ecdf.jl#L35)
+[QuantEcon/src/ecdf.jl:35](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/ecdf.jl#L35)
 
 ---
 
@@ -70,7 +70,7 @@ University Press, 2009.
 
 
 *source:*
-[QuantEcon/src/mc_tools.jl:139](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/mc_tools.jl#L139)
+[QuantEcon/src/mc_tools.jl:139](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/mc_tools.jl#L139)
 
 ---
 
@@ -99,7 +99,7 @@ are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`
 
 
 *source:*
-[QuantEcon/src/estspec.jl:115](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/estspec.jl#L115)
+[QuantEcon/src/estspec.jl:115](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/estspec.jl#L115)
 
 ---
 
@@ -135,7 +135,7 @@ Finance, MIT Press, 2002.
 
 
 *source:*
-[QuantEcon/src/quad.jl:354](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/quad.jl#L354)
+[QuantEcon/src/quad.jl:354](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/quad.jl#L354)
 
 ---
 
@@ -169,7 +169,7 @@ Finance, MIT Press, 2002.
 
 
 *source:*
-[QuantEcon/src/quad.jl:167](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/quad.jl#L167)
+[QuantEcon/src/quad.jl:167](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/quad.jl#L167)
 
 ---
 
@@ -211,7 +211,7 @@ Finance, MIT Press, 2002.
 
 
 *source:*
-[QuantEcon/src/quad.jl:726](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/quad.jl#L726)
+[QuantEcon/src/quad.jl:726](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/quad.jl#L726)
 
 ---
 
@@ -247,7 +247,7 @@ Finance, MIT Press, 2002.
 
 
 *source:*
-[QuantEcon/src/quad.jl:464](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/quad.jl#L464)
+[QuantEcon/src/quad.jl:464](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/quad.jl#L464)
 
 ---
 
@@ -281,7 +281,7 @@ Finance, MIT Press, 2002.
 
 
 *source:*
-[QuantEcon/src/quad.jl:99](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/quad.jl#L99)
+[QuantEcon/src/quad.jl:99](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/quad.jl#L99)
 
 ---
 
@@ -327,7 +327,7 @@ Finance, MIT Press, 2002.
 
 
 *source:*
-[QuantEcon/src/quad.jl:207](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/quad.jl#L207)
+[QuantEcon/src/quad.jl:207](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/quad.jl#L207)
 
 ---
 
@@ -361,7 +361,7 @@ Finance, MIT Press, 2002.
 
 
 *source:*
-[QuantEcon/src/quad.jl:286](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/quad.jl#L286)
+[QuantEcon/src/quad.jl:286](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/quad.jl#L286)
 
 ---
 
@@ -395,7 +395,7 @@ Finance, MIT Press, 2002.
 
 
 *source:*
-[QuantEcon/src/quad.jl:323](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/quad.jl#L323)
+[QuantEcon/src/quad.jl:323](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/quad.jl#L323)
 
 ---
 
@@ -423,8 +423,8 @@ values are:
     - `"W"` : Weyl equidistributed sequence
     - `"H"` : Haber  equidistributed sequence
     - `"R"` : Monte Carlo
-- `;args...`: additional positional arguments to pass to `f`
-- `;kwargs...`: additional keyword arguments to pass to `f`
+    - `args...(nothing)`: additional positional arguments to pass to `f`
+    - `;kwargs...(nothing)`: additional keyword arguments to pass to `f`
 
 ##### Returns
 
@@ -440,7 +440,7 @@ Finance, MIT Press, 2002.
 
 
 *source:*
-[QuantEcon/src/quad.jl:853](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/quad.jl#L853)
+[QuantEcon/src/quad.jl:853](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/quad.jl#L853)
 
 ---
 
@@ -462,7 +462,7 @@ Compute agent 2's best cost-minimizing response `K`, given `F`.
 
 
 *source:*
-[QuantEcon/src/robustlq.jl:245](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/robustlq.jl#L245)
+[QuantEcon/src/robustlq.jl:245](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/robustlq.jl#L245)
 
 ---
 
@@ -484,7 +484,7 @@ Compute agent 1's best cost-minimizing response `K`, given `F`.
 
 
 *source:*
-[QuantEcon/src/robustlq.jl:277](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/robustlq.jl#L277)
+[QuantEcon/src/robustlq.jl:277](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/robustlq.jl#L277)
 
 ---
 
@@ -510,7 +510,7 @@ are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`
 
 
 *source:*
-[QuantEcon/src/estspec.jl:136](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/estspec.jl#L136)
+[QuantEcon/src/estspec.jl:136](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/estspec.jl#L136)
 
 ---
 
@@ -536,7 +536,7 @@ are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`
 
 
 *source:*
-[QuantEcon/src/estspec.jl:136](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/estspec.jl#L136)
+[QuantEcon/src/estspec.jl:136](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/estspec.jl#L136)
 
 ---
 
@@ -562,7 +562,7 @@ are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`
 
 
 *source:*
-[QuantEcon/src/estspec.jl:136](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/estspec.jl#L136)
+[QuantEcon/src/estspec.jl:136](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/estspec.jl#L136)
 
 ---
 
@@ -580,7 +580,7 @@ and the inverse Fourier transform.
 
 
 *source:*
-[QuantEcon/src/arma.jl:137](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/arma.jl#L137)
+[QuantEcon/src/arma.jl:137](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/arma.jl#L137)
 
 ---
 
@@ -608,7 +608,7 @@ and also returning
 
 
 *source:*
-[QuantEcon/src/robustlq.jl:116](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/robustlq.jl#L116)
+[QuantEcon/src/robustlq.jl:116](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/robustlq.jl#L116)
 
 ---
 
@@ -631,7 +631,7 @@ beta^t x_t' K'K x_t with x_{t+1} = (A - BF + CK) x_t.
 
 
 *source:*
-[QuantEcon/src/robustlq.jl:305](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/robustlq.jl#L305)
+[QuantEcon/src/robustlq.jl:305](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/robustlq.jl#L305)
 
 ---
 
@@ -672,7 +672,63 @@ x_star = compute_fixed_point(x->T(x, 0.3), 0.4)  # (4μ - 1)/(4μ)
 
 
 *source:*
-[QuantEcon/src/compute_fp.jl:50](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/compute_fp.jl#L50)
+[QuantEcon/src/compute_fp.jl:50](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/compute_fp.jl#L50)
+
+---
+
+<a id="method__compute_sequence.1" class="lexicon_definition"></a>
+#### compute_sequence(lq::QuantEcon.LQ,  x0::Union{T, Array{T, N}}) [¶](#method__compute_sequence.1)
+Compute and return the optimal state and control sequence, assuming w ∼ N(0,1)
+
+##### Arguments
+
+- `lq::LQ` : instance of `LQ` type
+- `x0::ScalarOrArray`: initial state
+- `ts_length::Integer(100)` : maximum number of periods for which to return
+process. If `lq` instance is finite horizon type, the sequenes are returned
+only for `min(ts_length, lq.capT)`
+
+##### Returns
+
+- `x_path::Matrix{Float64}` : An n x T+1 matrix, where the t-th column
+represents `x_t`
+- `u_path::Matrix{Float64}` : A k x T matrix, where the t-th column represents
+`u_t`
+- `w_path::Matrix{Float64}` : A j x T+1 matrix, where the t-th column represents
+`lq.C*w_t`
+
+
+
+*source:*
+[QuantEcon/src/lqcontrol.jl:315](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/lqcontrol.jl#L315)
+
+---
+
+<a id="method__compute_sequence.2" class="lexicon_definition"></a>
+#### compute_sequence(lq::QuantEcon.LQ,  x0::Union{T, Array{T, N}},  ts_length::Integer) [¶](#method__compute_sequence.2)
+Compute and return the optimal state and control sequence, assuming w ∼ N(0,1)
+
+##### Arguments
+
+- `lq::LQ` : instance of `LQ` type
+- `x0::ScalarOrArray`: initial state
+- `ts_length::Integer(100)` : maximum number of periods for which to return
+process. If `lq` instance is finite horizon type, the sequenes are returned
+only for `min(ts_length, lq.capT)`
+
+##### Returns
+
+- `x_path::Matrix{Float64}` : An n x T+1 matrix, where the t-th column
+represents `x_t`
+- `u_path::Matrix{Float64}` : A k x T matrix, where the t-th column represents
+`u_t`
+- `w_path::Matrix{Float64}` : A j x T+1 matrix, where the t-th column represents
+`lq.C*w_t`
+
+
+
+*source:*
+[QuantEcon/src/lqcontrol.jl:315](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/lqcontrol.jl#L315)
 
 ---
 
@@ -694,7 +750,7 @@ The D operator, mapping P into
 
 
 *source:*
-[QuantEcon/src/robustlq.jl:87](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/robustlq.jl#L87)
+[QuantEcon/src/robustlq.jl:87](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/robustlq.jl#L87)
 
 ---
 
@@ -712,7 +768,7 @@ Make a single draw from the discrete distribution
 
 
 *source:*
-[QuantEcon/src/discrete_rv.jl:51](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/discrete_rv.jl#L51)
+[QuantEcon/src/discrete_rv.jl:51](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/discrete_rv.jl#L51)
 
 ---
 
@@ -732,7 +788,7 @@ Make multiple draws from the discrete distribution represented by a
 
 
 *source:*
-[QuantEcon/src/discrete_rv.jl:66](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/discrete_rv.jl#L66)
+[QuantEcon/src/discrete_rv.jl:66](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/discrete_rv.jl#L66)
 
 ---
 
@@ -758,7 +814,7 @@ x' P_F x + d_F.
 
 
 *source:*
-[QuantEcon/src/robustlq.jl:332](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/robustlq.jl#L332)
+[QuantEcon/src/robustlq.jl:332](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/robustlq.jl#L332)
 
 ---
 
@@ -781,7 +837,7 @@ response. We take psi[1] as unity.
 
 
 *source:*
-[QuantEcon/src/arma.jl:162](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/arma.jl#L162)
+[QuantEcon/src/arma.jl:162](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/arma.jl#L162)
 
 ---
 
@@ -802,7 +858,7 @@ values in the array y.
 
 
 *source:*
-[QuantEcon/src/lae.jl:58](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/lae.jl#L58)
+[QuantEcon/src/lae.jl:58](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/lae.jl#L58)
 
 ---
 
@@ -831,7 +887,7 @@ for convergence that the eigenvalues of B have moduli bounded by unity
 
 
 *source:*
-[QuantEcon/src/quadsums.jl:81](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/quadsums.jl#L81)
+[QuantEcon/src/quadsums.jl:81](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/quadsums.jl#L81)
 
 ---
 
@@ -853,7 +909,7 @@ distribution of `mc.p`
 
 
 *source:*
-[QuantEcon/src/mc_tools.jl:197](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/mc_tools.jl#L197)
+[QuantEcon/src/mc_tools.jl:197](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/mc_tools.jl#L197)
 
 ---
 
@@ -874,7 +930,7 @@ None modifies `samples` in place
 
 
 *source:*
-[QuantEcon/src/mc_tools.jl:286](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/mc_tools.jl#L286)
+[QuantEcon/src/mc_tools.jl:286](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/mc_tools.jl#L286)
 
 ---
 
@@ -898,7 +954,7 @@ be an integer between 1 and `n_states(mc)`
 
 
 *source:*
-[QuantEcon/src/mc_tools.jl:238](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/mc_tools.jl#L238)
+[QuantEcon/src/mc_tools.jl:238](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/mc_tools.jl#L238)
 
 ---
 
@@ -922,7 +978,7 @@ probability of being in seach state in the initial period
 
 
 *source:*
-[QuantEcon/src/mc_tools.jl:265](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/mc_tools.jl#L265)
+[QuantEcon/src/mc_tools.jl:265](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/mc_tools.jl#L265)
 
 ---
 
@@ -946,7 +1002,7 @@ probability of being in seach state in the initial period
 
 
 *source:*
-[QuantEcon/src/mc_tools.jl:265](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/mc_tools.jl#L265)
+[QuantEcon/src/mc_tools.jl:265](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/mc_tools.jl#L265)
 
 ---
 
@@ -970,7 +1026,7 @@ be an integer between 1 and `n_states(mc)`
 
 
 *source:*
-[QuantEcon/src/mc_tools.jl:238](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/mc_tools.jl#L238)
+[QuantEcon/src/mc_tools.jl:238](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/mc_tools.jl#L238)
 
 ---
 
@@ -994,7 +1050,7 @@ be an integer between 1 and `n_states(mc)`
 
 
 *source:*
-[QuantEcon/src/mc_tools.jl:238](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/mc_tools.jl#L238)
+[QuantEcon/src/mc_tools.jl:238](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/mc_tools.jl#L238)
 
 ---
 
@@ -1046,7 +1102,7 @@ double optimal linear regulator problem.
 
 
 *source:*
-[QuantEcon/src/lqnash.jl:57](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/lqnash.jl#L57)
+[QuantEcon/src/lqnash.jl:57](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/lqnash.jl#L57)
 
 ---
 
@@ -1065,7 +1121,7 @@ Evaluate the pdf of the distributions at the points 0, 1, ..., k
 
 
 *source:*
-[QuantEcon/src/distributions.jl:64](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/distributions.jl#L64)
+[QuantEcon/src/distributions.jl:64](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/distributions.jl#L64)
 
 ---
 
@@ -1099,7 +1155,7 @@ Finance, MIT Press, 2002.
 
 
 *source:*
-[QuantEcon/src/quad.jl:693](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/quad.jl#L693)
+[QuantEcon/src/quad.jl:693](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/quad.jl#L693)
 
 ---
 
@@ -1133,7 +1189,7 @@ Finance, MIT Press, 2002.
 
 
 *source:*
-[QuantEcon/src/quad.jl:668](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/quad.jl#L668)
+[QuantEcon/src/quad.jl:668](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/quad.jl#L668)
 
 ---
 
@@ -1165,7 +1221,7 @@ function
 
 
 *source:*
-[QuantEcon/src/robustlq.jl:154](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/robustlq.jl#L154)
+[QuantEcon/src/robustlq.jl:154](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/robustlq.jl#L154)
 
 ---
 
@@ -1199,7 +1255,7 @@ function
 
 
 *source:*
-[QuantEcon/src/robustlq.jl:202](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/robustlq.jl#L202)
+[QuantEcon/src/robustlq.jl:202](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/robustlq.jl#L202)
 
 ---
 
@@ -1233,7 +1289,7 @@ function
 
 
 *source:*
-[QuantEcon/src/robustlq.jl:202](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/robustlq.jl#L202)
+[QuantEcon/src/robustlq.jl:202](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/robustlq.jl#L202)
 
 ---
 
@@ -1261,7 +1317,7 @@ where ε_t ~ N (0, σ^2)
 
 
 *source:*
-[QuantEcon/src/markov_approx.jl:103](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/markov_approx.jl#L103)
+[QuantEcon/src/markov_approx.jl:103](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/markov_approx.jl#L103)
 
 ---
 
@@ -1289,7 +1345,7 @@ where ε_t ~ N (0, σ^2)
 
 
 *source:*
-[QuantEcon/src/markov_approx.jl:103](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/markov_approx.jl#L103)
+[QuantEcon/src/markov_approx.jl:103](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/markov_approx.jl#L103)
 
 ---
 
@@ -1311,7 +1367,7 @@ Compute a simulated sample path assuming Gaussian shocks.
 
 
 *source:*
-[QuantEcon/src/arma.jl:194](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/arma.jl#L194)
+[QuantEcon/src/arma.jl:194](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/arma.jl#L194)
 
 ---
 
@@ -1320,7 +1376,7 @@ Compute a simulated sample path assuming Gaussian shocks.
 Version of `smooth` where `window_len` and `window` are keyword arguments
 
 *source:*
-[QuantEcon/src/estspec.jl:70](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/estspec.jl#L70)
+[QuantEcon/src/estspec.jl:70](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/estspec.jl#L70)
 
 ---
 
@@ -1341,7 +1397,7 @@ are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`
 
 
 *source:*
-[QuantEcon/src/estspec.jl:30](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/estspec.jl#L30)
+[QuantEcon/src/estspec.jl:30](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/estspec.jl#L30)
 
 ---
 
@@ -1362,7 +1418,7 @@ are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`
 
 
 *source:*
-[QuantEcon/src/estspec.jl:30](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/estspec.jl#L30)
+[QuantEcon/src/estspec.jl:30](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/estspec.jl#L30)
 
 ---
 
@@ -1396,7 +1452,7 @@ for convergence that the eigenvalues of `B` have moduli bounded by unity
 
 
 *source:*
-[QuantEcon/src/matrix_eqn.jl:30](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/matrix_eqn.jl#L30)
+[QuantEcon/src/matrix_eqn.jl:30](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/matrix_eqn.jl#L30)
 
 ---
 
@@ -1430,7 +1486,7 @@ for convergence that the eigenvalues of `B` have moduli bounded by unity
 
 
 *source:*
-[QuantEcon/src/matrix_eqn.jl:30](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/matrix_eqn.jl#L30)
+[QuantEcon/src/matrix_eqn.jl:30](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/matrix_eqn.jl#L30)
 
 ---
 
@@ -1470,7 +1526,7 @@ WEIGHTING MATRICES." Taiwanese Journal of Mathematics 14, no. 3A (2010): pp-935.
 
 
 *source:*
-[QuantEcon/src/matrix_eqn.jl:96](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/matrix_eqn.jl#L96)
+[QuantEcon/src/matrix_eqn.jl:96](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/matrix_eqn.jl#L96)
 
 ---
 
@@ -1510,7 +1566,7 @@ WEIGHTING MATRICES." Taiwanese Journal of Mathematics 14, no. 3A (2010): pp-935.
 
 
 *source:*
-[QuantEcon/src/matrix_eqn.jl:96](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/matrix_eqn.jl#L96)
+[QuantEcon/src/matrix_eqn.jl:96](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/matrix_eqn.jl#L96)
 
 ---
 
@@ -1543,7 +1599,46 @@ then the function computes the response at the frequencies given by the array
 
 
 *source:*
-[QuantEcon/src/arma.jl:116](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/arma.jl#L116)
+[QuantEcon/src/arma.jl:116](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/arma.jl#L116)
+
+---
+
+<a id="method__stationary_values.1" class="lexicon_definition"></a>
+#### stationary_values!(lq::QuantEcon.LQ) [¶](#method__stationary_values.1)
+Computes value and policy functions in infinite horizon model
+
+##### Arguments
+
+- `lq::LQ` : instance of `LQ` type
+
+##### Returns
+
+- `P::ScalarOrArray` : n x n matrix in value function representation
+V(x) = x'Px + d
+- `d::Real` : Constant in value function representation
+- `F::ScalarOrArray` : Policy rule that specifies optimal control in each period
+
+##### Notes
+
+This function updates the `P`, `d`, and `F` fields on the `lq` instance in
+addition to returning them
+
+
+
+*source:*
+[QuantEcon/src/lqcontrol.jl:204](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/lqcontrol.jl#L204)
+
+---
+
+<a id="method__stationary_values.2" class="lexicon_definition"></a>
+#### stationary_values(lq::QuantEcon.LQ) [¶](#method__stationary_values.2)
+Non-mutating routine for solving for `P`, `d`, and `F` in infinite horizon model
+
+See docstring for stationary_values! for more explanation
+
+
+*source:*
+[QuantEcon/src/lqcontrol.jl:229](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/lqcontrol.jl#L229)
 
 ---
 
@@ -1574,7 +1669,7 @@ should span
 
 
 *source:*
-[QuantEcon/src/markov_approx.jl:41](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/markov_approx.jl#L41)
+[QuantEcon/src/markov_approx.jl:41](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/markov_approx.jl#L41)
 
 ---
 
@@ -1605,7 +1700,7 @@ should span
 
 
 *source:*
-[QuantEcon/src/markov_approx.jl:41](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/markov_approx.jl#L41)
+[QuantEcon/src/markov_approx.jl:41](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/markov_approx.jl#L41)
 
 ---
 
@@ -1636,7 +1731,33 @@ should span
 
 
 *source:*
-[QuantEcon/src/markov_approx.jl:41](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/markov_approx.jl#L41)
+[QuantEcon/src/markov_approx.jl:41](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/markov_approx.jl#L41)
+
+---
+
+<a id="method__update_values.1" class="lexicon_definition"></a>
+#### update_values!(lq::QuantEcon.LQ) [¶](#method__update_values.1)
+Update `P` and `d` from the value function representation in finite horizon case
+
+##### Arguments
+
+- `lq::LQ` : instance of `LQ` type
+
+##### Returns
+
+- `P::ScalarOrArray` : n x n matrix in value function representation
+V(x) = x'Px + d
+- `d::Real` : Constant in value function representation
+
+##### Notes
+
+This function updates the `P` and `d` fields on the `lq` instance in addition to
+returning them
+
+
+
+*source:*
+[QuantEcon/src/lqcontrol.jl:162](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/lqcontrol.jl#L162)
 
 ---
 
@@ -1675,7 +1796,7 @@ The formula for computing q(x_0) is q(x_0) = x_0' Q x_0 + v where
 
 
 *source:*
-[QuantEcon/src/quadsums.jl:41](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/quadsums.jl#L41)
+[QuantEcon/src/quadsums.jl:41](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/quadsums.jl#L41)
 
 ---
 
@@ -1728,7 +1849,7 @@ quad_plot(lp)
 
 
 *source:*
-[QuantEcon/src/arma.jl:64](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/arma.jl#L64)
+[QuantEcon/src/arma.jl:64](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/arma.jl#L64)
 
 ---
 
@@ -1747,7 +1868,7 @@ See also http://en.wikipedia.org/wiki/Beta-binomial_distribution
 
 
 *source:*
-[QuantEcon/src/distributions.jl:27](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/distributions.jl#L27)
+[QuantEcon/src/distributions.jl:27](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/distributions.jl#L27)
 
 ---
 
@@ -1763,7 +1884,7 @@ vector of probabilities given by q.
 
 
 *source:*
-[QuantEcon/src/discrete_rv.jl:31](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/discrete_rv.jl#L31)
+[QuantEcon/src/discrete_rv.jl:31](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/discrete_rv.jl#L31)
 
 ---
 
@@ -1778,7 +1899,7 @@ observations.
 
 
 *source:*
-[QuantEcon/src/ecdf.jl:20](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/ecdf.jl#L20)
+[QuantEcon/src/ecdf.jl:20](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/ecdf.jl#L20)
 
 ---
 
@@ -1797,7 +1918,64 @@ any kind of `AbstractArray` and will be coerced into an `n x 1` vector.
 
 
 *source:*
-[QuantEcon/src/lae.jl:34](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/lae.jl#L34)
+[QuantEcon/src/lae.jl:34](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/lae.jl#L34)
+
+---
+
+<a id="type__lq.1" class="lexicon_definition"></a>
+#### QuantEcon.LQ [¶](#type__lq.1)
+Linear quadratic optimal control of either infinite or finite horizon
+
+The infinite horizon problem can be written
+
+    min E sum_{t=0}^{infty} beta^t r(x_t, u_t)
+
+with
+
+    r(x_t, u_t) := x_t' R x_t + u_t' Q u_t + 2 u_t' N x_t
+
+The finite horizon form is
+
+    min E sum_{t=0}^{T-1} beta^t r(x_t, u_t) + beta^T x_T' R_f x_T
+
+Both are minimized subject to the law of motion
+
+    x_{t+1} = A x_t + B u_t + C w_{t+1}
+
+Here x is n x 1, u is k x 1, w is j x 1 and the matrices are conformable for
+these dimensions.  The sequence {w_t} is assumed to be white noise, with zero
+mean and E w_t w_t' = I, the j x j identity.
+
+For this model, the time t value (i.e., cost-to-go) function V_t takes the form
+
+    x' P_T x + d_T
+
+and the optimal policy is of the form u_T = -F_T x_T.  In the infinite horizon
+case, V, P, d and F are all stationary.
+
+##### Fields
+
+- `Q::ScalarOrArray` : k x k payoff coefficient for control variable u. Must be
+symmetric and nonnegative definite
+- `R::ScalarOrArray` : n x n payoff coefficient matrix for state variable x.
+Must be symmetric and nonnegative definite
+- `A::ScalarOrArray` : n x n coefficient on state in state transition
+- `B::ScalarOrArray` : n x k coefficient on control in state transition
+- `C::ScalarOrArray` : n x j coefficient on random shock in state transition
+- `N::ScalarOrArray` : k x n cross product in payoff equation
+- `bet::Real` : Discount factor in [0, 1]
+- `capT::Union(Int, Nothing)` : Terminal period in finite horizon problem
+- `rf::ScalarOrArray` : n x n terminal payoff in finite horizon problem. Must be
+symmetric and nonnegative definite
+- `P::ScalarOrArray` : n x n matrix in value function representation
+V(x) = x'Px + d
+- `d::Real` : Constant in value function representation
+- `F::ScalarOrArray` : Policy rule that specifies optimal control in each period
+
+
+
+*source:*
+[QuantEcon/src/lqcontrol.jl:67](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/lqcontrol.jl#L67)
 
 ---
 
@@ -1816,7 +1994,7 @@ positive, and all rows must sum to unity
 
 
 *source:*
-[QuantEcon/src/mc_tools.jl:30](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/mc_tools.jl#L30)
+[QuantEcon/src/mc_tools.jl:30](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/mc_tools.jl#L30)
 
 ---
 
@@ -1852,7 +2030,7 @@ the state space system. `C` should be n x j
 
 
 *source:*
-[QuantEcon/src/robustlq.jl:44](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/robustlq.jl#L44)
+[QuantEcon/src/robustlq.jl:44](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/robustlq.jl#L44)
 
 ## Internal
 
@@ -1884,7 +2062,7 @@ University Press, 2009.
 
 
 *source:*
-[QuantEcon/src/mc_tools.jl:139](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/mc_tools.jl#L139)
+[QuantEcon/src/mc_tools.jl:139](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/mc_tools.jl#L139)
 
 ---
 
@@ -1914,7 +2092,156 @@ University Press, 2009.
 
 
 *source:*
-[QuantEcon/src/mc_tools.jl:139](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/mc_tools.jl#L139)
+[QuantEcon/src/mc_tools.jl:139](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/mc_tools.jl#L139)
+
+---
+
+<a id="method___compute_sequence.1" class="lexicon_definition"></a>
+#### _compute_sequence{T}(lq::QuantEcon.LQ,  x0::Array{T, 1},  policies) [¶](#method___compute_sequence.1)
+Private method implementing `compute_sequence` when state is a scalar
+
+
+*source:*
+[QuantEcon/src/lqcontrol.jl:270](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/lqcontrol.jl#L270)
+
+---
+
+<a id="method___compute_sequence.2" class="lexicon_definition"></a>
+#### _compute_sequence{T}(lq::QuantEcon.LQ,  x0::T,  policies) [¶](#method___compute_sequence.2)
+Private method implementing `compute_sequence` when state is a scalar
+
+
+*source:*
+[QuantEcon/src/lqcontrol.jl:247](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/lqcontrol.jl#L247)
+
+---
+
+<a id="method__call.1" class="lexicon_definition"></a>
+#### call(::Type{QuantEcon.LQ},  Q::Union{T, Array{T, N}},  R::Union{T, Array{T, N}},  A::Union{T, Array{T, N}},  B::Union{T, Array{T, N}}) [¶](#method__call.1)
+Version of default constuctor making `bet` `capT` `rf` keyword arguments
+
+
+
+*source:*
+[QuantEcon/src/lqcontrol.jl:131](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/lqcontrol.jl#L131)
+
+---
+
+<a id="method__call.2" class="lexicon_definition"></a>
+#### call(::Type{QuantEcon.LQ},  Q::Union{T, Array{T, N}},  R::Union{T, Array{T, N}},  A::Union{T, Array{T, N}},  B::Union{T, Array{T, N}},  C::Union{T, Array{T, N}}) [¶](#method__call.2)
+Version of default constuctor making `bet` `capT` `rf` keyword arguments
+
+
+
+*source:*
+[QuantEcon/src/lqcontrol.jl:131](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/lqcontrol.jl#L131)
+
+---
+
+<a id="method__call.3" class="lexicon_definition"></a>
+#### call(::Type{QuantEcon.LQ},  Q::Union{T, Array{T, N}},  R::Union{T, Array{T, N}},  A::Union{T, Array{T, N}},  B::Union{T, Array{T, N}},  C::Union{T, Array{T, N}},  N::Union{T, Array{T, N}}) [¶](#method__call.3)
+Version of default constuctor making `bet` `capT` `rf` keyword arguments
+
+
+
+*source:*
+[QuantEcon/src/lqcontrol.jl:131](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/lqcontrol.jl#L131)
+
+---
+
+<a id="method__call.4" class="lexicon_definition"></a>
+#### call(::Type{QuantEcon.LQ},  Q::Union{T, Array{T, N}},  R::Union{T, Array{T, N}},  A::Union{T, Array{T, N}},  B::Union{T, Array{T, N}},  C::Union{T, Array{T, N}},  N::Union{T, Array{T, N}},  bet::Union{T, Array{T, N}}) [¶](#method__call.4)
+Main constructor for LQ type
+
+Specifies default argumets for all fields not part of the payoff function or
+transition equation.
+
+##### Arguments
+
+- `Q::ScalarOrArray` : k x k payoff coefficient for control variable u. Must be
+symmetric and nonnegative definite
+- `R::ScalarOrArray` : n x n payoff coefficient matrix for state variable x.
+Must be symmetric and nonnegative definite
+- `A::ScalarOrArray` : n x n coefficient on state in state transition
+- `B::ScalarOrArray` : n x k coefficient on control in state transition
+- `;C::ScalarOrArray(zeros(size(R, 1)))` : n x j coefficient on random shock in
+state transition
+- `;N::ScalarOrArray(zeros(size(B,1), size(A, 2)))` : k x n cross product in
+payoff equation
+- `;bet::Real(1.0)` : Discount factor in [0, 1]
+- `capT::Union(Int, Nothing)(nothing)` : Terminal period in finite horizon
+problem
+- `rf::ScalarOrArray(fill(NaN, size(R)...))` : n x n terminal payoff in finite
+horizon problem. Must be symmetric and nonnegative definite.
+
+
+
+*source:*
+[QuantEcon/src/lqcontrol.jl:107](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/lqcontrol.jl#L107)
+
+---
+
+<a id="method__call.5" class="lexicon_definition"></a>
+#### call(::Type{QuantEcon.LQ},  Q::Union{T, Array{T, N}},  R::Union{T, Array{T, N}},  A::Union{T, Array{T, N}},  B::Union{T, Array{T, N}},  C::Union{T, Array{T, N}},  N::Union{T, Array{T, N}},  bet::Union{T, Array{T, N}},  capT::Union{Int64, Void}) [¶](#method__call.5)
+Main constructor for LQ type
+
+Specifies default argumets for all fields not part of the payoff function or
+transition equation.
+
+##### Arguments
+
+- `Q::ScalarOrArray` : k x k payoff coefficient for control variable u. Must be
+symmetric and nonnegative definite
+- `R::ScalarOrArray` : n x n payoff coefficient matrix for state variable x.
+Must be symmetric and nonnegative definite
+- `A::ScalarOrArray` : n x n coefficient on state in state transition
+- `B::ScalarOrArray` : n x k coefficient on control in state transition
+- `;C::ScalarOrArray(zeros(size(R, 1)))` : n x j coefficient on random shock in
+state transition
+- `;N::ScalarOrArray(zeros(size(B,1), size(A, 2)))` : k x n cross product in
+payoff equation
+- `;bet::Real(1.0)` : Discount factor in [0, 1]
+- `capT::Union(Int, Nothing)(nothing)` : Terminal period in finite horizon
+problem
+- `rf::ScalarOrArray(fill(NaN, size(R)...))` : n x n terminal payoff in finite
+horizon problem. Must be symmetric and nonnegative definite.
+
+
+
+*source:*
+[QuantEcon/src/lqcontrol.jl:107](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/lqcontrol.jl#L107)
+
+---
+
+<a id="method__call.6" class="lexicon_definition"></a>
+#### call(::Type{QuantEcon.LQ},  Q::Union{T, Array{T, N}},  R::Union{T, Array{T, N}},  A::Union{T, Array{T, N}},  B::Union{T, Array{T, N}},  C::Union{T, Array{T, N}},  N::Union{T, Array{T, N}},  bet::Union{T, Array{T, N}},  capT::Union{Int64, Void},  rf::Union{T, Array{T, N}}) [¶](#method__call.6)
+Main constructor for LQ type
+
+Specifies default argumets for all fields not part of the payoff function or
+transition equation.
+
+##### Arguments
+
+- `Q::ScalarOrArray` : k x k payoff coefficient for control variable u. Must be
+symmetric and nonnegative definite
+- `R::ScalarOrArray` : n x n payoff coefficient matrix for state variable x.
+Must be symmetric and nonnegative definite
+- `A::ScalarOrArray` : n x n coefficient on state in state transition
+- `B::ScalarOrArray` : n x k coefficient on control in state transition
+- `;C::ScalarOrArray(zeros(size(R, 1)))` : n x j coefficient on random shock in
+state transition
+- `;N::ScalarOrArray(zeros(size(B,1), size(A, 2)))` : k x n cross product in
+payoff equation
+- `;bet::Real(1.0)` : Discount factor in [0, 1]
+- `capT::Union(Int, Nothing)(nothing)` : Terminal period in finite horizon
+problem
+- `rf::ScalarOrArray(fill(NaN, size(R)...))` : n x n terminal payoff in finite
+horizon problem. Must be symmetric and nonnegative definite.
+
+
+
+*source:*
+[QuantEcon/src/lqcontrol.jl:107](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/lqcontrol.jl#L107)
 
 ---
 
@@ -1934,7 +2261,7 @@ irreducible subsets of the transition matrix for p
 
 
 *source:*
-[QuantEcon/src/mc_tools.jl:154](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/mc_tools.jl#L154)
+[QuantEcon/src/mc_tools.jl:154](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/mc_tools.jl#L154)
 
 ---
 
@@ -1943,5 +2270,5 @@ irreducible subsets of the transition matrix for p
 Number of states in the markov chain `mc`
 
 *source:*
-[QuantEcon/src/mc_tools.jl:46](https://github.com/QuantEcon/QuantEcon.jl/tree/5494856f3540cc39bff854e23d41af47d4800ff5/src/mc_tools.jl#L46)
+[QuantEcon/src/mc_tools.jl:46](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/mc_tools.jl#L46)
 
