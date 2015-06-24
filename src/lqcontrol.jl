@@ -34,11 +34,11 @@ function LQ(Q::ScalarOrArray,
             R::ScalarOrArray,
             A::ScalarOrArray,
             B::ScalarOrArray,
-			C::ScalarOrArray          = zeros(size(R, 1)),
-			N::ScalarOrArray          = zero(B'A),
-			bet::ScalarOrArray        = 1.0,
-			capT::Union(Int, Nothing) = nothing,
-			rf::ScalarOrArray         = fill(NaN, size(R)...))
+            C::ScalarOrArray          = zeros(size(R, 1)),
+            N::ScalarOrArray          = zero(B'A),
+            bet::ScalarOrArray        = 1.0,
+            capT::Union(Int, Nothing) = nothing,
+            rf::ScalarOrArray         = fill(NaN, size(R)...))
 
     k = size(Q, 1)
     n = size(R, 1)
@@ -52,15 +52,15 @@ end
 
 # make kwarg version
 function LQ(Q::ScalarOrArray,
-			R::ScalarOrArray,
-			A::ScalarOrArray,
-			B::ScalarOrArray,
-			C::ScalarOrArray          = zeros(size(R, 1)),
-			N::ScalarOrArray          = zero(B'A);
-			bet::ScalarOrArray        = 1.0,
-			capT::Union(Int, Nothing) = nothing,
-			rf::ScalarOrArray         = fill(NaN, size(R)...))
-	LQ(Q, R, A, B, C, N, bet, capT, rf)
+            R::ScalarOrArray,
+            A::ScalarOrArray,
+            B::ScalarOrArray,
+            C::ScalarOrArray          = zeros(size(R, 1)),
+            N::ScalarOrArray          = zero(B'A);
+            bet::ScalarOrArray        = 1.0,
+            capT::Union(Int, Nothing) = nothing,
+            rf::ScalarOrArray         = fill(NaN, size(R)...))
+    LQ(Q, R, A, B, C, N, bet, capT, rf)
 end
 
 function update_values!(lq::LQ)
@@ -107,15 +107,15 @@ function stationary_values!(lq::LQ)
 end
 
 function stationary_values(lq::LQ)
-	_lq = LQ(copy(lq.Q),
-			 copy(lq.R),
-			 copy(lq.A),
-			 copy(lq.B),
-			 copy(lq.C),
-			 copy(lq.N),
-			 copy(lq.bet),
-			 lq.capT,
-			 copy(lq.rf))
+    _lq = LQ(copy(lq.Q),
+             copy(lq.R),
+             copy(lq.A),
+             copy(lq.B),
+             copy(lq.C),
+             copy(lq.N),
+             copy(lq.bet),
+             lq.capT,
+             copy(lq.rf))
 
     stationary_values!(_lq)
     return _lq.P, _lq.F, _lq.d
@@ -123,14 +123,14 @@ end
 
 # Dispatch for a scalar problem
 function _compute_sequence{T}(lq::LQ, x0::T, policies)
-	capT = length(policies)
+    capT = length(policies)
 
-	x_path = Array(T, capT+1)
-	u_path = Array(T, capT)
+    x_path = Array(T, capT+1)
+    u_path = Array(T, capT)
 
-	x_path[1] = x0
-	u_path[1] = -(first(policies)*x0)
-	w_path    = lq.C * randn(capT+1)
+    x_path[1] = x0
+    u_path[1] = -(first(policies)*x0)
+    w_path    = lq.C * randn(capT+1)
 
     for t = 2:capT
         f = policies[t]
@@ -154,8 +154,8 @@ function _compute_sequence{T}(lq::LQ, x0::Vector{T}, policies)
     u_path = Array(T, k, capT)
     w_path = [vec(C*randn(j)) for i=1:(capT+1)]
 
-	x_path[:, 1] = x0
-	u_path[:, 1] = -(first(policies)*x0)
+    x_path[:, 1] = x0
+    u_path[:, 1] = -(first(policies)*x0)
 
     for t = 2:capT
         f = policies[t]
@@ -182,5 +182,5 @@ function compute_sequence(lq::LQ, x0::ScalarOrArray, ts_length=100)
         end
     end
 
-	_compute_sequence(lq, x0, policies)
+    _compute_sequence(lq, x0, policies)
 end
