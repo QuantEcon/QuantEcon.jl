@@ -20,7 +20,7 @@ B = [-1.0, 0.0]
 C = [sigma, 0.0]
 
 # == Compute solutions and simulate == #
-lq = LQ(Q, R, A, B, C, bet, T, Rf)
+lq = LQ(Q, R, A, B, C; bet=bet, capT=T, rf=Rf)
 x0 = [0.0, 1.0]
 xp, up, wp = compute_sequence(lq, x0)
 

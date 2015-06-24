@@ -16,90 +16,67 @@ http://quant-econ.net/lqcontrol.html
 =#
 
 type LQ
-    Q::Matrix
-    R::Matrix
-    A::Matrix
-    B::Matrix
-    C::Union(Nothing, Matrix)
+    Q::ScalarOrArray
+    R::ScalarOrArray
+    A::ScalarOrArray
+    B::ScalarOrArray
+    C::ScalarOrArray
+    N::ScalarOrArray
     bet::Real
-    T::Union(Int, Nothing)
-    Rf::Matrix
-    k::Int
-    n::Int
-    j::Int
-    P::Matrix
+    capT::Union(Int, Nothing) # terminal period
+    rf::ScalarOrArray
+    P::ScalarOrArray
     d::Real
-    F::Matrix
+    F::ScalarOrArray # policy rule
 end
-
 
 function LQ(Q::ScalarOrArray,
             R::ScalarOrArray,
             A::ScalarOrArray,
             B::ScalarOrArray,
-            C::Union(Nothing, ScalarOrArray)=nothing,
-            bet::ScalarOrArray=1.0,
-            T::Union(Int, Nothing)=nothing,
-            Rf::Union(Nothing, ScalarOrArray)=nothing)
+            C::ScalarOrArray          = zeros(size(R, 1)),
+            N::ScalarOrArray          = zero(B'A),
+            bet::ScalarOrArray        = 1.0,
+            capT::Union(Int, Nothing) = nothing,
+            rf::ScalarOrArray         = fill(NaN, size(R)...))
+
     k = size(Q, 1)
     n = size(R, 1)
-
-    if C == nothing
-        j = 1
-        C = zeros(n, j)
-    else
-        j = size(C, 2)
-        if j == 1
-            C = reshape([C], n, j)  # make sure C is a Matrix
-        end
-    end
-
-    if Rf == nothing
-        Rf = fill(NaN, size(R)...)
-    end
-
-    # Reshape arrays to make sure they are Matrix
-    Q = reshape([Q], k, k)
-    R = reshape([R], n, n)
-    A = reshape([A], n, n)
-    B = reshape([B], n, k)
-    Rf = reshape([Rf], n, n)
-
-    F = zeros(Float64, k, n)
-    P = copy(Rf)
+    F = k==n==1 ? zero(Float64) : zeros(Float64, k, n)
+    P = copy(rf)
     d = 0.0
 
-    LQ(Q, R, A, B, C, bet, T, Rf, k, n, j, P, d, F)
+    LQ(Q, R, A, B, C, N, bet, capT, rf, P, d, F)
 end
+
 
 # make kwarg version
 function LQ(Q::ScalarOrArray,
             R::ScalarOrArray,
             A::ScalarOrArray,
-            B::ScalarOrArray;
-            C::Union(Nothing, ScalarOrArray)=nothing,
-            bet::ScalarOrArray=1.0,
-            T::Union(Int, Nothing)=nothing,
-            Rf::Union(Nothing, ScalarOrArray)=nothing)
-    LQ(Q, R, A, B, C, bet, T, Rf)
+            B::ScalarOrArray,
+            C::ScalarOrArray          = zeros(size(R, 1)),
+            N::ScalarOrArray          = zero(B'A);
+            bet::ScalarOrArray        = 1.0,
+            capT::Union(Int, Nothing) = nothing,
+            rf::ScalarOrArray         = fill(NaN, size(R)...))
+    LQ(Q, R, A, B, C, N, bet, capT, rf)
 end
-
-
 
 function update_values!(lq::LQ)
     # Simplify notation
-    Q, R, A, B, C, P, d = lq.Q, lq.R, lq.A, lq.B, lq.C, lq.P, lq.d
+    Q, R, A, B, N, C, P, d = lq.Q, lq.R, lq.A, lq.B, lq.N, lq.C, lq.P, lq.d
 
     # Some useful matrices
-    S1 = Q .+ lq.bet .* (B' * P * B)
-    S2 = lq.bet .* (B' * P * A)
-    S3 = lq.bet .* (A' * P * A)
+    s1 = Q + lq.bet * (B'P*B)
+    s2 = lq.bet * (B'P*A) + N
+    s3 = lq.bet * (A'P*A)
 
     # Compute F as (Q + B'PB)^{-1} (beta B'PA)
-    lq.F = S1 \ S2
+    lq.F = s1 \ s2
 
     # Shift P back in time one step
-    new_P = R - S2'*lq.F + S3
+    new_P = R - s2'lq.F + s3
 
     # Recalling that trace(AB) = trace(BA)
     new_d = lq.bet * (d + trace(P * C * C'))
@@ -107,81 +84,103 @@ function update_values!(lq::LQ)
     # Set new state
     lq.P = new_P
     lq.d = new_d
-    return nothing
 end
-
 
 function stationary_values!(lq::LQ)
     # simplify notation
-    Q, R, A, B, C = lq.Q, lq.R, lq.A, lq.B, lq.C
+    Q, R, A, B, N, C = lq.Q, lq.R, lq.A, lq.B, lq.N, lq.C
 
     # solve Riccati equation, obtain P
-    A0, B0 = sqrt(lq.bet) .* A, sqrt(lq.bet) .* B
-    P = solve_discrete_riccati(A0, B0, R, Q)
+    A0, B0 = sqrt(lq.bet) * A, sqrt(lq.bet) * B
+    P = solve_discrete_riccati(A0, B0, R, Q, N)
 
     # Compute F
-    S1 = Q .+ lq.bet .* (B' * P * B)
-    S2 = lq.bet .* (B' * P * A)
-    F = S1 \ S2
+    s1 = Q + lq.bet * (B' * P * B)
+    s2 = lq.bet * (B' * P * A) + N
+    F = s1 \ s2
 
     # Compute d
-    d = lq.bet .* trace(P * C * C') / (1 - lq.bet)
+    d = lq.bet * trace(P * C * C') / (1 - lq.bet)
 
     # Bind states
     lq.P, lq.F, lq.d = P, F, d
-    nothing
 end
 
 function stationary_values(lq::LQ)
-    stationary_values!(lq)
-    return lq.P, lq.F, lq.d
+    _lq = LQ(copy(lq.Q),
+             copy(lq.R),
+             copy(lq.A),
+             copy(lq.B),
+             copy(lq.C),
+             copy(lq.N),
+             copy(lq.bet),
+             lq.capT,
+             copy(lq.rf))
+
+    stationary_values!(_lq)
+    return _lq.P, _lq.F, _lq.d
 end
 
+# Dispatch for a scalar problem
+function _compute_sequence{T}(lq::LQ, x0::T, policies)
+    capT = length(policies)
+
+    x_path = Array(T, capT+1)
+    u_path = Array(T, capT)
+
+    x_path[1] = x0
+    u_path[1] = -(first(policies)*x0)
+    w_path    = lq.C * randn(capT+1)
+
+    for t = 2:capT
+        f = policies[t]
+        x_path[t] = lq.A*x_path[t-1] + lq.B*u_path[t-1] + w_path[t]
+        u_path[t] = -(f*x_path[t])
+    end
+    x_path[end] = lq.A*x_path[capT] + lq.B*u_path[capT] + w_path[end]
+
+    x_path, u_path, w_path
+end
+
+# Dispatch for a vector problem
+function _compute_sequence{T}(lq::LQ, x0::Vector{T}, policies)
+    # Ensure correct dimensionality
+    n, j, k = size(lq.C, 1), size(lq.C, 2), size(lq.B, 2)
+    capT = length(policies)
+
+    A, B, C = lq.A, reshape(lq.B, n, k), reshape(lq.C, n, j)
+
+    x_path = Array(T, n, capT+1)
+    u_path = Array(T, k, capT)
+    w_path = [vec(C*randn(j)) for i=1:(capT+1)]
+
+    x_path[:, 1] = x0
+    u_path[:, 1] = -(first(policies)*x0)
+
+    for t = 2:capT
+        f = policies[t]
+        x_path[:, t] = A*x_path[: ,t-1] + B*u_path[:, t-1] + w_path[t]
+        u_path[:, t] = -(f*x_path[:, t])
+    end
+    x_path[:, end] = A*x_path[:, capT] + B*u_path[:, capT] + w_path[end]
+
+    x_path, u_path, w_path
+end
 
 function compute_sequence(lq::LQ, x0::ScalarOrArray, ts_length=100)
-    # simplify notation
-    Q, R, A, B, C = lq.Q, lq.R, lq.A, lq.B, lq.C
-
-    # Preliminaries,
-    if lq.T != nothing
-        # finite horizon case
-        T = min(ts_length, lq.T)
-        lq.P, lq.d = lq.Rf, 0.0
-    else
-        # infinite horizon case
-        T = ts_length
-        stationary_values!(lq)
-    end
-
-    # Set up initial condition and arrays to store paths
-    x0 = reshape([x0], lq.n, 1)  # make sure x0 is a column vector
-    x_path = Array(eltype(x0), lq.n, T+1)
-    u_path = Array(eltype(x0), lq.k, T)
-    w_path = C * randn(lq.j, T+1)
+    capT = min(ts_length, lq.capT)
 
     # Compute and record the sequence of policies
-    policies = Array(typeof(lq.F), T)
-
-    for t=1:T
-        if lq.T != nothing
+    if isa(lq.capT, Nothing)
+        stationary_values!(lq)
+        policies = fill(lq.F, capT)
+    else
+        policies = Array(typeof(lq.F), capT)
+        for t = 1:capT
             update_values!(lq)
+            policies[t] = lq.F
         end
-        policies[t] = lq.F
     end
 
-    # Use policy sequence to generate states and controls
-    F = pop!(policies)
-    x_path[:, 1] = x0
-    u_path[:, 1] = - (F * x0)
-
-    for t=2:T
-        F = pop!(policies)
-        Ax, Bu = A * x_path[:, t-1], B * u_path[:, t-1]
-        x_path[:, t] = Ax .+ Bu .+ w_path[:, t]
-        u_path[:, t] = - (F * x_path[:, t])
-    end
-
-    Ax, Bu = A * x_path[:, T], B * u_path[:, T]
-    x_path[:, T+1] = Ax .+ Bu .+ w_path[:, T+1]
-    return x_path, u_path, w_path
+    _compute_sequence(lq, x0, policies)
 end
