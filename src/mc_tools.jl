@@ -152,7 +152,7 @@ irreducible subsets of the transition matrix for p
 
 """
 function irreducible_subsets(mc::MarkovChain)
-    p = similar(mc.p, Bool)
+    p = abs(mc.p) .> eps()
     g = simple_graph(n_states(mc))
     for i = 1:length(p)
         j,k = ind2sub(size(p),i) # j: node from, k: node to
