@@ -12,8 +12,8 @@ http://quant-econ.net/jl/finite_markov.html
 =#
 
 # new method to check if all elements of an array x are equal to p
-isapprox(x::Array,p::Number) = all([isapprox(x[i],p) for i=1:length(x)])
-isapprox(p::Number,x::Array) = isapprox(x,p)
+isapprox(x::Array, p::Number) = all([isapprox(x[i], p) for i=1:length(x)])
+isapprox(p::Number, x::Array) = isapprox(x, p)
 
 """
 Finite-state discrete-time Markov chain.
@@ -27,23 +27,26 @@ transitions.
 - `p::Matrix` The transition matrix. Must be square, all elements must be
 positive, and all rows must sum to unity
 """
-type MarkovChain
-    p::Matrix # valid stochastic matrix
+type MarkovChain{T<:Real}
+    p::Matrix{T} # valid stochastic matrix
 
-    function MarkovChain{T}(p::Matrix{T})
-        n,m = size(p)
+    function MarkovChain(p)
+        n, m = size(p)
 
         n != m && throw(ArgumentError("stochastic matrix must be square"))
         any(p .< 0) &&
             throw(ArgumentError("stochastic matrix must have nonnegative elements"))
-        isapprox(sum(p,2),one(T)) ||
+        isapprox(sum(p, 2), one(T)) ||
             throw(ArgumentError("stochastic matrix rows must sum to 1"))
         new(p)
     end
 end
 
+# Provide constructor that infers T from eltype of matrix
+MarkovChain{T<:Real}(p::Matrix{T}) = MarkovChain{T}(p)
+
 "Number of states in the markov chain `mc`"
-n_states(mc::MarkovChain) = size(mc.p,1)
+n_states(mc::MarkovChain) = size(mc.p, 1)
 
 function Base.show(io::IO, mc::MarkovChain)
     println(io, "Discrete Markov Chain")
@@ -53,11 +56,11 @@ end
 
 function eigen_solve{T}(p::Matrix{T})
     ef = eigfact(p')
-    isunit = map(x->isapprox(x,1), ef.values)
+    isunit = map(x->isapprox(x, 1), ef.values)
     x = real(ef.vectors[:, isunit])
-    x ./= sum(x,1) # normalisation
+    x ./= sum(x, 1) # normalisation
     for i = 1:length(x)
-        x[i] = isapprox(x[i],zero(T)) ? zero(T) : x[i]
+        x[i] = isapprox(x[i], zero(T)) ? zero(T) : x[i]
     end
     any(x .< 0) && warn("something has gone wrong with the eigen solve")
     x
@@ -65,21 +68,21 @@ end
 
 # function to solve x(P-I)=0 by lu decomposition
 function lu_solve{T}(p::Matrix{T})
-    n,m = size(p)
-    x   = vcat(Array(T,n-1),one(T))
+    n, m = size(p)
+    x   = vcat(Array(T, n-1), one(T))
     u   = lufact(p' - one(p))[:U]
     for i = n-1:-1:1 # backsubstitution
-        x[i] = -sum([x[j]*u[i,j] for j=i:n])/u[i,i]
+        x[i] = -sum([x[j]*u[i, j] for j=i:n])/u[i, i]
     end
-    x ./= norm(x,1) # normalisation
+    x ./= norm(x, 1) # normalisation
     for i = 1:length(x)
-        x[i] = isapprox(x[i],zero(T)) ? zero(T) : x[i]
+        x[i] = isapprox(x[i], zero(T)) ? zero(T) : x[i]
     end
     any(x .< 0) && warn("something has gone wrong with the lu solve")
     x
 end
 
-gth_solve{T<:Integer}(A::Matrix{T}) = gth_solve(convert(Array{Float64, 2},A))
+gth_solve{T<:Integer}(A::Matrix{T}) = gth_solve(convert(Array{Float64, 2}, A))
 
 function gth_solve{T<:Real}(A::AbstractMatrix{T})
     A1 = copy(A)
@@ -155,8 +158,8 @@ function irreducible_subsets(mc::MarkovChain)
     p = abs(mc.p) .> eps()
     g = simple_graph(n_states(mc))
     for i = 1:length(p)
-        j,k = ind2sub(size(p),i) # j: node from, k: node to
-        p[i] && add_edge!(g,j,k)
+        j, k = ind2sub(size(p), i) # j: node from, k: node to
+        p[i] && add_edge!(g, j, k)
     end
 
     classes = strongly_connected_components(g)
@@ -166,15 +169,15 @@ function irreducible_subsets(mc::MarkovChain)
     for class in classes
         sink = true
         for vertex in class # attempt to falsify class being a sink
-            targets = map(x->target(x,g),out_edges(vertex,g))
-            notsink = any(map(x->x∉class,targets))
+            targets = map(x->target(x, g), out_edges(vertex, g))
+            notsink = any(map(x->x∉class, targets))
 
             if notsink # are there any paths out class?
                 sink = false
                 break # stop looking
             end
         end
-        push!(sinks,sink)
+        push!(sinks, sink)
     end
     return classes[sinks]
 end
@@ -194,26 +197,26 @@ of the three `_solve` methods to use.
 distribution of `mc.p`
 
 """
-function mc_compute_stationary(mc::MarkovChain; method::Symbol=:gth)
+function mc_compute_stationary{T}(mc::MarkovChain{T}; method::Symbol=:gth)
     @compat solvers = Dict(:gth => gth_solve,
                            :lu => lu_solve,
                            :eigen => eigen_solve)
     solve = solvers[method]
 
-    p, T = mc.p, eltype(mc.p)
+    p = mc.p
     classes = irreducible_subsets(mc)
 
     # irreducible mc
     length(classes) == 1 && return solve(p)
 
     # reducible mc
-    stationary_dists = Array(T,n_states(mc),length(classes))
+    stationary_dists = Array(T, n_states(mc), length(classes))
     for i = 1:length(classes)
         class  = classes[i]
-        dist   = zeros(T,n_states(mc))
-        temp_p = p[class,class]
+        dist   = zeros(T, n_states(mc))
+        temp_p = p[class, class]
         dist[class] = solve(temp_p)
-        stationary_dists[:,i] = dist
+        stationary_dists[:, i] = dist
     end
     return stationary_dists
 end
@@ -239,7 +242,7 @@ function mc_sample_path(mc::MarkovChain,
                         init::Int=rand(1:n_states(mc)),
                         sample_size::Int=1000;
                         burn::Int=0)
-    samples = Array(Int,sample_size+1) # +1 extra for the init
+    samples = Array(Int, sample_size+1) # +1 extra for the init
     samples[1] = init
     mc_sample_path!(mc, samples)
     samples[burn+1:end]
@@ -265,7 +268,8 @@ probability of being in seach state in the initial period
 function mc_sample_path(mc::MarkovChain,
                         init::Vector,
                         sample_size::Int=1000; burn::Int=0)
-    init = map(Float64, init) # ensure floating point input for Categorical()
+    # ensure floating point input for Categorical()
+    init = convert(Vector{Float64}, init)
     mc_sample_path(mc, rand(Categorical(init)), sample_size, burn=burn)
 end
 
@@ -284,7 +288,8 @@ initial state and all other elements will be over-written.
 None modifies `samples` in place
 """
 function mc_sample_path!(mc::MarkovChain, samples::Array)
-    p       = map(Float64, mc.p) # ensure floating point input for Categorical()
+    # ensure floating point input for Categorical()
+    p       = convert(Matrix{Float64}, mc.p)
     dist    = [Categorical(vec(p[i, :])) for i=1:n_states(mc)]
     for t=2:length(samples)
         samples[t] = rand(dist[samples[t-1]])
