@@ -30,5 +30,6 @@ end
 
 ax[:scatter](x_vals, y_vals, z_vals, c="r", s = 60)
 
+P = MarkovChain(P)
 psi_star = mc_compute_stationary(P)
 ax[:scatter](psi_star[1], psi_star[2], psi_star[3], c="k", s = 60)
