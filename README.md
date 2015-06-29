@@ -17,8 +17,8 @@ Documentation for the library: [quantecon.github.io/QuantEcon.jl/](http://quante
 
 #### Current Build and Coverage Status:
 
-[![Build Status](https://travis-ci.org/QuantEcon/QuantEcon.jl.svg?branch=master)](https://travis-ci.org/spencerlyon2/QuantEcon.jl)
-[![Coverage Status](https://img.shields.io/coveralls/QuantEcon/QuantEcon.jl.svg)](https://coveralls.io/r/QuantEcon/QuantEcon.jl)
+[![Build Status](https://travis-ci.org/QuantEcon/QuantEcon.jl.svg?branch=master)](https://travis-ci.org/QuantEcon/QuantEcon.jl)
+[![Coverage Status](https://coveralls.io/repos/QuantEcon/QuantEcon.jl/badge.svg?branch=master)](https://coveralls.io/r/QuantEcon/QuantEcon.jl?branch=master)
 
 ## Additional Links
 
