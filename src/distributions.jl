@@ -8,12 +8,22 @@ Probability distributions useful in economics.
 References
 ----------
 
-Matches functionality of quantecon.distributions.py
-
 http://en.wikipedia.org/wiki/Beta-binomial_distribution
 
 =#
 
+"""
+The Beta-Binomial distribution
+
+##### Fields
+
+- `n, a, b::Float64` The three paramters to the distribution
+
+##### Notes
+
+See also http://en.wikipedia.org/wiki/Beta-binomial_distribution
+
+"""
 type BetaBinomial
     n::Integer
     a::Real
@@ -39,9 +49,21 @@ function skewness(d::BetaBinomial)
     t1 * t2
 end
 
+"""
+Evaluate the pdf of the distributions at the points 0, 1, ..., k
+
+##### Arguments
+
+`d::BetaBinomial`: Instance of `BetaBinomial` type
+
+##### Returns
+
+- `probs::vector{Float64}`: pdf of the distribution `d`, at `0:d.k`
+
+"""
 function pdf(d::BetaBinomial)
     n, a, b = d.n, d.a, d.b
-    k = [0:n]
+    k = 0:n
     binoms = Float64[binomial(n, i) for i in k]
     probs = binoms .* beta(k .+ a, n .- k .+ b) ./ beta(a, b)
 end

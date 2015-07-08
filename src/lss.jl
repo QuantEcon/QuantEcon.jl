@@ -14,9 +14,10 @@ The shocks {w_t} are iid and N(0, I)
 References
 ----------
 
-Simple port of the file quantecon.lss
+TODO: Come back and update to match `LinearStateSpace` type from py side
+TODO: Add docstrings
 
-http://quant-econ.net/linear_models.html
+http://quant-econ.net/jl/linear_models.html
 
 =#
 import Distributions: MultivariateNormal, rand

@@ -8,31 +8,45 @@ Tools for working with Markov Chains
 References
 ----------
 
-Simple port of the file quantecon.mc_tools
-
-http://quant-econ.net/finite_markov.html
+http://quant-econ.net/jl/finite_markov.html
 =#
 
 # new method to check if all elements of an array x are equal to p
-isapprox(x::Array,p::Number) = all([isapprox(x[i],p) for i=1:length(x)])
-isapprox(p::Number,x::Array) = isapprox(x,p)
+isapprox(x::Array, p::Number) = all([isapprox(x[i], p) for i=1:length(x)])
+isapprox(p::Number, x::Array) = isapprox(x, p)
 
-type MarkovChain
-    p::Matrix # valid stochastic matrix
+"""
+Finite-state discrete-time Markov chain.
 
-    function MarkovChain{T}(p::Matrix{T})
-        n,m = size(p)
+It stores useful information such as the stationary distributions, and
+communication, recurrent, and cyclic classes, and allows simulation of state
+transitions.
+
+##### Fields
+
+- `p::Matrix` The transition matrix. Must be square, all elements must be
+positive, and all rows must sum to unity
+"""
+type MarkovChain{T<:Real}
+    p::Matrix{T} # valid stochastic matrix
+
+    function MarkovChain(p)
+        n, m = size(p)
 
         n != m && throw(ArgumentError("stochastic matrix must be square"))
         any(p .< 0) &&
             throw(ArgumentError("stochastic matrix must have nonnegative elements"))
-        isapprox(sum(p,2),one(T)) ||
+        isapprox(sum(p, 2), one(T)) ||
             throw(ArgumentError("stochastic matrix rows must sum to 1"))
         new(p)
     end
 end
 
-n_states(mc::MarkovChain) = size(mc.p,1)
+# Provide constructor that infers T from eltype of matrix
+MarkovChain{T<:Real}(p::Matrix{T}) = MarkovChain{T}(p)
+
+"Number of states in the markov chain `mc`"
+n_states(mc::MarkovChain) = size(mc.p, 1)
 
 function Base.show(io::IO, mc::MarkovChain)
     println(io, "Discrete Markov Chain")
@@ -40,14 +54,13 @@ function Base.show(io::IO, mc::MarkovChain)
     println(io, mc.p)
 end
 
-# function to solve x(P-I)=0 by eigendecomposition
 function eigen_solve{T}(p::Matrix{T})
     ef = eigfact(p')
-    isunit = map(x->isapprox(x,1), ef.values)
+    isunit = map(x->isapprox(x, 1), ef.values)
     x = real(ef.vectors[:, isunit])
-    x ./= sum(x,1) # normalisation
+    x ./= sum(x, 1) # normalisation
     for i = 1:length(x)
-        x[i] = isapprox(x[i],zero(T)) ? zero(T) : x[i]
+        x[i] = isapprox(x[i], zero(T)) ? zero(T) : x[i]
     end
     any(x .< 0) && warn("something has gone wrong with the eigen solve")
     x
@@ -55,21 +68,21 @@ end
 
 # function to solve x(P-I)=0 by lu decomposition
 function lu_solve{T}(p::Matrix{T})
-    n,m = size(p)
-    x   = vcat(Array(T,n-1),one(T))
+    n, m = size(p)
+    x   = vcat(Array(T, n-1), one(T))
     u   = lufact(p' - one(p))[:U]
     for i = n-1:-1:1 # backsubstitution
-        x[i] = -sum([x[j]*u[i,j] for j=i:n])/u[i,i]
+        x[i] = -sum([x[j]*u[i, j] for j=i:n])/u[i, i]
     end
-    x ./= norm(x,1) # normalisation
+    x ./= norm(x, 1) # normalisation
     for i = 1:length(x)
-        x[i] = isapprox(x[i],zero(T)) ? zero(T) : x[i]
+        x[i] = isapprox(x[i], zero(T)) ? zero(T) : x[i]
     end
     any(x .< 0) && warn("something has gone wrong with the lu solve")
     x
 end
 
-gth_solve{T<:Integer}(A::Matrix{T}) = gth_solve(float64(A))
+gth_solve{T<:Integer}(A::Matrix{T}) = gth_solve(convert(Array{Float64, 2}, A))
 
 function gth_solve{T<:Real}(A::AbstractMatrix{T})
     A1 = copy(A)
@@ -103,13 +116,50 @@ function gth_solve{T<:Real}(A::AbstractMatrix{T})
     x / sum(x)
 end
 
-# find the reducible subsets of a markov chain
+"""
+solve x(P-I)=0 using either an eigendecomposition, lu factorization, or an
+algorithm presented by Grassmann-Taksar-Heyman (GTH)
+
+##### Arguments
+
+- `p::Matrix` : valid stochastic matrix
+
+##### Returns
+
+- `x::Matrix`: A matrix whose columns contain stationary vectors of `p`
+
+##### References
+
+The following references were consulted for the GTH algorithm
+
+- W. K. Grassmann, M. I. Taksar and D. P. Heyman, "Regenerative Analysis and
+Steady State Distributions for Markov Chains," Operations Research (1985),
+1107-1116.
+- W. J. Stewart, Probability, Markov Chains, Queues, and Simulation, Princeton
+University Press, 2009.
+
+"""
+[eigen_solve, lu_solve, gth_solve]
+
+"""
+Find the irreducible subsets of the `MarkovChain`
+
+##### Arguments
+
+- `mc::MarkovChain` : MarkovChain instance containing a valid stochastic matrix
+
+##### Returns
+
+- `x::Vector{Vector}`: A `Vector` containing `Vector{Int}`s that describe the
+irreducible subsets of the transition matrix for p
+
+"""
 function irreducible_subsets(mc::MarkovChain)
-    p = bool(mc.p)
+    p = abs(mc.p) .> eps()
     g = simple_graph(n_states(mc))
     for i = 1:length(p)
-        j,k = ind2sub(size(p),i) # j: node from, k: node to
-        p[i] && add_edge!(g,j,k)
+        j, k = ind2sub(size(p), i) # j: node from, k: node to
+        p[i] && add_edge!(g, j, k)
     end
 
     classes = strongly_connected_components(g)
@@ -119,78 +169,130 @@ function irreducible_subsets(mc::MarkovChain)
     for class in classes
         sink = true
         for vertex in class # attempt to falsify class being a sink
-            targets = map(x->target(x,g),out_edges(vertex,g))
-            notsink = any(map(x->x∉class,targets))
+            targets = map(x->target(x, g), out_edges(vertex, g))
+            notsink = any(map(x->x∉class, targets))
 
             if notsink # are there any paths out class?
                 sink = false
                 break # stop looking
             end
         end
-        push!(sinks,sink)
+        push!(sinks, sink)
     end
     return classes[sinks]
 end
 
-# mc_compute_stationary()
-# calculate the stationary distributions associated with a N-state markov chain
-# output is a N x M matrix where each column is a stationary distribution
-# currently using lu decomposition to solve p(P-I)=0
-function mc_compute_stationary(mc::MarkovChain; method=:gth)
-    @compat solvers = Dict(:gth => gth_solve, :lu => lu_solve,
+"""
+calculate the stationary distributions associated with a N-state markov chain
+
+##### Arguments
+
+- `mc::MarkovChain` : MarkovChain instance containing a valid stochastic matrix
+- `;method::Symbol(:gth)`: One of `gth`, `lu`, and `eigen`; specifying which
+of the three `_solve` methods to use.
+
+##### Returns
+
+- `dists::Matrix{Float64}`: N x M matrix where each column is a stationary
+distribution of `mc.p`
+
+"""
+function mc_compute_stationary{T}(mc::MarkovChain{T}; method::Symbol=:gth)
+    @compat solvers = Dict(:gth => gth_solve,
+                           :lu => lu_solve,
                            :eigen => eigen_solve)
     solve = solvers[method]
 
-    p, T = mc.p, eltype(mc.p)
+    p = mc.p
     classes = irreducible_subsets(mc)
 
     # irreducible mc
     length(classes) == 1 && return solve(p)
 
     # reducible mc
-    stationary_dists = Array(T,n_states(mc),length(classes))
+    stationary_dists = Array(T, n_states(mc), length(classes))
     for i = 1:length(classes)
         class  = classes[i]
-        dist   = zeros(T,n_states(mc))
-        temp_p = p[class,class]
+        dist   = zeros(T, n_states(mc))
+        temp_p = p[class, class]
         dist[class] = solve(temp_p)
-        stationary_dists[:,i] = dist
+        stationary_dists[:, i] = dist
     end
     return stationary_dists
 end
 
-# mc_sample_path()
-# simulate a discrete markov chain starting from some initial value
-# mc::MarkovChain
-# init::Int initial state (default: choose an initial state at random)
-# sample_size::Int number of samples to output (default: 1000)
+"""
+Simulate a Markov chain starting from an initial state
+
+##### Arguments
+
+- `mc::MarkovChain` : MarkovChain instance containing a valid stochastic matrix
+- `init::Int(rand(1:n_states(mc)))` : The index of the initial state. This should
+be an integer between 1 and `n_states(mc)`
+- `sample_size::Int(1000)`: The number of samples to collect
+- `;burn::Int(0)`: The burn in length. Routine drops first `burn` of the
+`sample_size` total samples collected
+
+##### Returns
+
+- `samples::Vector{Int}`: Vector of simulated states
+
+"""
 function mc_sample_path(mc::MarkovChain,
                         init::Int=rand(1:n_states(mc)),
                         sample_size::Int=1000;
                         burn::Int=0)
-    p       = float(mc.p) # ensure floating point input for Categorical()
-    dist    = [Categorical(vec(p[i,:])) for i=1:n_states(mc)]
-    samples = Array(Int,sample_size+1) # +1 extra for the init
+    samples = Array(Int, sample_size+1) # +1 extra for the init
     samples[1] = init
-    for t=2:length(samples)
-        last = samples[t-1]
-        samples[t]= rand(dist[last])
-    end
+    mc_sample_path!(mc, samples)
     samples[burn+1:end]
 end
 
-# starting from unknown state, given a distribution
+"""
+Simulate a Markov chain starting from an initial distribution
+
+##### Arguments
+
+- `mc::MarkovChain` : MarkovChain instance containing a valid stochastic matrix
+- `init::Vector` : A vector of length `n_state(mc)` specifying the number
+probability of being in seach state in the initial period
+- `sample_size::Int(1000)`: The number of samples to collect
+- `;burn::Int(0)`: The burn in length. Routine drops first `burn` of the
+`sample_size` total samples collected
+
+##### Returns
+
+- `samples::Vector{Int}`: Vector of simulated states
+
+"""
 function mc_sample_path(mc::MarkovChain,
                         init::Vector,
                         sample_size::Int=1000; burn::Int=0)
-    init = float(init) # ensure floating point input for Categorical()
+    # ensure floating point input for Categorical()
+    init = convert(Vector{Float64}, init)
     mc_sample_path(mc, rand(Categorical(init)), sample_size, burn=burn)
 end
 
-# simulate markov chain starting from some initial value. In other words
-# out[1] is already defined as the user wants it
-function mc_sample_path!(mc::MarkovChain, samples::Vector)
-    length(samples) < 2 &&
-        throw(ArgumentError("samples vector must have length greater than 2"))
-    samples = mc_sample_path(mc,samples[1],length(samples)-1)
+"""
+Fill `samples` with samples from the Markov chain `mc`
+
+##### Arguments
+
+- `mc::MarkovChain` : MarkovChain instance containing a valid stochastic matrix
+- `samples::Array{Int}` : Pre-allocated vector of integers to be filled with
+samples from the markov chain `mc`. The first element will be used as the
+initial state and all other elements will be over-written.
+
+##### Returns
+
+None modifies `samples` in place
+"""
+function mc_sample_path!(mc::MarkovChain, samples::Array)
+    # ensure floating point input for Categorical()
+    p       = convert(Matrix{Float64}, mc.p)
+    dist    = [Categorical(vec(p[i, :])) for i=1:n_states(mc)]
+    for t=2:length(samples)
+        samples[t] = rand(dist[samples[t-1]])
+    end
+    nothing
 end

@@ -3,8 +3,9 @@ module TestMatrixEqn
 using QuantEcon
 using Base.Test
 using FactCheck
+using Compat
 
-rough_kwargs = {:atol => 1e-7, :rtol => 1e-7}
+rough_kwargs = @compat Dict(:atol => 1e-7, :rtol => 1e-7)
 
 facts("Testing matrix_eqn.jl") do
     context("simple test where X is all zero") do

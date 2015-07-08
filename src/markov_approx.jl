@@ -8,48 +8,37 @@ Various routines to discretize AR(1) processes
 References
 ----------
 
-http://quant-econ.net/finite_markov.html
+http://quant-econ.net/jl/finite_markov.html
 =#
+
 std_norm_cdf{T <: Real}(x::T) = 0.5 * erfc(-x/sqrt(2))
 std_norm_cdf{T <: Real}(x::Array{T}) = 0.5 .* erfc(-x./sqrt(2))
 
+"""
+Tauchen's (1996) method for approximating AR(1) process with finite markov chain
 
-function tauchen(N::Int64, ρ::Real, σ::Real, μ::Real=0.0, n_std::Int64=3)
-    """
-    Use Tauchen's (1986) method to produce finite state Markov
-    approximation of the AR(1) processes
+The process follows
 
     y_t = μ + ρ y_{t-1} + ε_t,
 
-    where ε_t ~ N (0, σ^2)
+where ε_t ~ N (0, σ^2)
 
-    Parameters
-    ----------
-    N : int
-        Number of points in markov process
+##### Arguments
 
-    ρ : float
-        Persistence parameter in AR(1) process
+- `N::Int`: Number of points in markov process
+- `ρ::Real` : Persistence parameter in AR(1) process
+- `σ::Real` : Standard deviation of random component of AR(1) process
+- `μ::Real(0.0)` : Mean of AR(1) process
+- `n_std::Int(3)` : The number of standard deviations to each side the process
+should span
 
-    σ : float
-        Standard deviation of random component of AR(1) process
+##### Returns
 
-    μ : float, optional(default=0.0)
-        Mean of AR(1) process
+- `y::Vector{Float64}` : Nodes in the state space
+- `Π::Matrix{Float64}` Matrix transition probabilities for Markov Process
 
-    n_std : int, optional(default=3)
-        The number of standard deviations to each side the processes
-        should span
-
-    Returns
-    -------
-    y : array(dtype=float, ndim=1)
-        1d-Array of nodes in the state space
-
-    Π : array(dtype=float, ndim=2)
-        Matrix transition probabilities for Markov Process
-
-    """
+"""
+function tauchen(N::Int64, ρ::Real, σ::Real, μ::Real=0.0, n_std::Int64=3)
     # Get discretized space
     a_bar = n_std * sqrt(σ^2 / (1 - ρ^2))
     y = linspace(-a_bar, a_bar, N)
@@ -90,38 +79,28 @@ function tauchen(N::Int64, ρ::Real, σ::Real, μ::Real=0.0, n_std::Int64=3)
 end
 
 
-function rouwenhorst(N::Int, ρ::Real, σ::Real, μ::Real=0.0)
-    """
-    Use Rouwenhorst's method to produce finite state Markov
-    approximation of the AR(1) processes
+"""
+Rouwenhorst's method to approximate AR(1) processes.
+
+The process follows
 
     y_t = μ + ρ y_{t-1} + ε_t,
 
-    where ε_t ~ N (0, σ^2)
+where ε_t ~ N (0, σ^2)
 
-    Parameters
-    ----------
-    N : int
-        Number of points in markov process
+##### Arguments
+- `N::Int` : Number of points in markov process
+- `ρ::Real` : Persistence parameter in AR(1) process
+- `σ::Real` : Standard deviation of random component of AR(1) process
+- `μ::Real(0.0)` :  Mean of AR(1) process
 
-    ρ : float
-        Persistence parameter in AR(1) process
+##### Returns
 
-    σ : float
-        Standard deviation of random component of AR(1) process
+- `y::Vector{Float64}` : Nodes in the state space
+- `Θ::Matrix{Float64}` Matrix transition probabilities for Markov Process
 
-    μ : float, optional(default=0.0)
-        Mean of AR(1) process
-
-    Returns
-    -------
-    y : array(dtype=float, ndim=1)
-        1d-Array of nodes in the state space
-
-    Θ : array(dtype=float, ndim=2)
-        Matrix transition probabilities for Markov Process
-
-    """
+"""
+function rouwenhorst(N::Int, ρ::Real, σ::Real, μ::Real=0.0)
     σ_y = σ / sqrt(1-ρ^2)
     p  = (1+ρ)/2
     Θ = [p 1-p; 1-p p]

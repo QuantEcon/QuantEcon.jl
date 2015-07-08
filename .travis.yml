@@ -1,19 +1,15 @@
-language: cpp
-compiler:
-  - clang
+language: julia
+os:
+    - linux
+    - osx
+julia:
+    - release
+    - nightly
 notifications:
-  email: false
-env:
-  matrix:
-    - JULIAVERSION="juliareleases"
-before_install:
-  - sudo add-apt-repository ppa:staticfloat/julia-deps -y
-  - sudo add-apt-repository ppa:staticfloat/${JULIAVERSION} -y
-  - sudo apt-get update -qq -y
-  - sudo apt-get install libpcre3-dev julia -y
-  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+    email: false
 script:
-  - julia -e 'Pkg.init(); Pkg.clone(pwd())'
-  - julia -e 'Pkg.test("QuantEcon"; coverage=true)'
+    - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+    - julia -e 'Pkg.clone(pwd()); Pkg.build("QuantEcon")'
+    - julia -e 'Pkg.test("QuantEcon", coverage=true)'
 after_success:
-  - julia -e 'cd(Pkg.dir("QuantEcon")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
+    - if [ $TRAVIS_JULIA_VERSION = "nightly" ]; then julia -e 'cd(Pkg.dir("QuantEcon")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'; fi

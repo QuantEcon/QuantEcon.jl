@@ -7,6 +7,7 @@ using Distributions, Graphs
 import Distributions: pdf, skewness
 using DSP: TFFilter, freqz
 using Compat
+using Docile
 
 
 # useful types
@@ -103,7 +104,7 @@ export
     m_quadratic_sum
 
 include("util.jl")
-### includes
+##### includes
 include("arma.jl")
 include("compute_fp.jl")
 include("discrete_rv.jl")
@@ -118,7 +119,6 @@ include("lqnash.jl")
 include("lss.jl")
 include("markov_approx.jl")
 include("matrix_eqn.jl")
-include("mc_tools.jl")
 include("robustlq.jl")
 include("quad.jl")
 include("quadsums.jl")

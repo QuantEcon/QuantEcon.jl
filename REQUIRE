@@ -1,6 +1,6 @@
-julia 0.3-
-Distributions 0.5-
-Grid 0.3-
+julia 0.3
+Distributions 0.5
+Grid 0.3
 Optim
 DSP
 HDF5
@@ -9,3 +9,5 @@ FactCheck
 DataStructures
 Compat
 Graphs
+IterationManagers
+Docile

@@ -12,11 +12,25 @@ aversion in the household's utility function.
 References
 ----------
 
-Simple port of the file quantecon.models.asset_pricing.py
-
-http://quant-econ.net/markov_asset.html
+http://quant-econ.net/jl/markov_asset.html
 =#
 
+"""
+A class to compute asset prices when the endowment follows a finite Markov chain
+
+##### Fields
+
+- `bet::Float64` : Discount factor in (0, 1)
+- `P::Matrix{Float64}` A valid stochastic matrix
+- `s::Vector{Float64}` : Growth rate of consumption in each state
+- `gamma::Float64` : Coefficient of risk aversion
+- `n::Int(size(P, 1))`: The numberof states
+- `P_tilde::Matrix{Float64}` : modified transition matrix used in computing the
+price of the lucas tree
+- `P_check::Matrix{Float64}` : modified transition matrix used in computing the
+price of the consol
+
+"""
 type AssetPrices
     bet::Real
     P::Matrix
@@ -27,14 +41,28 @@ type AssetPrices
     P_check::Matrix
 end
 
-
+"""
+Construct an instance of `AssetPrices`, where `n`, `P_tilde`, and `P_check` are
+computed automatically for you. See also the documentation for the type itself
+"""
 function AssetPrices(bet::Real, P::Matrix, s::Vector, gamm::Real)
     P_tilde = P .* s'.^(1-gamm)
     P_check = P .* s'.^(-gamm)
     return AssetPrices(bet, P, s, gamm, size(P, 1), P_tilde, P_check)
 end
 
+"""
+Computes the function v such that the price of the lucas tree is v(lambda)C_t
 
+##### Arguments
+
+- `ap::AssetPrices` : An instance of the `AssetPrices` type
+
+##### Returns
+
+- `v::Vector{Float64}` : the pricing function for the lucas tree
+
+"""
 function tree_price(ap::AssetPrices)
     # Simplify names
     P, s, gamm, bet, P_tilde = ap.P, ap.s, ap.gamm, ap.bet, ap.P_tilde
@@ -46,7 +74,19 @@ function tree_price(ap::AssetPrices)
     return v
 end
 
+"""
+Computes price of a consol bond with payoff zeta
 
+##### Arguments
+
+- `ap::AssetPrices` : An instance of the `AssetPrices` type
+- `zeta::Float64` : Per period payoff of the consol
+
+##### Returns
+
+- `pbar::Vector{Float64}` : the pricing function for the lucas tree
+
+"""
 function consol_price(ap::AssetPrices, zet::Real)
     # Simplify names
     P, s, gamm, bet, P_check = ap.P, ap.s, ap.gamm, ap.bet, ap.P_check
@@ -58,7 +98,26 @@ function consol_price(ap::AssetPrices, zet::Real)
     return v
 end
 
+"""
+Computes price of a call option on a consol bond, both finite and infinite
+horizon
 
+##### Arguments
+
+- `zeta::Float64` : Coupon of the console
+- `p_s::Float64` : Strike price
+- `T::Vector{Int}(Int[])`: Time periods for which to store the price in the
+finite horizon version
+- `epsilon::Float64` : Tolerance for infinite horizon problem
+
+##### Returns
+
+- `w_bar::Vector{Float64}` Infinite horizon call option prices
+- `w_bars::Dict{Int, Vector{Float64}}` A dictionary of key-value pairs {t: vec},
+where t is one of the dates in the list T and vec is the option prices at that
+date
+
+"""
 function call_option(ap::AssetPrices, zet::Real, p_s::Real,
                      T::Vector{Int}=Int[], epsilon=1e-8)
     # Simplify names, initialize variables
@@ -85,5 +144,3 @@ function call_option(ap::AssetPrices, zet::Real, p_s::Real,
     end
     return w_bar, w_bars
 end
-
-

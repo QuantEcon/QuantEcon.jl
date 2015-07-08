@@ -23,21 +23,37 @@ The distribution phi of xi is
 References
 ----------
 
-Simple port of the file quantecon.models.lucastree.py
-
-http://quant-econ.net/markov_asset.html
+http://quant-econ.net/jl/markov_asset.html
 
 TODO: refactor. Python is much cleaner.
 =#
 
+"""
+The Lucas asset pricing model
 
+##### Fields
+
+-  `gam::Real` : coefficient of risk aversion in the CRRA utility function
+-  `bet::Real` : Discount factor in (0, 1)
+-  `alpha::Real` : Correlation coefficient in the shock process
+-  `sigma::Real` : Volatility of shock process
+-  `phi::Distribution` : Distribution for shock process
+-  `grid::AbstractVector` : Grid of points on which to evaluate the prices. Each
+point should be non-negative
+-  `grid_min::Real` : Lower bound on grid
+-  `grid_max::Real` : Upper bound on grid
+-  `grid_size::Int` : Number of points in the grid
+- `quad_nodes::Vector` : Quadrature nodes for integrating over the shock
+- `quad_weights::Vector` : Quadrature weights for integrating over the shock
+-  `h::Vector` : Storage array for the `h` vector in the lucas operator
+"""
 type LucasTree
     gam::Real
     bet::Real
     alpha::Real
     sigma::Real
     phi::Distribution
-    grid::Union(FloatRange, Vector)
+    grid::AbstractVector
     grid_min::Real
     grid_max::Real
     grid_size::Int
@@ -47,6 +63,20 @@ type LucasTree
 
     # this needs to be an internal constructor because we need to incompletely
     # initialize the object before we can compute h.
+    """
+    Constructor for LucasTree
+
+    ##### Arguments
+
+    -  `gam::Real` : coefficient of risk aversion in the CRRA utility function
+    -  `bet::Real` : Discount factor in (0, 1)
+    -  `alpha::Real` : Correlation coefficient in the shock process
+    -  `sigma::Real` : Volatility of shock process
+
+    ##### Notes
+
+    All other fields of the type are instantiated within the constructor
+    """
     function LucasTree(gam::Real, bet::Real, alpha::Real, sigma::Real)
         phi = LogNormal(0.0, sigma)
         grid = make_grid(alpha, sigma)
@@ -94,8 +124,22 @@ function integrate(lt::LucasTree, g::Function, qn::Array=lt.quad_nodes,
 end
 
 
-# Set up the Lucas operator T
-function lucas_operator(lt::LucasTree, f::Vector)
+"""
+The approximate Lucas operator, which computes and returns the updated function
+Tf on the grid points.
+
+##### Arguments
+
+- `lt::LucasTree` : An instance of the `LucasTree` type
+- `f::Vector{Float64}` : A candidate function on R_+ represented as points on a
+grid. It should be the same size as `lt.grid`
+
+##### Returns
+
+- `Tf::Vector{Float64}` : The updated function Tf
+
+"""
+function lucas_operator(lt::LucasTree, f::AbstractVector)
     grid, h, alpha, bet = lt.grid, lt.h, lt.alpha, lt.bet
 
     Tf = similar(f)
@@ -109,6 +153,19 @@ function lucas_operator(lt::LucasTree, f::Vector)
 end
 
 
+"""
+Compute the equilibrium price function associated with Lucas tree `lt`
+
+##### Arguments
+
+- `lt::LucasTree` : An instance of the `LucasTree` type
+- `;kwargs...` : other arguments to be passed to `compute_fixed_point`
+
+##### Returns
+
+- `price::Vector{Float64}` : The price at each point in `lt.grid`
+
+"""
 function compute_lt_price(lt::LucasTree; kwargs...)
     # Simplify names, set up distribution phi
     grid, grid_size, gam = lt.grid, lt.grid_size, lt.gam
