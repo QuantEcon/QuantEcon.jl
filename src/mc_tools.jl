@@ -10,10 +10,8 @@ References
 
 http://quant-econ.net/jl/finite_markov.html
 =#
-
-# new method to check if all elements of an array x are equal to p
-isapprox(x::Array, p::Number) = all([isapprox(x[i], p) for i=1:length(x)])
-isapprox(p::Number, x::Array) = isapprox(x, p)
+import LightGraphs: DiGraph, period, attracting_components,
+                    strongly_connected_components, is_strongly_connected
 
 """
 Finite-state discrete-time Markov chain.
@@ -30,15 +28,19 @@ positive, and all rows must sum to unity
 type MarkovChain{T<:Real}
     p::Matrix{T} # valid stochastic matrix
 
-    function MarkovChain(p)
+
+    function MarkovChain(p::Matrix)
         n, m = size(p)
 
-        n != m && throw(ArgumentError("stochastic matrix must be square"))
-        any(p .< 0) &&
+        if n != m
+            throw(ArgumentError("stochastic matrix must be square"))
+        elseif any(p.<0)
             throw(ArgumentError("stochastic matrix must have nonnegative elements"))
-        isapprox(sum(p, 2), one(T)) ||
+        elseif any(x->!isapprox(sum(x), 1), [p[i, :] for i = 1:n])
             throw(ArgumentError("stochastic matrix rows must sum to 1"))
-        new(p)
+        end
+
+        return new(p)
     end
 end
 
@@ -54,6 +56,7 @@ function Base.show(io::IO, mc::MarkovChain)
     println(io, mc.p)
 end
 
+# solve x(P-I)=0 by eigen decomposition
 function eigen_solve{T}(p::Matrix{T})
     ef = eigfact(p')
     isunit = map(x->isapprox(x, 1), ef.values)
@@ -66,7 +69,7 @@ function eigen_solve{T}(p::Matrix{T})
     x
 end
 
-# function to solve x(P-I)=0 by lu decomposition
+# solve x(P-I)=0 by lu decomposition
 function lu_solve{T}(p::Matrix{T})
     n, m = size(p)
     x   = vcat(Array(T, n-1), one(T))
@@ -82,37 +85,34 @@ function lu_solve{T}(p::Matrix{T})
     x
 end
 
-gth_solve{T<:Integer}(A::Matrix{T}) = gth_solve(convert(Array{Float64, 2}, A))
+gth_solve{T<:Integer}(a::Matrix{T}) = gth_solve(convert(Array{Rational, 2}, a))
 
-function gth_solve{T<:Real}(A::AbstractMatrix{T})
-    A1 = copy(A)
-    n = size(A1, 1)
+# solve x(P-I)=0 by the GTH method
+function gth_solve{T<:Real}(original::Matrix{T})
+    a = copy(original)
+    n = size(a, 1)
     x = zeros(T, n)
 
-    # === Reduction === #
-    for k in 1:n-1
-        scale = sum(A1[k, k+1:n])
-        if scale <= 0
-            # There is one (and only one) recurrent class contained in
-            # {1, ..., k};
-            # compute the solution associated with that recurrent class.
+    @inbounds for k in 1:n-1
+        scale = sum(a[k, k+1:n])
+        if scale <= zero(T)
             n = k
             break
         end
-        A1[k+1:n, k] ./= scale
+        a[k+1:n, k] /= scale
 
         for j in k+1:n, i in k+1:n
-            A1[i, j] += A1[i, k] * A1[k, j]
+            a[i, j] += a[i, k] * a[k, j]
         end
     end
 
-    # === Backward substitution === #
+    # backsubstitution
     x[end] = 1
-    for k in n-1:-1:1, i in k+1:n
-        x[k] += x[i] * A1[i, k]
+    @inbounds for k in n-1:-1:1, i in k+1:n
+        x[k] += x[i] * a[i, k]
     end
 
-    # === Normalization === #
+    # normalisation
     x / sum(x)
 end
 
@@ -133,7 +133,7 @@ algorithm presented by Grassmann-Taksar-Heyman (GTH)
 The following references were consulted for the GTH algorithm
 
 - W. K. Grassmann, M. I. Taksar and D. P. Heyman, "Regenerative Analysis and
-Steady State Distributions for Markov Chains," Operations Research (1985),
+Steady State Distributions for Markov Chains, " Operations Research (1985),
 1107-1116.
 - W. J. Stewart, Probability, Markov Chains, Queues, and Simulation, Princeton
 University Press, 2009.
@@ -142,7 +142,7 @@ University Press, 2009.
 [eigen_solve, lu_solve, gth_solve]
 
 """
-Find the irreducible subsets of the `MarkovChain`
+Find the recurrent classes of the `MarkovChain`
 
 ##### Arguments
 
@@ -151,37 +151,27 @@ Find the irreducible subsets of the `MarkovChain`
 ##### Returns
 
 - `x::Vector{Vector}`: A `Vector` containing `Vector{Int}`s that describe the
-irreducible subsets of the transition matrix for p
+recurrent classes of the transition matrix for p
 
 """
-function irreducible_subsets(mc::MarkovChain)
-    p = abs(mc.p) .> eps()
-    g = simple_graph(n_states(mc))
-    for i = 1:length(p)
-        j, k = ind2sub(size(p), i) # j: node from, k: node to
-        p[i] && add_edge!(g, j, k)
+recurrent_classes(mc::MarkovChain) = attracting_components(DiGraph(mc.p))
+
+communication_classes(mc::MarkovChain) = strongly_connected_components(DiGraph(mc.p))
+
+is_irreducible(mc::MarkovChain) =  is_strongly_connected(DiGraph(mc.p))
+
+is_aperiodic(mc::MarkovChain) = period(DiGraph(mc.p)) == 1
+
+function period(mc::MarkovChain)
+    g = DiGraph(mc.p)
+    recurrent = attracting_components(g)
+    periods   = @compat Vector{Int}()
+
+    for r in recurrent
+        push!(periods, period(g[r]))
     end
-
-    classes = strongly_connected_components(g)
-    length(classes) == 1 && return classes
-
-    sinks = Bool[] # which classes are sinks
-    for class in classes
-        sink = true
-        for vertex in class # attempt to falsify class being a sink
-            targets = map(x->target(x, g), out_edges(vertex, g))
-            notsink = any(map(x->x∉class, targets))
-
-            if notsink # are there any paths out class?
-                sink = false
-                break # stop looking
-            end
-        end
-        push!(sinks, sink)
-    end
-    return classes[sinks]
+    return lcm(periods)
 end
-
 """
 calculate the stationary distributions associated with a N-state markov chain
 
@@ -198,29 +188,23 @@ distribution of `mc.p`
 
 """
 function mc_compute_stationary{T}(mc::MarkovChain{T}; method::Symbol=:gth)
-    @compat solvers = Dict(:gth => gth_solve,
-                           :lu => lu_solve,
-                           :eigen => eigen_solve)
-    solve = solvers[method]
+    solvers = @compat Dict(:gth => gth_solve, :lu => lu_solve, :eigen => eigen_solve)
+    solve   = solvers[method]
 
-    p = mc.p
-    classes = irreducible_subsets(mc)
+    recurrent = recurrent_classes(mc)
 
-    # irreducible mc
-    length(classes) == 1 && return solve(p)
+    # unique recurrent class
+    length(recurrent) == 1 && return solve(mc.p)
 
-    # reducible mc
-    stationary_dists = Array(T, n_states(mc), length(classes))
-    for i = 1:length(classes)
-        class  = classes[i]
-        dist   = zeros(T, n_states(mc))
-        temp_p = p[class, class]
-        dist[class] = solve(temp_p)
+    # more than one recurrent classes
+    stationary_dists = Array(T, n_states(mc), length(recurrent))
+    for (i, class) in enumerate(recurrent)
+        dist        = zeros(T, n_states(mc))
+        dist[class] = solve(mc.p[class, class]) # recast to correct dimension
         stationary_dists[:, i] = dist
     end
     return stationary_dists
 end
-
 """
 Simulate a Markov chain starting from an initial state
 
@@ -266,11 +250,20 @@ probability of being in seach state in the initial period
 
 """
 function mc_sample_path(mc::MarkovChain,
-                        init::Vector,
+                        init::Vector = vcat(1, zeros(n_states(mc)-1)),
                         sample_size::Int=1000; burn::Int=0)
     # ensure floating point input for Categorical()
     init = convert(Vector{Float64}, init)
-    mc_sample_path(mc, rand(Categorical(init)), sample_size, burn=burn)
+    return mc_sample_path(mc, rand(Categorical(init)), sample_size, burn=burn)
+end
+
+# duplicate python functionality
+function mc_sample_path(mc::MarkovChain,
+                        state::Real,
+                        sample_size::Int=1000; burn::Int=0)
+    init = zeros(n_states(mc))
+    init[state] = 1
+    return mc_sample_path(mc, init, sample_size, burn=burn)
 end
 
 """
@@ -295,4 +288,10 @@ function mc_sample_path!(mc::MarkovChain, samples::Array)
         samples[t] = rand(dist[samples[t-1]])
     end
     nothing
+end
+
+function simulate(mc::MarkovChain,
+                  init::Vector = vcat(1, zeros(n_states(mc)-1)),
+                  sample_size=1000)
+    return mc_sample_path(mc, init, sample_size)
 end
