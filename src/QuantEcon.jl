@@ -3,7 +3,7 @@ module QuantEcon
 import Base: mean, std, var, show, isapprox
 
 # 3rd party
-using Distributions, Graphs
+using Distributions
 import Distributions: pdf, skewness
 using DSP: TFFilter, freqz
 using Compat
@@ -43,6 +43,7 @@ export
 # mc_tools
     MarkovChain,
     mc_compute_stationary, mc_sample_path, mc_sample_path!,
+    period, is_irreducible, is_aperiodic, recurrent_classes, communication_classes, simulate,
 
 # gth_solve
     gth_solve,
