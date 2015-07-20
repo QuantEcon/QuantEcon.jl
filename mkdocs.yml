@@ -16,3 +16,5 @@ pages:
 - API Docs:
   - QuantEcon: 'api/QuantEcon.md'
   - Models: 'api/QuantEcon.Models.md'
+- Contributor Notes:
+  - Style Guide: 'style_guide.md'
