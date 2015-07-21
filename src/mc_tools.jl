@@ -160,7 +160,7 @@ communication_classes(mc::MarkovChain) = strongly_connected_components(DiGraph(m
 
 is_irreducible(mc::MarkovChain) =  is_strongly_connected(DiGraph(mc.p))
 
-is_aperiodic(mc::MarkovChain) = period(DiGraph(mc.p)) == 1
+is_aperiodic(mc::MarkovChain) = period(mc) == 1
 
 function period(mc::MarkovChain)
     g = DiGraph(mc.p)
