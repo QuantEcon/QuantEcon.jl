@@ -42,7 +42,7 @@ function gridmake(arrays::Vector...)
     out = Array(Float64, l, n)
 
     shapes = shapes[end:-1:1]
-    sh = push!([1], shapes[1:end-1]...)
+    sh = vcat([1], shapes[1:end-1]...)
     repititions = cumprod(sh)
     repititions = repititions[end:-1:1]
 
@@ -168,8 +168,8 @@ $(qnw_refs)
 
 function qnwcheb(n::Int, a::Real, b::Real)
     nodes = (b+a)/2 - (b-a)/2 .* cos(pi/n .* (0.5:(n-0.5)))
-    weights = ((b-a)/n) .* (cos(pi/n .* ([1:n]-0.5)*[0:2:n-1]')
-                            *[1, -2./([1:2:n-2].*[3:2:n])])
+    weights = ((b-a)/n) .* (cos(pi/n .* (collect(1:n)-0.5)*collect(0:2:n-1)')
+                            *vcat(1, -2./(collect(1:2:n-2).*collect(3:2:n))))
     return nodes, weights
 end
 
@@ -212,6 +212,8 @@ function qnwnorm(n::Int)
     m = floor(Int, (n + 1) / 2)
     nodes = zeros(n)
     weights = zeros(n)
+
+    z = sqrt(2n+1) - 1.85575 * ((2n+1).^(-1/6))
 
     for i=1:m
         # Reasonable starting values for root finding
@@ -296,7 +298,7 @@ function qnwsimp(n::Int, a::Real, b::Real)
     end
 
     dx = (b - a) / (n - 1)
-    nodes = [a:dx:b]
+    nodes = collect(a:dx:b)
     weights = repeat([2.0, 4.0], outer=Int[(n + 1.0) / 2.0])
     weights = weights[1:n]
     weights[1] = 1
@@ -328,7 +330,7 @@ function qnwtrap(n::Int, a::Real, b::Real)
     end
 
     dx = (b - a) / (n - 1)
-    nodes = [a:dx:b]
+    nodes = collect(a:dx:b)
     weights = fill(dx, n)
     weights[[1, n]] .*= 0.5
     return nodes, weights
@@ -472,6 +474,8 @@ function qnwgamma(n::Int, a::Real=1.0, b::Real=1.0)
     fact = -exp(lgamma(a+n)-lgamma(n)-lgamma(a+1))
     nodes = zeros(n)
     weights = zeros(n)
+
+    z = (1+a)*(3 + 0.92a)/(1 + 2.4n + 1.8a)
 
     for i=1:n
         # get starting values
@@ -733,7 +737,7 @@ function qnwequi(n::Int, a::Vector, b::Vector, kind::String="N")
     end
 
     d = n_a
-    i = [1:n]''
+    i = reshape(1:n, n, 1)
     if kind == "N"
         j = 2.^((1:d)/(d+1))
         nodes = i*j'

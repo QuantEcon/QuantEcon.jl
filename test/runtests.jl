@@ -16,7 +16,7 @@ include("test_markov_approx.jl")
 include("test_matrix_eqn.jl")
 include("test_mc_tools.jl")
 include("test_models.jl")
-# include("test_quad.jl")
+include("test_quad.jl")
 include("test_quadsum.jl")
 include("test_robustlq.jl")
 
