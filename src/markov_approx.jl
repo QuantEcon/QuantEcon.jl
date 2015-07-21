@@ -25,20 +25,20 @@ where ε_t ~ N (0, σ^2)
 
 ##### Arguments
 
-- `N::Int`: Number of points in markov process
+- `N::Integer`: Number of points in markov process
 - `ρ::Real` : Persistence parameter in AR(1) process
 - `σ::Real` : Standard deviation of random component of AR(1) process
 - `μ::Real(0.0)` : Mean of AR(1) process
-- `n_std::Int(3)` : The number of standard deviations to each side the process
+- `n_std::Integer(3)` : The number of standard deviations to each side the process
 should span
 
 ##### Returns
 
-- `y::Vector{Float64}` : Nodes in the state space
-- `Π::Matrix{Float64}` Matrix transition probabilities for Markov Process
+- `y::Vector{Real}` : Nodes in the state space
+- `Π::Matrix{Real}` Matrix transition probabilities for Markov Process
 
 """
-function tauchen(N::Int64, ρ::Real, σ::Real, μ::Real=0.0, n_std::Int64=3)
+function tauchen(N::Integer, ρ::Real, σ::Real, μ::Real=0.0, n_std::Integer=3)
     # Get discretized space
     a_bar = n_std * sqrt(σ^2 / (1 - ρ^2))
     y = linspace(-a_bar, a_bar, N)
@@ -89,18 +89,18 @@ The process follows
 where ε_t ~ N (0, σ^2)
 
 ##### Arguments
-- `N::Int` : Number of points in markov process
+- `N::Integer` : Number of points in markov process
 - `ρ::Real` : Persistence parameter in AR(1) process
 - `σ::Real` : Standard deviation of random component of AR(1) process
 - `μ::Real(0.0)` :  Mean of AR(1) process
 
 ##### Returns
 
-- `y::Vector{Float64}` : Nodes in the state space
-- `Θ::Matrix{Float64}` Matrix transition probabilities for Markov Process
+- `y::Vector{Real}` : Nodes in the state space
+- `Θ::Matrix{Real}` Matrix transition probabilities for Markov Process
 
 """
-function rouwenhorst(N::Int, ρ::Real, σ::Real, μ::Real=0.0)
+function rouwenhorst(N::Integer, ρ::Real, σ::Real, μ::Real=0.0)
     σ_y = σ / sqrt(1-ρ^2)
     p  = (1+ρ)/2
     Θ = [p 1-p; 1-p p]
@@ -110,9 +110,9 @@ function rouwenhorst(N::Int, ρ::Real, σ::Real, μ::Real=0.0)
     return rouwenhorst(p, p, m, ψ, N)
 end
 
-function rouwenhorst(p::Float64, q::Float64, m::Float64, Δ::Float64, n::Int)
+function rouwenhorst(p::Real, q::Real, m::Real, Δ::Real, n::Integer)
     if n == 2
-        return Float64[m-Δ, m+Δ], [p 1-p; 1-q q]
+        return Real[m-Δ, m+Δ], [p 1-p; 1-q q]
     else
         _, θ_nm1 = rouwenhorst(p, q, m, Δ, n-1)
         θN = p    *[θ_nm1 zeros(n-1, 1); zeros(1, n)] +
