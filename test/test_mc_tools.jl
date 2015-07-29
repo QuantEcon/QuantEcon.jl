@@ -27,6 +27,11 @@ mc6_stationary = [3//7, 4//7]
 mc7 = [1 0; 0 1]
 mc7_stationary = [1 0;0 1]
 
+# Reducible mc with a unique recurrent class,
+# where n=2 is a transient state
+mc8 = [1. 0; 1. 0]
+mc8_stationary = [1., 0]
+
 mc1 = MarkovChain(mc1)
 mc2 = MarkovChain(mc2)
 mc3 = MarkovChain(mc3)
@@ -34,6 +39,7 @@ mc4 = MarkovChain(mc4)
 mc5 = MarkovChain(mc5)
 mc6 = MarkovChain(mc6)
 mc7 = MarkovChain(mc7)
+mc8 = MarkovChain(mc8)
 
 # examples from
 # Graph-Theoretic Analysis of Finite Markov Chains by J.P. Jarvis & D. R. Shier
@@ -92,6 +98,7 @@ facts("Testing mc_tools.jl") do
         @fact mc_compute_stationary(mc5) => mc5_stationary
         @fact mc_compute_stationary(mc6) => mc6_stationary
         @fact mc_compute_stationary(mc7) => mc7_stationary
+        @fact mc_compute_stationary(mc8) => mc8_stationary
     end
 
     context("test gth_solve with KMR matrices") do
