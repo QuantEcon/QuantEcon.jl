@@ -229,7 +229,7 @@ function mc_sample_path(mc::MarkovChain,
                         init::Int=rand(1:n_states(mc)),
                         sample_size::Int=1000;
                         burn::Int=0)
-    samples = Array(Int, sample_size) # +1 extra for the init
+    samples = Array(Int, sample_size)
     samples[1] = init
     mc_sample_path!(mc, samples)
     samples[burn+1:end]
