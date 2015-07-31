@@ -8,6 +8,8 @@ import StatsBase: sample
 import QuantEcon: MarkovChain
 
 
+# random_markov_chain
+
 """
 Return a randomly sampled MarkovChain instance with n states.
 
@@ -46,6 +48,8 @@ function random_markov_chain(n::Integer, k::Integer)
     return mc
 end
 
+
+# random_stochastic_matrix
 
 """
 Return a randomly sampled n x n stochastic matrix.
@@ -93,13 +97,16 @@ function random_stochastic_matrix(n::Integer, k::Integer)
         throw(ArgumentError("k must be an integer with 0 < k <= n"))
     end
 
+    k == n && return random_stochastic_matrix(n)
+
+    # if k < n
+    probvecs = random_probvec(k, n)
+
     # Randomly sample row indices for each column for nonzero values
     row_indices = @compat Vector{Int}(k*n)
     for j in 1:n
         row_indices[(j-1)*k+1:j*k] = sample(1:n, k, replace=false)
     end
-
-    probvecs = random_probvec(k, n)
 
     p = zeros(n, n)
     for j in 1:n
@@ -112,6 +119,8 @@ function random_stochastic_matrix(n::Integer, k::Integer)
 end
 
 
+# random_probvec
+
 """
 Return m randomly sampled probability vectors of size k.
 
@@ -119,16 +128,23 @@ Return m randomly sampled probability vectors of size k.
 
 - `k::Integer` : Number of probability vectors.
 - `m::Integer` : Size of each probability vectors.
+- `rng::AbstractRNG` : (Optional) Random number generator
 
 ##### Returns
 
 - `a::Array` : Array of shape (k, m) containing probability vectors as colums.
 
 """
-function random_probvec(k::Integer, m::Integer)
+function random_probvec(k::Integer, m::Integer, rng::AbstractRNG)
     x = Array(Float64, (k+1, m))
 
-    r = rand((k-1, m))
+    r = rand(rng, (k-1, m))
     x[1, :], x[2:end-1, :], x[end, :] = 0, sort(r, 1), 1
     return diff(x, 1)
 end
+
+random_probvec(k::Integer, m::Integer, seed::Integer) =
+    random_probvec(k, m, MersenneTwister(seed))
+
+random_probvec(k::Integer, m::Integer) =
+    random_probvec(k, m, Base.Random.GLOBAL_RNG)
