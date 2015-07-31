@@ -21,6 +21,21 @@ Return a randomly sampled MarkovChain instance with n states.
 
 - `mc::MarkovChain` : MarkovChain instance.
 
+##### Examples
+
+```julia
+julia> using QuantEcon
+
+julia> mc = random_markov_chain(3)
+Discrete Markov Chain
+stochastic matrix:
+3x3 Array{Float64,2}:
+ 0.281188  0.61799   0.100822
+ 0.144461  0.848179  0.0073594
+ 0.360115  0.323973  0.315912
+
+```
+
 """
 function random_markov_chain(n::Integer)
     p = random_stochastic_matrix(n)
@@ -40,6 +55,21 @@ has k states with positive transition probability.
 ##### Returns
 
 - `mc::MarkovChain` : MarkovChain instance.
+
+##### Examples
+
+```julia
+julia> using QuantEcon
+
+julia> mc = random_markov_chain(3, 2)
+Discrete Markov Chain
+stochastic matrix:
+3x3 Array{Float64,2}:
+ 0.369124  0.0       0.630876
+ 0.519035  0.480965  0.0
+ 0.0       0.744614  0.255386
+
+```
 
 """
 function random_markov_chain(n::Integer, k::Integer)
