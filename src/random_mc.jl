@@ -4,9 +4,14 @@ Generate a MarkovChain randomly.
 @author : Daisuke Oyama
 
 =#
-import Base.Random: GLOBAL_RNG
 import StatsBase: sample
 import QuantEcon: MarkovChain
+
+if VERSION < v"0.4-"
+    const GLOBAL_RNG = MersenneTwister()
+else
+    const GLOBAL_RNG = Base.Random.GLOBAL_RNG
+end
 
 
 # random_markov_chain
