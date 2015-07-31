@@ -4,6 +4,7 @@ Generate a MarkovChain randomly.
 @author : Daisuke Oyama
 
 =#
+import Base.Random: GLOBAL_RNG
 import StatsBase: sample
 import QuantEcon: MarkovChain
 
@@ -165,7 +166,7 @@ Return m randomly sampled probability vectors of size k.
 - `a::Array` : Array of shape (k, m) containing probability vectors as colums.
 
 """
-function random_probvec(k::Integer, m::Integer, rng::AbstractRNG)
+function random_probvec(k::Integer, m::Integer, rng::AbstractRNG=GLOBAL_RNG)
     x = Array(Float64, (k+1, m))
 
     r = rand(rng, (k-1, m))
@@ -175,6 +176,3 @@ end
 
 random_probvec(k::Integer, m::Integer, seed::Integer) =
     random_probvec(k, m, MersenneTwister(seed))
-
-random_probvec(k::Integer, m::Integer) =
-    random_probvec(k, m, Base.Random.GLOBAL_RNG)
