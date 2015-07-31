@@ -11,10 +11,10 @@ facts("Testing random_mc.jl") do
         mc_dicts = (@compat Dict("P" => random_markov_chain(n).p, "k" => n),
                     @compat Dict("P" => random_markov_chain(n, k).p, "k" => k))
         for d in mc_dicts
-            @fact size(d["P"]) --> (n, n)
-            for i in 1:size(d["P"])[1]
-                @fact countnz(d["P"][i, :]) --> d["k"]
-            end
+            P = d["P"]
+            @fact size(P) --> (n, n)
+            @fact all(x->(countnz(x)==d["k"]),
+                      [P[i, :] for i in 1:size(P)[1]]) --> true
         end
     end
 
