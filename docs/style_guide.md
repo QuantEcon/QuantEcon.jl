@@ -4,7 +4,7 @@
 
 The main goal of the style guide is to help developers write code that is readable and fits with the style of other code across the library. The suggestions in this document are just that: suggestions. If in a particular instance, following every suggestion exactly seems to work against the goal of readable code, submit a pull request that doesn't follow one or more of the guidelines here. Project maintainers will review the request and work with you to find a solution.
 
-The rest of this document is split into various sections. Within each section there is a list of suggestions. When applicable the list is followed by examples of `bad` code that violates the suggestion and `good` code that adheres to it.
+The rest of this document is split into various sections. Within each section there is a list of suggestions. When applicable, each list item is followed by one or more examples of "bad" style that violates the suggestion and "good" style that adheres to it.
 
 ## Whitespace
 
@@ -32,7 +32,7 @@ foo(x,y)
 # good
 foo(x, y)
 ```
-- Always include a new line at the end of every file. Your text editor most likely has a build in mechanism for doing this for you. If you can't find this setting, let us know and we can help you.
+- Always include a new line at the end of every file. Your text editor most likely has a built in mechanism for doing this for you. If you can't find this setting, let us know and we can help you.
 - No trailing whitespace at the end of a line (each line should match the regex `.+[^\s]$`). Your editor should also be able to do this for you.
 ```julia
 # bad (note that SPACE below represents a single space)
@@ -123,13 +123,14 @@ function bar(z, q)
    ...
 end
 ```
+
 ```julia
-# bad - one line functions separated
+# Acceptable - one line definitions separated with new line
 foo(x, y) = ...
 
 bar(z, q) = ...
 
-# good
+# better
 foo(x, y) = ...
 bar(z, q) = ...
 ```
@@ -138,26 +139,26 @@ bar(z, q) = ...
 
 - Type names should be `UpperCamelCase` (meaning no underscores where the first letter of _every_ word is capitalized)
 ```julia
-# bad
+# bad - lowerCamelCase
 type fooBar
     ...
 end
 
-# bad
+# bad- Upper_Case_With_Underscores
 type Foo_Bar
     ...
 end
 
-# good
+# good - UpperCamelCase
 type FooBar
     ...
 end
 ```
 - Function names should be all lower case with words separated by underscores (`_`)
 ```julia
-# bad
+# bad - lowerCamelCase
 fooBar(x, y) = ...
 
-# good
+# good - lower_case_with_underscores
 foo_bar(x, y) = ...
 ```
