@@ -96,6 +96,9 @@ function gth_solve{T<:Real}(original::Matrix{T})
     @inbounds for k in 1:n-1
         scale = sum(a[k, k+1:n])
         if scale <= zero(T)
+            # There is one (and only one) recurrent class contained in
+            # {1, ..., k};
+            # compute the solution associated with that recurrent class.
             n = k
             break
         end
@@ -107,7 +110,7 @@ function gth_solve{T<:Real}(original::Matrix{T})
     end
 
     # backsubstitution
-    x[end] = 1
+    x[n] = 1
     @inbounds for k in n-1:-1:1, i in k+1:n
         x[k] += x[i] * a[i, k]
     end
@@ -226,7 +229,7 @@ function mc_sample_path(mc::MarkovChain,
                         init::Int=rand(1:n_states(mc)),
                         sample_size::Int=1000;
                         burn::Int=0)
-    samples = Array(Int, sample_size) # +1 extra for the init
+    samples = Array(Int, sample_size)
     samples[1] = init
     mc_sample_path!(mc, samples)
     samples[burn+1:end]
