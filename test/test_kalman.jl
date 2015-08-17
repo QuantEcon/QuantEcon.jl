@@ -25,14 +25,14 @@ sig_recursion = A * sig_inf * A' - kal_recursion * G * sig_inf * A' + Q
 
 facts("Testing kalman.jl") do
     # test stationary
-    @fact sig_inf => roughly(sig_recursion; rough_kwargs...)
-    @fact kal_gain => roughly(kal_recursion; rough_kwargs...)
+    @fact sig_inf --> roughly(sig_recursion; rough_kwargs...)
+    @fact kal_gain --> roughly(kal_recursion; rough_kwargs...)
 
     # test_update_using_stationary
     set_state!(kf, [0.0 0.0]', sig_inf)
     update!(kf, [0.0 0.0]')
-    @fact kf.cur_sigma => roughly(sig_inf; rough_kwargs...)
-    @fact kf.cur_x_hat => roughly([0.0 0.0]'; rough_kwargs...)
+    @fact kf.cur_sigma --> roughly(sig_inf; rough_kwargs...)
+    @fact kf.cur_x_hat --> roughly([0.0 0.0]'; rough_kwargs...)
 
     # test update nonstationary
     curr_x, curr_sigma = ones(2, 1), eye(2) .* .75
@@ -43,8 +43,8 @@ facts("Testing kalman.jl") do
     curr_k = A * curr_sigma * (G') * mat_inv
     new_sigma = A * curr_sigma * A' - curr_k * G * curr_sigma * A' + Q
     new_xhat = A * curr_x + curr_k * (y_observed - G * curr_x)
-    @fact kf.cur_sigma => roughly(new_sigma; rough_kwargs...)
-    @fact kf.cur_x_hat => roughly(new_xhat; rough_kwargs...)
+    @fact kf.cur_sigma --> roughly(new_sigma; rough_kwargs...)
+    @fact kf.cur_x_hat --> roughly(new_xhat; rough_kwargs...)
 
 end  # facts
 end  # module

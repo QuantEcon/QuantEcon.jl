@@ -33,14 +33,14 @@ facts("Testing lqnash.jl") do
 
     context("Checking the policies") do
 
-        @fact sum(f1) => roughly(sum(f2))
-        @fact sum(f1) => roughly(sum(f))
+        @fact sum(f1) --> roughly(sum(f2))
+        @fact sum(f1) --> roughly(sum(f))
     end
 
     context("Checking the Value Function") do
 
-        @fact p1[1, 1] => roughly(p2[2, 2])
-        @fact p1[1, 1] => roughly(p[1])
+        @fact p1[1, 1] --> roughly(p2[2, 2])
+        @fact p1[1, 1] --> roughly(p[1])
     end
 
     context("Judd test case")  do
@@ -111,9 +111,9 @@ facts("Testing lqnash.jl") do
 
         xbar_ml = [1.246871007582702, 1.246871007582685]
 
-        @fact f1 => roughly(f1_ml)
-        @fact f2 => roughly(f2_ml)
-        @fact xbar => roughly(xbar_ml)
+        @fact f1 --> roughly(f1_ml)
+        @fact f2 --> roughly(f2_ml)
+        @fact xbar --> roughly(xbar_ml)
 
     end
 end
