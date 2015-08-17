@@ -91,6 +91,14 @@ tol = 1e-15
 
 facts("Testing mc_tools.jl") do
     context("test mc_compute_stationary using exact solutions") do
+        @fact mc_compute_stationary(mc1) => eye(3)[:, [1, 3]]
+        @fact mc_compute_stationary(mc2) => roughly([0, 9/14, 5/14])
+        @fact mc_compute_stationary(mc3) => roughly([1/4, 3/4])
+        @fact mc_compute_stationary(mc4) => eye(2)
+        @fact mc_compute_stationary(mc5) => mc5_stationary
+        @fact mc_compute_stationary(mc6) => mc6_stationary
+        @fact mc_compute_stationary(mc7) => mc7_stationary
+        @fact mc_compute_stationary(mc10) => mc10_stationary
         @fact mc_compute_stationary(mc1) --> eye(3)[:, [1, 3]]
         @fact mc_compute_stationary(mc2) --> roughly([0, 9/14, 5/14])
         @fact mc_compute_stationary(mc3) --> roughly([1/4, 3/4])
@@ -98,6 +106,7 @@ facts("Testing mc_tools.jl") do
         @fact mc_compute_stationary(mc5) --> mc5_stationary
         @fact mc_compute_stationary(mc6) --> mc6_stationary
         @fact mc_compute_stationary(mc7) --> mc7_stationary
+        @fact mc_compute_stationary(mc10) --> mc10_stationary
     end
 
     context("test gth_solve with KMR matrices") do
