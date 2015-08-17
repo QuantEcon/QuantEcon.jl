@@ -91,14 +91,13 @@ tol = 1e-15
 
 facts("Testing mc_tools.jl") do
     context("test mc_compute_stationary using exact solutions") do
-        @fact mc_compute_stationary(mc1) => eye(3)[:, [1, 3]]
-        @fact mc_compute_stationary(mc2) => roughly([0, 9/14, 5/14])
-        @fact mc_compute_stationary(mc3) => roughly([1/4, 3/4])
-        @fact mc_compute_stationary(mc4) => eye(2)
-        @fact mc_compute_stationary(mc5) => mc5_stationary
-        @fact mc_compute_stationary(mc6) => mc6_stationary
-        @fact mc_compute_stationary(mc7) => mc7_stationary
-        @fact mc_compute_stationary(mc10) => mc10_stationary
+        @fact mc_compute_stationary(mc1) --> eye(3)[:, [1, 3]]
+        @fact mc_compute_stationary(mc2) --> roughly([0, 9/14, 5/14])
+        @fact mc_compute_stationary(mc3) --> roughly([1/4, 3/4])
+        @fact mc_compute_stationary(mc4) --> eye(2)
+        @fact mc_compute_stationary(mc5) --> mc5_stationary
+        @fact mc_compute_stationary(mc6) --> mc6_stationary
+        @fact mc_compute_stationary(mc7) --> mc7_stationary
     end
 
     context("test gth_solve with KMR matrices") do
@@ -106,15 +105,15 @@ facts("Testing mc_tools.jl") do
             x = mc_compute_stationary(d)
 
             # Check elements sum to one
-            @fact sum(x) => roughly(1; atol=tol)
+            @fact sum(x) --> roughly(1; atol=tol)
 
             # Check elements are nonnegative
             for i in 1:length(x)
-                @fact x[i] => greater_than_or_equal(-tol)
+                @fact x[i] --> greater_than_or_equal(-tol)
             end
 
             # Check x is a left eigenvector of P
-            @fact vec(x'*d.p) => roughly(x; atol=tol)
+            @fact vec(x'*d.p) --> roughly(x; atol=tol)
         end
     end
 
@@ -126,19 +125,19 @@ facts("Testing mc_tools.jl") do
 
     context("test graph theoretic algorithms") do
         for fig in [fig1, fig1_rat]
-            @fact period(fig) => 2
-            @fact recurrent_classes(fig) => Vector[[2, 5]]
-            @fact communication_classes(fig) => Vector[[2, 5], [1, 3, 4]]
-            @fact is_aperiodic(fig) => false
-            @fact is_irreducible(fig) => false
+            @fact period(fig) --> 2
+            @fact recurrent_classes(fig) --> Vector[[2, 5]]
+            @fact communication_classes(fig) --> Vector[[2, 5], [1, 3, 4]]
+            @fact is_aperiodic(fig) --> false
+            @fact is_irreducible(fig) --> false
         end
 
         for fig in [fig2, fig2_rat]
-            @fact period(fig) => 1
-            @fact recurrent_classes(fig) => Vector[[1, 3, 4]]
-            @fact communication_classes(fig) => Vector[[1, 3, 4], [2, 5]]
-            @fact is_aperiodic(fig) => true
-            @fact is_irreducible(fig) => false
+            @fact period(fig) --> 1
+            @fact recurrent_classes(fig) --> Vector[[1, 3, 4]]
+            @fact communication_classes(fig) --> Vector[[1, 3, 4], [2, 5]]
+            @fact is_aperiodic(fig) --> true
+            @fact is_irreducible(fig) --> false
         end
     end
 end  # facts

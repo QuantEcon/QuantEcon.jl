@@ -18,7 +18,7 @@ facts("Testing quadsums.jl") do
 
         val = var_quadratic_sum(A, C, H, beta, x0)
 
-        @fact val => roughly(20.0; rough_kwargs...)
+        @fact val --> roughly(20.0; rough_kwargs...)
     end
 
     context("test identity var sum") do
@@ -30,7 +30,7 @@ facts("Testing quadsums.jl") do
 
         val = var_quadratic_sum(A, C, H, beta, x0)
 
-        @fact val => roughly(60.0; rough_kwargs...)
+        @fact val --> roughly(60.0; rough_kwargs...)
     end
 
 end  # facts
