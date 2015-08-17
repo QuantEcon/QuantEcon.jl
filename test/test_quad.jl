@@ -67,12 +67,12 @@ facts("Testing quad.jl") do
             m7 = f([11], [1], [3])
 
             # Stack nodes/weights in columns
-            @fact [m1[1] m1[2]] => roughly([m2[1] m2[2]])
-            @fact [m1[1] m1[2]] => roughly([m3[1] m3[2]])
-            @fact [m1[1] m1[2]] => roughly([m4[1] m4[2]])
-            @fact [m1[1] m1[2]] => roughly([m5[1] m5[2]])
-            @fact [m1[1] m1[2]] => roughly([m6[1] m6[2]])
-            @fact [m1[1] m1[2]] => roughly([m7[1] m7[2]])
+            @fact [m1[1] m1[2]] --> roughly([m2[1] m2[2]])
+            @fact [m1[1] m1[2]] --> roughly([m3[1] m3[2]])
+            @fact [m1[1] m1[2]] --> roughly([m4[1] m4[2]])
+            @fact [m1[1] m1[2]] --> roughly([m5[1] m5[2]])
+            @fact [m1[1] m1[2]] --> roughly([m6[1] m6[2]])
+            @fact [m1[1] m1[2]] --> roughly([m7[1] m7[2]])
         end
     end
 
@@ -86,8 +86,8 @@ facts("Testing quad.jl") do
                 jl_x, jl_w = eval(symbol(x_str_name)), eval(symbol(w_str_name))
                 ml_x, ml_w = m[x_str_name],  m[w_str_name]
                 ml_x = d == 3 ? ml_x : squeeze(ml_x, 2)
-                @fact jl_x => roughly(ml_x; atol=1e-5)
-                @fact jl_w => roughly(squeeze(ml_w, 2); atol=1e-5)
+                @fact jl_x --> roughly(ml_x; atol=1e-5)
+                @fact jl_w --> roughly(squeeze(ml_w, 2); atol=1e-5)
             end
         end
     end
@@ -116,12 +116,12 @@ facts("Testing quad.jl") do
         #       random numbers than Matlab.
         ml_data_1d = m["int_1d"][:, 1:6, :]
 
-        @fact data1d[:, 1, :] => roughly(ml_data_1d[:, 1, :])  # trap
-        @fact data1d[:, 2, :] => roughly(ml_data_1d[:, 2, :])  # simp
-        @fact data1d[:, 3, :] => roughly(ml_data_1d[:, 3, :])  # lege
-        @fact data1d[:, 4, :] => roughly(ml_data_1d[:, 4, :])  # N
-        @fact data1d[:, 5, :] => roughly(ml_data_1d[:, 5, :])  # W
-        @fact data1d[:, 6, :] => roughly(ml_data_1d[:, 6, :])  # H
+        @fact data1d[:, 1, :] --> roughly(ml_data_1d[:, 1, :])  # trap
+        @fact data1d[:, 2, :] --> roughly(ml_data_1d[:, 2, :])  # simp
+        @fact data1d[:, 3, :] --> roughly(ml_data_1d[:, 3, :])  # lege
+        @fact data1d[:, 4, :] --> roughly(ml_data_1d[:, 4, :])  # N
+        @fact data1d[:, 5, :] --> roughly(ml_data_1d[:, 5, :])  # W
+        @fact data1d[:, 6, :] --> roughly(ml_data_1d[:, 6, :])  # H
     end
 
     context("testing quadrect 2d against Matlab") do
@@ -147,12 +147,12 @@ facts("Testing quad.jl") do
         #       random numbers than Matlab.
         ml_data_2d1 = m["int_2d1"][:, 1:6]
 
-        @fact data2d1[:, 1] => roughly(ml_data_2d1[:, 1])  # trap
-        @fact data2d1[:, 2] => roughly(ml_data_2d1[:, 2])  # simp
-        @fact data2d1[:, 3] => roughly(ml_data_2d1[:, 3])  # lege
-        @fact data2d1[:, 4] => roughly(ml_data_2d1[:, 4])  # N
-        @fact data2d1[:, 5] => roughly(ml_data_2d1[:, 5])  # W
-        @fact data2d1[:, 6] => roughly(ml_data_2d1[:, 6])  # H
+        @fact data2d1[:, 1] --> roughly(ml_data_2d1[:, 1])  # trap
+        @fact data2d1[:, 2] --> roughly(ml_data_2d1[:, 2])  # simp
+        @fact data2d1[:, 3] --> roughly(ml_data_2d1[:, 3])  # lege
+        @fact data2d1[:, 4] --> roughly(ml_data_2d1[:, 4])  # N
+        @fact data2d1[:, 5] --> roughly(ml_data_2d1[:, 5])  # W
+        @fact data2d1[:, 6] --> roughly(ml_data_2d1[:, 6])  # H
     end
 
 

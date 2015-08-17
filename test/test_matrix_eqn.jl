@@ -14,7 +14,7 @@ facts("Testing matrix_eqn.jl") do
 
         X = solve_discrete_lyapunov(A, B)
 
-        @fact X => roughly(B)
+        @fact X --> roughly(B)
     end
 
     context("simple test where X is same as B") do
@@ -23,7 +23,7 @@ facts("Testing matrix_eqn.jl") do
 
         X = solve_discrete_lyapunov(A, B)
 
-        @fact X => roughly(B)
+        @fact X --> roughly(B)
     end
 
     context("simple_ones lyap") do
@@ -32,27 +32,27 @@ facts("Testing matrix_eqn.jl") do
 
         sol = solve_discrete_lyapunov(A, B)
 
-        @fact sol => roughly(B)
+        @fact sol --> roughly(B)
     end
 
     context("scalars lyap") do
         a, b = 0.5, 0.75
         sol = solve_discrete_lyapunov(a, b)
 
-        @fact sol => ones(1, 1)
+        @fact sol --> ones(1, 1)
     end
 
     context("testing ricatti golden_num_float") do
         val = solve_discrete_riccati(1.0, 1.0, 1.0, 1.0)
         gold_ratio = (1 + sqrt(5)) / 2.
-        @fact val[1] => roughly(gold_ratio)
+        @fact val[1] --> roughly(gold_ratio)
     end
 
     context("testing ricatti golden_num_2d") do
         A, B, R, Q = eye(2), eye(2), eye(2), eye(2)
         gold_diag = eye(2) .* (1 + sqrt(5)) ./ 2.
         val = solve_discrete_riccati(A, B, Q, R)
-        @fact val => roughly(gold_diag)
+        @fact val --> roughly(gold_diag)
     end
 
     context("test tjm 1") do
@@ -70,7 +70,7 @@ facts("Testing matrix_eqn.jl") do
         X = solve_discrete_riccati(A, B, Q, R)
         Y = diagm([1e5, 1e3, 0.0])
 
-        @fact X => roughly(Y; rough_kwargs...)
+        @fact X --> roughly(Y; rough_kwargs...)
     end
 
     context("test tjm 2") do
@@ -85,7 +85,7 @@ facts("Testing matrix_eqn.jl") do
         X = solve_discrete_riccati(A, B, Q, R)
         Y = zeros(2, 2)
         Y[1, 1] = 1
-        @fact X => roughly(Y; rough_kwargs...)
+        @fact X --> roughly(Y; rough_kwargs...)
     end
 
     context("test tjm 3") do
@@ -99,7 +99,7 @@ facts("Testing matrix_eqn.jl") do
         Q = I - A' * A + A' * ((R + I) \ A)
         X = solve_discrete_riccati(A, B, Q, R)
         Y = eye(2)
-        @fact X => roughly(Y; rough_kwargs...)
+        @fact X --> roughly(Y; rough_kwargs...)
     end
 
 end  # facts
