@@ -139,7 +139,7 @@ Steady State Distributions for Markov Chains, " Operations Research (1985),
 University Press, 2009.
 
 """
-[eigen_solve, lu_solve, gth_solve]
+(eigen_solve, lu_solve, gth_solve)
 
 """
 Find the recurrent classes of the `MarkovChain`
