@@ -29,7 +29,7 @@ facts("Testing compute_fp.jl") do
     # convergence inside interval of convergence
     let f(x) = T(x, mu_1)
         for i in unit_inverval
-            @fact abs_fp(f, i, 0.0) => roughly(0.0; rough_kwargs...)
+            @fact abs_fp(f, i, 0.0) --> roughly(0.0; rough_kwargs...)
         end
     end
 
@@ -37,14 +37,14 @@ facts("Testing compute_fp.jl") do
     let f(x) = T(x, mu_2)
         for i in unit_inverval
             # none of these should converge to 0
-            @fact abs_fp(f, i, 0.0) < 1e-4 => false
+            @fact abs_fp(f, i, 0.0) < 1e-4 --> false
         end
     end
 
     # convergence inside interval of convergence
     let f(x) = T(x, mu_2), fp = (4 * mu_2 - 1) / (4 * mu_2)
         for i in unit_inverval
-            @fact abs_fp(f, i, fp) => roughly(0.0; rough_kwargs...)
+            @fact abs_fp(f, i, fp) --> roughly(0.0; rough_kwargs...)
         end
     end
 
@@ -52,7 +52,7 @@ facts("Testing compute_fp.jl") do
     let f(x) = T(x, mu_1), fp = (4 * mu_1 - 1) / (4 * mu_1)
         for i in unit_inverval
             # none of these should converge to 0
-            @fact abs_fp(f, i, fp) < 1e-4 => false
+            @fact abs_fp(f, i, fp) < 1e-4 --> false
         end
     end
 

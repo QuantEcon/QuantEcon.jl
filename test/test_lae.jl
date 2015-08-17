@@ -38,13 +38,13 @@ facts("Testing lae.jl") do
     # test stuff
     for l in laes
         # make sure X is made a column vector by constructor
-        @fact size(l.X, 2) => 1
+        @fact size(l.X, 2) --> 1
 
         # make sure X is indeed a column vector (2 dims)
-        @fact ndims(l.X) => 2
+        @fact ndims(l.X) --> 2
 
         # Make sure we get 1d estimate out
-        @fact size(lae_est(l, y)) => (n_y, )
+        @fact size(lae_est(l, y)) --> (n_y, )
     end
 end  # facts
 end  # module
