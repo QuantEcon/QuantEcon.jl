@@ -45,7 +45,7 @@ where
  - `theta::Vector` : MA parameters theta_1, ..., theta_q
  - `p::Integer` : Number of AR coefficients
  - `q::Integer` : Number of MA coefficients
- - `sigma::Real` : Variance of white noise
+ - `sigma::Real` : Standard deviation of white noise
  - `ma_poly::Vector` : MA polynomial --- filtering representatoin
  - `ar_poly::Vector` : AR polynomial --- filtering representation
 
