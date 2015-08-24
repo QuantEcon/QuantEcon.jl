@@ -13,6 +13,30 @@ http://quant-econ.net/jl/finite_markov.html
 import LightGraphs: DiGraph, period, attracting_components,
                     strongly_connected_components, is_strongly_connected
 
+____solver_docs = """
+solve x(P-I)=0 using either an eigendecomposition, lu factorization, or an
+algorithm presented by Grassmann-Taksar-Heyman (GTH)
+
+##### Arguments
+
+- `p::Matrix` : valid stochastic matrix
+
+##### Returns
+
+- `x::Matrix`: A matrix whose columns contain stationary vectors of `p`
+
+##### References
+
+The following references were consulted for the GTH algorithm
+
+- W. K. Grassmann, M. I. Taksar and D. P. Heyman, "Regenerative Analysis and
+Steady State Distributions for Markov Chains, " Operations Research (1985),
+1107-1116.
+- W. J. Stewart, Probability, Markov Chains, Queues, and Simulation, Princeton
+University Press, 2009.
+
+"""
+
 """
 Finite-state discrete-time Markov chain.
 
@@ -57,6 +81,7 @@ function Base.show(io::IO, mc::MarkovChain)
 end
 
 # solve x(P-I)=0 by eigen decomposition
+"$(____solver_docs)"
 function eigen_solve{T}(p::Matrix{T})
     ef = eigfact(p')
     isunit = map(x->isapprox(x, 1), ef.values)
@@ -70,6 +95,7 @@ function eigen_solve{T}(p::Matrix{T})
 end
 
 # solve x(P-I)=0 by lu decomposition
+"$(____solver_docs)"
 function lu_solve{T}(p::Matrix{T})
     n, m = size(p)
     x   = vcat(Array(T, n-1), one(T))
@@ -85,6 +111,7 @@ function lu_solve{T}(p::Matrix{T})
     x
 end
 
+"$(____solver_docs)"
 gth_solve{T<:Integer}(a::Matrix{T}) = gth_solve(convert(Array{Rational, 2}, a))
 
 # solve x(P-I)=0 by the GTH method
@@ -118,31 +145,6 @@ function gth_solve{T<:Real}(original::Matrix{T})
     # normalisation
     x / sum(x)
 end
-
-"""
-solve x(P-I)=0 using either an eigendecomposition, lu factorization, or an
-algorithm presented by Grassmann-Taksar-Heyman (GTH)
-
-##### Arguments
-
-- `p::Matrix` : valid stochastic matrix
-
-##### Returns
-
-- `x::Matrix`: A matrix whose columns contain stationary vectors of `p`
-
-##### References
-
-The following references were consulted for the GTH algorithm
-
-- W. K. Grassmann, M. I. Taksar and D. P. Heyman, "Regenerative Analysis and
-Steady State Distributions for Markov Chains, " Operations Research (1985),
-1107-1116.
-- W. J. Stewart, Probability, Markov Chains, Queues, and Simulation, Princeton
-University Press, 2009.
-
-"""
-(eigen_solve, lu_solve, gth_solve)
 
 """
 Find the recurrent classes of the `MarkovChain`
