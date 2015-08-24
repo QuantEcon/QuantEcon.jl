@@ -233,7 +233,7 @@ facts("Testing career.jl") do
         # new array to update inplace in bellman_operator! and get_greedy!
         out = copy(v_init)
         get_greedy!(cp, v_init, out)
-        @fact out --> roughly(greedy)
+        @fact out --> roughly(greedy, atol=1e-12)
 
         # now test bellman_operator!
         bellman_operator!(cp, v_init, out)
@@ -268,11 +268,11 @@ facts("Testing ifp.jl") do
         # new array to update inplace in bellman_operator! and get_greedy!
         out = copy(v_star)
         get_greedy!(cp, v_star, out)
-        @fact out --> roughly(c_star_vfi)
+        @fact out --> roughly(c_star_vfi, atol=1e-12)
 
         # now test bellman_operator!
         bellman_operator!(cp, v_star, out)
-        @fact out --> roughly(v_star)
+        @fact out --> roughly(v_star, atol=1e-12)
 
         # now test coleman_operator!
         coleman_operator!(cp, c_star, out)
@@ -314,12 +314,12 @@ facts("Testing jv.jl") do
         out1 = copy(v_star)
         out2 = copy(v_star)
         get_greedy!(jv, v_star, (out1, out2))
-        @fact out1 --> roughly(s_star)
-        @fact out2 --> roughly(phi_star)
+        @fact out1 --> roughly(s_star, atol=1e-12)
+        @fact out2 --> roughly(phi_star, atol=1e-12)
 
         # now test bellman_operator!
         bellman_operator!(jv, v_star, out1)
-        @fact out1 --> roughly(v_star)
+        @fact out1 --> roughly(v_star, atol=1e-12)
     end
 end  # facts
 
@@ -415,16 +415,16 @@ facts("Testing odu.jl") do
         # new array to update inplace in bellman_operator! and get_greedy!
         out = copy(v_star)
         get_greedy!(sp, v_star, out)
-        @fact out --> roughly(phi_vfi)
+        @fact out --> roughly(phi_vfi, atol=1e-12)
 
         # now test bellman_operator!
         bellman_operator!(sp, v_star, out)
-        @fact out --> roughly(v_star)
+        @fact out --> roughly(v_star, atol=1e-12)
 
         # now test res_wage_operator!
         out2 = copy(phi_pfi)
         res_wage_operator!(sp, phi_pfi, out2)
-        @fact out2 --> roughly(phi_pfi)
+        @fact out2 --> roughly(phi_pfi, atol=1e-12)
     end
 end  # facts
 
@@ -469,11 +469,11 @@ facts("Testing optgrowth.jl") do
         # new array to update inplace in bellman_operator! and get_greedy!
         out = copy(v_star)
         get_greedy!(gm, v_star, out)
-        @fact out --> roughly(sigma)
+        @fact out --> roughly(sigma, atol=1e-12)
 
         # now test bellman_operator!
         bellman_operator!(gm, v_star, out)
-        @fact out --> roughly(v_star)
+        @fact out --> roughly(v_star, atol=1e-12)
     end
 end  # facts
 
