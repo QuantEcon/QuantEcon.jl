@@ -28,7 +28,7 @@ function de_normalize(X, Y, beta)
     B = Array(Float64, size(beta, 1) + 1, size(beta, 2))
 
     # Infer de-normalized slope coefficients
-    B[2:end, :] = (1. / std(X[:,2:n], 1)') * std(Y) .* beta
+    B[2:end, :] = (1.0 ./ std(X[:, 2:n], 1)') * std(Y) .* beta
 
     # Infer intercept from others.
     B[1, :] = mean(Y) - mean(X[:, 2:n], 1) * B[2:end, :]
@@ -43,10 +43,10 @@ function OLS(X, Y, normalize=true)
     T, n = size(X)
     if normalize
         X1, Y1 = normalize_data(X, Y)
-        B1 = inv(X1' * X1) * X1' * Y1
+        B1 = X1 \ Y1
         B = de_normalize(X, Y, B1)
     else
-        B = inv(X' * X) * X' * Y
+        B = X \ Y
     end
 
     return B
@@ -58,13 +58,13 @@ function LS_SVD(X, Y, normalize=true)
     # Verified on 11-2-13
     if normalize
         X1, Y1 = normalize_data(X, Y)
-        U, S, V = svd(X1, true)
-        S_inv = diagm(1. / S)
+        U, S, V = svd(X1, thin=true)
+        S_inv = diagm(1.0 ./ S)
         B1 = V*S_inv * U' * Y1
         B = de_normalize(X, Y, B1)
     else
-        U, S, V = svd(X, true)
-        S_inv = diagm(1. / S)
+        U, S, V = svd(X, thin=true)
+        S_inv = diagm(1.0 ./ S)
         B = V * S_inv * U' * Y
     end
     return B
@@ -85,7 +85,7 @@ function LAD_PP(X, Y, normalize=true)
 
     #lower and upper bound
     LB = [zeros(n1)-100; zeros(2*T)]
-    UB = [zeros(n1)+100; ones(2*T) * Inf]
+    UB = [zeros(n1)+100; fill(Inf, 2T)]
 
     f = [zeros(n1); ones(2*T)]
     Aeq =  [X1 eye(T,T) -eye(T,T)]
@@ -145,11 +145,10 @@ end
 
 
 function RLS_TSVD(X, Y, penalty=7)
-
     T, n = size(X)
     n1 = n - 1
     X1, Y1 = normalize_data(X, Y)
-    U, S, V = svd(X1, true)
+    U, S, V = svd(X1; thin=true)
     r = sum((maximum(S)./ S) .<= 10.0^penalty)
     Sr_inv = zeros(Float64, n1, n1)
     Sr_inv[1:r, 1:r] = diagm(1./ S[1:r])
