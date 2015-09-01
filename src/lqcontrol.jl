@@ -292,7 +292,7 @@ function _compute_sequence{T}(lq::LQ, x0::Vector{T}, policies)
 end
 
 """
-Compute and return the optimal state and control sequence, assuming w ∼ N(0,1)
+Compute and return the optimal state and control sequence, assuming w ~ N(0,1)
 
 ##### Arguments
 
