@@ -131,7 +131,7 @@ function one_step_update!(ae, EV, EVd, EVc)
 
             # Update value and policy functions
             ae.vc[ib, iy] = current_max
-            ae.pol[ib, iy] = pol_ind
+            ae.policy[ib, iy] = pol_ind
             ae.vf[ib, iy] = defval > current_max ? defval : current_max
         end
     end
@@ -154,7 +154,11 @@ function compute_prices!(ae)
     nothing
 end
 
-function vfi(ae; tol=1e-8, maxit=10000)
+#=
+This performs value function iteration and stores all of the data inside
+the ArellanoEconomy type.
+=#
+function vfi!(ae; tol=1e-8, maxit=10000)
 
     # Unpack stuff
     β, γ, r, ρ, η, θ, ny, nB = _unpack(ae)
@@ -192,4 +196,69 @@ function vfi(ae; tol=1e-8, maxit=10000)
     end
 
     nothing
+end
+
+function QuantEcon.simulate(ae, T::Int=5000;
+                            y_init=mean(ae.ygrid), B_init=mean(ae.Bgrid))
+
+    # Get initial indices
+    zero_index = searchsortedfirst(ae.Bgrid, 0.)
+    y_init_ind = searchsortedfirst(ae.ygrid, y_init)
+    B_init_ind = searchsortedfirst(ae.Bgrid, B_init)
+    initial_dist, meany = zeros(ae.ny), mean(ae.ygrid)
+    initial_dist[y_init_ind] = 1
+
+    # Create a QE MarkovChain
+    mc = MarkovChain(ae.Π)
+    y_sim_indices = simulate(mc, initial_dist, T+1)
+
+    # Allocate and Fill output
+    y_sim_val, B_sim_val, q_sim_val = Array(Float64, T+1), Array(Float64, T+1), Array(Float64, T+1)
+    B_sim_indices = Array(Int, T+1)
+    default_status = fill(false, T+1)
+    B_sim_indices[1], default_status[1] = B_init_ind, false
+    y_sim_val[1], B_sim_val[1] = ae.ygrid[y_init_ind], ae.Bgrid[B_init_ind]
+
+    for t=1:T
+        # Get today's indexes
+        yi, Bi = y_sim_indices[t], B_sim_indices[t]
+        defstat = default_status[t]
+
+        # If you are not in default
+        if !defstat
+            default_today = ae.vc[Bi, yi] < ae.vd[yi] ? true : false
+
+            if default_today
+                # Default values
+                default_status[t] = true
+                default_status[t+1] = true
+                y_sim_val[t] = ae.ydefgrid[y_sim_indices[t]]
+                B_sim_indices[t+1] = zero_index
+                B_sim_val[t+1] = 0.
+                q_sim_val[t] = 0.
+            else
+                default_status[t] = false
+                y_sim_val[t] = ae.ygrid[y_sim_indices[t]]
+                B_sim_indices[t+1] = ae.policy[Bi, yi]
+                B_sim_val[t+1] = ae.Bgrid[B_sim_indices[t+1]]
+                q_sim_val[t] = ae.q[B_sim_indices[t+1], y_sim_indices[t]]
+            end
+
+        # If you are in default
+        else
+            B_sim_indices[t+1] = zero_index
+            B_sim_val[t+1] = 0.
+            y_sim_val[t] = ae.ydefgrid[y_sim_indices[t]]
+            q_sim_val[t] = 0.
+
+            # With probability θ exit default status
+            if rand() < ae.θ
+                default_status[t+1] = false
+            else
+                default_status[t+1] = true
+            end
+        end
+    end
+
+    return B_sim_val[1:T], y_sim_val[1:T], q_sim_val[1:T], default_status[1:T]
 end
