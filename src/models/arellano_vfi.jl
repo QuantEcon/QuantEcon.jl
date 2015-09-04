@@ -1,8 +1,5 @@
-try
-    using QuantEcon: tauchen, MarkovChain, simulate
-catch
-    using QuantEcon: tauchen, MarkovChain, simulate
-end
+using QuantEcon: tauchen, MarkovChain, simulate
+
 
 # ------------------------------------------------------------------- #
 # Define the main Arellano Economy type
