@@ -11,7 +11,7 @@ using Grid: CoordInterpGrid, BCnan, BCnearest, InterpLinear
 
 export
 # types
-    Arellano_Economy,
+    ArellanoEconomy,
     AssetPrices,
     CareerWorkerProblem,
     ConsumerProblem,

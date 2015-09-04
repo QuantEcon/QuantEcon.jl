@@ -30,7 +30,7 @@ ny : int
 nB : int
     Number of points in B grid
 =#
-immutable Arellano_Economy
+immutable ArellanoEconomy
     # Model Parameters
     β::Float64
     γ::Float64
@@ -56,7 +56,7 @@ immutable Arellano_Economy
     defprob::Array{Float64, 2}
 end
 
-function Arellano_Economy(;β=.953, γ=2., r=0.017, ρ=0.945, η=0.025, θ=0.282,
+function ArellanoEconomy(;β=.953, γ=2., r=0.017, ρ=0.945, η=0.025, θ=0.282,
                           ny=21, nB=251)
 
     # Create grids
@@ -74,14 +74,14 @@ function Arellano_Economy(;β=.953, γ=2., r=0.017, ρ=0.945, η=0.025, θ=0.282
     q = ones(nB, ny) .* (1 / (1 + r))
     defprob = Array(Float64, nB, ny)
 
-    return Arellano_Economy(β, γ, r, ρ, η, θ, ny, nB, ygrid, ydefgrid, Bgrid, Π,
+    return ArellanoEconomy(β, γ, r, ρ, η, θ, ny, nB, ygrid, ydefgrid, Bgrid, Π,
                             vf, vd, vc, policy, q, defprob)
 end
 
-u(ae::Arellano_Economy, c) = c^(1 - ae.γ) / (1 - ae.γ)
-_unpack(ae::Arellano_Economy) =
+u(ae::ArellanoEconomy, c) = c^(1 - ae.γ) / (1 - ae.γ)
+_unpack(ae::ArellanoEconomy) =
     ae.β, ae.γ, ae.r, ae.ρ, ae.η, ae.θ, ae.ny, ae.nB
-_unpackgrids(ae::Arellano_Economy) =
+_unpackgrids(ae::ArellanoEconomy) =
     ae.ygrid, ae.ydefgrid, ae.Bgrid, ae.Π, ae.vf, ae.vd, ae.vc, ae.policy, ae.q, ae.defprob
 
 
@@ -95,7 +95,7 @@ at every state by solving for the optimal choice of savings
 
 Note: Updates value functions in place.
 =#
-function one_step_update!(ae::Arellano_Economy, EV, EVd, EVc)
+function one_step_update!(ae::ArellanoEconomy, EV, EVd, EVc)
 
     # Unpack stuff
     β, γ, r, ρ, η, θ, ny, nB = _unpack(ae)
@@ -136,7 +136,7 @@ function one_step_update!(ae::Arellano_Economy, EV, EVd, EVc)
     nothing
 end
 
-function compute_prices!(ae::Arellano_Economy)
+function compute_prices!(ae::ArellanoEconomy)
     # Unpack parameters
     β, γ, r, ρ, η, θ, ny, nB = _unpack(ae)
 
@@ -155,7 +155,7 @@ end
 This performs value function iteration and stores all of the data inside
 the ArellanoEconomy type.
 =#
-function vfi!(ae::Arellano_Economy; tol=1e-8, maxit=10000)
+function vfi!(ae::ArellanoEconomy; tol=1e-8, maxit=10000)
 
     # Unpack stuff
     β, γ, r, ρ, η, θ, ny, nB = _unpack(ae)
@@ -195,7 +195,7 @@ function vfi!(ae::Arellano_Economy; tol=1e-8, maxit=10000)
     nothing
 end
 
-function QuantEcon.simulate(ae::Arellano_Economy, T::Int=5000;
+function QuantEcon.simulate(ae::ArellanoEconomy, T::Int=5000;
                             y_init=mean(ae.ygrid), B_init=mean(ae.Bgrid))
 
     # Get initial indices
