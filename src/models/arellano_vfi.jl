@@ -95,7 +95,7 @@ at every state by solving for the optimal choice of savings
 
 Note: Updates value functions in place.
 =#
-function one_step_update!(ae, EV, EVd, EVc)
+function one_step_update!(ae::Arellano_Economy, EV, EVd, EVc)
 
     # Unpack stuff
     β, γ, r, ρ, η, θ, ny, nB = _unpack(ae)
@@ -136,7 +136,7 @@ function one_step_update!(ae, EV, EVd, EVc)
     nothing
 end
 
-function compute_prices!(ae)
+function compute_prices!(ae::Arellano_Economy)
     # Unpack parameters
     β, γ, r, ρ, η, θ, ny, nB = _unpack(ae)
 
@@ -155,7 +155,7 @@ end
 This performs value function iteration and stores all of the data inside
 the ArellanoEconomy type.
 =#
-function vfi!(ae; tol=1e-8, maxit=10000)
+function vfi!(ae::Arellano_Economy; tol=1e-8, maxit=10000)
 
     # Unpack stuff
     β, γ, r, ρ, η, θ, ny, nB = _unpack(ae)
@@ -195,7 +195,7 @@ function vfi!(ae; tol=1e-8, maxit=10000)
     nothing
 end
 
-function QuantEcon.simulate(ae, T::Int=5000;
+function QuantEcon.simulate(ae::Arellano_Economy, T::Int=5000;
                             y_init=mean(ae.ygrid), B_init=mean(ae.Bgrid))
 
     # Get initial indices
