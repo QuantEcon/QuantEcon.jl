@@ -18,14 +18,16 @@ export
     LucasTree,
     SearchProblem,
     GrowthModel,
+    UncertaintyTrapEcon,
 
 # functions
-    tree_price, consol_price, call_option,            # asset_pricing
-    get_greedy, get_greedy!,                          # career, odu, optgrowth
-    coleman_operator, coleman_operator!, init_values, # ifp
-    compute_lt_price, lucas_operator,                 # lucastree
-    res_wage_operator, res_wage_operator!,            # odu
-    bellman_operator, bellman_operator!               # many
+    tree_price, consol_price, call_option,               # asset_pricing
+    get_greedy, get_greedy!,                             # career, odu, optgrowth
+    coleman_operator, coleman_operator!, init_values,    # ifp
+    compute_lt_price, lucas_operator,                    # lucastree
+    res_wage_operator, res_wage_operator!,               # odu
+    bellman_operator, bellman_operator!,                 # many
+    psi, update_beliefs!, update_theta!, gen_aggregates  # uncertainty_traps
 
 ____bellman_main_docstring = """
 Apply the Bellman operator for a given model and initial value
@@ -55,7 +57,7 @@ include("models/jv.jl")
 include("models/lucastree.jl")
 include("models/odu.jl")
 include("models/optgrowth.jl")
-
+include("models/uncertainty_traps.jl")
 
 """
 $(____bellman_main_docstring). $(____see_methods_docstring)

@@ -104,7 +104,10 @@ export
 
 # quadsums
     var_quadratic_sum,
-    m_quadratic_sum
+    m_quadratic_sum,
+
+# export the models module
+    Models
 
 include("util.jl")
 ##### includes
