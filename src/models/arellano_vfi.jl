@@ -12,24 +12,28 @@ domestic households. Domestic households receive a stochastic
 path of income.
 
 ##### Fields
-* `β::Real` : Time discounting parameter
-* `γ::Real` : Risk aversion parameter
-* `r::Real` : World interest rate
-* `ρ::Real` : Autoregressive coefficient on income process
-* `η::Real` : Standard deviation of noise in income process
-* `θ::Real` : Probability of re-entering the world financial sector after default
-* `ny::Int` : Number of points to use in approximation of income process
-* `nB::Int` : Number of points to use in approximation of asset holdings
-* `ygrid::Vector{Float64}` : This is the grid used to approximate income process
-* `ydefgrid::Vector{Float64}` : When in default get less income than process would otherwise dictate
-* `Bgrid::Vector{Float64}` : This is grid used to approximate choices of asset holdings
-* `Π::Array{Float64, 2}` : Transition probabilities between income levels
-* `vf::Array{Float64, 2}` : Place to hold value function
-* `vd::Array{Float64, 2}` : Place to hold value function when in default
-* `vc::Array{Float64, 2}` : Place to hold value function when choosing to continue
-* `policy::Array{Float64, 2}` : Place to hold asset policy function
-* `q::Array{Float64, 2}` : Place to hold prices at different pairs of (y, B')
-* `defprob::Array{Float64, 2}` : Place to hold the default probabilities for pairs of (y, B')
+* `β::Real`: Time discounting parameter
+* `γ::Real`: Risk aversion parameter
+* `r::Real`: World interest rate
+* `ρ::Real`: Autoregressive coefficient on income process
+* `η::Real`: Standard deviation of noise in income process
+* `θ::Real`: Probability of re-entering the world financial sector after default
+* `ny::Int`: Number of points to use in approximation of income process
+* `nB::Int`: Number of points to use in approximation of asset holdings
+* `ygrid::Vector{Float64}`: This is the grid used to approximate income process
+* `ydefgrid::Vector{Float64}`: When in default get less income than process
+  would otherwise dictate
+* `Bgrid::Vector{Float64}`: This is grid used to approximate choices of asset
+  holdings
+* `Π::Array{Float64, 2}`: Transition probabilities between income levels
+* `vf::Array{Float64, 2}`: Place to hold value function
+* `vd::Array{Float64, 2}`: Place to hold value function when in default
+* `vc::Array{Float64, 2}`: Place to hold value function when choosing to
+  continue
+* `policy::Array{Float64, 2}`: Place to hold asset policy function
+* `q::Array{Float64, 2}`: Place to hold prices at different pairs of (y, B')
+* `defprob::Array{Float64, 2}`: Place to hold the default probabilities for
+  pairs of (y, B')
 """
 immutable ArellanoEconomy
     # Model Parameters
@@ -62,14 +66,15 @@ This is the default constructor for building an economy as presented
 in Arellano 2008.
 
 ##### Arguments
-* `β::Real` : Time discounting parameter
-* `γ::Real` : Risk aversion parameter
-* `r::Real` : World interest rate
-* `ρ::Real` : Autoregressive coefficient on income process
-* `η::Real` : Standard deviation of noise in income process
-* `θ::Real` : Probability of re-entering the world financial sector after default
-* `ny::Int` : Number of points to use in approximation of income process
-* `nB::Int` : Number of points to use in approximation of asset holdings
+* `;β::Real(0.953)`: Time discounting parameter
+* `;γ::Real(2.0)`: Risk aversion parameter
+* `;r::Real(0.017)`: World interest rate
+* `;ρ::Real(0.945)`: Autoregressive coefficient on income process
+* `;η::Real(0.025)`: Standard deviation of noise in income process
+* `;θ::Real(0.282)`: Probability of re-entering the world financial sector
+  after default
+* `;ny::Int(21)`: Number of points to use in approximation of income process
+* `;nB::Int(251)`: Number of points to use in approximation of asset holdings
 """
 function ArellanoEconomy(;β=.953, γ=2., r=0.017, ρ=0.945, η=0.025, θ=0.282,
                           ny=21, nB=251)
@@ -111,17 +116,18 @@ choice of savings
 
 ##### Arguments
 
-* `ae::ArellanoEconomy` : This is the economy we would like to update the
-                          value functions for
-* `EV::Array{Float64, 2}` : Expected value function at each state
-* `EVd::Array{Float64, 2}` : Expected value function of default at each state
-* `EVc::Array{Float64, 2}` : Expected value function of continuing at each state
+* `ae::ArellanoEconomy`: This is the economy we would like to update the
+  value functions for
+* `EV::Matrix{Float64}`: Expected value function at each state
+* `EVd::Matrix{Float64}`: Expected value function of default at each state
+* `EVc::Matrix{Float64}`: Expected value function of continuing at each state
 
 ##### Notes
 
 * This function updates value functions and policy functions in place.
 """
-function one_step_update!(ae::ArellanoEconomy, EV, EVd, EVc)
+function one_step_update!(ae::ArellanoEconomy, EV::Matrix{Float64},
+                          EVd::Matrix{Float64}, EVc::Matrix{Float64})
 
     # Unpack stuff
     β, γ, r, ρ, η, θ, ny, nB = _unpack(ae)
@@ -155,7 +161,7 @@ function one_step_update!(ae::ArellanoEconomy, EV, EVd, EVc)
             # Update value and policy functions
             ae.vc[ib, iy] = current_max
             ae.policy[ib, iy] = pol_ind
-            ae.vf[ib, iy] = defval > current_max ? defval : current_max
+            ae.vf[ib, iy] = defval > current_max ? defval: current_max
         end
     end
 
@@ -168,8 +174,8 @@ policy functions and then updates the prices for each (y, B') pair
 
 ##### Arguments
 
-* `ae::ArellanoEconomy` : This is the economy we would like to update the
-                          prices for
+* `ae::ArellanoEconomy`: This is the economy we would like to update the
+  prices for
 
 ##### Notes
 
@@ -196,9 +202,9 @@ the ArellanoEconomy type.
 
 ##### Arguments
 
-* `ae::ArellanoEconomy` : This is the economy we would like to solve
-* `tol::Float64` : Level of tolerance we would like to achieve
-* `maxit::Int` : Maximum number of iterations
+* `ae::ArellanoEconomy`: This is the economy we would like to solve
+* `;tol::Float64(1e-8)`: Level of tolerance we would like to achieve
+* `;maxit::Int(10000)`: Maximum number of iterations
 
 ##### Notes
 
@@ -250,24 +256,27 @@ This function simulates the Arellano economy
 
 ##### Arguments
 
-* `ae::ArellanoEconomy` : This is the economy we would like to solve
-* `T::Int` : Number of periods to simulate
-* `y_init::Float64` : The level of income we would like to start with
-* `B_init::Float64` : The level of asset holdings we would like to start with
+* `ae::ArellanoEconomy`: This is the economy we would like to solve
+* `capT::Int`: Number of periods to simulate
+* `;y_init::Float64(mean(ae.ygrid)`: The level of income we would like to
+  start with
+* `;B_init::Float64(mean(ae.Bgrid)`: The level of asset holdings we would like
+  to start with
 
 ##### Returns
 
-* `B_sim_val::Vector{Float64}` : Simulated values of assets
-* `y_sim_val::Vector{Float64}` : Simulated values of income
-* `q_sim_val::Vector{Float64}` : Simulated values of prices
-* `default_status::Vector{Float64}` : Simulated default status (True if in default)
+* `B_sim_val::Vector{Float64}`: Simulated values of assets
+* `y_sim_val::Vector{Float64}`: Simulated values of income
+* `q_sim_val::Vector{Float64}`: Simulated values of prices
+* `default_status::Vector{Float64}`: Simulated default status
+  (true if in default)
 
 ##### Notes
 
 * This updates all value functions, policy functions, and prices in place.
 
 """
-function QuantEcon.simulate(ae::ArellanoEconomy, T::Int=5000;
+function QuantEcon.simulate(ae::ArellanoEconomy, capT::Int=5000;
                             y_init=mean(ae.ygrid), B_init=mean(ae.Bgrid))
 
     # Get initial indices
@@ -279,23 +288,24 @@ function QuantEcon.simulate(ae::ArellanoEconomy, T::Int=5000;
 
     # Create a QE MarkovChain
     mc = MarkovChain(ae.Π)
-    y_sim_indices = simulate(mc, initial_dist, T+1)
+    y_sim_indices = simulate(mc, initial_dist, capT+1)
 
     # Allocate and Fill output
-    y_sim_val, B_sim_val, q_sim_val = Array(Float64, T+1), Array(Float64, T+1), Array(Float64, T+1)
-    B_sim_indices = Array(Int, T+1)
-    default_status = fill(false, T+1)
+    y_sim_val = Array(Float64, capT+1)
+    B_sim_val, q_sim_val = similar(y_sim_val), similar(y_sim_val)
+    B_sim_indices = Array(Int, capT+1)
+    default_status = fill(false, capT+1)
     B_sim_indices[1], default_status[1] = B_init_ind, false
     y_sim_val[1], B_sim_val[1] = ae.ygrid[y_init_ind], ae.Bgrid[B_init_ind]
 
-    for t=1:T
+    for t=1:capT
         # Get today's indexes
         yi, Bi = y_sim_indices[t], B_sim_indices[t]
         defstat = default_status[t]
 
         # If you are not in default
         if !defstat
-            default_today = ae.vc[Bi, yi] < ae.vd[yi] ? true : false
+            default_today = ae.vc[Bi, yi] < ae.vd[yi] ? true: false
 
             if default_today
                 # Default values
@@ -329,5 +339,6 @@ function QuantEcon.simulate(ae::ArellanoEconomy, T::Int=5000;
         end
     end
 
-    return B_sim_val[1:T], y_sim_val[1:T], q_sim_val[1:T], default_status[1:T]
+    return (B_sim_val[1:capT], y_sim_val[1:capT], q_sim_val[1:capT],
+            default_status[1:capT])
 end
