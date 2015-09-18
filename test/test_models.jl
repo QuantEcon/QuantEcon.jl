@@ -16,7 +16,7 @@ function set_up_data(cp::ConsumerProblem)
     else
         v_init, c_init = init_values(cp)
         v_star = compute_fixed_point(x-> bellman_operator(cp, x), v_init,
-                                     max_iter=1000, err_tol=1e-7,
+                                     max_iter=5000, err_tol=1e-10,
                                      verbose=true, print_skip=10)
         write(f, "ifp/v_star", v_star)
     end
@@ -35,7 +35,7 @@ function set_up_data(cp::ConsumerProblem)
     else
         v_init, c_init = init_values(cp)
         c_star = compute_fixed_point(x-> coleman_operator(cp, x), c_init,
-                                     max_iter=1000, err_tol=1e-7,
+                                     max_iter=5000, err_tol=1e-10,
                                      verbose=true, print_skip=10)
         write(f, "ifp/c_star", c_star)
     end
@@ -55,7 +55,7 @@ function set_up_data(jv::JvWorker)
     else
         v_init = [jv.x_grid .* 0.5]
         v_star = compute_fixed_point(x-> bellman_operator(jv, x), v_init,
-                                     max_iter=1000, err_tol=1e-7,
+                                     max_iter=5000, err_tol=1e-10,
                                      verbose=true, print_skip=10)
         write(f, "jv/v_star", v_star)
     end
@@ -91,7 +91,7 @@ function set_up_data(lt::LucasTree)
     if exists(f, "lt/prices")
         prices = read(f, "lt/prices")
     else
-        prices = compute_lt_price(lt, err_tol=1e-12, max_iter=10000)
+        prices = compute_lt_price(lt, err_tol=1e-10, max_iter=5000)
         write(f, "lt/prices", prices)
     end
 
@@ -110,7 +110,7 @@ function set_up_data(sp::SearchProblem)
     else
         v_init = fill(sp.c / (1 - sp.bet), sp.n_w, sp.n_pi)
         v_star = compute_fixed_point(x-> bellman_operator(sp, x), v_init,
-                                     print_skip=1, err_tol=1e-6, max_iter=5000)
+                                     print_skip=1, err_tol=1e-10, max_iter=5000)
         write(f, "odu/v_star", v_star)
     end
 
@@ -128,7 +128,7 @@ function set_up_data(sp::SearchProblem)
     else
         phi_init = ones(sp.n_pi)
         phi_pfi = compute_fixed_point(x-> res_wage_operator(sp, x), phi_init,
-                                      print_skip=1, err_tol=1e-6, max_iter=5000)
+                                      print_skip=1, err_tol=1e-10, max_iter=5000)
         write(f, "odu/phi_pfi", phi_pfi)
     end
 
@@ -146,7 +146,7 @@ function set_up_data(gm::GrowthModel)
     else
         v_init = 5 .* gm.u([gm.grid]) .- 25
         v_star = compute_fixed_point(x->bellman_operator(gm, x), v_init,
-                                     err_tol=1e-8, max_iter=5000, print_skip=1)
+                                     err_tol=1e-10, max_iter=5000, print_skip=1)
         write(f, "gm/v_star", v_star)
     end
 

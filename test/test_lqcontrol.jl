@@ -35,16 +35,16 @@ facts("Testing lqcontrol.jl") do
            (2.*lq_scalar.Q+lq_scalar.bet*lq_scalar.rf*2lq_scalar.B^2)*x0
         x_1 = lq_scalar.A * x0 + lq_scalar.B * u_0 + w_seq[end]
 
-        @fact u_0[1] => roughly(u_seq[end]; rough_kwargs...)
-        @fact x_1[1] => roughly(x_seq[end]; rough_kwargs...)
+        @fact u_0[1] --> roughly(u_seq[end]; rough_kwargs...)
+        @fact x_1[1] --> roughly(x_seq[end]; rough_kwargs...)
     end
 
     context("test matrix solutions") do
         x0 = randn(2) * 25
         x_seq, u_seq, w_seq = compute_sequence(lq_mat, x0)
 
-        @fact sum(u_seq) => roughly(0.95 * sum(x0); rough_kwargs...)
-        @fact x_seq[:,end] => roughly(zeros(x0); rough_kwargs...)
+        @fact sum(u_seq) --> roughly(0.95 * sum(x0); rough_kwargs...)
+        @fact x_seq[:,end] --> roughly(zeros(x0); rough_kwargs...)
     end
 
     context("test stationary matrix") do
@@ -57,9 +57,9 @@ facts("Testing lqcontrol.jl") do
         val_func_lq = (x0' * P * x0)[1]
         val_func_answer = x0[1]^2
 
-        @fact f_answer => roughly(F; rough_kwargs...)
-        @fact val_func_lq => roughly(val_func_answer; rough_kwargs...)
-        @fact p_answer => roughly(P; rough_kwargs...)
+        @fact f_answer --> roughly(F; rough_kwargs...)
+        @fact val_func_lq --> roughly(val_func_answer; rough_kwargs...)
+        @fact p_answer --> roughly(P; rough_kwargs...)
     end
 
     context("test runs a (n,k,j) = (2,1,1) model") do
@@ -85,7 +85,7 @@ facts("Testing lqcontrol.jl") do
         lq = LQ(Q, R, A, B, C; bet=bet, capT=T, rf=Rf)
         x0 = [0.0, 1.0]
         xp, up, wp = compute_sequence(lq, x0)
-        @fact true => true  # just assert true if we made it to this point
+        @fact true --> true  # just assert true if we made it to this point
     end
 
 end  # facts
