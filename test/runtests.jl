@@ -1,24 +1,35 @@
-using FactCheck
+using Compat  # for startswith
 
-include("util.jl")
+function test_file_string(s)
+    if !startswith("test_", s)
+        s = string("test_", s)
+    end
 
-include("test_arma.jl")
-include("test_compute_fp.jl")
-include("test_discrete_rv.jl")
-include("test_ecdf.jl")
-include("test_estspec.jl")
-include("test_kalman.jl")
-include("test_lae.jl")
-include("test_lqcontrol.jl")
-include("test_lqnash.jl")
-include("test_lss.jl")
-include("test_markov_approx.jl")
-include("test_matrix_eqn.jl")
-include("test_mc_tools.jl")
-include("test_models.jl")
-include("test_quad.jl")
-include("test_quadsum.jl")
-include("test_random_mc.jl")
-include("test_robustlq.jl")
+    if !endswith(s, ".jl")
+        s = string(s, ".jl")
+    end
+    return Pkg.dir("QuantEcon", "test", s)
+end
+
+if length(ARGS) > 0
+    tests = map(test_file_string, ARGS)
+else
+    tests = map(test_file_string, ["arma", "compute_fp", "discrete_rv", "ecdf",
+                                   "estspec", "kalman", "lae", "lqcontrol",
+                                   "lqnash", "lss", "markov_approx",
+                                   "matrix_eqn", "mc_tools", "quad", "quadsum",
+                                   "random_mc", "robustlq"])
+end
+
+n = min(8, CPU_CORES, length(tests))
+n > 1 && addprocs(n)
+
+@everywhere using FactCheck
+@everywhere include(Pkg.dir("QuantEcon", "test", "util.jl"))
+
+@sync @parallel for test_file in tests
+    println("running for $test_file")
+    include(test_file)
+end
 
 exitstatus()

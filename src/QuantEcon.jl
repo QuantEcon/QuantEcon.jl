@@ -106,6 +106,9 @@ export
     var_quadratic_sum,
     m_quadratic_sum,
 
+# export the models module
+    Models,
+
 # random_mc
     random_markov_chain, random_stochastic_matrix
 

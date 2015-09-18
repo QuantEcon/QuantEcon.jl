@@ -15,7 +15,7 @@ drv = DiscreteRV(x)
 
 facts("Testing discrete_rv.jl") do
     # test Q sums to 1
-    @fact drv.Q[end] => roughly(1.0)
+    @fact drv.Q[end] --> roughly(1.0)
 
     # test lln
     draws = draw(drv, 100000)
@@ -26,7 +26,7 @@ facts("Testing discrete_rv.jl") do
     end
     counts ./= sum(counts)
 
-    @fact Base.maxabs(counts - drv.q) => roughly(0.0; atol=1e-2)
+    @fact Base.maxabs(counts - drv.q) --> roughly(0.0; atol=1e-2)
 
 end  # facts
 end  # module

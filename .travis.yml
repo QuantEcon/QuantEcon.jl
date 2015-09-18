@@ -1,10 +1,7 @@
 language: julia
-os:
-    - linux
-    - osx
 julia:
-    - release
-    - nightly
+    - 0.3
+    - 0.4
 notifications:
     email: false
 script:
@@ -12,4 +9,5 @@ script:
     - julia -e 'Pkg.clone(pwd()); Pkg.build("QuantEcon")'
     - julia -e 'Pkg.test("QuantEcon", coverage=true)'
 after_success:
-    - if [ $TRAVIS_JULIA_VERSION = "nightly" ]; then julia -e 'cd(Pkg.dir("QuantEcon")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'; fi
+    - echo $TRAVIS_JULIA_VERSION
+    - julia -e 'Pkg.add("Coverage"); cd(Pkg.dir("QuantEcon")); using Coverage; Coveralls.submit(process_folder())'
