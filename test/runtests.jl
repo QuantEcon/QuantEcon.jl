@@ -1,3 +1,5 @@
+using Compat  # for startswith
+
 function test_file_string(s)
     if !startswith("test_", s)
         s = string("test_", s)
