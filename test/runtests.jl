@@ -18,6 +18,7 @@ include("test_mc_tools.jl")
 include("test_models.jl")
 include("test_quad.jl")
 include("test_quadsum.jl")
+include("test_random_mc.jl")
 include("test_robustlq.jl")
 
 exitstatus()

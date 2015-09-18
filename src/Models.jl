@@ -11,6 +11,7 @@ using Grid: CoordInterpGrid, BCnan, BCnearest, InterpLinear
 
 export
 # types
+    ArellanoEconomy,
     AssetPrices,
     CareerWorkerProblem,
     ConsumerProblem,
@@ -21,6 +22,7 @@ export
     UncertaintyTrapEcon,
 
 # functions
+    vfi!,                                                # arellano_vfi
     tree_price, consol_price, call_option,               # asset_pricing
     get_greedy, get_greedy!,                             # career, odu, optgrowth
     coleman_operator, coleman_operator!, init_values,    # ifp
@@ -50,6 +52,7 @@ There is also a version of this function that accepts keyword arguments for
 each parameter
 """
 
+include("models/arellano_vfi.jl")
 include("models/asset_pricing.jl")
 include("models/career.jl")
 include("models/ifp.jl")
