@@ -339,6 +339,6 @@ function QuantEcon.simulate(ae::ArellanoEconomy, capT::Int=5000;
         end
     end
 
-    return (B_sim_val[1:capT], y_sim_val[1:capT], q_sim_val[1:capT],
+    return (y_sim_val[1:capT], B_sim_val[1:capT], q_sim_val[1:capT],
             default_status[1:capT])
 end
