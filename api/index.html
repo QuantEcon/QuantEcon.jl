@@ -148,8 +148,6 @@
         
             <li><a href="#types-exported">Types [Exported]</a></li>
         
-            <li><a href="#functions-internal">Functions [Internal]</a></li>
-        
             <li><a href="#methods-internal">Methods [Internal]</a></li>
         
             <li><a href="#module-quanteconmodels">MODULE: QuantEcon.Models</a></li>
@@ -171,19 +169,9 @@
 <h2 id="module-quantecon">MODULE: QuantEcon</h2>
 <hr />
 <h2 id="functions-exported">Functions [Exported]</h2>
-<p><a href="QuantEcon/#function__do_quad.1">do_quad</a>  Approximate the integral of <code>f</code>, given quadrature <code>nodes</code> and <code>weights</code></p>
-<p><a href="QuantEcon/#function__ecdf.1">ecdf</a>  Evaluate the empirical cdf at one or more points</p>
-<p><a href="QuantEcon/#function__gth_solve.1">gth_solve</a>  solve x(P-I)=0 using either an eigendecomposition, lu factorization, or an</p>
-<p><a href="QuantEcon/#function__periodogram.1">periodogram</a>  Computes the periodogram</p>
-<p><a href="QuantEcon/#function__qnwbeta.1">qnwbeta</a>  Computes nodes and weights for beta distribution</p>
-<p><a href="QuantEcon/#function__qnwcheb.1">qnwcheb</a>  Computes multivariate Guass-Checbychev quadrature nodes and weights.</p>
-<p><a href="QuantEcon/#function__qnwequi.1">qnwequi</a>  Generates equidistributed sequences with property that averages</p>
-<p><a href="QuantEcon/#function__qnwgamma.1">qnwgamma</a>  Computes nodes and weights for beta distribution</p>
-<p><a href="QuantEcon/#function__qnwlege.1">qnwlege</a>  Computes multivariate Guass-Legendre  quadrature nodes and weights.</p>
-<p><a href="QuantEcon/#function__qnwnorm.1">qnwnorm</a>  Computes nodes and weights for multivariate normal distribution</p>
-<p><a href="QuantEcon/#function__qnwsimp.1">qnwsimp</a>  Computes multivariate Simpson quadrature nodes and weights.</p>
-<p><a href="QuantEcon/#function__qnwtrap.1">qnwtrap</a>  Computes multivariate trapezoid quadrature nodes and weights.</p>
-<p><a href="QuantEcon/#function__quadrect.1">quadrect</a>  Integrate the d-dimensional function f on a rectangle with lower and upper bound</p>
+<p><a href="QuantEcon/#function__do_quad.1">QuantEcon.do_quad</a>  Approximate the integral of <code>f</code>, given quadrature <code>nodes</code> and <code>weights</code></p>
+<p><a href="QuantEcon/#function__ecdf.1">QuantEcon.ecdf</a>  Evaluate the empirical cdf at one or more points</p>
+<p><a href="QuantEcon/#function__periodogram.1">QuantEcon.periodogram</a>  Computes the periodogram</p>
 <hr />
 <h2 id="methods-exported">Methods [Exported]</h2>
 <p><a href="QuantEcon/#method__f_to_k.1">F_to_K(rlq::QuantEcon.RBLQ,  F::Array{T, 2})</a>  Compute agent 2's best cost-minimizing response <code>K</code>, given <code>F</code>.</p>
@@ -195,8 +183,8 @@
 <p><a href="QuantEcon/#method__b_operator.1">b_operator(rlq::QuantEcon.RBLQ,  P::Array{T, 2})</a>  The D operator, mapping P into</p>
 <p><a href="QuantEcon/#method__compute_deterministic_entropy.1">compute_deterministic_entropy(rlq::QuantEcon.RBLQ,  F,  K,  x0)</a>  Given <code>K</code> and <code>F</code>, compute the value of deterministic entropy, which is sum_t</p>
 <p><a href="QuantEcon/#method__compute_fixed_point.1">compute_fixed_point{TV}(T::Function,  v::TV)</a>  Repeatedly apply a function to search for a fixed point</p>
-<p><a href="QuantEcon/#method__compute_sequence.1">compute_sequence(lq::QuantEcon.LQ,  x0::Union{T, Array{T, N}})</a>  Compute and return the optimal state and control sequence, assuming w ∼ N(0,1)</p>
-<p><a href="QuantEcon/#method__compute_sequence.2">compute_sequence(lq::QuantEcon.LQ,  x0::Union{T, Array{T, N}},  ts_length::Integer)</a>  Compute and return the optimal state and control sequence, assuming w ∼ N(0,1)</p>
+<p><a href="QuantEcon/#method__compute_sequence.1">compute_sequence(lq::QuantEcon.LQ,  x0::Union{Array{T, N}, T})</a>  Compute and return the optimal state and control sequence, assuming w ~ N(0,1)</p>
+<p><a href="QuantEcon/#method__compute_sequence.2">compute_sequence(lq::QuantEcon.LQ,  x0::Union{Array{T, N}, T},  ts_length::Integer)</a>  Compute and return the optimal state and control sequence, assuming w ~ N(0,1)</p>
 <p><a href="QuantEcon/#method__d_operator.1">d_operator(rlq::QuantEcon.RBLQ,  P::Array{T, 2})</a>  The D operator, mapping P into</p>
 <p><a href="QuantEcon/#method__draw.1">draw(d::QuantEcon.DiscreteRV{T&lt;:Real})</a>  Make a single draw from the discrete distribution</p>
 <p><a href="QuantEcon/#method__draw.2">draw{T}(d::QuantEcon.DiscreteRV{T},  k::Int64)</a>  Make multiple draws from the discrete distribution represented by a</p>
@@ -204,38 +192,41 @@
 <p><a href="QuantEcon/#method__impulse_response.1">impulse_response(arma::QuantEcon.ARMA)</a>  Get the impulse response corresponding to our model.</p>
 <p><a href="QuantEcon/#method__lae_est.1">lae_est{T}(l::QuantEcon.LAE,  y::AbstractArray{T, N})</a>  A vectorized function that returns the value of the look ahead estimate at the</p>
 <p><a href="QuantEcon/#method__m_quadratic_sum.1">m_quadratic_sum(A::Array{T, 2},  B::Array{T, 2})</a>  Computes the quadratic sum</p>
-<p><a href="QuantEcon/#method__mc_compute_stationary.1">mc_compute_stationary(mc::QuantEcon.MarkovChain)</a>  calculate the stationary distributions associated with a N-state markov chain</p>
-<p><a href="QuantEcon/#method__mc_sample_path.1">mc_sample_path!(mc::QuantEcon.MarkovChain,  samples::Array{T, N})</a>  Fill <code>samples</code> with samples from the Markov chain <code>mc</code></p>
-<p><a href="QuantEcon/#method__mc_sample_path.2">mc_sample_path(mc::QuantEcon.MarkovChain)</a>  Simulate a Markov chain starting from an initial state</p>
-<p><a href="QuantEcon/#method__mc_sample_path.3">mc_sample_path(mc::QuantEcon.MarkovChain,  init::Array{T, 1})</a>  Simulate a Markov chain starting from an initial distribution</p>
-<p><a href="QuantEcon/#method__mc_sample_path.4">mc_sample_path(mc::QuantEcon.MarkovChain,  init::Array{T, 1},  sample_size::Int64)</a>  Simulate a Markov chain starting from an initial distribution</p>
-<p><a href="QuantEcon/#method__mc_sample_path.5">mc_sample_path(mc::QuantEcon.MarkovChain,  init::Int64)</a>  Simulate a Markov chain starting from an initial state</p>
-<p><a href="QuantEcon/#method__mc_sample_path.6">mc_sample_path(mc::QuantEcon.MarkovChain,  init::Int64,  sample_size::Int64)</a>  Simulate a Markov chain starting from an initial state</p>
+<p><a href="QuantEcon/#method__mc_compute_stationary.1">mc_compute_stationary{T}(mc::QuantEcon.MarkovChain{T})</a>  calculate the stationary distributions associated with a N-state markov chain</p>
+<p><a href="QuantEcon/#method__mc_sample_path.1">mc_sample_path!(mc::QuantEcon.MarkovChain{T&lt;:Real},  samples::Array{T, N})</a>  Fill <code>samples</code> with samples from the Markov chain <code>mc</code></p>
+<p><a href="QuantEcon/#method__mc_sample_path.2">mc_sample_path(mc::QuantEcon.MarkovChain{T&lt;:Real})</a>  Simulate a Markov chain starting from an initial distribution</p>
+<p><a href="QuantEcon/#method__mc_sample_path.3">mc_sample_path(mc::QuantEcon.MarkovChain{T&lt;:Real},  init::Array{T, 1})</a>  Simulate a Markov chain starting from an initial distribution</p>
+<p><a href="QuantEcon/#method__mc_sample_path.4">mc_sample_path(mc::QuantEcon.MarkovChain{T&lt;:Real},  init::Array{T, 1},  sample_size::Int64)</a>  Simulate a Markov chain starting from an initial distribution</p>
+<p><a href="QuantEcon/#method__mc_sample_path.5">mc_sample_path(mc::QuantEcon.MarkovChain{T&lt;:Real},  init::Int64)</a>  Simulate a Markov chain starting from an initial state</p>
+<p><a href="QuantEcon/#method__mc_sample_path.6">mc_sample_path(mc::QuantEcon.MarkovChain{T&lt;:Real},  init::Int64,  sample_size::Int64)</a>  Simulate a Markov chain starting from an initial state</p>
 <p><a href="QuantEcon/#method__nnash.1">nnash(a,  b1,  b2,  r1,  r2,  q1,  q2,  s1,  s2,  w1,  w2,  m1,  m2)</a>  Compute the limit of a Nash linear quadratic dynamic game.</p>
 <p><a href="QuantEcon/#method__pdf.1">pdf(d::QuantEcon.BetaBinomial)</a>  Evaluate the pdf of the distributions at the points 0, 1, ..., k</p>
-<p><a href="QuantEcon/#method__qnwlogn.1">qnwlogn(n,  mu,  sig2)</a>  Computes quadrature nodes and weights for multivariate uniform distribution</p>
-<p><a href="QuantEcon/#method__qnwunif.1">qnwunif(n,  a,  b)</a>  Computes quadrature nodes and weights for multivariate uniform distribution</p>
+<p><a href="QuantEcon/#method__random_markov_chain.1">random_markov_chain(n::Integer)</a>  Return a randomly sampled MarkovChain instance with n states.</p>
+<p><a href="QuantEcon/#method__random_markov_chain.2">random_markov_chain(n::Integer,  k::Integer)</a>  Return a randomly sampled MarkovChain instance with n states, where each state</p>
+<p><a href="QuantEcon/#method__random_stochastic_matrix.1">random_stochastic_matrix(n::Integer)</a>  Return a randomly sampled n x n stochastic matrix.</p>
+<p><a href="QuantEcon/#method__random_stochastic_matrix.2">random_stochastic_matrix(n::Integer,  k::Integer)</a>  Return a randomly sampled n x n stochastic matrix with k nonzero entries for</p>
+<p><a href="QuantEcon/#method__recurrent_classes.1">recurrent_classes(mc::QuantEcon.MarkovChain{T&lt;:Real})</a>  Find the recurrent classes of the <code>MarkovChain</code></p>
 <p><a href="QuantEcon/#method__robust_rule.1">robust_rule(rlq::QuantEcon.RBLQ)</a>  Solves the robust control problem.</p>
 <p><a href="QuantEcon/#method__robust_rule_simple.1">robust_rule_simple(rlq::QuantEcon.RBLQ)</a>  Solve the robust LQ problem</p>
 <p><a href="QuantEcon/#method__robust_rule_simple.2">robust_rule_simple(rlq::QuantEcon.RBLQ,  P::Array{T, 2})</a>  Solve the robust LQ problem</p>
-<p><a href="QuantEcon/#method__rouwenhorst.1">rouwenhorst(N::Int64,  ρ::Real,  σ::Real)</a>  Rouwenhorst's method to approximate AR(1) processes.</p>
-<p><a href="QuantEcon/#method__rouwenhorst.2">rouwenhorst(N::Int64,  ρ::Real,  σ::Real,  μ::Real)</a>  Rouwenhorst's method to approximate AR(1) processes.</p>
+<p><a href="QuantEcon/#method__rouwenhorst.1">rouwenhorst(N::Integer,  ρ::Real,  σ::Real)</a>  Rouwenhorst's method to approximate AR(1) processes.</p>
+<p><a href="QuantEcon/#method__rouwenhorst.2">rouwenhorst(N::Integer,  ρ::Real,  σ::Real,  μ::Real)</a>  Rouwenhorst's method to approximate AR(1) processes.</p>
 <p><a href="QuantEcon/#method__simulation.1">simulation(arma::QuantEcon.ARMA)</a>  Compute a simulated sample path assuming Gaussian shocks.</p>
 <p><a href="QuantEcon/#method__smooth.1">smooth(x::Array{T, N})</a>  Version of <code>smooth</code> where <code>window_len</code> and <code>window</code> are keyword arguments</p>
 <p><a href="QuantEcon/#method__smooth.2">smooth(x::Array{T, N},  window_len::Int64)</a>  Smooth the data in x using convolution with a window of requested size and type.</p>
 <p><a href="QuantEcon/#method__smooth.3">smooth(x::Array{T, N},  window_len::Int64,  window::AbstractString)</a>  Smooth the data in x using convolution with a window of requested size and type.</p>
-<p><a href="QuantEcon/#method__solve_discrete_lyapunov.1">solve_discrete_lyapunov(A::Union{T, Array{T, N}},  B::Union{T, Array{T, N}})</a>  Solves the discrete lyapunov equation.</p>
-<p><a href="QuantEcon/#method__solve_discrete_lyapunov.2">solve_discrete_lyapunov(A::Union{T, Array{T, N}},  B::Union{T, Array{T, N}},  max_it::Int64)</a>  Solves the discrete lyapunov equation.</p>
-<p><a href="QuantEcon/#method__solve_discrete_riccati.1">solve_discrete_riccati(A::Union{T, Array{T, N}},  B::Union{T, Array{T, N}},  Q::Union{T, Array{T, N}},  R::Union{T, Array{T, N}})</a>  Solves the discrete-time algebraic Riccati equation</p>
-<p><a href="QuantEcon/#method__solve_discrete_riccati.2">solve_discrete_riccati(A::Union{T, Array{T, N}},  B::Union{T, Array{T, N}},  Q::Union{T, Array{T, N}},  R::Union{T, Array{T, N}},  N::Union{T, Array{T, N}})</a>  Solves the discrete-time algebraic Riccati equation</p>
+<p><a href="QuantEcon/#method__solve_discrete_lyapunov.1">solve_discrete_lyapunov(A::Union{Array{T, N}, T},  B::Union{Array{T, N}, T})</a>  Solves the discrete lyapunov equation.</p>
+<p><a href="QuantEcon/#method__solve_discrete_lyapunov.2">solve_discrete_lyapunov(A::Union{Array{T, N}, T},  B::Union{Array{T, N}, T},  max_it::Int64)</a>  Solves the discrete lyapunov equation.</p>
+<p><a href="QuantEcon/#method__solve_discrete_riccati.1">solve_discrete_riccati(A::Union{Array{T, N}, T},  B::Union{Array{T, N}, T},  Q::Union{Array{T, N}, T},  R::Union{Array{T, N}, T})</a>  Solves the discrete-time algebraic Riccati equation</p>
+<p><a href="QuantEcon/#method__solve_discrete_riccati.2">solve_discrete_riccati(A::Union{Array{T, N}, T},  B::Union{Array{T, N}, T},  Q::Union{Array{T, N}, T},  R::Union{Array{T, N}, T},  N::Union{Array{T, N}, T})</a>  Solves the discrete-time algebraic Riccati equation</p>
 <p><a href="QuantEcon/#method__spectral_density.1">spectral_density(arma::QuantEcon.ARMA)</a>  Compute the spectral density function.</p>
 <p><a href="QuantEcon/#method__stationary_values.1">stationary_values!(lq::QuantEcon.LQ)</a>  Computes value and policy functions in infinite horizon model</p>
 <p><a href="QuantEcon/#method__stationary_values.2">stationary_values(lq::QuantEcon.LQ)</a>  Non-mutating routine for solving for <code>P</code>, <code>d</code>, and <code>F</code> in infinite horizon model</p>
-<p><a href="QuantEcon/#method__tauchen.1">tauchen(N::Int64,  ρ::Real,  σ::Real)</a>  Tauchen's (1996) method for approximating AR(1) process with finite markov chain</p>
-<p><a href="QuantEcon/#method__tauchen.2">tauchen(N::Int64,  ρ::Real,  σ::Real,  μ::Real)</a>  Tauchen's (1996) method for approximating AR(1) process with finite markov chain</p>
-<p><a href="QuantEcon/#method__tauchen.3">tauchen(N::Int64,  ρ::Real,  σ::Real,  μ::Real,  n_std::Int64)</a>  Tauchen's (1996) method for approximating AR(1) process with finite markov chain</p>
+<p><a href="QuantEcon/#method__tauchen.1">tauchen(N::Integer,  ρ::Real,  σ::Real)</a>  Tauchen's (1996) method for approximating AR(1) process with finite markov chain</p>
+<p><a href="QuantEcon/#method__tauchen.2">tauchen(N::Integer,  ρ::Real,  σ::Real,  μ::Real)</a>  Tauchen's (1996) method for approximating AR(1) process with finite markov chain</p>
+<p><a href="QuantEcon/#method__tauchen.3">tauchen(N::Integer,  ρ::Real,  σ::Real,  μ::Real,  n_std::Integer)</a>  Tauchen's (1996) method for approximating AR(1) process with finite markov chain</p>
 <p><a href="QuantEcon/#method__update_values.1">update_values!(lq::QuantEcon.LQ)</a>  Update <code>P</code> and <code>d</code> from the value function representation in finite horizon case</p>
-<p><a href="QuantEcon/#method__var_quadratic_sum.1">var_quadratic_sum(A::Union{T, Array{T, N}},  C::Union{T, Array{T, N}},  H::Union{T, Array{T, N}},  bet::Real,  x0::Union{T, Array{T, N}})</a>  Computes the expected discounted quadratic sum</p>
+<p><a href="QuantEcon/#method__var_quadratic_sum.1">var_quadratic_sum(A::Union{Array{T, N}, T},  C::Union{Array{T, N}, T},  H::Union{Array{T, N}, T},  bet::Real,  x0::Union{Array{T, N}, T})</a>  Computes the expected discounted quadratic sum</p>
 <hr />
 <h2 id="types-exported">Types [Exported]</h2>
 <p><a href="QuantEcon/#type__arma.1">QuantEcon.ARMA</a>  Represents a scalar ARMA(p, q) process</p>
@@ -244,38 +235,29 @@
 <p><a href="QuantEcon/#type__ecdf.1">QuantEcon.ECDF</a>  One-dimensional empirical distribution function given a vector of</p>
 <p><a href="QuantEcon/#type__lae.1">QuantEcon.LAE</a>  A look ahead estimator associated with a given stochastic kernel p and a vector</p>
 <p><a href="QuantEcon/#type__lq.1">QuantEcon.LQ</a>  Linear quadratic optimal control of either infinite or finite horizon</p>
-<p><a href="QuantEcon/#type__markovchain.1">QuantEcon.MarkovChain</a>  Finite-state discrete-time Markov chain.</p>
+<p><a href="QuantEcon/#type__markovchain.1">QuantEcon.MarkovChain{T&lt;:Real}</a>  Finite-state discrete-time Markov chain.</p>
 <p><a href="QuantEcon/#type__rblq.1">QuantEcon.RBLQ</a>  Represents infinite horizon robust LQ control problems of the form</p>
-<hr />
-<h2 id="functions-internal">Functions [Internal]</h2>
-<p><a href="QuantEcon/#function__eigen_solve.1">eigen_solve</a>  solve x(P-I)=0 using either an eigendecomposition, lu factorization, or an</p>
-<p><a href="QuantEcon/#function__lu_solve.1">lu_solve</a>  solve x(P-I)=0 using either an eigendecomposition, lu factorization, or an</p>
 <hr />
 <h2 id="methods-internal">Methods [Internal]</h2>
 <p><a href="QuantEcon/#method___compute_sequence.1">_compute_sequence{T}(lq::QuantEcon.LQ,  x0::Array{T, 1},  policies)</a>  Private method implementing <code>compute_sequence</code> when state is a scalar</p>
 <p><a href="QuantEcon/#method___compute_sequence.2">_compute_sequence{T}(lq::QuantEcon.LQ,  x0::T,  policies)</a>  Private method implementing <code>compute_sequence</code> when state is a scalar</p>
-<p><a href="QuantEcon/#method__call.1">call(::Type{QuantEcon.LQ},  Q::Union{T, Array{T, N}},  R::Union{T, Array{T, N}},  A::Union{T, Array{T, N}},  B::Union{T, Array{T, N}})</a>  Version of default constuctor making <code>bet</code> <code>capT</code> <code>rf</code> keyword arguments</p>
-<p><a href="QuantEcon/#method__call.2">call(::Type{QuantEcon.LQ},  Q::Union{T, Array{T, N}},  R::Union{T, Array{T, N}},  A::Union{T, Array{T, N}},  B::Union{T, Array{T, N}},  C::Union{T, Array{T, N}})</a>  Version of default constuctor making <code>bet</code> <code>capT</code> <code>rf</code> keyword arguments</p>
-<p><a href="QuantEcon/#method__call.3">call(::Type{QuantEcon.LQ},  Q::Union{T, Array{T, N}},  R::Union{T, Array{T, N}},  A::Union{T, Array{T, N}},  B::Union{T, Array{T, N}},  C::Union{T, Array{T, N}},  N::Union{T, Array{T, N}})</a>  Version of default constuctor making <code>bet</code> <code>capT</code> <code>rf</code> keyword arguments</p>
-<p><a href="QuantEcon/#method__call.4">call(::Type{QuantEcon.LQ},  Q::Union{T, Array{T, N}},  R::Union{T, Array{T, N}},  A::Union{T, Array{T, N}},  B::Union{T, Array{T, N}},  C::Union{T, Array{T, N}},  N::Union{T, Array{T, N}},  bet::Union{T, Array{T, N}})</a>  Main constructor for LQ type</p>
-<p><a href="QuantEcon/#method__call.5">call(::Type{QuantEcon.LQ},  Q::Union{T, Array{T, N}},  R::Union{T, Array{T, N}},  A::Union{T, Array{T, N}},  B::Union{T, Array{T, N}},  C::Union{T, Array{T, N}},  N::Union{T, Array{T, N}},  bet::Union{T, Array{T, N}},  capT::Union{Int64, Void})</a>  Main constructor for LQ type</p>
-<p><a href="QuantEcon/#method__call.6">call(::Type{QuantEcon.LQ},  Q::Union{T, Array{T, N}},  R::Union{T, Array{T, N}},  A::Union{T, Array{T, N}},  B::Union{T, Array{T, N}},  C::Union{T, Array{T, N}},  N::Union{T, Array{T, N}},  bet::Union{T, Array{T, N}},  capT::Union{Int64, Void},  rf::Union{T, Array{T, N}})</a>  Main constructor for LQ type</p>
-<p><a href="QuantEcon/#method__irreducible_subsets.1">irreducible_subsets(mc::QuantEcon.MarkovChain)</a>  Find the irreducible subsets of the <code>MarkovChain</code></p>
-<p><a href="QuantEcon/#method__n_states.1">n_states(mc::QuantEcon.MarkovChain)</a>  Number of states in the markov chain <code>mc</code></p>
+<p><a href="QuantEcon/#method__call.1">call(::Type{QuantEcon.LQ},  Q::Union{Array{T, N}, T},  R::Union{Array{T, N}, T},  A::Union{Array{T, N}, T},  B::Union{Array{T, N}, T})</a>  Version of default constuctor making <code>bet</code> <code>capT</code> <code>rf</code> keyword arguments</p>
+<p><a href="QuantEcon/#method__call.2">call(::Type{QuantEcon.LQ},  Q::Union{Array{T, N}, T},  R::Union{Array{T, N}, T},  A::Union{Array{T, N}, T},  B::Union{Array{T, N}, T},  C::Union{Array{T, N}, T})</a>  Version of default constuctor making <code>bet</code> <code>capT</code> <code>rf</code> keyword arguments</p>
+<p><a href="QuantEcon/#method__call.3">call(::Type{QuantEcon.LQ},  Q::Union{Array{T, N}, T},  R::Union{Array{T, N}, T},  A::Union{Array{T, N}, T},  B::Union{Array{T, N}, T},  C::Union{Array{T, N}, T},  N::Union{Array{T, N}, T})</a>  Version of default constuctor making <code>bet</code> <code>capT</code> <code>rf</code> keyword arguments</p>
+<p><a href="QuantEcon/#method__call.4">call(::Type{QuantEcon.LQ},  Q::Union{Array{T, N}, T},  R::Union{Array{T, N}, T},  A::Union{Array{T, N}, T},  B::Union{Array{T, N}, T},  C::Union{Array{T, N}, T},  N::Union{Array{T, N}, T},  bet::Union{Array{T, N}, T})</a>  Main constructor for LQ type</p>
+<p><a href="QuantEcon/#method__call.5">call(::Type{QuantEcon.LQ},  Q::Union{Array{T, N}, T},  R::Union{Array{T, N}, T},  A::Union{Array{T, N}, T},  B::Union{Array{T, N}, T},  C::Union{Array{T, N}, T},  N::Union{Array{T, N}, T},  bet::Union{Array{T, N}, T},  capT::Union{Int64, Void})</a>  Main constructor for LQ type</p>
+<p><a href="QuantEcon/#method__call.6">call(::Type{QuantEcon.LQ},  Q::Union{Array{T, N}, T},  R::Union{Array{T, N}, T},  A::Union{Array{T, N}, T},  B::Union{Array{T, N}, T},  C::Union{Array{T, N}, T},  N::Union{Array{T, N}, T},  bet::Union{Array{T, N}, T},  capT::Union{Int64, Void},  rf::Union{Array{T, N}, T})</a>  Main constructor for LQ type</p>
+<p><a href="QuantEcon/#method__n_states.1">n_states(mc::QuantEcon.MarkovChain{T&lt;:Real})</a>  Number of states in the markov chain <code>mc</code></p>
+<p><a href="QuantEcon/#method__random_probvec.1">random_probvec(k::Integer,  m::Integer)</a>  Return m randomly sampled probability vectors of size k.</p>
 <h2 id="module-quanteconmodels">MODULE: QuantEcon.Models</h2>
 <hr />
 <h2 id="functions-exported_1">Functions [Exported]</h2>
-<p><a href="QuantEcon.Models/#function__bellman_operator.1">bellman_operator</a>  Apply the Bellman operator for a given model and initial value</p>
-<p><a href="QuantEcon.Models/#function__bellman_operator.2">bellman_operator!</a>  Apply the Bellman operator for a given model and initial value</p>
-<p><a href="QuantEcon.Models/#function__get_greedy.1">get_greedy</a>  Extract the greedy policy (policy function) of the model</p>
-<p><a href="QuantEcon.Models/#function__get_greedy.2">get_greedy!</a>  Extract the greedy policy (policy function) of the model</p>
+<p><a href="QuantEcon.Models/#function__bellman_operator.1">QuantEcon.Models.bellman_operator</a>  Apply the Bellman operator for a given model and initial value</p>
+<p><a href="QuantEcon.Models/#function__bellman_operator.2">QuantEcon.Models.bellman_operator!</a>  Apply the Bellman operator for a given model and initial value</p>
+<p><a href="QuantEcon.Models/#function__get_greedy.1">QuantEcon.Models.get_greedy</a>  Extract the greedy policy (policy function) of the model</p>
+<p><a href="QuantEcon.Models/#function__get_greedy.2">QuantEcon.Models.get_greedy!</a>  Extract the greedy policy (policy function) of the model</p>
 <hr />
 <h2 id="methods-exported_1">Methods [Exported]</h2>
-<p><a href="QuantEcon.Models/#method__bellman_operator.1">bellman_operator!(cp::QuantEcon.Models.CareerWorkerProblem,  v::Array{T, N},  out::Array{T, N})</a>  Apply the Bellman operator for a given model and initial value</p>
-<p><a href="QuantEcon.Models/#method__bellman_operator.2">bellman_operator!(cp::QuantEcon.Models.ConsumerProblem,  V::Array{T, 2},  out::Array{T, 2})</a>  Apply the Bellman operator for a given model and initial value</p>
-<p><a href="QuantEcon.Models/#method__bellman_operator.3">bellman_operator!(g::QuantEcon.Models.GrowthModel,  w::Array{T, 1},  out::Array{T, 1})</a>  Apply the Bellman operator for a given model and initial value</p>
-<p><a href="QuantEcon.Models/#method__bellman_operator.4">bellman_operator!(jv::QuantEcon.Models.JvWorker,  V::Array{T, 1},  out::Union{Tuple{Array{T, 1}, Array{T, 1}}, Array{T, 1}})</a>  Apply the Bellman operator for a given model and initial value</p>
-<p><a href="QuantEcon.Models/#method__bellman_operator.5">bellman_operator!(sp::QuantEcon.Models.SearchProblem,  v::Array{T, 2},  out::Array{T, 2})</a>  Apply the Bellman operator for a given model and initial value</p>
 <p><a href="QuantEcon.Models/#method__call_option.1">call_option(ap::QuantEcon.Models.AssetPrices,  zet::Real,  p_s::Real)</a>  Computes price of a call option on a consol bond, both finite and infinite</p>
 <p><a href="QuantEcon.Models/#method__call_option.2">call_option(ap::QuantEcon.Models.AssetPrices,  zet::Real,  p_s::Real,  T::Array{Int64, 1})</a>  Computes price of a call option on a consol bond, both finite and infinite</p>
 <p><a href="QuantEcon.Models/#method__call_option.3">call_option(ap::QuantEcon.Models.AssetPrices,  zet::Real,  p_s::Real,  T::Array{Int64, 1},  epsilon)</a>  Computes price of a call option on a consol bond, both finite and infinite</p>
@@ -283,17 +265,16 @@
 <p><a href="QuantEcon.Models/#method__coleman_operator.2">coleman_operator(cp::QuantEcon.Models.ConsumerProblem,  c::Array{T, 2})</a>  Apply the Coleman operator for a given model and initial value</p>
 <p><a href="QuantEcon.Models/#method__compute_lt_price.1">compute_lt_price(lt::QuantEcon.Models.LucasTree)</a>  Compute the equilibrium price function associated with Lucas tree <code>lt</code></p>
 <p><a href="QuantEcon.Models/#method__consol_price.1">consol_price(ap::QuantEcon.Models.AssetPrices,  zet::Real)</a>  Computes price of a consol bond with payoff zeta</p>
-<p><a href="QuantEcon.Models/#method__get_greedy.1">get_greedy!(cp::QuantEcon.Models.CareerWorkerProblem,  v::Array{T, N},  out::Array{T, N})</a>  Extract the greedy policy (policy function) of the model</p>
-<p><a href="QuantEcon.Models/#method__get_greedy.2">get_greedy!(cp::QuantEcon.Models.ConsumerProblem,  V::Array{T, 2},  out::Array{T, 2})</a>  Extract the greedy policy (policy function) of the model</p>
-<p><a href="QuantEcon.Models/#method__get_greedy.3">get_greedy!(g::QuantEcon.Models.GrowthModel,  w::Array{T, 1},  out::Array{T, 1})</a>  Extract the greedy policy (policy function) of the model</p>
-<p><a href="QuantEcon.Models/#method__get_greedy.4">get_greedy!(jv::QuantEcon.Models.JvWorker,  V::Array{T, 1},  out::Tuple{Array{T, 1}, Array{T, 1}})</a>  Extract the greedy policy (policy function) of the model</p>
-<p><a href="QuantEcon.Models/#method__get_greedy.5">get_greedy!(sp::QuantEcon.Models.SearchProblem,  v::Array{T, 2},  out::Array{T, 2})</a>  Extract the greedy policy (policy function) of the model</p>
+<p><a href="QuantEcon.Models/#method__gen_aggregates.1">gen_aggregates(uc::QuantEcon.Models.UncertaintyTrapEcon)</a>  Generate aggregates based on current beliefs (mu, gamma).  This</p>
 <p><a href="QuantEcon.Models/#method__lucas_operator.1">lucas_operator(lt::QuantEcon.Models.LucasTree,  f::AbstractArray{T, 1})</a>  The approximate Lucas operator, which computes and returns the updated function</p>
 <p><a href="QuantEcon.Models/#method__res_wage_operator.1">res_wage_operator!(sp::QuantEcon.Models.SearchProblem,  phi::Array{T, 1},  out::Array{T, 1})</a>  Updates the reservation wage function guess phi via the operator Q.</p>
 <p><a href="QuantEcon.Models/#method__res_wage_operator.2">res_wage_operator(sp::QuantEcon.Models.SearchProblem,  phi::Array{T, 1})</a>  Updates the reservation wage function guess phi via the operator Q.</p>
 <p><a href="QuantEcon.Models/#method__tree_price.1">tree_price(ap::QuantEcon.Models.AssetPrices)</a>  Computes the function v such that the price of the lucas tree is v(lambda)C_t</p>
+<p><a href="QuantEcon.Models/#method__update_beliefs.1">update_beliefs!(uc::QuantEcon.Models.UncertaintyTrapEcon,  X,  M)</a>  Update beliefs (mu, gamma) based on aggregates X and M.</p>
+<p><a href="QuantEcon.Models/#method__vfi.1">vfi!(ae::QuantEcon.Models.ArellanoEconomy)</a>  This performs value function iteration and stores all of the data inside</p>
 <hr />
 <h2 id="types-exported_1">Types [Exported]</h2>
+<p><a href="QuantEcon.Models/#type__arellanoeconomy.1">QuantEcon.Models.ArellanoEconomy</a>  Arellano 2008 deals with a small open economy whose government</p>
 <p><a href="QuantEcon.Models/#type__assetprices.1">QuantEcon.Models.AssetPrices</a>  A class to compute asset prices when the endowment follows a finite Markov chain</p>
 <p><a href="QuantEcon.Models/#type__careerworkerproblem.1">QuantEcon.Models.CareerWorkerProblem</a>  Career/job choice model fo Derek Neal (1999)</p>
 <p><a href="QuantEcon.Models/#type__consumerproblem.1">QuantEcon.Models.ConsumerProblem</a>  Income fluctuation problem</p>
@@ -303,44 +284,20 @@
 <p><a href="QuantEcon.Models/#type__searchproblem.1">QuantEcon.Models.SearchProblem</a>  Unemployment/search problem where offer distribution is unknown</p>
 <hr />
 <h2 id="methods-internal_1">Methods [Internal]</h2>
-<p><a href="QuantEcon.Models/#method__call.1">call(::Type{QuantEcon.Models.AssetPrices},  bet::Real,  P::Array{T, 2},  s::Array{T, 1},  gamm::Real)</a>  Construct an instance of <code>AssetPrices</code>, where <code>n</code>, <code>P_tilde</code>, and <code>P_check</code> are</p>
-<p><a href="QuantEcon.Models/#method__call.2">call(::Type{QuantEcon.Models.CareerWorkerProblem},  beta::Real)</a>  Constructor with default values for <code>CareerWorkerProblem</code></p>
-<p><a href="QuantEcon.Models/#method__call.3">call(::Type{QuantEcon.Models.CareerWorkerProblem},  beta::Real,  B::Real)</a>  Constructor with default values for <code>CareerWorkerProblem</code></p>
-<p><a href="QuantEcon.Models/#method__call.4">call(::Type{QuantEcon.Models.CareerWorkerProblem},  beta::Real,  B::Real,  N::Real)</a>  Constructor with default values for <code>CareerWorkerProblem</code></p>
-<p><a href="QuantEcon.Models/#method__call.5">call(::Type{QuantEcon.Models.CareerWorkerProblem},  beta::Real,  B::Real,  N::Real,  F_a::Real)</a>  Constructor with default values for <code>CareerWorkerProblem</code></p>
-<p><a href="QuantEcon.Models/#method__call.6">call(::Type{QuantEcon.Models.CareerWorkerProblem},  beta::Real,  B::Real,  N::Real,  F_a::Real,  F_b::Real)</a>  Constructor with default values for <code>CareerWorkerProblem</code></p>
-<p><a href="QuantEcon.Models/#method__call.7">call(::Type{QuantEcon.Models.CareerWorkerProblem},  beta::Real,  B::Real,  N::Real,  F_a::Real,  F_b::Real,  G_a::Real)</a>  Constructor with default values for <code>CareerWorkerProblem</code></p>
-<p><a href="QuantEcon.Models/#method__call.8">call(::Type{QuantEcon.Models.CareerWorkerProblem},  beta::Real,  B::Real,  N::Real,  F_a::Real,  F_b::Real,  G_a::Real,  G_b::Real)</a>  Constructor with default values for <code>CareerWorkerProblem</code></p>
-<p><a href="QuantEcon.Models/#method__call.9">call(::Type{QuantEcon.Models.ConsumerProblem},  r)</a>  Constructor with default values for <code>ConsumerProblem</code></p>
-<p><a href="QuantEcon.Models/#method__call.10">call(::Type{QuantEcon.Models.ConsumerProblem},  r,  bet)</a>  Constructor with default values for <code>ConsumerProblem</code></p>
-<p><a href="QuantEcon.Models/#method__call.11">call(::Type{QuantEcon.Models.ConsumerProblem},  r,  bet,  Pi)</a>  Constructor with default values for <code>ConsumerProblem</code></p>
-<p><a href="QuantEcon.Models/#method__call.12">call(::Type{QuantEcon.Models.ConsumerProblem},  r,  bet,  Pi,  z_vals)</a>  Constructor with default values for <code>ConsumerProblem</code></p>
-<p><a href="QuantEcon.Models/#method__call.13">call(::Type{QuantEcon.Models.ConsumerProblem},  r,  bet,  Pi,  z_vals,  b)</a>  Constructor with default values for <code>ConsumerProblem</code></p>
-<p><a href="QuantEcon.Models/#method__call.14">call(::Type{QuantEcon.Models.ConsumerProblem},  r,  bet,  Pi,  z_vals,  b,  grid_max)</a>  Constructor with default values for <code>ConsumerProblem</code></p>
-<p><a href="QuantEcon.Models/#method__call.15">call(::Type{QuantEcon.Models.ConsumerProblem},  r,  bet,  Pi,  z_vals,  b,  grid_max,  grid_size)</a>  Constructor with default values for <code>ConsumerProblem</code></p>
-<p><a href="QuantEcon.Models/#method__call.16">call(::Type{QuantEcon.Models.ConsumerProblem},  r,  bet,  Pi,  z_vals,  b,  grid_max,  grid_size,  u)</a>  Constructor with default values for <code>ConsumerProblem</code></p>
-<p><a href="QuantEcon.Models/#method__call.17">call(::Type{QuantEcon.Models.ConsumerProblem},  r,  bet,  Pi,  z_vals,  b,  grid_max,  grid_size,  u,  du)</a>  Constructor with default values for <code>ConsumerProblem</code></p>
-<p><a href="QuantEcon.Models/#method__call.18">call(::Type{QuantEcon.Models.GrowthModel})</a>  Constructor of <code>GrowthModel</code></p>
-<p><a href="QuantEcon.Models/#method__call.19">call(::Type{QuantEcon.Models.GrowthModel},  f)</a>  Constructor of <code>GrowthModel</code></p>
-<p><a href="QuantEcon.Models/#method__call.20">call(::Type{QuantEcon.Models.GrowthModel},  f,  bet)</a>  Constructor of <code>GrowthModel</code></p>
-<p><a href="QuantEcon.Models/#method__call.21">call(::Type{QuantEcon.Models.GrowthModel},  f,  bet,  u)</a>  Constructor of <code>GrowthModel</code></p>
-<p><a href="QuantEcon.Models/#method__call.22">call(::Type{QuantEcon.Models.GrowthModel},  f,  bet,  u,  grid_max)</a>  Constructor of <code>GrowthModel</code></p>
-<p><a href="QuantEcon.Models/#method__call.23">call(::Type{QuantEcon.Models.GrowthModel},  f,  bet,  u,  grid_max,  grid_size)</a>  Constructor of <code>GrowthModel</code></p>
-<p><a href="QuantEcon.Models/#method__call.24">call(::Type{QuantEcon.Models.JvWorker},  A)</a>  Constructor with default values for <code>JvWorker</code></p>
-<p><a href="QuantEcon.Models/#method__call.25">call(::Type{QuantEcon.Models.JvWorker},  A,  alpha)</a>  Constructor with default values for <code>JvWorker</code></p>
-<p><a href="QuantEcon.Models/#method__call.26">call(::Type{QuantEcon.Models.JvWorker},  A,  alpha,  bet)</a>  Constructor with default values for <code>JvWorker</code></p>
-<p><a href="QuantEcon.Models/#method__call.27">call(::Type{QuantEcon.Models.JvWorker},  A,  alpha,  bet,  grid_size)</a>  Constructor with default values for <code>JvWorker</code></p>
-<p><a href="QuantEcon.Models/#method__call.28">call(::Type{QuantEcon.Models.LucasTree},  gam::Real,  bet::Real,  alpha::Real,  sigma::Real)</a>  Constructor for LucasTree</p>
-<p><a href="QuantEcon.Models/#method__call.29">call(::Type{QuantEcon.Models.SearchProblem},  bet)</a>  Constructor for <code>SearchProblem</code> with default values</p>
-<p><a href="QuantEcon.Models/#method__call.30">call(::Type{QuantEcon.Models.SearchProblem},  bet,  c)</a>  Constructor for <code>SearchProblem</code> with default values</p>
-<p><a href="QuantEcon.Models/#method__call.31">call(::Type{QuantEcon.Models.SearchProblem},  bet,  c,  F_a)</a>  Constructor for <code>SearchProblem</code> with default values</p>
-<p><a href="QuantEcon.Models/#method__call.32">call(::Type{QuantEcon.Models.SearchProblem},  bet,  c,  F_a,  F_b)</a>  Constructor for <code>SearchProblem</code> with default values</p>
-<p><a href="QuantEcon.Models/#method__call.33">call(::Type{QuantEcon.Models.SearchProblem},  bet,  c,  F_a,  F_b,  G_a)</a>  Constructor for <code>SearchProblem</code> with default values</p>
-<p><a href="QuantEcon.Models/#method__call.34">call(::Type{QuantEcon.Models.SearchProblem},  bet,  c,  F_a,  F_b,  G_a,  G_b)</a>  Constructor for <code>SearchProblem</code> with default values</p>
-<p><a href="QuantEcon.Models/#method__call.35">call(::Type{QuantEcon.Models.SearchProblem},  bet,  c,  F_a,  F_b,  G_a,  G_b,  w_max)</a>  Constructor for <code>SearchProblem</code> with default values</p>
-<p><a href="QuantEcon.Models/#method__call.36">call(::Type{QuantEcon.Models.SearchProblem},  bet,  c,  F_a,  F_b,  G_a,  G_b,  w_max,  w_grid_size)</a>  Constructor for <code>SearchProblem</code> with default values</p>
-<p><a href="QuantEcon.Models/#method__call.37">call(::Type{QuantEcon.Models.SearchProblem},  bet,  c,  F_a,  F_b,  G_a,  G_b,  w_max,  w_grid_size,  pi_grid_size)</a>  Constructor for <code>SearchProblem</code> with default values</p>
-<p><a href="QuantEcon.Models/#method__default_du.1">default_du{T&lt;:Real}(x::T&lt;:Real)</a>  Marginal utility for log utility function</p></div>
+<p><a href="QuantEcon.Models/#method__call.1">call(::Type{QuantEcon.Models.ArellanoEconomy})</a>  This is the default constructor for building an economy as presented</p>
+<p><a href="QuantEcon.Models/#method__call.2">call(::Type{QuantEcon.Models.AssetPrices},  bet::Real,  P::Array{T, 2},  s::Array{T, 1},  gamm::Real)</a>  Construct an instance of <code>AssetPrices</code>, where <code>n</code>, <code>P_tilde</code>, and <code>P_check</code> are</p>
+<p><a href="QuantEcon.Models/#method__call.3">call(::Type{QuantEcon.Models.GrowthModel})</a>  Constructor of <code>GrowthModel</code></p>
+<p><a href="QuantEcon.Models/#method__call.4">call(::Type{QuantEcon.Models.GrowthModel},  f)</a>  Constructor of <code>GrowthModel</code></p>
+<p><a href="QuantEcon.Models/#method__call.5">call(::Type{QuantEcon.Models.GrowthModel},  f,  bet)</a>  Constructor of <code>GrowthModel</code></p>
+<p><a href="QuantEcon.Models/#method__call.6">call(::Type{QuantEcon.Models.GrowthModel},  f,  bet,  u)</a>  Constructor of <code>GrowthModel</code></p>
+<p><a href="QuantEcon.Models/#method__call.7">call(::Type{QuantEcon.Models.GrowthModel},  f,  bet,  u,  grid_max)</a>  Constructor of <code>GrowthModel</code></p>
+<p><a href="QuantEcon.Models/#method__call.8">call(::Type{QuantEcon.Models.GrowthModel},  f,  bet,  u,  grid_max,  grid_size)</a>  Constructor of <code>GrowthModel</code></p>
+<p><a href="QuantEcon.Models/#method__call.9">call(::Type{QuantEcon.Models.LucasTree},  gam::Real,  bet::Real,  alpha::Real,  sigma::Real)</a>  Constructor for LucasTree</p>
+<p><a href="QuantEcon.Models/#method__compute_prices.1">compute_prices!(ae::QuantEcon.Models.ArellanoEconomy)</a>  This function takes the Arellano economy and its value functions and</p>
+<p><a href="QuantEcon.Models/#method__default_du.1">default_du{T&lt;:Real}(x::T&lt;:Real)</a>  Marginal utility for log utility function</p>
+<p><a href="QuantEcon.Models/#method__one_step_update.1">one_step_update!(ae::QuantEcon.Models.ArellanoEconomy,  EV::Array{Float64, 2},  EVd::Array{Float64, 2},  EVc::Array{Float64, 2})</a>  This function performs the one step update of the value function for the</p>
+<p><a href="QuantEcon.Models/#method__simulate.1">simulate(ae::QuantEcon.Models.ArellanoEconomy)</a>  This function simulates the Arellano economy</p>
+<p><a href="QuantEcon.Models/#method__simulate.2">simulate(ae::QuantEcon.Models.ArellanoEconomy,  capT::Int64)</a>  This function simulates the Arellano economy</p></div>
             
         </div>
 
