@@ -1,13 +1,6 @@
 julia 0.4
-Distributions 0.5
-Grid 0.3
-Optim
 DSP
-HDF5
-MAT
-FactCheck
-DataStructures
+Distributions 0.5
 LightGraphs
-IterationManagers
-Docile
-JLD
+Optim
+Grid

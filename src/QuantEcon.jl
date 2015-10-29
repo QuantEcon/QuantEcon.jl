@@ -8,8 +8,6 @@ import Base: mean, std, var, show, isapprox
 using Distributions
 import Distributions: pdf, skewness
 using DSP: TFFilter, freqz
-using Docile
-
 
 # useful types
 typealias ScalarOrArray{T} Union{T, Array{T}}
