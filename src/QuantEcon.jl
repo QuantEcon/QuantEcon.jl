@@ -8,7 +8,6 @@ import Base: mean, std, var, show, isapprox
 using Distributions
 import Distributions: pdf, skewness
 using DSP: TFFilter, freqz
-using Compat
 using Docile
 
 

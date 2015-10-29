@@ -41,12 +41,12 @@ function smooth(x::Array, window_len::Int=7, window::AbstractString="hanning")
         println("Window length must be odd, reset to $window_len")
     end
 
-    windows = @compat Dict("hanning" => DSP.hanning,
-               "hamming" => DSP.hamming,
-               "bartlett" => DSP.bartlett,
-               "blackman" => DSP.blackman,
-               "flat" => DSP.rect  # moving average
-               )
+    windows = Dict("hanning" => DSP.hanning,
+                   "hamming" => DSP.hamming,
+                   "bartlett" => DSP.bartlett,
+                   "blackman" => DSP.blackman,
+                   "flat" => DSP.rect  # moving average
+                   )
 
     # Reflect x around x[0] and x[-1] prior to convolution
     k = round(Int, window_len / 2)

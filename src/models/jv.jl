@@ -149,7 +149,7 @@ we will re-activate this option.
 
 """
 function bellman_operator!(jv::JvWorker, V::Vector,
-                           out::Union{Vector, @compat Tuple{Vector, Vector}};
+                           out::Union{Vector, Tuple{Vector, Vector}};
                            brute_force=true, ret_policies=false)
 
     if !(brute_force)
@@ -167,7 +167,7 @@ function bellman_operator!(jv::JvWorker, V::Vector,
     # instantiate variables so they are available outside loop and exist
     # within it
     if ret_policies
-        if !(typeof(out) <: @compat Tuple{Vector, Vector})
+        if !(typeof(out) <: Tuple{Vector, Vector})
             msg = "You asked for policies, but only provided one output array"
             msg *= "\nthere are two policies so two arrays must be given"
             error(msg)
@@ -178,7 +178,7 @@ function bellman_operator!(jv::JvWorker, V::Vector,
         c2(z) = z[1] - epsilon
         c3(z) = z[2] - epsilon
         guess = (0.2, 0.2)
-        constraints = [@compat Dict("type" => "ineq", "fun"=> i) for i in [c1, c2, c3]]
+        constraints = [Dict("type" => "ineq", "fun"=> i) for i in [c1, c2, c3]]
         if typeof(out) <: Tuple
             msg = "Multiple output arrays given. There is only one value"
             msg = " function.\nDid you mean to pass ret_policies=true?"
@@ -264,7 +264,7 @@ $(____greedy_main_docstring).
 None, `out` is updated in place to hold the policy function
 
 """
-function get_greedy!(jv::JvWorker, V::Vector, out::@compat Tuple{Vector, Vector};
+function get_greedy!(jv::JvWorker, V::Vector, out::Tuple{Vector, Vector};
                      brute_force=true)
     bellman_operator!(jv, V, out, ret_policies=true)
 end

@@ -7,7 +7,6 @@ Generate a MarkovChain randomly.
 import StatsBase: sample
 import QuantEcon: MarkovChain
 
-
 # random_markov_chain
 
 """
@@ -133,7 +132,7 @@ function random_stochastic_matrix(n::Integer, k::Integer)
     probvecs = random_probvec(k, n)
 
     # Randomly sample row indices for each column for nonzero values
-    row_indices = @compat Vector{Int}(k*n)
+    row_indices = Array(Int, k*n)
     for j in 1:n
         row_indices[(j-1)*k+1:j*k] = sample(1:n, k, replace=false)
     end

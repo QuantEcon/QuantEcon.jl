@@ -1,4 +1,4 @@
-julia 0.3
+julia 0.4
 Distributions 0.5
 Grid 0.3
 Optim
@@ -7,7 +7,6 @@ HDF5
 MAT
 FactCheck
 DataStructures
-Compat
 LightGraphs
 IterationManagers
 Docile

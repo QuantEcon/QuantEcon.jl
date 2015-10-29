@@ -170,7 +170,7 @@ is_aperiodic(mc::MarkovChain) = period(mc) == 1
 function period(mc::MarkovChain)
     g = DiGraph(mc.p)
     recurrent = attracting_components(g)
-    periods   = @compat Vector{Int}()
+    periods   = Int[]
 
     for r in recurrent
         push!(periods, period(g[r]))
@@ -193,7 +193,7 @@ distribution of `mc.p`
 
 """
 function mc_compute_stationary{T}(mc::MarkovChain{T}; method::Symbol=:gth)
-    solvers = @compat Dict(:gth => gth_solve, :lu => lu_solve, :eigen => eigen_solve)
+    solvers = Dict(:gth => gth_solve, :lu => lu_solve, :eigen => eigen_solve)
     solve   = solvers[method]
 
     recurrent = recurrent_classes(mc)

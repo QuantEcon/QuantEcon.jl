@@ -3,9 +3,9 @@ module TestQuadsum
 using QuantEcon
 using Base.Test
 using FactCheck
-using Compat
 
-rough_kwargs = @compat Dict(:atol => 1e-10, :rtol => 1e-10)
+
+rough_kwargs = Dict(:atol => 1e-10, :rtol => 1e-10)
 
 
 facts("Testing quadsums.jl") do

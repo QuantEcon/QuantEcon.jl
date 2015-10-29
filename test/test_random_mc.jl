@@ -3,13 +3,13 @@ module TestRandomMC
 using QuantEcon
 using Base.Test
 using FactCheck
-using Compat
+
 
 facts("Testing random_mc.jl") do
     context("Test random_markov_chain") do
         n, k = 5, 3
-        mc_dicts = (@compat Dict("P" => random_markov_chain(n).p, "k" => n),
-                    @compat Dict("P" => random_markov_chain(n, k).p, "k" => k))
+        mc_dicts = (Dict("P" => random_markov_chain(n).p, "k" => n),
+                    Dict("P" => random_markov_chain(n, k).p, "k" => k))
         for d in mc_dicts
             P = d["P"]
             @fact size(P) --> (n, n)
