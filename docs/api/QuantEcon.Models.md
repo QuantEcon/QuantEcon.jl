@@ -5,19 +5,19 @@
 ---
 
 <a id="function__bellman_operator.1" class="lexicon_definition"></a>
-#### bellman_operator [¶](#function__bellman_operator.1)
+#### QuantEcon.Models.bellman_operator [¶](#function__bellman_operator.1)
 Apply the Bellman operator for a given model and initial value
 . See the specific methods of the mutating function for more details on arguments
 
 
 
 *source:*
-[QuantEcon/src/Models.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/Models.jl#L63)
+[QuantEcon/src/Models.jl:69](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/Models.jl#L69)
 
 ---
 
 <a id="function__bellman_operator.2" class="lexicon_definition"></a>
-#### bellman_operator! [¶](#function__bellman_operator.2)
+#### QuantEcon.Models.bellman_operator! [¶](#function__bellman_operator.2)
 Apply the Bellman operator for a given model and initial value
 . See the specific methods of the mutating function for more details on arguments
 
@@ -27,24 +27,24 @@ The last positional argument passed to this function will be over-written
 
 
 *source:*
-[QuantEcon/src/Models.jl:70](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/Models.jl#L70)
+[QuantEcon/src/Models.jl:78](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/Models.jl#L78)
 
 ---
 
 <a id="function__get_greedy.1" class="lexicon_definition"></a>
-#### get_greedy [¶](#function__get_greedy.1)
+#### QuantEcon.Models.get_greedy [¶](#function__get_greedy.1)
 Extract the greedy policy (policy function) of the model
 . See the specific methods of the mutating function for more details on arguments
 
 
 
 *source:*
-[QuantEcon/src/Models.jl:75](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/Models.jl#L75)
+[QuantEcon/src/Models.jl:81](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/Models.jl#L81)
 
 ---
 
 <a id="function__get_greedy.2" class="lexicon_definition"></a>
-#### get_greedy! [¶](#function__get_greedy.2)
+#### QuantEcon.Models.get_greedy! [¶](#function__get_greedy.2)
 Extract the greedy policy (policy function) of the model
 . See the specific methods of the mutating function for more details on arguments
 
@@ -54,136 +54,7 @@ The last positional argument passed to this function will be over-written
 
 
 *source:*
-[QuantEcon/src/Models.jl:82](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/Models.jl#L82)
-
----
-
-<a id="method__bellman_operator.1" class="lexicon_definition"></a>
-#### bellman_operator!(cp::QuantEcon.Models.CareerWorkerProblem,  v::Array{T, N},  out::Array{T, N}) [¶](#method__bellman_operator.1)
-Apply the Bellman operator for a given model and initial value
-.
-
-##### Arguments
-
-- `cp::CareerWorkerProblem` : Instance of `CareerWorkerProblem`
-- `v::Matrix`: Current guess for the value function
-- `out::Matrix` : Storage for output
-- `;ret_policy::Bool(false)`: Toggles return of value or policy functions
-
-##### Returns
-
-None, `out` is updated in place. If `ret_policy == true` out is filled with the
-policy function, otherwise the value function is stored in `out`.
-
-
-
-*source:*
-[QuantEcon/src/models/career.jl:96](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/career.jl#L96)
-
----
-
-<a id="method__bellman_operator.2" class="lexicon_definition"></a>
-#### bellman_operator!(cp::QuantEcon.Models.ConsumerProblem,  V::Array{T, 2},  out::Array{T, 2}) [¶](#method__bellman_operator.2)
-Apply the Bellman operator for a given model and initial value
-.
-
-##### Arguments
-
-- `cp::ConsumerProblem` : Instance of `ConsumerProblem`
-- `v::Matrix`: Current guess for the value function
-- `out::Matrix` : Storage for output
-- `;ret_policy::Bool(false)`: Toggles return of value or policy functions
-
-##### Returns
-
-None, `out` is updated in place. If `ret_policy == true` out is filled with the
-policy function, otherwise the value function is stored in `out`.
-
-
-
-*source:*
-[QuantEcon/src/models/ifp.jl:103](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L103)
-
----
-
-<a id="method__bellman_operator.3" class="lexicon_definition"></a>
-#### bellman_operator!(g::QuantEcon.Models.GrowthModel,  w::Array{T, 1},  out::Array{T, 1}) [¶](#method__bellman_operator.3)
-Apply the Bellman operator for a given model and initial value
-.
-
-##### Arguments
-
-- `g::GrowthModel` : Instance of `GrowthModel`
-- `w::Vector`: Current guess for the value function
-- `out::Vector` : Storage for output.
-- `;ret_policy::Bool(false)`: Toggles return of value or policy functions
-
-##### Returns
-
-None, `out` is updated in place. If `ret_policy == true` out is filled with the
-policy function, otherwise the value function is stored in `out`.
-
-
-
-*source:*
-[QuantEcon/src/models/optgrowth.jl:85](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/optgrowth.jl#L85)
-
----
-
-<a id="method__bellman_operator.4" class="lexicon_definition"></a>
-#### bellman_operator!(jv::QuantEcon.Models.JvWorker,  V::Array{T, 1},  out::Union{Tuple{Array{T, 1}, Array{T, 1}}, Array{T, 1}}) [¶](#method__bellman_operator.4)
-Apply the Bellman operator for a given model and initial value
-.
-
-##### Arguments
-
-- `jv::JvWorker` : Instance of `JvWorker`
-- `V::Vector`: Current guess for the value function
-- `out::Union(Vector, Tuple{Vector, Vector})` : Storage for output. Note that
-there are two policy rules, but one value function
-- `;brute_force::Bool(true)`: Whether to use a brute force grid search
-algorithm or a solver from scipy.
-- `;ret_policy::Bool(false)`: Toggles return of value or policy functions
-
-##### Returns
-
-None, `out` is updated in place. If `ret_policy == true` out is filled with the
-policy function, otherwise the value function is stored in `out`.
-
-##### Notes
-
-Currently, the `brute_force` parameter must be `true`. We are waiting for a
-constrained optimization routine to emerge in pure Julia. Once that happens,
-we will re-activate this option.
-
-
-
-*source:*
-[QuantEcon/src/models/jv.jl:151](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/jv.jl#L151)
-
----
-
-<a id="method__bellman_operator.5" class="lexicon_definition"></a>
-#### bellman_operator!(sp::QuantEcon.Models.SearchProblem,  v::Array{T, 2},  out::Array{T, 2}) [¶](#method__bellman_operator.5)
-Apply the Bellman operator for a given model and initial value
-.
-
-##### Arguments
-
-- `sp::SearchProblem` : Instance of `SearchProblem`
-- `v::Matrix`: Current guess for the value function
-- `out::Matrix` : Storage for output.
-- `;ret_policy::Bool(false)`: Toggles return of value or policy functions
-
-##### Returns
-
-None, `out` is updated in place. If `ret_policy == true` out is filled with the
-policy function, otherwise the value function is stored in `out`.
-
-
-
-*source:*
-[QuantEcon/src/models/odu.jl:130](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/odu.jl#L130)
+[QuantEcon/src/Models.jl:90](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/Models.jl#L90)
 
 ---
 
@@ -210,7 +81,7 @@ date
 
 
 *source:*
-[QuantEcon/src/models/asset_pricing.jl:121](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/asset_pricing.jl#L121)
+[QuantEcon/src/models/asset_pricing.jl:121](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/asset_pricing.jl#L121)
 
 ---
 
@@ -237,7 +108,7 @@ date
 
 
 *source:*
-[QuantEcon/src/models/asset_pricing.jl:121](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/asset_pricing.jl#L121)
+[QuantEcon/src/models/asset_pricing.jl:121](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/asset_pricing.jl#L121)
 
 ---
 
@@ -264,7 +135,7 @@ date
 
 
 *source:*
-[QuantEcon/src/models/asset_pricing.jl:121](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/asset_pricing.jl#L121)
+[QuantEcon/src/models/asset_pricing.jl:121](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/asset_pricing.jl#L121)
 
 ---
 
@@ -292,7 +163,7 @@ None, `out` is updated in place to hold the policy function
 
 
 *source:*
-[QuantEcon/src/models/ifp.jl:190](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L190)
+[QuantEcon/src/models/ifp.jl:190](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/ifp.jl#L190)
 
 ---
 
@@ -305,7 +176,7 @@ details on arguments
 
 
 *source:*
-[QuantEcon/src/models/ifp.jl:231](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L231)
+[QuantEcon/src/models/ifp.jl:231](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/ifp.jl#L231)
 
 ---
 
@@ -325,7 +196,7 @@ Compute the equilibrium price function associated with Lucas tree `lt`
 
 
 *source:*
-[QuantEcon/src/models/lucastree.jl:169](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/lucastree.jl#L169)
+[QuantEcon/src/models/lucastree.jl:169](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/lucastree.jl#L169)
 
 ---
 
@@ -345,117 +216,18 @@ Computes price of a consol bond with payoff zeta
 
 
 *source:*
-[QuantEcon/src/models/asset_pricing.jl:90](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/asset_pricing.jl#L90)
+[QuantEcon/src/models/asset_pricing.jl:90](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/asset_pricing.jl#L90)
 
 ---
 
-<a id="method__get_greedy.1" class="lexicon_definition"></a>
-#### get_greedy!(cp::QuantEcon.Models.CareerWorkerProblem,  v::Array{T, N},  out::Array{T, N}) [¶](#method__get_greedy.1)
-Extract the greedy policy (policy function) of the model
-.
-
-##### Arguments
-
-- `cp::CareerWorkerProblem` : Instance of `CareerWorkerProblem`
-- `v::Matrix`: Current guess for the value function
-- `out::Matrix` : Storage for output
-
-##### Returns
-
-None, `out` is updated in place to hold the policy function
-
+<a id="method__gen_aggregates.1" class="lexicon_definition"></a>
+#### gen_aggregates(uc::QuantEcon.Models.UncertaintyTrapEcon) [¶](#method__gen_aggregates.1)
+Generate aggregates based on current beliefs (mu, gamma).  This
+is a simulation step that depends on the draws for F.
 
 
 *source:*
-[QuantEcon/src/models/career.jl:149](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/career.jl#L149)
-
----
-
-<a id="method__get_greedy.2" class="lexicon_definition"></a>
-#### get_greedy!(cp::QuantEcon.Models.ConsumerProblem,  V::Array{T, 2},  out::Array{T, 2}) [¶](#method__get_greedy.2)
-Extract the greedy policy (policy function) of the model
-.
-
-##### Arguments
-
-- `cp::CareerWorkerProblem` : Instance of `CareerWorkerProblem`
-- `v::Matrix`: Current guess for the value function
-- `out::Matrix` : Storage for output
-
-##### Returns
-
-None, `out` is updated in place to hold the policy function
-
-
-
-*source:*
-[QuantEcon/src/models/ifp.jl:160](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L160)
-
----
-
-<a id="method__get_greedy.3" class="lexicon_definition"></a>
-#### get_greedy!(g::QuantEcon.Models.GrowthModel,  w::Array{T, 1},  out::Array{T, 1}) [¶](#method__get_greedy.3)
-Extract the greedy policy (policy function) of the model
-.
-
-##### Arguments
-
-- `g::GrowthModel` : Instance of `GrowthModel`
-- `w::Vector`: Current guess for the value function
-- `out::Vector` : Storage for output
-
-##### Returns
-
-None, `out` is updated in place to hold the policy function
-
-
-
-*source:*
-[QuantEcon/src/models/optgrowth.jl:127](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/optgrowth.jl#L127)
-
----
-
-<a id="method__get_greedy.4" class="lexicon_definition"></a>
-#### get_greedy!(jv::QuantEcon.Models.JvWorker,  V::Array{T, 1},  out::Tuple{Array{T, 1}, Array{T, 1}}) [¶](#method__get_greedy.4)
-Extract the greedy policy (policy function) of the model
-.
-
-##### Arguments
-
-- `cp::CareerWorkerProblem` : Instance of `CareerWorkerProblem`
-- `v::Vector`: Current guess for the value function
-- `out::Tuple(Vector, Vector)` : Storage for output of policy rule
-
-##### Returns
-
-None, `out` is updated in place to hold the policy function
-
-
-
-*source:*
-[QuantEcon/src/models/jv.jl:267](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/jv.jl#L267)
-
----
-
-<a id="method__get_greedy.5" class="lexicon_definition"></a>
-#### get_greedy!(sp::QuantEcon.Models.SearchProblem,  v::Array{T, 2},  out::Array{T, 2}) [¶](#method__get_greedy.5)
-Extract the greedy policy (policy function) of the model
-.
-
-##### Arguments
-
-- `sp::SearchProblem` : Instance of `SearchProblem`
-- `v::Matrix`: Current guess for the value function
-- `out::Matrix` : Storage for output
-
-##### Returns
-
-None, `out` is updated in place to hold the policy function
-
-
-
-*source:*
-[QuantEcon/src/models/odu.jl:193](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/odu.jl#L193)
+[QuantEcon/src/models/uncertainty_traps.jl:54](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/uncertainty_traps.jl#L54)
 
 ---
 
@@ -477,7 +249,7 @@ grid. It should be the same size as `lt.grid`
 
 
 *source:*
-[QuantEcon/src/models/lucastree.jl:142](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/lucastree.jl#L142)
+[QuantEcon/src/models/lucastree.jl:142](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/lucastree.jl#L142)
 
 ---
 
@@ -497,7 +269,7 @@ None, `out` is updated in place to hold the updated levels of phi
 
 
 *source:*
-[QuantEcon/src/models/odu.jl:214](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/odu.jl#L214)
+[QuantEcon/src/models/odu.jl:214](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/odu.jl#L214)
 
 ---
 
@@ -510,7 +282,7 @@ on arguments
 
 
 *source:*
-[QuantEcon/src/models/odu.jl:237](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/odu.jl#L237)
+[QuantEcon/src/models/odu.jl:237](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/odu.jl#L237)
 
 ---
 
@@ -529,7 +301,76 @@ Computes the function v such that the price of the lucas tree is v(lambda)C_t
 
 
 *source:*
-[QuantEcon/src/models/asset_pricing.jl:66](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/asset_pricing.jl#L66)
+[QuantEcon/src/models/asset_pricing.jl:66](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/asset_pricing.jl#L66)
+
+---
+
+<a id="method__update_beliefs.1" class="lexicon_definition"></a>
+#### update_beliefs!(uc::QuantEcon.Models.UncertaintyTrapEcon,  X,  M) [¶](#method__update_beliefs.1)
+Update beliefs (mu, gamma) based on aggregates X and M.
+
+
+*source:*
+[QuantEcon/src/models/uncertainty_traps.jl:34](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/uncertainty_traps.jl#L34)
+
+---
+
+<a id="method__vfi.1" class="lexicon_definition"></a>
+#### vfi!(ae::QuantEcon.Models.ArellanoEconomy) [¶](#method__vfi.1)
+This performs value function iteration and stores all of the data inside
+the ArellanoEconomy type.
+
+##### Arguments
+
+* `ae::ArellanoEconomy`: This is the economy we would like to solve
+* `;tol::Float64(1e-8)`: Level of tolerance we would like to achieve
+* `;maxit::Int(10000)`: Maximum number of iterations
+
+##### Notes
+
+* This updates all value functions, policy functions, and prices in place.
+
+
+
+*source:*
+[QuantEcon/src/models/arellano_vfi.jl:214](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/arellano_vfi.jl#L214)
+
+---
+
+<a id="type__arellanoeconomy.1" class="lexicon_definition"></a>
+#### QuantEcon.Models.ArellanoEconomy [¶](#type__arellanoeconomy.1)
+Arellano 2008 deals with a small open economy whose government
+invests in foreign assets in order to smooth the consumption of
+domestic households. Domestic households receive a stochastic
+path of income.
+
+##### Fields
+* `β::Real`: Time discounting parameter
+* `γ::Real`: Risk aversion parameter
+* `r::Real`: World interest rate
+* `ρ::Real`: Autoregressive coefficient on income process
+* `η::Real`: Standard deviation of noise in income process
+* `θ::Real`: Probability of re-entering the world financial sector after default
+* `ny::Int`: Number of points to use in approximation of income process
+* `nB::Int`: Number of points to use in approximation of asset holdings
+* `ygrid::Vector{Float64}`: This is the grid used to approximate income process
+* `ydefgrid::Vector{Float64}`: When in default get less income than process
+  would otherwise dictate
+* `Bgrid::Vector{Float64}`: This is grid used to approximate choices of asset
+  holdings
+* `Π::Array{Float64, 2}`: Transition probabilities between income levels
+* `vf::Array{Float64, 2}`: Place to hold value function
+* `vd::Array{Float64, 2}`: Place to hold value function when in default
+* `vc::Array{Float64, 2}`: Place to hold value function when choosing to
+  continue
+* `policy::Array{Float64, 2}`: Place to hold asset policy function
+* `q::Array{Float64, 2}`: Place to hold prices at different pairs of (y, B')
+* `defprob::Array{Float64, 2}`: Place to hold the default probabilities for
+  pairs of (y, B')
+
+
+*source:*
+[QuantEcon/src/models/arellano_vfi.jl:38](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/arellano_vfi.jl#L38)
 
 ---
 
@@ -552,7 +393,7 @@ price of the consol
 
 
 *source:*
-[QuantEcon/src/models/asset_pricing.jl:34](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/asset_pricing.jl#L34)
+[QuantEcon/src/models/asset_pricing.jl:34](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/asset_pricing.jl#L34)
 
 ---
 
@@ -575,7 +416,7 @@ Career/job choice model fo Derek Neal (1999)
 
 
 *source:*
-[QuantEcon/src/models/career.jl:33](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/career.jl#L33)
+[QuantEcon/src/models/career.jl:33](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/career.jl#L33)
 
 ---
 
@@ -597,7 +438,7 @@ Income fluctuation problem
 
 
 *source:*
-[QuantEcon/src/models/ifp.jl:36](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L36)
+[QuantEcon/src/models/ifp.jl:36](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/ifp.jl#L36)
 
 ---
 
@@ -617,7 +458,7 @@ Neoclassical growth model
 
 
 *source:*
-[QuantEcon/src/models/optgrowth.jl:38](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/optgrowth.jl#L38)
+[QuantEcon/src/models/optgrowth.jl:38](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/optgrowth.jl#L38)
 
 ---
 
@@ -661,7 +502,7 @@ of new job offers is drawn
 
 
 *source:*
-[QuantEcon/src/models/jv.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/jv.jl#L63)
+[QuantEcon/src/models/jv.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/jv.jl#L63)
 
 ---
 
@@ -687,7 +528,7 @@ point should be non-negative
 
 
 *source:*
-[QuantEcon/src/models/lucastree.jl:50](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/lucastree.jl#L50)
+[QuantEcon/src/models/lucastree.jl:50](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/lucastree.jl#L50)
 
 ---
 
@@ -716,664 +557,161 @@ Unemployment/search problem where offer distribution is unknown
 
 
 *source:*
-[QuantEcon/src/models/odu.jl:40](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/odu.jl#L40)
+[QuantEcon/src/models/odu.jl:40](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/odu.jl#L40)
 
 ## Internal
 
 ---
 
 <a id="method__call.1" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.AssetPrices},  bet::Real,  P::Array{T, 2},  s::Array{T, 1},  gamm::Real) [¶](#method__call.1)
+#### call(::Type{QuantEcon.Models.ArellanoEconomy}) [¶](#method__call.1)
+This is the default constructor for building an economy as presented
+in Arellano 2008.
+
+##### Arguments
+* `;β::Real(0.953)`: Time discounting parameter
+* `;γ::Real(2.0)`: Risk aversion parameter
+* `;r::Real(0.017)`: World interest rate
+* `;ρ::Real(0.945)`: Autoregressive coefficient on income process
+* `;η::Real(0.025)`: Standard deviation of noise in income process
+* `;θ::Real(0.282)`: Probability of re-entering the world financial sector
+  after default
+* `;ny::Int(21)`: Number of points to use in approximation of income process
+* `;nB::Int(251)`: Number of points to use in approximation of asset holdings
+
+
+*source:*
+[QuantEcon/src/models/arellano_vfi.jl:79](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/arellano_vfi.jl#L79)
+
+---
+
+<a id="method__call.2" class="lexicon_definition"></a>
+#### call(::Type{QuantEcon.Models.AssetPrices},  bet::Real,  P::Array{T, 2},  s::Array{T, 1},  gamm::Real) [¶](#method__call.2)
 Construct an instance of `AssetPrices`, where `n`, `P_tilde`, and `P_check` are
 computed automatically for you. See also the documentation for the type itself
 
 
 *source:*
-[QuantEcon/src/models/asset_pricing.jl:48](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/asset_pricing.jl#L48)
-
----
-
-<a id="method__call.2" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.CareerWorkerProblem},  beta::Real) [¶](#method__call.2)
-Constructor with default values for `CareerWorkerProblem`
-
-##### Arguments
-
-- `beta::Real(0.95)` : Discount factor in (0, 1)
-- `B::Real(5.0)` : upper bound for both epsilon and theta
-- `N::Real(50)` : Number of possible realizations of both epsilon and theta
-- `F_a::Real(1), F_b::Real(1)` : Parameters of the distribution F
-- `G_a::Real(1), G_b::Real(1)` : Parameters of the distribution F
-
-##### Notes
-
-There is also a version of this function that accepts keyword arguments for
-each parameter
-
-
-
-*source:*
-[QuantEcon/src/models/career.jl:60](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/career.jl#L60)
+[QuantEcon/src/models/asset_pricing.jl:48](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/asset_pricing.jl#L48)
 
 ---
 
 <a id="method__call.3" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.CareerWorkerProblem},  beta::Real,  B::Real) [¶](#method__call.3)
-Constructor with default values for `CareerWorkerProblem`
+#### call(::Type{QuantEcon.Models.GrowthModel}) [¶](#method__call.3)
+Constructor of `GrowthModel`
 
 ##### Arguments
 
-- `beta::Real(0.95)` : Discount factor in (0, 1)
-- `B::Real(5.0)` : upper bound for both epsilon and theta
-- `N::Real(50)` : Number of possible realizations of both epsilon and theta
-- `F_a::Real(1), F_b::Real(1)` : Parameters of the distribution F
-- `G_a::Real(1), G_b::Real(1)` : Parameters of the distribution F
-
-##### Notes
-
-There is also a version of this function that accepts keyword arguments for
-each parameter
+- `f::Function(k->k^0.65)` : Production function
+- `bet::Real(0.95)` : Discount factor in (0, 1)
+- `u::Function(log)` : Utility function
+- `grid_max::Int(2)` : Maximum for grid over savings values
+- `grid_size::Int(150)` : Number of points in grid for savings values
 
 
 
 *source:*
-[QuantEcon/src/models/career.jl:60](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/career.jl#L60)
+[QuantEcon/src/models/optgrowth.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/optgrowth.jl#L63)
 
 ---
 
 <a id="method__call.4" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.CareerWorkerProblem},  beta::Real,  B::Real,  N::Real) [¶](#method__call.4)
-Constructor with default values for `CareerWorkerProblem`
+#### call(::Type{QuantEcon.Models.GrowthModel},  f) [¶](#method__call.4)
+Constructor of `GrowthModel`
 
 ##### Arguments
 
-- `beta::Real(0.95)` : Discount factor in (0, 1)
-- `B::Real(5.0)` : upper bound for both epsilon and theta
-- `N::Real(50)` : Number of possible realizations of both epsilon and theta
-- `F_a::Real(1), F_b::Real(1)` : Parameters of the distribution F
-- `G_a::Real(1), G_b::Real(1)` : Parameters of the distribution F
-
-##### Notes
-
-There is also a version of this function that accepts keyword arguments for
-each parameter
+- `f::Function(k->k^0.65)` : Production function
+- `bet::Real(0.95)` : Discount factor in (0, 1)
+- `u::Function(log)` : Utility function
+- `grid_max::Int(2)` : Maximum for grid over savings values
+- `grid_size::Int(150)` : Number of points in grid for savings values
 
 
 
 *source:*
-[QuantEcon/src/models/career.jl:60](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/career.jl#L60)
+[QuantEcon/src/models/optgrowth.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/optgrowth.jl#L63)
 
 ---
 
 <a id="method__call.5" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.CareerWorkerProblem},  beta::Real,  B::Real,  N::Real,  F_a::Real) [¶](#method__call.5)
-Constructor with default values for `CareerWorkerProblem`
+#### call(::Type{QuantEcon.Models.GrowthModel},  f,  bet) [¶](#method__call.5)
+Constructor of `GrowthModel`
 
 ##### Arguments
 
-- `beta::Real(0.95)` : Discount factor in (0, 1)
-- `B::Real(5.0)` : upper bound for both epsilon and theta
-- `N::Real(50)` : Number of possible realizations of both epsilon and theta
-- `F_a::Real(1), F_b::Real(1)` : Parameters of the distribution F
-- `G_a::Real(1), G_b::Real(1)` : Parameters of the distribution F
-
-##### Notes
-
-There is also a version of this function that accepts keyword arguments for
-each parameter
+- `f::Function(k->k^0.65)` : Production function
+- `bet::Real(0.95)` : Discount factor in (0, 1)
+- `u::Function(log)` : Utility function
+- `grid_max::Int(2)` : Maximum for grid over savings values
+- `grid_size::Int(150)` : Number of points in grid for savings values
 
 
 
 *source:*
-[QuantEcon/src/models/career.jl:60](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/career.jl#L60)
+[QuantEcon/src/models/optgrowth.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/optgrowth.jl#L63)
 
 ---
 
 <a id="method__call.6" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.CareerWorkerProblem},  beta::Real,  B::Real,  N::Real,  F_a::Real,  F_b::Real) [¶](#method__call.6)
-Constructor with default values for `CareerWorkerProblem`
+#### call(::Type{QuantEcon.Models.GrowthModel},  f,  bet,  u) [¶](#method__call.6)
+Constructor of `GrowthModel`
 
 ##### Arguments
 
-- `beta::Real(0.95)` : Discount factor in (0, 1)
-- `B::Real(5.0)` : upper bound for both epsilon and theta
-- `N::Real(50)` : Number of possible realizations of both epsilon and theta
-- `F_a::Real(1), F_b::Real(1)` : Parameters of the distribution F
-- `G_a::Real(1), G_b::Real(1)` : Parameters of the distribution F
-
-##### Notes
-
-There is also a version of this function that accepts keyword arguments for
-each parameter
+- `f::Function(k->k^0.65)` : Production function
+- `bet::Real(0.95)` : Discount factor in (0, 1)
+- `u::Function(log)` : Utility function
+- `grid_max::Int(2)` : Maximum for grid over savings values
+- `grid_size::Int(150)` : Number of points in grid for savings values
 
 
 
 *source:*
-[QuantEcon/src/models/career.jl:60](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/career.jl#L60)
+[QuantEcon/src/models/optgrowth.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/optgrowth.jl#L63)
 
 ---
 
 <a id="method__call.7" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.CareerWorkerProblem},  beta::Real,  B::Real,  N::Real,  F_a::Real,  F_b::Real,  G_a::Real) [¶](#method__call.7)
-Constructor with default values for `CareerWorkerProblem`
+#### call(::Type{QuantEcon.Models.GrowthModel},  f,  bet,  u,  grid_max) [¶](#method__call.7)
+Constructor of `GrowthModel`
 
 ##### Arguments
 
-- `beta::Real(0.95)` : Discount factor in (0, 1)
-- `B::Real(5.0)` : upper bound for both epsilon and theta
-- `N::Real(50)` : Number of possible realizations of both epsilon and theta
-- `F_a::Real(1), F_b::Real(1)` : Parameters of the distribution F
-- `G_a::Real(1), G_b::Real(1)` : Parameters of the distribution F
-
-##### Notes
-
-There is also a version of this function that accepts keyword arguments for
-each parameter
+- `f::Function(k->k^0.65)` : Production function
+- `bet::Real(0.95)` : Discount factor in (0, 1)
+- `u::Function(log)` : Utility function
+- `grid_max::Int(2)` : Maximum for grid over savings values
+- `grid_size::Int(150)` : Number of points in grid for savings values
 
 
 
 *source:*
-[QuantEcon/src/models/career.jl:60](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/career.jl#L60)
+[QuantEcon/src/models/optgrowth.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/optgrowth.jl#L63)
 
 ---
 
 <a id="method__call.8" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.CareerWorkerProblem},  beta::Real,  B::Real,  N::Real,  F_a::Real,  F_b::Real,  G_a::Real,  G_b::Real) [¶](#method__call.8)
-Constructor with default values for `CareerWorkerProblem`
+#### call(::Type{QuantEcon.Models.GrowthModel},  f,  bet,  u,  grid_max,  grid_size) [¶](#method__call.8)
+Constructor of `GrowthModel`
 
 ##### Arguments
 
-- `beta::Real(0.95)` : Discount factor in (0, 1)
-- `B::Real(5.0)` : upper bound for both epsilon and theta
-- `N::Real(50)` : Number of possible realizations of both epsilon and theta
-- `F_a::Real(1), F_b::Real(1)` : Parameters of the distribution F
-- `G_a::Real(1), G_b::Real(1)` : Parameters of the distribution F
-
-##### Notes
-
-There is also a version of this function that accepts keyword arguments for
-each parameter
+- `f::Function(k->k^0.65)` : Production function
+- `bet::Real(0.95)` : Discount factor in (0, 1)
+- `u::Function(log)` : Utility function
+- `grid_max::Int(2)` : Maximum for grid over savings values
+- `grid_size::Int(150)` : Number of points in grid for savings values
 
 
 
 *source:*
-[QuantEcon/src/models/career.jl:60](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/career.jl#L60)
+[QuantEcon/src/models/optgrowth.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/optgrowth.jl#L63)
 
 ---
 
 <a id="method__call.9" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.ConsumerProblem},  r) [¶](#method__call.9)
-Constructor with default values for `ConsumerProblem`
-
-##### Arguments
-
-- `r::Real(0.01)` : Strictly positive interest rate
-- `bet::Real(0.96)` : Discount rate in (0, 1)
-- `Pi::Matrix{Float64}([0.6 0.4; 0.05 0.95])` : Transition matrix for `z`
-- `z_vals::Vector{Float64}([0.5, 1.0])` : Levels of productivity
-- `b::Real(0.0)` : Borrowing constraint
-- `grid_max::Real(16)` : Maximum in grid for asset holdings
-- `grid_size::Int(50)` : Number of points in grid for asset holdings
-- `u::Function(log)` : Utility `function`
-- `du::Function(x->1/x)` : Marginal utility `function`
-
-##### Notes
-
-There is also a version of this function that accepts keyword arguments for
-each parameter
-
-
-
-
-*source:*
-[QuantEcon/src/models/ifp.jl:71](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L71)
-
----
-
-<a id="method__call.10" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.ConsumerProblem},  r,  bet) [¶](#method__call.10)
-Constructor with default values for `ConsumerProblem`
-
-##### Arguments
-
-- `r::Real(0.01)` : Strictly positive interest rate
-- `bet::Real(0.96)` : Discount rate in (0, 1)
-- `Pi::Matrix{Float64}([0.6 0.4; 0.05 0.95])` : Transition matrix for `z`
-- `z_vals::Vector{Float64}([0.5, 1.0])` : Levels of productivity
-- `b::Real(0.0)` : Borrowing constraint
-- `grid_max::Real(16)` : Maximum in grid for asset holdings
-- `grid_size::Int(50)` : Number of points in grid for asset holdings
-- `u::Function(log)` : Utility `function`
-- `du::Function(x->1/x)` : Marginal utility `function`
-
-##### Notes
-
-There is also a version of this function that accepts keyword arguments for
-each parameter
-
-
-
-
-*source:*
-[QuantEcon/src/models/ifp.jl:71](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L71)
-
----
-
-<a id="method__call.11" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.ConsumerProblem},  r,  bet,  Pi) [¶](#method__call.11)
-Constructor with default values for `ConsumerProblem`
-
-##### Arguments
-
-- `r::Real(0.01)` : Strictly positive interest rate
-- `bet::Real(0.96)` : Discount rate in (0, 1)
-- `Pi::Matrix{Float64}([0.6 0.4; 0.05 0.95])` : Transition matrix for `z`
-- `z_vals::Vector{Float64}([0.5, 1.0])` : Levels of productivity
-- `b::Real(0.0)` : Borrowing constraint
-- `grid_max::Real(16)` : Maximum in grid for asset holdings
-- `grid_size::Int(50)` : Number of points in grid for asset holdings
-- `u::Function(log)` : Utility `function`
-- `du::Function(x->1/x)` : Marginal utility `function`
-
-##### Notes
-
-There is also a version of this function that accepts keyword arguments for
-each parameter
-
-
-
-
-*source:*
-[QuantEcon/src/models/ifp.jl:71](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L71)
-
----
-
-<a id="method__call.12" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.ConsumerProblem},  r,  bet,  Pi,  z_vals) [¶](#method__call.12)
-Constructor with default values for `ConsumerProblem`
-
-##### Arguments
-
-- `r::Real(0.01)` : Strictly positive interest rate
-- `bet::Real(0.96)` : Discount rate in (0, 1)
-- `Pi::Matrix{Float64}([0.6 0.4; 0.05 0.95])` : Transition matrix for `z`
-- `z_vals::Vector{Float64}([0.5, 1.0])` : Levels of productivity
-- `b::Real(0.0)` : Borrowing constraint
-- `grid_max::Real(16)` : Maximum in grid for asset holdings
-- `grid_size::Int(50)` : Number of points in grid for asset holdings
-- `u::Function(log)` : Utility `function`
-- `du::Function(x->1/x)` : Marginal utility `function`
-
-##### Notes
-
-There is also a version of this function that accepts keyword arguments for
-each parameter
-
-
-
-
-*source:*
-[QuantEcon/src/models/ifp.jl:71](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L71)
-
----
-
-<a id="method__call.13" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.ConsumerProblem},  r,  bet,  Pi,  z_vals,  b) [¶](#method__call.13)
-Constructor with default values for `ConsumerProblem`
-
-##### Arguments
-
-- `r::Real(0.01)` : Strictly positive interest rate
-- `bet::Real(0.96)` : Discount rate in (0, 1)
-- `Pi::Matrix{Float64}([0.6 0.4; 0.05 0.95])` : Transition matrix for `z`
-- `z_vals::Vector{Float64}([0.5, 1.0])` : Levels of productivity
-- `b::Real(0.0)` : Borrowing constraint
-- `grid_max::Real(16)` : Maximum in grid for asset holdings
-- `grid_size::Int(50)` : Number of points in grid for asset holdings
-- `u::Function(log)` : Utility `function`
-- `du::Function(x->1/x)` : Marginal utility `function`
-
-##### Notes
-
-There is also a version of this function that accepts keyword arguments for
-each parameter
-
-
-
-
-*source:*
-[QuantEcon/src/models/ifp.jl:71](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L71)
-
----
-
-<a id="method__call.14" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.ConsumerProblem},  r,  bet,  Pi,  z_vals,  b,  grid_max) [¶](#method__call.14)
-Constructor with default values for `ConsumerProblem`
-
-##### Arguments
-
-- `r::Real(0.01)` : Strictly positive interest rate
-- `bet::Real(0.96)` : Discount rate in (0, 1)
-- `Pi::Matrix{Float64}([0.6 0.4; 0.05 0.95])` : Transition matrix for `z`
-- `z_vals::Vector{Float64}([0.5, 1.0])` : Levels of productivity
-- `b::Real(0.0)` : Borrowing constraint
-- `grid_max::Real(16)` : Maximum in grid for asset holdings
-- `grid_size::Int(50)` : Number of points in grid for asset holdings
-- `u::Function(log)` : Utility `function`
-- `du::Function(x->1/x)` : Marginal utility `function`
-
-##### Notes
-
-There is also a version of this function that accepts keyword arguments for
-each parameter
-
-
-
-
-*source:*
-[QuantEcon/src/models/ifp.jl:71](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L71)
-
----
-
-<a id="method__call.15" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.ConsumerProblem},  r,  bet,  Pi,  z_vals,  b,  grid_max,  grid_size) [¶](#method__call.15)
-Constructor with default values for `ConsumerProblem`
-
-##### Arguments
-
-- `r::Real(0.01)` : Strictly positive interest rate
-- `bet::Real(0.96)` : Discount rate in (0, 1)
-- `Pi::Matrix{Float64}([0.6 0.4; 0.05 0.95])` : Transition matrix for `z`
-- `z_vals::Vector{Float64}([0.5, 1.0])` : Levels of productivity
-- `b::Real(0.0)` : Borrowing constraint
-- `grid_max::Real(16)` : Maximum in grid for asset holdings
-- `grid_size::Int(50)` : Number of points in grid for asset holdings
-- `u::Function(log)` : Utility `function`
-- `du::Function(x->1/x)` : Marginal utility `function`
-
-##### Notes
-
-There is also a version of this function that accepts keyword arguments for
-each parameter
-
-
-
-
-*source:*
-[QuantEcon/src/models/ifp.jl:71](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L71)
-
----
-
-<a id="method__call.16" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.ConsumerProblem},  r,  bet,  Pi,  z_vals,  b,  grid_max,  grid_size,  u) [¶](#method__call.16)
-Constructor with default values for `ConsumerProblem`
-
-##### Arguments
-
-- `r::Real(0.01)` : Strictly positive interest rate
-- `bet::Real(0.96)` : Discount rate in (0, 1)
-- `Pi::Matrix{Float64}([0.6 0.4; 0.05 0.95])` : Transition matrix for `z`
-- `z_vals::Vector{Float64}([0.5, 1.0])` : Levels of productivity
-- `b::Real(0.0)` : Borrowing constraint
-- `grid_max::Real(16)` : Maximum in grid for asset holdings
-- `grid_size::Int(50)` : Number of points in grid for asset holdings
-- `u::Function(log)` : Utility `function`
-- `du::Function(x->1/x)` : Marginal utility `function`
-
-##### Notes
-
-There is also a version of this function that accepts keyword arguments for
-each parameter
-
-
-
-
-*source:*
-[QuantEcon/src/models/ifp.jl:71](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L71)
-
----
-
-<a id="method__call.17" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.ConsumerProblem},  r,  bet,  Pi,  z_vals,  b,  grid_max,  grid_size,  u,  du) [¶](#method__call.17)
-Constructor with default values for `ConsumerProblem`
-
-##### Arguments
-
-- `r::Real(0.01)` : Strictly positive interest rate
-- `bet::Real(0.96)` : Discount rate in (0, 1)
-- `Pi::Matrix{Float64}([0.6 0.4; 0.05 0.95])` : Transition matrix for `z`
-- `z_vals::Vector{Float64}([0.5, 1.0])` : Levels of productivity
-- `b::Real(0.0)` : Borrowing constraint
-- `grid_max::Real(16)` : Maximum in grid for asset holdings
-- `grid_size::Int(50)` : Number of points in grid for asset holdings
-- `u::Function(log)` : Utility `function`
-- `du::Function(x->1/x)` : Marginal utility `function`
-
-##### Notes
-
-There is also a version of this function that accepts keyword arguments for
-each parameter
-
-
-
-
-*source:*
-[QuantEcon/src/models/ifp.jl:71](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L71)
-
----
-
-<a id="method__call.18" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.GrowthModel}) [¶](#method__call.18)
-Constructor of `GrowthModel`
-
-##### Arguments
-
-- `f::Function(k->k^0.65)` : Production function
-- `bet::Real(0.95)` : Discount factor in (0, 1)
-- `u::Function(log)` : Utility function
-- `grid_max::Int(2)` : Maximum for grid over savings values
-- `grid_size::Int(150)` : Number of points in grid for savings values
-
-
-
-*source:*
-[QuantEcon/src/models/optgrowth.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/optgrowth.jl#L63)
-
----
-
-<a id="method__call.19" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.GrowthModel},  f) [¶](#method__call.19)
-Constructor of `GrowthModel`
-
-##### Arguments
-
-- `f::Function(k->k^0.65)` : Production function
-- `bet::Real(0.95)` : Discount factor in (0, 1)
-- `u::Function(log)` : Utility function
-- `grid_max::Int(2)` : Maximum for grid over savings values
-- `grid_size::Int(150)` : Number of points in grid for savings values
-
-
-
-*source:*
-[QuantEcon/src/models/optgrowth.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/optgrowth.jl#L63)
-
----
-
-<a id="method__call.20" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.GrowthModel},  f,  bet) [¶](#method__call.20)
-Constructor of `GrowthModel`
-
-##### Arguments
-
-- `f::Function(k->k^0.65)` : Production function
-- `bet::Real(0.95)` : Discount factor in (0, 1)
-- `u::Function(log)` : Utility function
-- `grid_max::Int(2)` : Maximum for grid over savings values
-- `grid_size::Int(150)` : Number of points in grid for savings values
-
-
-
-*source:*
-[QuantEcon/src/models/optgrowth.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/optgrowth.jl#L63)
-
----
-
-<a id="method__call.21" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.GrowthModel},  f,  bet,  u) [¶](#method__call.21)
-Constructor of `GrowthModel`
-
-##### Arguments
-
-- `f::Function(k->k^0.65)` : Production function
-- `bet::Real(0.95)` : Discount factor in (0, 1)
-- `u::Function(log)` : Utility function
-- `grid_max::Int(2)` : Maximum for grid over savings values
-- `grid_size::Int(150)` : Number of points in grid for savings values
-
-
-
-*source:*
-[QuantEcon/src/models/optgrowth.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/optgrowth.jl#L63)
-
----
-
-<a id="method__call.22" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.GrowthModel},  f,  bet,  u,  grid_max) [¶](#method__call.22)
-Constructor of `GrowthModel`
-
-##### Arguments
-
-- `f::Function(k->k^0.65)` : Production function
-- `bet::Real(0.95)` : Discount factor in (0, 1)
-- `u::Function(log)` : Utility function
-- `grid_max::Int(2)` : Maximum for grid over savings values
-- `grid_size::Int(150)` : Number of points in grid for savings values
-
-
-
-*source:*
-[QuantEcon/src/models/optgrowth.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/optgrowth.jl#L63)
-
----
-
-<a id="method__call.23" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.GrowthModel},  f,  bet,  u,  grid_max,  grid_size) [¶](#method__call.23)
-Constructor of `GrowthModel`
-
-##### Arguments
-
-- `f::Function(k->k^0.65)` : Production function
-- `bet::Real(0.95)` : Discount factor in (0, 1)
-- `u::Function(log)` : Utility function
-- `grid_max::Int(2)` : Maximum for grid over savings values
-- `grid_size::Int(150)` : Number of points in grid for savings values
-
-
-
-*source:*
-[QuantEcon/src/models/optgrowth.jl:63](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/optgrowth.jl#L63)
-
----
-
-<a id="method__call.24" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.JvWorker},  A) [¶](#method__call.24)
-Constructor with default values for `JvWorker`
-
-##### Arguments
-
- - `A::Real(1.4)` : Parameter in human capital transition function
- - `alpha::Real(0.6)` : Parameter in human capital transition function
- - `bet::Real(0.96)` : Discount factor in (0, 1)
- - `grid_size::Int(50)` : Number of points in discrete grid for `x`
-
-##### Notes
-
-There is also a version of this function that accepts keyword arguments for
-each parameter
-
-
-
-
-*source:*
-[QuantEcon/src/models/jv.jl:90](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/jv.jl#L90)
-
----
-
-<a id="method__call.25" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.JvWorker},  A,  alpha) [¶](#method__call.25)
-Constructor with default values for `JvWorker`
-
-##### Arguments
-
- - `A::Real(1.4)` : Parameter in human capital transition function
- - `alpha::Real(0.6)` : Parameter in human capital transition function
- - `bet::Real(0.96)` : Discount factor in (0, 1)
- - `grid_size::Int(50)` : Number of points in discrete grid for `x`
-
-##### Notes
-
-There is also a version of this function that accepts keyword arguments for
-each parameter
-
-
-
-
-*source:*
-[QuantEcon/src/models/jv.jl:90](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/jv.jl#L90)
-
----
-
-<a id="method__call.26" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.JvWorker},  A,  alpha,  bet) [¶](#method__call.26)
-Constructor with default values for `JvWorker`
-
-##### Arguments
-
- - `A::Real(1.4)` : Parameter in human capital transition function
- - `alpha::Real(0.6)` : Parameter in human capital transition function
- - `bet::Real(0.96)` : Discount factor in (0, 1)
- - `grid_size::Int(50)` : Number of points in discrete grid for `x`
-
-##### Notes
-
-There is also a version of this function that accepts keyword arguments for
-each parameter
-
-
-
-
-*source:*
-[QuantEcon/src/models/jv.jl:90](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/jv.jl#L90)
-
----
-
-<a id="method__call.27" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.JvWorker},  A,  alpha,  bet,  grid_size) [¶](#method__call.27)
-Constructor with default values for `JvWorker`
-
-##### Arguments
-
- - `A::Real(1.4)` : Parameter in human capital transition function
- - `alpha::Real(0.6)` : Parameter in human capital transition function
- - `bet::Real(0.96)` : Discount factor in (0, 1)
- - `grid_size::Int(50)` : Number of points in discrete grid for `x`
-
-##### Notes
-
-There is also a version of this function that accepts keyword arguments for
-each parameter
-
-
-
-
-*source:*
-[QuantEcon/src/models/jv.jl:90](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/jv.jl#L90)
-
----
-
-<a id="method__call.28" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.LucasTree},  gam::Real,  bet::Real,  alpha::Real,  sigma::Real) [¶](#method__call.28)
+#### call(::Type{QuantEcon.Models.LucasTree},  gam::Real,  bet::Real,  alpha::Real,  sigma::Real) [¶](#method__call.9)
 Constructor for LucasTree
 
 ##### Arguments
@@ -1389,250 +727,27 @@ All other fields of the type are instantiated within the constructor
 
 
 *source:*
-[QuantEcon/src/models/lucastree.jl:80](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/lucastree.jl#L80)
+[QuantEcon/src/models/lucastree.jl:80](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/lucastree.jl#L80)
 
 ---
 
-<a id="method__call.29" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.SearchProblem},  bet) [¶](#method__call.29)
-Constructor for `SearchProblem` with default values
+<a id="method__compute_prices.1" class="lexicon_definition"></a>
+#### compute_prices!(ae::QuantEcon.Models.ArellanoEconomy) [¶](#method__compute_prices.1)
+This function takes the Arellano economy and its value functions and
+policy functions and then updates the prices for each (y, B') pair
 
 ##### Arguments
 
-- `bet::Real(0.95)` : Discount factor in (0, 1)
-- `c::Real(0.6)` : Unemployment compensation
-- `F_a::Real(1), F_b::Real(1)` : Parameters of `Beta` distribution for `F`
-- `G_a::Real(3), G_b::Real(1.2)` : Parameters of `Beta` distribution for `G`
-- `w_max::Real(2)` : Maximum of wage offer grid
-- `w_grid_size::Int(40)` : Number of points in wage offer grid
-- `pi_grid_size::Int(40)` : Number of points in probability grid
+* `ae::ArellanoEconomy`: This is the economy we would like to update the
+  prices for
 
 ##### Notes
 
-There is also a version of this function that accepts keyword arguments for
-each parameter
-
-
+* This function updates the prices and default probabilities in place
 
 
 *source:*
-[QuantEcon/src/models/odu.jl:76](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/odu.jl#L76)
-
----
-
-<a id="method__call.30" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.SearchProblem},  bet,  c) [¶](#method__call.30)
-Constructor for `SearchProblem` with default values
-
-##### Arguments
-
-- `bet::Real(0.95)` : Discount factor in (0, 1)
-- `c::Real(0.6)` : Unemployment compensation
-- `F_a::Real(1), F_b::Real(1)` : Parameters of `Beta` distribution for `F`
-- `G_a::Real(3), G_b::Real(1.2)` : Parameters of `Beta` distribution for `G`
-- `w_max::Real(2)` : Maximum of wage offer grid
-- `w_grid_size::Int(40)` : Number of points in wage offer grid
-- `pi_grid_size::Int(40)` : Number of points in probability grid
-
-##### Notes
-
-There is also a version of this function that accepts keyword arguments for
-each parameter
-
-
-
-
-*source:*
-[QuantEcon/src/models/odu.jl:76](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/odu.jl#L76)
-
----
-
-<a id="method__call.31" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.SearchProblem},  bet,  c,  F_a) [¶](#method__call.31)
-Constructor for `SearchProblem` with default values
-
-##### Arguments
-
-- `bet::Real(0.95)` : Discount factor in (0, 1)
-- `c::Real(0.6)` : Unemployment compensation
-- `F_a::Real(1), F_b::Real(1)` : Parameters of `Beta` distribution for `F`
-- `G_a::Real(3), G_b::Real(1.2)` : Parameters of `Beta` distribution for `G`
-- `w_max::Real(2)` : Maximum of wage offer grid
-- `w_grid_size::Int(40)` : Number of points in wage offer grid
-- `pi_grid_size::Int(40)` : Number of points in probability grid
-
-##### Notes
-
-There is also a version of this function that accepts keyword arguments for
-each parameter
-
-
-
-
-*source:*
-[QuantEcon/src/models/odu.jl:76](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/odu.jl#L76)
-
----
-
-<a id="method__call.32" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.SearchProblem},  bet,  c,  F_a,  F_b) [¶](#method__call.32)
-Constructor for `SearchProblem` with default values
-
-##### Arguments
-
-- `bet::Real(0.95)` : Discount factor in (0, 1)
-- `c::Real(0.6)` : Unemployment compensation
-- `F_a::Real(1), F_b::Real(1)` : Parameters of `Beta` distribution for `F`
-- `G_a::Real(3), G_b::Real(1.2)` : Parameters of `Beta` distribution for `G`
-- `w_max::Real(2)` : Maximum of wage offer grid
-- `w_grid_size::Int(40)` : Number of points in wage offer grid
-- `pi_grid_size::Int(40)` : Number of points in probability grid
-
-##### Notes
-
-There is also a version of this function that accepts keyword arguments for
-each parameter
-
-
-
-
-*source:*
-[QuantEcon/src/models/odu.jl:76](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/odu.jl#L76)
-
----
-
-<a id="method__call.33" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.SearchProblem},  bet,  c,  F_a,  F_b,  G_a) [¶](#method__call.33)
-Constructor for `SearchProblem` with default values
-
-##### Arguments
-
-- `bet::Real(0.95)` : Discount factor in (0, 1)
-- `c::Real(0.6)` : Unemployment compensation
-- `F_a::Real(1), F_b::Real(1)` : Parameters of `Beta` distribution for `F`
-- `G_a::Real(3), G_b::Real(1.2)` : Parameters of `Beta` distribution for `G`
-- `w_max::Real(2)` : Maximum of wage offer grid
-- `w_grid_size::Int(40)` : Number of points in wage offer grid
-- `pi_grid_size::Int(40)` : Number of points in probability grid
-
-##### Notes
-
-There is also a version of this function that accepts keyword arguments for
-each parameter
-
-
-
-
-*source:*
-[QuantEcon/src/models/odu.jl:76](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/odu.jl#L76)
-
----
-
-<a id="method__call.34" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.SearchProblem},  bet,  c,  F_a,  F_b,  G_a,  G_b) [¶](#method__call.34)
-Constructor for `SearchProblem` with default values
-
-##### Arguments
-
-- `bet::Real(0.95)` : Discount factor in (0, 1)
-- `c::Real(0.6)` : Unemployment compensation
-- `F_a::Real(1), F_b::Real(1)` : Parameters of `Beta` distribution for `F`
-- `G_a::Real(3), G_b::Real(1.2)` : Parameters of `Beta` distribution for `G`
-- `w_max::Real(2)` : Maximum of wage offer grid
-- `w_grid_size::Int(40)` : Number of points in wage offer grid
-- `pi_grid_size::Int(40)` : Number of points in probability grid
-
-##### Notes
-
-There is also a version of this function that accepts keyword arguments for
-each parameter
-
-
-
-
-*source:*
-[QuantEcon/src/models/odu.jl:76](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/odu.jl#L76)
-
----
-
-<a id="method__call.35" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.SearchProblem},  bet,  c,  F_a,  F_b,  G_a,  G_b,  w_max) [¶](#method__call.35)
-Constructor for `SearchProblem` with default values
-
-##### Arguments
-
-- `bet::Real(0.95)` : Discount factor in (0, 1)
-- `c::Real(0.6)` : Unemployment compensation
-- `F_a::Real(1), F_b::Real(1)` : Parameters of `Beta` distribution for `F`
-- `G_a::Real(3), G_b::Real(1.2)` : Parameters of `Beta` distribution for `G`
-- `w_max::Real(2)` : Maximum of wage offer grid
-- `w_grid_size::Int(40)` : Number of points in wage offer grid
-- `pi_grid_size::Int(40)` : Number of points in probability grid
-
-##### Notes
-
-There is also a version of this function that accepts keyword arguments for
-each parameter
-
-
-
-
-*source:*
-[QuantEcon/src/models/odu.jl:76](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/odu.jl#L76)
-
----
-
-<a id="method__call.36" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.SearchProblem},  bet,  c,  F_a,  F_b,  G_a,  G_b,  w_max,  w_grid_size) [¶](#method__call.36)
-Constructor for `SearchProblem` with default values
-
-##### Arguments
-
-- `bet::Real(0.95)` : Discount factor in (0, 1)
-- `c::Real(0.6)` : Unemployment compensation
-- `F_a::Real(1), F_b::Real(1)` : Parameters of `Beta` distribution for `F`
-- `G_a::Real(3), G_b::Real(1.2)` : Parameters of `Beta` distribution for `G`
-- `w_max::Real(2)` : Maximum of wage offer grid
-- `w_grid_size::Int(40)` : Number of points in wage offer grid
-- `pi_grid_size::Int(40)` : Number of points in probability grid
-
-##### Notes
-
-There is also a version of this function that accepts keyword arguments for
-each parameter
-
-
-
-
-*source:*
-[QuantEcon/src/models/odu.jl:76](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/odu.jl#L76)
-
----
-
-<a id="method__call.37" class="lexicon_definition"></a>
-#### call(::Type{QuantEcon.Models.SearchProblem},  bet,  c,  F_a,  F_b,  G_a,  G_b,  w_max,  w_grid_size,  pi_grid_size) [¶](#method__call.37)
-Constructor for `SearchProblem` with default values
-
-##### Arguments
-
-- `bet::Real(0.95)` : Discount factor in (0, 1)
-- `c::Real(0.6)` : Unemployment compensation
-- `F_a::Real(1), F_b::Real(1)` : Parameters of `Beta` distribution for `F`
-- `G_a::Real(3), G_b::Real(1.2)` : Parameters of `Beta` distribution for `G`
-- `w_max::Real(2)` : Maximum of wage offer grid
-- `w_grid_size::Int(40)` : Number of points in wage offer grid
-- `pi_grid_size::Int(40)` : Number of points in probability grid
-
-##### Notes
-
-There is also a version of this function that accepts keyword arguments for
-each parameter
-
-
-
-
-*source:*
-[QuantEcon/src/models/odu.jl:76](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/odu.jl#L76)
+[QuantEcon/src/models/arellano_vfi.jl:184](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/arellano_vfi.jl#L184)
 
 ---
 
@@ -1641,5 +756,94 @@ each parameter
 Marginal utility for log utility function
 
 *source:*
-[QuantEcon/src/models/ifp.jl:49](https://github.com/QuantEcon/QuantEcon.jl/tree/ddaddc4fd9864c1a76be73bf3cab199ee3f668f0/src/models/ifp.jl#L49)
+[QuantEcon/src/models/ifp.jl:49](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/ifp.jl#L49)
+
+---
+
+<a id="method__one_step_update.1" class="lexicon_definition"></a>
+#### one_step_update!(ae::QuantEcon.Models.ArellanoEconomy,  EV::Array{Float64, 2},  EVd::Array{Float64, 2},  EVc::Array{Float64, 2}) [¶](#method__one_step_update.1)
+This function performs the one step update of the value function for the
+Arellano model-- Using current value functions and their expected value,
+it updates the value function at every state by solving for the optimal
+choice of savings
+
+##### Arguments
+
+* `ae::ArellanoEconomy`: This is the economy we would like to update the
+  value functions for
+* `EV::Matrix{Float64}`: Expected value function at each state
+* `EVd::Matrix{Float64}`: Expected value function of default at each state
+* `EVc::Matrix{Float64}`: Expected value function of continuing at each state
+
+##### Notes
+
+* This function updates value functions and policy functions in place.
+
+
+*source:*
+[QuantEcon/src/models/arellano_vfi.jl:129](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/arellano_vfi.jl#L129)
+
+---
+
+<a id="method__simulate.1" class="lexicon_definition"></a>
+#### simulate(ae::QuantEcon.Models.ArellanoEconomy) [¶](#method__simulate.1)
+This function simulates the Arellano economy
+
+##### Arguments
+
+* `ae::ArellanoEconomy`: This is the economy we would like to solve
+* `capT::Int`: Number of periods to simulate
+* `;y_init::Float64(mean(ae.ygrid)`: The level of income we would like to
+  start with
+* `;B_init::Float64(mean(ae.Bgrid)`: The level of asset holdings we would like
+  to start with
+
+##### Returns
+
+* `B_sim_val::Vector{Float64}`: Simulated values of assets
+* `y_sim_val::Vector{Float64}`: Simulated values of income
+* `q_sim_val::Vector{Float64}`: Simulated values of prices
+* `default_status::Vector{Float64}`: Simulated default status
+  (true if in default)
+
+##### Notes
+
+* This updates all value functions, policy functions, and prices in place.
+
+
+
+*source:*
+[QuantEcon/src/models/arellano_vfi.jl:279](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/arellano_vfi.jl#L279)
+
+---
+
+<a id="method__simulate.2" class="lexicon_definition"></a>
+#### simulate(ae::QuantEcon.Models.ArellanoEconomy,  capT::Int64) [¶](#method__simulate.2)
+This function simulates the Arellano economy
+
+##### Arguments
+
+* `ae::ArellanoEconomy`: This is the economy we would like to solve
+* `capT::Int`: Number of periods to simulate
+* `;y_init::Float64(mean(ae.ygrid)`: The level of income we would like to
+  start with
+* `;B_init::Float64(mean(ae.Bgrid)`: The level of asset holdings we would like
+  to start with
+
+##### Returns
+
+* `B_sim_val::Vector{Float64}`: Simulated values of assets
+* `y_sim_val::Vector{Float64}`: Simulated values of income
+* `q_sim_val::Vector{Float64}`: Simulated values of prices
+* `default_status::Vector{Float64}`: Simulated default status
+  (true if in default)
+
+##### Notes
+
+* This updates all value functions, policy functions, and prices in place.
+
+
+
+*source:*
+[QuantEcon/src/models/arellano_vfi.jl:279](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/models/arellano_vfi.jl#L279)
 
