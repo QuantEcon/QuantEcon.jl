@@ -165,7 +165,7 @@ function one_step_update!(ae::ArellanoEconomy, EV::Matrix{Float64},
         end
     end
 
-    nothing
+    Void
 end
 
 """
@@ -193,7 +193,7 @@ function compute_prices!(ae::ArellanoEconomy)
     copy!(ae.defprob, default_states * ae.Π')
     copy!(ae.q, (1 - ae.defprob) / (1 + r))
 
-    nothing
+    Void
 end
 
 """
@@ -248,7 +248,7 @@ function vfi!(ae::ArellanoEconomy; tol=1e-8, maxit=10000)
         end
     end
 
-    nothing
+    Void
 end
 
 """

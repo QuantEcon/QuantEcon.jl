@@ -130,7 +130,7 @@ $(____bellman_main_docstring).
 
 - `jv::JvWorker` : Instance of `JvWorker`
 - `V::Vector`: Current guess for the value function
-- `out::Union(Vector, Tuple{Vector, Vector})` : Storage for output. Note that
+- `out::Union{Vector, Tuple{Vector, Vector}}` : Storage for output. Note that
 there are two policy rules, but one value function
 - `;brute_force::Bool(true)`: Whether to use a brute force grid search
 algorithm or a solver from scipy.
@@ -149,7 +149,7 @@ we will re-activate this option.
 
 """
 function bellman_operator!(jv::JvWorker, V::Vector,
-                           out::Union(Vector, @compat Tuple{Vector, Vector});
+                           out::Union{Vector, @compat Tuple{Vector, Vector}};
                            brute_force=true, ret_policies=false)
 
     if !(brute_force)

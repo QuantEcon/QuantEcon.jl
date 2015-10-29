@@ -63,5 +63,5 @@ function main()
     ax[:plot](0:T, b, "b-", label="debt"; p_args...)
     ax[:legend](loc="lower right")
 
-    return nothing
+    return Void
 end

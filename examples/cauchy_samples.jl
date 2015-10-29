@@ -20,7 +20,7 @@ function plot_draws()
     ax[:plot](1:n, data, "bo", alpha=0.5)
     ax[:vlines](1:n, 0, data, lw=0.2)
     ax[:set_title]("$n observations from the Cauchy distribution")
-    nothing
+    Void
 end
 
 
@@ -36,7 +36,7 @@ function plot_means()
     ax[:plot](1:n, sample_mean, "r-", lw=3, alpha=0.6, label=L"$\bar{X}_n$")
     ax[:plot](1:n, zeros(n), "k--", lw=0.5)
     ax[:legend]()
-    nothing
+    Void
 end
 
 plot_draws()

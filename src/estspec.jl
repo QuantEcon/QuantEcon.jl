@@ -20,14 +20,14 @@ Smooth the data in x using convolution with a window of requested size and type.
 
 - `x::Array`: An array containing the data to smooth
 - `window_len::Int(7)`: An odd integer giving the length of the window
-- `window::String("hanning")`: A string giving the window type. Possible values
+- `window::AbstractString("hanning")`: A string giving the window type. Possible values
 are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`
 
 ##### Returns
 
 - `out::Array`: The array of smoothed data
 """
-function smooth(x::Array, window_len::Int=7, window::String="hanning")
+function smooth(x::Array, window_len::Int=7, window::AbstractString="hanning")
     if length(x) < window_len
         throw(ArgumentError("Input vector length must be >= window length"))
     end
@@ -67,7 +67,7 @@ function smooth(x::Array, window_len::Int=7, window::String="hanning")
 end
 
 "Version of `smooth` where `window_len` and `window` are keyword arguments"
-function smooth(x::Array; window_len::Int=7, window::String="hanning")
+function smooth(x::Array; window_len::Int=7, window::AbstractString="hanning")
     smooth(x, window_len, window)
 end
 
@@ -84,7 +84,7 @@ function periodogram(x::Vector)
 end
 
 
-function periodogram(x::Vector, window::String, window_len::Int=7)
+function periodogram(x::Vector, window::AbstractString, window_len::Int=7)
     w, I_w = periodogram(x)
     I_w = smooth(I_w, window_len=window_len, window=window)
     return w, I_w
@@ -103,7 +103,7 @@ I(w_j) are returned.  If a window type is given then smoothing is performed.
 
 - `x::Array`: An array containing the data to smooth
 - `window_len::Int(7)`: An odd integer giving the length of the window
-- `window::String("hanning")`: A string giving the window type. Possible values
+- `window::AbstractString("hanning")`: A string giving the window type. Possible values
 are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`
 
 ##### Returns
@@ -124,7 +124,7 @@ coefficients are then used for recoloring.
 
 - `x::Array`: An array containing the data to smooth
 - `window_len::Int(7)`: An odd integer giving the length of the window
-- `window::String("hanning")`: A string giving the window type. Possible values
+- `window::AbstractString("hanning")`: A string giving the window type. Possible values
 are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`
 
 ##### Returns
@@ -133,7 +133,7 @@ are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`
 - `I_w::Array{Float64}`: The periodogram at frequences `w`
 
 """
-function ar_periodogram(x::Array, window::String="hanning", window_len::Int=7)
+function ar_periodogram(x::Array, window::AbstractString="hanning", window_len::Int=7)
     # run regression
     x_current, x_lagged = x[2:end], x[1:end-1]  # x_t and x_{t-1}
     coefs = linreg(x_lagged, x_current)

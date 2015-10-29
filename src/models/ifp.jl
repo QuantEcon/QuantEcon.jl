@@ -201,7 +201,7 @@ function coleman_operator!(cp::ConsumerProblem, c::Matrix, out::Matrix)
             vals[i] = CoordInterpGrid(asset_grid, c[:, i], BCnearest,
                                       InterpLinear)[a]
         end
-        nothing
+        Void
     end
 
     # compute lower_bound for optimization

@@ -16,14 +16,14 @@ Here {x_t} is the VAR process x_{t+1} = A x_t + C w_t with {w_t}
 standard normal and x_0 the initial condition.
 
 ##### Arguments
-- `A::Union(Float64, Matrix{Float64})` The n x n matrix described above (scalar)
+- `A::Union{Float64, Matrix{Float64}}` The n x n matrix described above (scalar)
 if n = 1
-- `C::Union(Float64, Matrix{Float64})` The n x n matrix described above (scalar)
+- `C::Union{Float64, Matrix{Float64}}` The n x n matrix described above (scalar)
 if n = 1
-- `H::Union(Float64, Matrix{Float64})` The n x n matrix described above (scalar)
+- `H::Union{Float64, Matrix{Float64}}` The n x n matrix described above (scalar)
 if n = 1
 - `beta::Float64`: Discount factor in (0, 1)
-- `x_0::Union(Float64, Vector{Float64})` The initial condtion. A conformable
+- `x_0::Union{Float64, Vector{Float64}}` The initial condtion. A conformable
 array (of length n) or a scalar if n=1
 
 ##### Returns

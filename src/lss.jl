@@ -47,7 +47,7 @@ type LSS
     m::Int
     mu_0::Vector
     Sigma_0::Matrix
-    dist::Union(MultivariateNormal, FakeMVTNorm)
+    dist::Union{MultivariateNormal, FakeMVTNorm}
 end
 
 
@@ -120,7 +120,7 @@ function moment_sequence(lss::LSS)
         mu_x = A * mu_x
         Sigma_x = A * Sigma_x * A' + C * C'
     end
-    nothing
+    Void
 end
 
 

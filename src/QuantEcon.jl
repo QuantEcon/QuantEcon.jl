@@ -13,7 +13,7 @@ using Docile
 
 
 # useful types
-typealias ScalarOrArray{T} Union(T, Array{T})
+typealias ScalarOrArray{T} Union{T, Array{T}}
 
 
 export

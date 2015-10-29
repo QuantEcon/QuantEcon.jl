@@ -55,7 +55,7 @@ Must be symmetric and nonnegative definite
 - `C::ScalarOrArray` : n x j coefficient on random shock in state transition
 - `N::ScalarOrArray` : k x n cross product in payoff equation
 - `bet::Real` : Discount factor in [0, 1]
-- `capT::Union(Int, Nothing)` : Terminal period in finite horizon problem
+- `capT::Union{Int, Void}` : Terminal period in finite horizon problem
 - `rf::ScalarOrArray` : n x n terminal payoff in finite horizon problem. Must be
 symmetric and nonnegative definite
 - `P::ScalarOrArray` : n x n matrix in value function representation
@@ -72,7 +72,7 @@ type LQ
     C::ScalarOrArray
     N::ScalarOrArray
     bet::Real
-    capT::Union(Int, Nothing) # terminal period
+    capT::Union{Int, Void} # terminal period
     rf::ScalarOrArray
     P::ScalarOrArray
     d::Real
@@ -98,7 +98,7 @@ state transition
 - `;N::ScalarOrArray(zeros(size(B,1), size(A, 2)))` : k x n cross product in
 payoff equation
 - `;bet::Real(1.0)` : Discount factor in [0, 1]
-- `capT::Union(Int, Nothing)(nothing)` : Terminal period in finite horizon
+- `capT::Union{Int, Void}(Void)` : Terminal period in finite horizon
 problem
 - `rf::ScalarOrArray(fill(NaN, size(R)...))` : n x n terminal payoff in finite
 horizon problem. Must be symmetric and nonnegative definite.
@@ -111,7 +111,7 @@ function LQ(Q::ScalarOrArray,
             C::ScalarOrArray          = zeros(size(R, 1)),
             N::ScalarOrArray          = zero(B'A),
             bet::ScalarOrArray        = 1.0,
-            capT::Union(Int, Nothing) = nothing,
+            capT::Union{Int, Void} = Void,
             rf::ScalarOrArray         = fill(NaN, size(R)...))
 
     k = size(Q, 1)
@@ -135,7 +135,7 @@ function LQ(Q::ScalarOrArray,
             C::ScalarOrArray          = zeros(size(R, 1)),
             N::ScalarOrArray          = zero(B'A);
             bet::ScalarOrArray        = 1.0,
-            capT::Union(Int, Nothing) = nothing,
+            capT::Union{Int, Void} = Void,
             rf::ScalarOrArray         = fill(NaN, size(R)...))
     LQ(Q, R, A, B, C, N, bet, capT, rf)
 end
@@ -316,7 +316,7 @@ function compute_sequence(lq::LQ, x0::ScalarOrArray, ts_length::Integer=100)
     capT = min(ts_length, lq.capT)
 
     # Compute and record the sequence of policies
-    if isa(lq.capT, Nothing)
+    if isa(lq.capT, Void)
         stationary_values!(lq)
         policies = fill(lq.F, capT)
     else

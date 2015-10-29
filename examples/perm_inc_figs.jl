@@ -44,7 +44,7 @@ function single_realization()
     ax[:plot](0:T, b, "b-", label="debt"; p_args...)
     ax[:legend](ncol=3, bbox_to_anchor=bbox, loc="upper left", mode="expand")
 
-    return nothing
+    return Void
 end
 
 
@@ -58,5 +58,5 @@ function consumption_paths(n=250)  # n is number of paths
     for i=1:n
         ax[:plot](0:T, time_path()[3], colors[rand(1:4)], lw=0.8, alpha=0.7)
     end
-    return nothing
+    return Void
 end

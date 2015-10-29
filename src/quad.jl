@@ -86,9 +86,9 @@ Computes multivariate Guass-Legendre  quadrature nodes and weights.
 
 ##### Arguments
 
-- `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
-- `a::Union(Real, Vector{Real})` : Lower endpoint along each dimension
-- `b::Union(Real, Vector{Real})` : Upper endpoint along each dimension
+- `n::Union{Int, Vector{Int}}` : Number of desired nodes along each dimension
+- `a::Union{Real, Vector{Real}}` : Lower endpoint along each dimension
+- `b::Union{Real, Vector{Real}}` : Upper endpoint along each dimension
 
 $(qnw_returns)
 
@@ -154,9 +154,9 @@ Computes multivariate Guass-Checbychev quadrature nodes and weights.
 
 ##### Arguments
 
-- `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
-- `a::Union(Real, Vector{Real})` : Lower endpoint along each dimension
-- `b::Union(Real, Vector{Real})` : Upper endpoint along each dimension
+- `n::Union{Int, Vector{Int}}` : Number of desired nodes along each dimension
+- `a::Union{Real, Vector{Real}}` : Lower endpoint along each dimension
+- `b::Union{Real, Vector{Real}}` : Upper endpoint along each dimension
 
 $(qnw_returns)
 
@@ -178,9 +178,9 @@ Computes nodes and weights for multivariate normal distribution
 
 ##### Arguments
 
-- `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
-- `mu::Union(Real, Vector{Real})` : Mean along each dimension
-- `sig2::Union(Real, Vector{Real}, Matrix{Real})(eye(length(n)))` : Covariance
+- `n::Union{Int, Vector{Int}}` : Number of desired nodes along each dimension
+- `mu::Union{Real, Vector{Real}}` : Mean along each dimension
+- `sig2::Union{Real, Vector{Real}, Matrix{Real}}(eye(length(n)))` : Covariance
 structure
 
 $(qnw_returns)
@@ -275,9 +275,9 @@ Computes multivariate Simpson quadrature nodes and weights.
 
 ##### Arguments
 
-- `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
-- `a::Union(Real, Vector{Real})` : Lower endpoint along each dimension
-- `b::Union(Real, Vector{Real})` : Upper endpoint along each dimension
+- `n::Union{Int, Vector{Int}}` : Number of desired nodes along each dimension
+- `a::Union{Real, Vector{Real}}` : Lower endpoint along each dimension
+- `b::Union{Real, Vector{Real}}` : Upper endpoint along each dimension
 
 $(qnw_returns)
 
@@ -312,9 +312,9 @@ Computes multivariate trapezoid quadrature nodes and weights.
 
 ##### Arguments
 
-- `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
-- `a::Union(Real, Vector{Real})` : Lower endpoint along each dimension
-- `b::Union(Real, Vector{Real})` : Upper endpoint along each dimension
+- `n::Union{Int, Vector{Int}}` : Number of desired nodes along each dimension
+- `a::Union{Real, Vector{Real}}` : Lower endpoint along each dimension
+- `b::Union{Real, Vector{Real}}` : Upper endpoint along each dimension
 
 $(qnw_returns)
 
@@ -341,10 +341,10 @@ Computes nodes and weights for beta distribution
 
 ##### Arguments
 
-- `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
-- `a::Union(Real, Vector{Real})` : First parameter of the beta distribution,
+- `n::Union{Int, Vector{Int}}` : Number of desired nodes along each dimension
+- `a::Union{Real, Vector{Real}}` : First parameter of the beta distribution,
 along each dimension
-- `b::Union(Real, Vector{Real})` : Second parameter of the beta distribution,
+- `b::Union{Real, Vector{Real}}` : Second parameter of the beta distribution,
 along each dimension
 
 $(qnw_returns)
@@ -451,10 +451,10 @@ Computes nodes and weights for beta distribution
 
 ##### Arguments
 
-- `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
-- `a::Union(Real, Vector{Real})` : First parameter of the gamma distribution,
+- `n::Union{Int, Vector{Int}}` : Number of desired nodes along each dimension
+- `a::Union{Real, Vector{Real}}` : First parameter of the gamma distribution,
 along each dimension
-- `b::Union(Real, Vector{Real})` : Second parameter of the gamma distribution,
+- `b::Union{Real, Vector{Real}}` : Second parameter of the gamma distribution,
 along each dimension
 
 $(qnw_returns)
@@ -659,9 +659,9 @@ Computes quadrature nodes and weights for multivariate uniform distribution
 
 ##### Arguments
 
-- `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
-- `a::Union(Real, Vector{Real})` : Lower endpoint along each dimension
-- `b::Union(Real, Vector{Real})` : Upper endpoint along each dimension
+- `n::Union{Int, Vector{Int}}` : Number of desired nodes along each dimension
+- `a::Union{Real, Vector{Real}}` : Lower endpoint along each dimension
+- `b::Union{Real, Vector{Real}}` : Upper endpoint along each dimension
 
 $(qnw_returns)
 
@@ -680,9 +680,9 @@ Computes quadrature nodes and weights for multivariate uniform distribution
 
 ##### Arguments
 
-- `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
-- `mu::Union(Real, Vector{Real})` : Mean along each dimension
-- `sig2::Union(Real, Vector{Real}, Matrix{Real})(eye(length(n)))` : Covariance
+- `n::Union{Int, Vector{Int}}` : Number of desired nodes along each dimension
+- `mu::Union{Real, Vector{Real}}` : Mean along each dimension
+- `sig2::Union{Real, Vector{Real}, Matrix{Real}}(eye(length(n)))` : Covariance
 structure
 
 
@@ -711,10 +711,10 @@ to the integral as n goes to infinity.
 
 ##### Arguments
 
-- `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
-- `a::Union(Real, Vector{Real})` : Lower endpoint along each dimension
-- `b::Union(Real, Vector{Real})` : Upper endpoint along each dimension
-- `kind::String("N")`: One of the following:
+- `n::Union{Int, Vector{Int}}` : Number of desired nodes along each dimension
+- `a::Union{Real, Vector{Real}}` : Lower endpoint along each dimension
+- `b::Union{Real, Vector{Real}}` : Upper endpoint along each dimension
+- `kind::AbstractString("N")`: One of the following:
     - N - Neiderreiter (default)
     - W - Weyl
     - H - Haber
@@ -729,7 +729,7 @@ $(qnw_refs)
 """
 :qnwequi
 
-function qnwequi(n::Int, a::Vector, b::Vector, kind::String="N")
+function qnwequi(n::Int, a::Vector, b::Vector, kind::AbstractString="N")
     # error checking
     n_a, n_b = length(a), length(b)
     if !(n_a == n_b)
@@ -770,25 +770,25 @@ function qnwequi(n::Int, a::Vector, b::Vector, kind::String="N")
 end
 
 # Other argument types
-qnwequi(n::Vector{Int}, a::Vector, b::Vector, kind::String="N") =
+qnwequi(n::Vector{Int}, a::Vector, b::Vector, kind::AbstractString="N") =
     qnwequi(prod(n), a, b, kind)
 
-qnwequi(n::Vector{Int}, a::Real, b::Vector, kind::String="N") =
+qnwequi(n::Vector{Int}, a::Real, b::Vector, kind::AbstractString="N") =
     qnwequi(prod(n), fill(a, length(b)), b, kind)
 
-qnwequi(n::Vector{Int}, a::Vector, b::Real, kind::String="N") =
+qnwequi(n::Vector{Int}, a::Vector, b::Real, kind::AbstractString="N") =
     qnwequi(prod(n), a, fill(b, length(a)), kind)
 
-qnwequi(n::Vector{Int}, a::Real, b::Real, kind::String="N") =
+qnwequi(n::Vector{Int}, a::Real, b::Real, kind::AbstractString="N") =
     qnwequi(prod(n), fill(a, length(n)), fill(b, length(n)), kind)
 
-qnwequi(n::Int, a::Real, b::Vector, kind::String="N") =
+qnwequi(n::Int, a::Real, b::Vector, kind::AbstractString="N") =
     qnwequi(n, fill(a, length(b)), b, kind)
 
-qnwequi(n::Int, a::Vector, b::Real, kind::String="N") =
+qnwequi(n::Int, a::Vector, b::Real, kind::AbstractString="N") =
     qnwequi(n, a, fill(b, length(a)), kind)
 
-qnwequi(n::Int, a::Real, b::Real, kind::String="N") =
+qnwequi(n::Int, a::Real, b::Real, kind::AbstractString="N") =
     qnwequi(n, [a], [b], kind)
 
 
@@ -803,8 +803,8 @@ Approximate the integral of `f`, given quadrature `nodes` and `weights`
 spanned by `nodes`.
 - `nodes::Array`: Quadrature nodes
 - `weights::Array`: Quadrature nodes
-- `args...(nothing)`: additional positional arguments to pass to `f`
-- `;kwargs...(nothing)`: additional keyword arguments to pass to `f`
+- `args...(Void)`: additional positional arguments to pass to `f`
+- `;kwargs...(Void)`: additional keyword arguments to pass to `f`
 
 ##### Returns
 
@@ -830,10 +830,10 @@ for dimension i defined by a[i] and b[i], respectively; using n[i] points.
 accepts as its first argument a matrix representing points along each dimension
 (each dimension is a column). Other arguments that need to be passed to the
 function are caught by `args...` and `kwargs...``
-- `n::Union(Int, Vector{Int})` : Number of desired nodes along each dimension
-- `a::Union(Real, Vector{Real})` : Lower endpoint along each dimension
-- `b::Union(Real, Vector{Real})` : Upper endpoint along each dimension
-- `kind::String("lege")` Specifies which type of integration to perform. Valid
+- `n::Union{Int, Vector{Int}}` : Number of desired nodes along each dimension
+- `a::Union{Real, Vector{Real}}` : Lower endpoint along each dimension
+- `b::Union{Real, Vector{Real}}` : Upper endpoint along each dimension
+- `kind::AbstractString("lege")` Specifies which type of integration to perform. Valid
 values are:
     - `"lege"` : Gauss-Legendre
     - `"cheb"` : Gauss-Chebyshev
@@ -843,8 +843,8 @@ values are:
     - `"W"` : Weyl equidistributed sequence
     - `"H"` : Haber  equidistributed sequence
     - `"R"` : Monte Carlo
-    - `args...(nothing)`: additional positional arguments to pass to `f`
-    - `;kwargs...(nothing)`: additional keyword arguments to pass to `f`
+    - `args...(Void)`: additional positional arguments to pass to `f`
+    - `;kwargs...(Void)`: additional keyword arguments to pass to `f`
 
 ##### Returns
 

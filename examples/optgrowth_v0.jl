@@ -54,5 +54,5 @@ function main(n::Int=35)
     lb = "true value function"
     ax[:plot](grid, v_star(grid), "k-", lw=2, alpha=0.8, label=lb)
     ax[:legend](loc="upper left")
-    nothing
+    Void
 end

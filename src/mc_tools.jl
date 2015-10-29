@@ -292,7 +292,7 @@ function mc_sample_path!(mc::MarkovChain, samples::Array)
     for t=2:length(samples)
         samples[t] = rand(dist[samples[t-1]])
     end
-    nothing
+    Void
 end
 
 function simulate(mc::MarkovChain,

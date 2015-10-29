@@ -39,7 +39,7 @@ end
 function set_state!(k::Kalman, x_hat, Sigma)
     k.cur_x_hat = x_hat
     k.cur_sigma = Sigma
-    nothing
+    Void
 end
 
 
@@ -57,7 +57,7 @@ function prior_to_filtered!(k::Kalman, y)
     M = A * inv(B)
     k.cur_x_hat = x_hat + M * (y - G * x_hat)
     k.cur_sigma = Sigma - M * G * Sigma
-    nothing
+    Void
 end
 
 
@@ -69,14 +69,14 @@ function filtered_to_forecast!(k::Kalman)
     # and then update
     k.cur_x_hat = A * x_hat
     k.cur_sigma = A * Sigma * A' + Q
-    nothing
+    Void
 end
 
 
 function update!(k::Kalman, y)
     prior_to_filtered!(k, y)
     filtered_to_forecast!(k)
-    nothing
+    Void
 end
 
 
