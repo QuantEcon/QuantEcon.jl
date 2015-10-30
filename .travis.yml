@@ -10,4 +10,4 @@ script:
     - julia -e 'Pkg.test("QuantEcon", coverage=true)'
 after_success:
     - echo $TRAVIS_JULIA_VERSION
-    - julia -e 'Pkg.add("Coverage"); cd(Pkg.dir("QuantEcon")); using Coverage; Coveralls.submit(process_folder())'
+    - julia -e 'Pkg.add("Coverage"); cd(Pkg.dir("QuantEcon")); using Coverage; Coveralls.submit(process_folder()); Codecov.submit(process_folder())'
