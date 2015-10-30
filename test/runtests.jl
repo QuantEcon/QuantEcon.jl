@@ -1,3 +1,5 @@
+using Compat  # for startswith
+
 function test_file_string(s)
     if !startswith("test_", s)
         s = string("test_", s)
@@ -19,13 +21,15 @@ else
                                    "random_mc", "robustlq"])
 end
 
-n = min(8, CPU_CORES, length(tests))
-n > 1 && addprocs(n)
+# n = min(8, CPU_CORES, length(tests))
+# n > 1 && addprocs(n)
 
-@everywhere using FactCheck
-@everywhere include(Pkg.dir("QuantEcon", "test", "util.jl"))
+# @everywhere using FactCheck
+# @everywhere include(Pkg.dir("QuantEcon", "test", "util.jl"))
+using FactCheck
+include(Pkg.dir("QuantEcon", "test", "util.jl"))
 
-@sync @parallel for test_file in tests
+for test_file in tests
     println("running for $test_file")
     include(test_file)
 end

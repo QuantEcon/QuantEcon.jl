@@ -108,11 +108,11 @@ function LQ(Q::ScalarOrArray,
             R::ScalarOrArray,
             A::ScalarOrArray,
             B::ScalarOrArray,
-            C::ScalarOrArray          = zeros(size(R, 1)),
-            N::ScalarOrArray          = zero(B'A),
-            bet::ScalarOrArray        = 1.0,
-            capT::Union{Int, Void} = Void,
-            rf::ScalarOrArray         = fill(NaN, size(R)...))
+            C::ScalarOrArray=zeros(size(R, 1)),
+            N::ScalarOrArray=zero(B'A),
+            bet::ScalarOrArray=1.0,
+            capT::Union{Int, Void}=nothing,
+            rf::ScalarOrArray=fill(NaN, size(R)...))
 
     k = size(Q, 1)
     n = size(R, 1)
@@ -132,11 +132,11 @@ function LQ(Q::ScalarOrArray,
             R::ScalarOrArray,
             A::ScalarOrArray,
             B::ScalarOrArray,
-            C::ScalarOrArray          = zeros(size(R, 1)),
-            N::ScalarOrArray          = zero(B'A);
-            bet::ScalarOrArray        = 1.0,
-            capT::Union{Int, Void} = Void,
-            rf::ScalarOrArray         = fill(NaN, size(R)...))
+            C::ScalarOrArray=zeros(size(R, 1)),
+            N::ScalarOrArray=zero(B'A);
+            bet::ScalarOrArray=1.0,
+            capT::Union{Int, Void}=nothing,
+            rf::ScalarOrArray=fill(NaN, size(R)...))
     LQ(Q, R, A, B, C, N, bet, capT, rf)
 end
 
