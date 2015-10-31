@@ -1,4 +1,5 @@
 language: julia
+sudo: false
 julia:
     - 0.4
     - nightly
