@@ -72,9 +72,9 @@ type ARMA
 end
 
 # constructors to coerce phi/theta to vectors
-ARMA(phi::Real, theta::Real=0.0, sigma::Real=1.0) = ARMA([phi], [theta], sigma)
-ARMA(phi::Real, theta::Vector=[0.0], sigma::Real=1.0) = ARMA([phi], theta, sigma)
-ARMA(phi::Vector, theta::Real=0.0, sigma::Real=1.0) = ARMA(phi, theta, sigma)
+ARMA(phi::Real, theta::Real=0.0, sigma::Real=1.0) = ARMA([phi;], [theta;], sigma)
+ARMA(phi::Real, theta::Vector=[0.0], sigma::Real=1.0) = ARMA([phi;], theta, sigma)
+ARMA(phi::Vector, theta::Real=0.0, sigma::Real=1.0) = ARMA(phi, [theta;], sigma)
 
 function ARMA(phi::AbstractVector, theta::AbstractVector=[0.0], sigma::Real=1.0)
     # == Record dimensions == #
