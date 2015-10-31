@@ -313,13 +313,13 @@ represents `x_t`
 
 """
 function compute_sequence(lq::LQ, x0::ScalarOrArray, ts_length::Integer=100)
-    capT = min(ts_length, lq.capT)
 
     # Compute and record the sequence of policies
     if isa(lq.capT, Void)
         stationary_values!(lq)
-        policies = fill(lq.F, capT)
+        policies = fill(lq.F, ts_length)
     else
+        capT = min(ts_length, lq.capT)
         policies = Array(typeof(lq.F), capT)
         for t = 1:capT
             update_values!(lq)
