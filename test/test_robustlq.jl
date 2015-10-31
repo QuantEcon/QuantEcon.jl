@@ -61,5 +61,10 @@ facts("Testing robustlq") do
         @fact Pf --> roughly(Pr; rough_kwargs...)
         @fact Kf --> roughly(Kr; rough_kwargs...)
     end
+
+    context("test no run-time error in robust_rule_simple") do
+        # this will just print out a warning
+        robust_rule_simple(rblq, ones(Pr); tol=eps(), max_iter=1)
+    end
 end  # facts
 end  # module
