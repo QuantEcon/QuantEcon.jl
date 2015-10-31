@@ -21,6 +21,7 @@ http://quant-econ.net/jl/linear_models.html
 
 =#
 import Distributions: MultivariateNormal, rand
+import Base: ==
 
 #=
     numpy allows its multivariate_normal function to have a matrix of
@@ -35,6 +36,9 @@ type FakeMVTNorm{T <: Real}
     mu_0::Array{T}
     Sigma_0::Array{T}
 end
+
+==(f1::FakeMVTNorm, f2::FakeMVTNorm) =
+    (f1.mu_0 == f2.mu_0) && (f1.Sigma_0 == f2.Sigma_0)
 
 Base.rand{T}(d::FakeMVTNorm{T}) = copy(d.mu_0)
 
@@ -63,7 +67,7 @@ function LSS(A::ScalarOrArray, C::ScalarOrArray, G::ScalarOrArray,
     C = reshape([C], n, m)
     G = reshape([G], k, n)
 
-    mu_0 = reshape([mu_0], n)
+    mu_0 = reshape([mu_0;], n)
 
     # define distribution
     if all(Sigma_0 .== 0.0)   # no variance -- no distribution
@@ -75,7 +79,7 @@ function LSS(A::ScalarOrArray, C::ScalarOrArray, G::ScalarOrArray,
 end
 
 # make kwarg version
-function LSS(A::Matrix, C::Matrix, G::Matrix;
+function LSS(A::ScalarOrArray, C::ScalarOrArray, G::ScalarOrArray;
              mu_0::Vector=zeros(size(G, 2)),
              Sigma_0::Matrix=zeros(size(G, 2), size(G, 2)))
     return LSS(A, C, G, mu_0, Sigma_0)
@@ -120,7 +124,6 @@ function moment_sequence(lss::LSS)
         mu_x = A * mu_x
         Sigma_x = A * Sigma_x * A' + C * C'
     end
-    Void
 end
 
 
@@ -134,8 +137,7 @@ function stationary_distributions(lss::LSS; max_iter=200, tol=1e-5)
 
     while err > tol
         if i > max_iter
-            println("Convergence failed after $i iterations")
-            break
+            error("Convergence failed after $i iterations")
         else
             i += 1
             mu_x1, mu_y, Sigma_x1, Sigma_y = consume(m)
@@ -152,7 +154,7 @@ end
 
 function geometric_sums(lss::LSS, bet, x_t)
     I = eye(lss.n)
-    S_x = (I - bet .* A) \ x_t
+    S_x = (I - bet .* lss.A) \ x_t
     S_y = lss.G * S_x
     return S_x, S_y
 end
