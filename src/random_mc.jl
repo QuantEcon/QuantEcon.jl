@@ -164,9 +164,17 @@ Return m randomly sampled probability vectors of size k.
 
 """
 function random_probvec(k::Integer, m::Integer)
-    x = Array(Float64, (k+1, m))
+    x = Array(Float64, (k, m))
 
     r = rand(k-1, m)
-    x[1, :], x[2:end-1, :], x[end, :] = 0, sort(r, 1), 1
-    return diff(x, 1)
+    x[1:end-1, :] = sort(r, 1)
+
+    for j in 1:m
+        x[end, j] = 1 - x[end-1, j]
+        for i in k-1:-1:2
+            x[i, j] -= x[i-1, j]
+        end
+    end
+
+    return x
 end
