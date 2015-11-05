@@ -141,6 +141,34 @@ facts("Testing mc_tools.jl") do
             # @fact is_aperiodic(fig) --> true
         end
     end
+
+    context("test simulate shape") do
+        mc = mc3
+        ts_length = 10
+        init = [1, 2]
+        nums_reps = [3, 1]
+
+        @fact size(simulate(mc, ts_length)) --> (ts_length,)
+        @fact size(simulate(mc, ts_length, init)) -->
+            (ts_length, length(init))
+        num_reps = nums_reps[1]
+        @fact size(simulate(mc, ts_length, init, num_reps=num_reps)) -->
+            (ts_length, length(init)*num_reps)
+        for num_reps in nums_reps
+            @fact size(simulate(mc, ts_length, num_reps=num_reps)) -->
+                (ts_length, num_reps)
+        end
+    end
+
+    context("test simulate init array") do
+        mc = mc3
+        ts_length = 10
+        init = [1, 2]
+        num_reps = 3
+
+        X = simulate(mc, ts_length, init, num_reps=num_reps)
+        @fact vec(X[1, :]) --> repmat(init, num_reps)
+    end
 end  # facts
 
 end  # module
