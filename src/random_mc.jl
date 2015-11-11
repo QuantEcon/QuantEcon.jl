@@ -81,70 +81,75 @@ end
 # random_stochastic_matrix
 
 """
-Return a randomly sampled n x n stochastic matrix.
-
-##### Arguments
-
-- `n::Integer` : Number of states.
-- `k::Integer` : Number of nonzero entries in each row of the matrix.
-
-##### Returns
-
-- `p::Array` : Stochastic matrix.
-
-"""
-function random_stochastic_matrix(n::Integer)
-    if n <= 0
-        throw(ArgumentError("n must be a positive integer"))
-    end
-
-    p = random_probvec(n, n)
-
-    return transpose(p)
-end
-
-
-"""
 Return a randomly sampled n x n stochastic matrix with k nonzero entries for
 each row.
 
 ##### Arguments
 
 - `n::Integer` : Number of states.
-- `k::Integer` : Number of nonzero entries in each row of the matrix.
+- `;k::Union{Integer, Void}(nothing)` : Number of nonzero entries in each
+column of the matrix. Set to n if note specified.
 
 ##### Returns
 
 - `p::Array` : Stochastic matrix.
 
 """
-function random_stochastic_matrix(n::Integer, k::Integer)
+function random_stochastic_matrix(n::Integer, k::Union{Integer, Void}=nothing)
     if !(n > 0)
         throw(ArgumentError("n must be a positive integer"))
     end
-    if !(k > 0 && k <= n)
+    if k != nothing && !(k > 0 && k <= n)
         throw(ArgumentError("k must be an integer with 0 < k <= n"))
     end
 
-    k == n && return random_stochastic_matrix(n)
+    p = _random_stochastic_matrix(n, n, k=k)
+
+    return transpose(p)
+end
+
+
+"""
+Generate a "non-square column stochstic matrix" of shape (n, m), which contains
+as columns m probability vectors of length n with k nonzero entries.
+
+##### Arguments
+
+- `n::Integer` : Number of states.
+- `m::Integer` : Number of probability vectors.
+- `;k::Union{Integer, Void}(nothing)` : Number of nonzero entries in each
+column of the matrix. Set to n if note specified.
+
+##### Returns
+
+- `p::Array` : Array of shape (n, m) containing m probability vectors of length
+n as columns.
+
+"""
+function _random_stochastic_matrix(n::Integer, m::Integer;
+                                   k::Union{Integer, Void}=nothing)
+    if k == nothing
+        k = n
+    end
+    probvecs = random_probvec(k, m)
+
+    k == n && return probvecs
 
     # if k < n
-    probvecs = random_probvec(k, n)
-
     # Randomly sample row indices for each column for nonzero values
-    row_indices = Array(Int, k*n)
-    for j in 1:n
+    row_indices = Vector{Int}(k*m)
+    for j in 1:m
         row_indices[(j-1)*k+1:j*k] = sample(1:n, k, replace=false)
     end
 
-    p = zeros(n, n)
-    for j in 1:n
+    p = zeros(n, m)
+    for j in 1:m
         for i in 1:k
             p[row_indices[(j-1)*k+i], j] = probvecs[i, j]
         end
     end
 
-    return transpose(p)
+    return p
 end
 
 
