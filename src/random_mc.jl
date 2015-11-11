@@ -1,11 +1,11 @@
 #=
-Generate a MarkovChain randomly.
+Generate MarkovChain and DiscreteDP instances randomly.
 
 @author : Daisuke Oyama
 
 =#
 import StatsBase: sample
-import QuantEcon: MarkovChain
+import QuantEcon: MarkovChain, DiscreteDP
 
 # random_markov_chain
 
@@ -150,6 +150,49 @@ function _random_stochastic_matrix(n::Integer, m::Integer;
     end
 
     return p
+end
+
+
+# random_discrete_dp
+
+"""
+Generate a DiscreteDP randomly. The reward values are drawn from the normal
+distribution with mean 0 and standard deviation `scale`.
+
+##### Arguments
+
+- `num_states::Integer` : Number of states.
+- `num_actions::Integer` : Number of actions.
+- `beta::Union{Float64, Void}(nothing)` : Discount factor. Randomly chosen from
+[0, 1) if not specified.
+- `;k::Union{Integer, Void}(nothing)` : Number of possible next states for each
+state-action pair. Equal to `num_states` if not specified.
+
+- `scale::Real(1)` : Standard deviation of the normal distribution for the
+reward values.
+
+##### Returns
+
+- `ddp::DiscreteDP` : An instance of DiscreteDP.
+
+"""
+function random_discrete_dp(num_states::Integer,
+                            num_actions::Integer,
+                            beta::Union{Real, Void}=nothing;
+                            k::Union{Integer, Void}=nothing,
+                            scale::Real=1)
+    L = num_states * num_actions
+    R = scale * randn(L)
+    Q = _random_stochastic_matrix(num_states, L; k=k)
+    if beta == nothing
+        beta = rand()
+    end
+
+    R = reshape(R, num_states, num_actions)
+    Q = reshape(transpose(Q), num_states, num_actions, num_states)
+
+    ddp = DiscreteDP(R, Q, beta)
+    return ddp
 end
 
 
