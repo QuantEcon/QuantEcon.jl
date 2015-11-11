@@ -28,6 +28,14 @@ facts("Testing random_mc.jl") do
         end
     end
 
+    context("Test random_stochastic_matrix with k=1") do
+        n, k = 3, 1
+        P = random_stochastic_matrix(n, k)
+        @fact all((P .== 0) | (P .== 1)) --> true
+        @fact all(x->isequal(sum(x), 1),
+                  [P[i, :] for i in 1:size(P)[1]]) --> true
+    end
+
     context("Test errors properly thrown") do
         # n <= 0
         @fact_throws random_markov_chain(0)
