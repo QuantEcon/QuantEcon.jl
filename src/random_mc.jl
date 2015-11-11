@@ -164,6 +164,9 @@ Return m randomly sampled probability vectors of size k.
 
 """
 function random_probvec(k::Integer, m::Integer)
+    k == 1 && return ones((k, m))
+
+    # if k >= 2
     x = Array(Float64, (k, m))
 
     r = rand(k-1, m)
