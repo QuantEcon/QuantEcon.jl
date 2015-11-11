@@ -155,8 +155,8 @@ Return m randomly sampled probability vectors of size k.
 
 ##### Arguments
 
-- `k::Integer` : Number of probability vectors.
-- `m::Integer` : Size of each probability vectors.
+- `k::Integer` : Size of each probability vector.
+- `m::Integer` : Number of probability vectors.
 
 ##### Returns
 
