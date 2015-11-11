@@ -155,8 +155,8 @@ Return m randomly sampled probability vectors of size k.
 
 ##### Arguments
 
-- `k::Integer` : Number of probability vectors.
-- `m::Integer` : Size of each probability vectors.
+- `k::Integer` : Size of each probability vector.
+- `m::Integer` : Number of probability vectors.
 
 ##### Returns
 
@@ -164,6 +164,9 @@ Return m randomly sampled probability vectors of size k.
 
 """
 function random_probvec(k::Integer, m::Integer)
+    k == 1 && return ones((k, m))
+
+    # if k >= 2
     x = Array(Float64, (k, m))
 
     r = rand(k-1, m)
