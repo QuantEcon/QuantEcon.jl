@@ -103,9 +103,6 @@ export
     var_quadratic_sum,
     m_quadratic_sum,
 
-# export the models module
-    Models,
-
 # random_mc
     random_markov_chain, random_stochastic_matrix
 
@@ -129,8 +126,5 @@ include("robustlq.jl")
 include("quad.jl")
 include("quadsums.jl")
 include("random_mc.jl")
-
-# include the models file/module
-include("Models.jl")
 
 end # module
