@@ -1,7 +1,7 @@
 #=
 Discrete Decision Processes
 
-@author : Daisuke Oyama (Ported by Spencer Lyon, Matthew McKay)
+@author : Daisuke Oyama, Spencer Lyon, Matthew McKay
 
 @date: 24/Sep/2015
 
@@ -278,7 +278,7 @@ Solve the dynamic programming problem.
 - `ddp::DisreteDP` : Object that contains the Model Parameters
 - `method::Type{T<Algo}(VFI)`: Type name specifying solution method. Acceptable
 arguments are `VFI` for value function iteration or `PFI` for policy function
-iteration
+iteration or `MPFI` for modified policy function iteration
 - `;max_iter::Int(250)` : Maximum number of iterations
 - `;epsilon::Float64(1e-3)` : Value for epsilon-optimality. Only used if
 `method` is `VFI`
@@ -355,11 +355,12 @@ function _solve!(ddp::DiscreteDP, ddpr::DPSolveResult{PFI}, max_iter::Int,
        ddpr.v = evaluate_policy(ddp, ddpr)
        compute_greedy!(ddp, ddpr)
 
+       ddpr.num_iter += 1
        if all(old_sigma .== ddpr.sigma)
            break
        end
        copy!(old_sigma, ddpr.sigma)
-       ddpr.num_iter += 1
+  
     end
 
     ddpr
@@ -387,6 +388,8 @@ function _solve!(ddp::DiscreteDP, ddpr::DPSolveResult{MPFI}, max_iter::Int,
         bellman_operator!(ddp, ddpr)  # updates Tv, sigma inplace
         dif = ddpr.Tv - ddpr.v
 
+        ddpr.num_iter += 1
+
         # check convergence
         if span(dif) < tol
             ddpr.v = ddpr.Tv + midrange(dif) * beta / (1-beta)
@@ -406,8 +409,6 @@ function _solve!(ddp::DiscreteDP, ddpr::DPSolveResult{MPFI}, max_iter::Int,
             err = maxabs(ddpr.Tv .- ddpr.v)
             copy!(ddpr.v, ddpr.Tv)
         end
-
-        ddpr.num_iter += 1
 
     end
 
