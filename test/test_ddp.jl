@@ -52,6 +52,37 @@ facts("Testing markov/dpp.jl") do
 		@fact evaluate_policy(ddp0, sigma_star) --> roughly(v_star)
 	end
 
+	context("test methods for subtypes != (Float64, Int)") do
+		float_types = [Float16, Float32, Float64, BigFloat, Real]
+		int_types = [Int8, Int16, Int32, Int64, Int128,
+					 UInt8, UInt16, UInt32, UInt64, UInt128]
+
+		for f in (bellman_operator, compute_greedy)
+			for T in vcat(float_types, int_types)
+				@fact f(ddp0, [1.0, 1.0]) --> f(ddp0, ones(T, 2))
+			end
+
+			# only Integer subtypes can be Rational type params
+			for T in int_types
+				@fact f(ddp0, [1.0, 1.0]) --> f(ddp0, ones(Rational{T}, 2))
+			end
+		end
+
+		for T in vcat(float_types, int_types), S in int_types
+			v = ones(T, 2)
+			s = ones(S, 2)
+			# just test that we can call the method and the result is
+			# deterministic
+			@fact bellman_operator!(ddp0, v, s) --> bellman_operator!(ddp0, v, s)
+		end
+
+		for T in int_types
+			s = T[1, 2]
+			@fact evaluate_policy(ddp0, s) --> roughly(v_star)
+		end
+
+	end
+
 	context("test compute_greedy! changes ddpr.v") do
 		res = solve(ddp0, VFI)
 		res.Tv[:] = 500.0
