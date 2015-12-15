@@ -61,7 +61,7 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real}
 end
 
 # necessary for dispatch to fill in type parameters {T,NQ,NR,Tbeta}
-DiscreteDP{T,NQ,NR,Tbeta}(R::Array{T,NR}, Q::Array{T,NQ}, beta::Tbeta =
+DiscreteDP{T,NQ,NR,Tbeta}(R::Array{T,NR}, Q::Array{T,NQ}, beta::Tbeta) =
     DiscreteDP{T,NQ,NR,Tbeta}(R, Q, beta)
 
 #~Property Functions~#
@@ -174,19 +174,13 @@ corresponding policy rule
 bellman_operator!{T<:AbstractFloat}(ddp::DiscreteDP, v::Vector{T}, sigma::Vector) =
     bellman_operator!(ddp, v, v, sigma)
 
-"""
-```
-bellman_operator!(::DiscreteDP, v::Vector{T<:Real}, sigma::Vector{Int})
-```
-
-Applies the bellman operator and ∀ T<:AbstractFloat will overwrite both `v` and
-`sigma` with the updated value function and policy.
-
-However, if `T` is not an `AbstractFloat` subtype then only sigma will be
-updated inplace and the input `v` will not be modified.
-"""
-bellman_operator!{T<:Real}(ddp::DiscreteDP, v::Vector{T}, sigma::Vector) =
-    bellman_operator!(ddp, v, convert(Vector{Float64}, v), sigma)
+# method to allow dispatch on rationals
+# TODO: add a test for this
+function bellman_operator!{T1<:Rational,T2<:Rational,NR,NQ,T3<:Rational}(ddp::DiscreteDP{T1,NR,NQ,T2},
+                                                                         v::Vector{T3},
+                                                                         sigma::Vector)
+    bellman_operator!(ddp, v, v, sigma)
+end
 
 """
 The Bellman operator, which computes and returns the updated value function Tv
@@ -228,14 +222,12 @@ modifies ddpr.sigma and ddpr.Tv in place
 compute_greedy!(ddp::DiscreteDP, ddpr::DPSolveResult) =
     (bellman_operator!(ddp, ddpr); ddpr.sigma)
 
-function compute_greedy(ddp::DiscreteDP, v::Vector)
-    Tv = similar(v, Float64)  # buffer so we don't change the input v
-    copy!(Tv, v)
+function compute_greedy{TV<:Real}(ddp::DiscreteDP, v::Vector{TV})
+    Tv = similar(v)
     sigma = ones(Int, length(v))
-    bellman_operator!(ddp, Tv, sigma)
+    bellman_operator!(ddp, v, Tv, sigma)
     sigma
 end
-
 
 # ----------------------- #
 # Evaluate policy methods #
@@ -293,19 +285,19 @@ policy iteration (irrelevant for other methods).
 - `ddpr::DPSolveResult{Algo}` : Optimization result represented as a
 DPSolveResult. See `DPSolveResult` for details.
 """
-function solve{Algo<:DDPAlgorithm}(ddp::DiscreteDP, method::Type{Algo}=VFI;
-                                   max_iter::Integer=250, epsilon::Real=1e-3,
-                                   k::Integer=20)
-    ddpr = DPSolveResult{Algo}(ddp)
+function solve{Algo<:DDPAlgorithm,T}(ddp::DiscreteDP{T}, method::Type{Algo}=VFI;
+                                     max_iter::Integer=250, epsilon::Real=1e-3,
+                                     k::Integer=20)
+    ddpr = DPSolveResult{Algo,T}(ddp)
     _solve!(ddp, ddpr, max_iter, epsilon, k)
     ddpr.mc = MarkovChain(ddp, ddpr)
     ddpr
 end
 
-function solve{Algo<:DDPAlgorithm}(ddp::DiscreteDP, v_init::Vector,
+function solve{Algo<:DDPAlgorithm,T}(ddp::DiscreteDP{T}, v_init::Vector{T},
                                    method::Type{Algo}=VFI; max_iter::Integer=250,
                                    epsilon::Real=1e-3, k::Integer=20)
-    ddpr = DPSolveResult{Algo}(ddp, v_init)
+    ddpr = DPSolveResult{Algo,T}(ddp, v_init)
     _solve!(ddp, ddpr, max_iter, epsilon, k)
     ddpr.mc = MarkovChain(ddp, ddpr)
     ddpr
@@ -358,11 +350,10 @@ the transition probability matrix `Q_sigma`.
 function RQ_sigma{T<:Integer}(ddp::DiscreteDP, sigma::Array{T})
     R_sigma = ddp.R[sigma]
     # convert from linear index based on R to column number
-    ind = ind2sub(ddp, ddpr)
+    ind = map(x->ind2sub(size(ddp.R), x), sigma)
     Q_sigma = hcat([getindex(ddp.Q, ind[i]..., Colon())[:] for i=1:num_states(ddp)]...)
     return R_sigma, Q_sigma'
 end
-
 
 # ---------------- #
 # Internal methods #
@@ -408,8 +399,8 @@ function *{T}(A::Array{T,3}, v::Vector)
 end
 
 
-Base.ind2sub(ddp::DiscreteDP, ddpr::DPSolveResult) =
-    map(x -> ind2sub(size(ddp.R), x)[2], ddpr.sigma)
+Base.ind2sub(ddp::DiscreteDP, x::Vector) =
+    map(_ -> ind2sub(size(ddp.R), _)[2], x)
 
 """
 Impliments Value Iteration

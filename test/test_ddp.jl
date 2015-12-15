@@ -6,7 +6,7 @@ Tests for markov/ddp.jl
 
 =#
 
-module TestDiscreteDP
+# module TestDiscreteDP
 
 using QuantEcon
 using Base.Test
@@ -53,22 +53,23 @@ facts("Testing markov/dpp.jl") do
     end
 
     context("test methods for subtypes != (Float64, Int)") do
-        float_types = [Float16, Float32, Float64, BigFloat, Real]
+        float_types = [Float16, Float32, Float64, BigFloat]
         int_types = [Int8, Int16, Int32, Int64, Int128,
                      UInt8, UInt16, UInt32, UInt64, UInt128]
 
         for f in (bellman_operator, compute_greedy)
-            for T in vcat(float_types, int_types)
+            for T in float_types
                 @fact f(ddp0, [1.0, 1.0]) --> f(ddp0, ones(T, 2))
             end
 
             # only Integer subtypes can be Rational type params
-            for T in int_types
-                @fact f(ddp0, [1.0, 1.0]) --> f(ddp0, ones(Rational{T}, 2))
+            # NOTE: Only the integer types below don't overflow for this example
+            for T in [Int64, Int128]
+                @fact f(ddp0, [1//1, 1//1]) --> f(ddp0, ones(Rational{T}, 2))
             end
         end
 
-        for T in vcat(float_types, int_types), S in int_types
+        for T in float_types, S in int_types
             v = ones(T, 2)
             s = ones(S, 2)
             # just test that we can call the method and the result is
@@ -124,6 +125,32 @@ facts("Testing markov/dpp.jl") do
 
         #TODO: State-Action formulation test
 
+    end
+
+    context("test DiscreteDP{Rational,_,_,Rational} maintains Rational") do
+        ddp_rational = DiscreteDP(map(Rational{Int128}, R),
+                                  map(Rational{Int128}, Q),
+                                  map(Rational{Int128}, beta))
+        # do minimal number of iterations to avoid overflow
+        vi = Rational{Int128}[1/2, 1/2]
+        @fact eltype(solve(ddp_rational, VFI; max_iter=1, epsilon=Inf).v) --> Rational{Int128}
+        @fact eltype(solve(ddp_rational, vi, PFI; max_iter=1).v) --> Rational{Int128}
+        @fact eltype(solve(ddp_rational, vi, MPFI; max_iter=1, k=1, epsilon=Inf).v) --> Rational{Int128}
+    end
+
+    context("test DiscreteDP{Rational{BigInt},_,_,Rational{BigInt}}  works") do
+        ddp_rational = DiscreteDP(map(Rational{BigInt}, R),
+                                  map(Rational{BigInt}, Q),
+                                  map(Rational{BigInt}, beta))
+        # do minimal number of iterations to avoid overflow
+        r1 = solve(ddp_rational, PFI)
+        r2 = solve(ddp_rational, MPFI)
+        r3 = solve(ddp_rational, VFI)
+        @fact maxabs(r1.v-v_star) < 1e-13  --> true
+        @fact r1.sigma --> r2.sigma
+        @fact r1.sigma --> r3.sigma
+        @fact r1.mc.p --> r2.mc.p
+        @fact r1.mc.p --> r3.mc.p
     end
 
     context("test modified_policy_iteration") do
@@ -182,4 +209,4 @@ facts("Testing markov/dpp.jl") do
 
 end # end facts
 
-end #end module
+# end #end module
