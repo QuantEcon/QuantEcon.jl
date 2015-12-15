@@ -36,12 +36,12 @@ DiscreteDP type for specifying paramters for discrete dynamic programming model
 - `ddp::DiscreteDP` : DiscreteDP object
 
 """
-type DiscreteDP{T<:Real,NQ,NR}
+type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real}
     R::Array{T,NR}  #-Reward Array-#
     Q::Array{T,NQ}  #-Transition Probability Array-#
-    beta::Float64   #-Discount Factor-#
+    beta::Tbeta     #-Discount Factor-#
 
-    function DiscreteDP(R::Array, Q::Array, beta::Float64)
+    function DiscreteDP(R::Array, Q::Array, beta::Real)
         # verify input integrity
         !(NQ in [2, 3]) && throw(ArgumentError("Q must be 2- or 3-dimensional"))
         !(NR in [1, 2]) && throw(ArgumentError("R must be 1- or 2-dimensional"))
@@ -60,9 +60,9 @@ type DiscreteDP{T<:Real,NQ,NR}
     end
 end
 
-# necessary for dispatch to fill in type parameters {T,NQ,NR}
-DiscreteDP{T,NQ,NR}(R::Array{T,NR}, Q::Array{T,NQ}, beta::Real) =
-    DiscreteDP{T,NQ,NR}(R, Q, beta)
+# necessary for dispatch to fill in type parameters {T,NQ,NR,Tbeta}
+DiscreteDP{T,NQ,NR,Tbeta}(R::Array{T,NR}, Q::Array{T,NQ}, beta::Tbeta =
+    DiscreteDP{T,NQ,NR,Tbeta}(R, Q, beta)
 
 #~Property Functions~#
 num_states(ddp::DiscreteDP) = size(ddp.R, 1)
@@ -86,9 +86,9 @@ solving the model
 - `ddpr::DPSolveResult` : DiscreteDP Results object
 
 """
-type DPSolveResult{Algo<:DDPAlgorithm}
-    v::Vector{Float64}
-    Tv::Array{Float64}
+type DPSolveResult{Algo<:DDPAlgorithm,Tval<:Real}
+    v::Vector{Tval}
+    Tv::Array{Tval}
     num_iter::Int
     sigma::Array{Int,1}
     mc::MarkovChain
@@ -111,6 +111,262 @@ type DPSolveResult{Algo<:DDPAlgorithm}
         ddpr
     end
 end
+
+# ------------------------ #
+# Bellman opertaor methods #
+# ------------------------ #
+
+"""
+The Bellman operator, which computes and returns the updated value function Tv
+for a value function v.
+
+##### Parameters
+
+- `ddp::DisreteDP` : Object that contains the model parameters
+- `v::Vector{T<:AbstractFloat}`: The current guess of the value function
+- `Tv::Vector{T<:AbstractFloat}`: A buffer array to hold the updated value
+  function. Initial value not used and will be overwritten
+- `sigma::Vector`: A buffer array to hold the policy function. Initial
+  values not used and will be overwritten
+
+##### Returns
+
+- `Tv::Vector` : Updated value function vector
+- `sigma::Vector` : Updated policiy function vector
+"""
+function bellman_operator!(ddp::DiscreteDP, v::Vector, Tv::Vector, sigma::Vector)
+    vals = ddp.R + ddp.beta * ddp.Q * v
+    s_wise_max!(vals, Tv, sigma)
+    Tv, sigma
+end
+
+"""
+Apply the Bellman operator using `v=ddpr.v`, `Tv=ddpr.Tv`, and `sigma=ddpr.sigma`
+
+##### Notes
+
+Updates `ddpr.Tv` and `ddpr.sigma` inplace
+
+"""
+bellman_operator!(ddp::DiscreteDP, ddpr::DPSolveResult) =
+    bellman_operator!(ddp, ddpr.v, ddpr.Tv, ddpr.sigma)
+
+"""
+The Bellman operator, which computes and returns the updated value function Tv
+for a given value function v.
+
+This function will fill the input `v` with `Tv` and the input `sigma` with the
+corresponding policy rule
+
+##### Parameters
+
+- `ddp::DisreteDP`: The ddp model
+- `v::Vector{T<:AbstractFloat}`: The current guess of the value function. This
+  array will be overwritten
+- `sigma::Vector`: A buffer array to hold the policy function. Initial
+  values not used and will be overwritten
+
+##### Returns
+
+- `Tv::Vector`: Updated value function vector
+- `sigma::Vector{T<:Integer}`: Policy rule
+"""
+bellman_operator!{T<:AbstractFloat}(ddp::DiscreteDP, v::Vector{T}, sigma::Vector) =
+    bellman_operator!(ddp, v, v, sigma)
+
+"""
+```
+bellman_operator!(::DiscreteDP, v::Vector{T<:Real}, sigma::Vector{Int})
+```
+
+Applies the bellman operator and ∀ T<:AbstractFloat will overwrite both `v` and
+`sigma` with the updated value function and policy.
+
+However, if `T` is not an `AbstractFloat` subtype then only sigma will be
+updated inplace and the input `v` will not be modified.
+"""
+bellman_operator!{T<:Real}(ddp::DiscreteDP, v::Vector{T}, sigma::Vector) =
+    bellman_operator!(ddp, v, convert(Vector{Float64}, v), sigma)
+
+"""
+The Bellman operator, which computes and returns the updated value function Tv
+for a given value function v.
+
+##### Parameters
+
+- `ddp::DisreteDP`: The ddp model
+- `v::Vector`: The current guess of the value function
+
+##### Returns
+
+- `Tv::Vector` : Updated value function vector
+"""
+bellman_operator(ddp::DiscreteDP, v::Vector) =
+    s_wise_max(ddp.R + ddp.beta * ddp.Q * v)
+
+# ---------------------- #
+# Compute greedy methods #
+# ---------------------- #
+
+"""
+Compute the v-greedy policy
+
+##### Parameters
+
+- `ddp::DisreteDP` : Object that contains the model parameters
+- `ddpr::DPSolveResult` : Object that contains result variables
+
+##### Returns
+
+- `sigma::Vector{Int}` : Array containing `v`-greedy policy rule
+
+##### Notes
+
+modifies ddpr.sigma and ddpr.Tv in place
+
+"""
+compute_greedy!(ddp::DiscreteDP, ddpr::DPSolveResult) =
+    (bellman_operator!(ddp, ddpr); ddpr.sigma)
+
+function compute_greedy(ddp::DiscreteDP, v::Vector)
+    Tv = similar(v, Float64)  # buffer so we don't change the input v
+    copy!(Tv, v)
+    sigma = ones(Int, length(v))
+    bellman_operator!(ddp, Tv, sigma)
+    sigma
+end
+
+
+# ----------------------- #
+# Evaluate policy methods #
+# ----------------------- #
+
+"""
+Method of `evaluate_policy` that extracts sigma from a `DPSolveResult`
+
+See other docstring for details
+"""
+evaluate_policy(ddp::DiscreteDP, ddpr::DPSolveResult) =
+    evaluate_policy(ddp, ddpr.sigma)
+
+"""
+Compute the value of a policy.
+
+##### Parameters
+
+- `ddp::DisreteDP` : Object that contains the model parameters
+- `sigma::Vector{T<:Integer}` : Policy rule vector
+
+##### Returns
+
+- `v_sigma::Array{Float64}` : Value vector of `sigma`, of length n.
+
+"""
+function evaluate_policy{T<:Integer}(ddp::DiscreteDP, sigma::Vector{T})
+    R_sigma, Q_sigma = RQ_sigma(ddp, sigma)
+    b = R_sigma
+    A = I - ddp.beta * Q_sigma
+    return A \ b
+end
+
+# ------------- #
+# Solve methods #
+# ------------- #
+
+"""
+Solve the dynamic programming problem.
+
+##### Parameters
+
+- `ddp::DisreteDP` : Object that contains the Model Parameters
+- `method::Type{T<Algo}(VFI)`: Type name specifying solution method. Acceptable
+arguments are `VFI` for value function iteration or `PFI` for policy function
+iteration or `MPFI` for modified policy function iteration
+- `;max_iter::Int(250)` : Maximum number of iterations
+- `;epsilon::Float64(1e-3)` : Value for epsilon-optimality. Only used if
+`method` is `VFI`
+- `;k::Int(20)` : Number of iterations for partial policy evaluation in modified
+policy iteration (irrelevant for other methods).
+
+##### Returns
+
+- `ddpr::DPSolveResult{Algo}` : Optimization result represented as a
+DPSolveResult. See `DPSolveResult` for details.
+"""
+function solve{Algo<:DDPAlgorithm}(ddp::DiscreteDP, method::Type{Algo}=VFI;
+                                   max_iter::Integer=250, epsilon::Real=1e-3,
+                                   k::Integer=20)
+    ddpr = DPSolveResult{Algo}(ddp)
+    _solve!(ddp, ddpr, max_iter, epsilon, k)
+    ddpr.mc = MarkovChain(ddp, ddpr)
+    ddpr
+end
+
+function solve{Algo<:DDPAlgorithm}(ddp::DiscreteDP, v_init::Vector,
+                                   method::Type{Algo}=VFI; max_iter::Integer=250,
+                                   epsilon::Real=1e-3, k::Integer=20)
+    ddpr = DPSolveResult{Algo}(ddp, v_init)
+    _solve!(ddp, ddpr, max_iter, epsilon, k)
+    ddpr.mc = MarkovChain(ddp, ddpr)
+    ddpr
+end
+
+# --------- #
+# Other API #
+# --------- #
+
+"""
+Returns the controlled Markov chain for a given policy `sigma`.
+
+##### Parameters
+
+- `ddp::DisreteDP` : Object that contains the model parameters
+- `ddpr::DPSolveResult` : Object that contains result variables
+
+##### Returns
+
+mc : MarkovChain
+     Controlled Markov chain.
+"""
+QuantEcon.MarkovChain(ddp::DiscreteDP, ddpr::DPSolveResult) =
+    MarkovChain(RQ_sigma(ddp, ddpr)[2])
+
+"""
+Method of `RQ_sigma` that extracts sigma from a `DPSolveResult`
+
+See other docstring for details
+"""
+RQ_sigma(ddp::DiscreteDP, ddpr::DPSolveResult) = RQ_sigma(ddp, ddpr.sigma)
+
+"""
+Given a policy `sigma`, return the reward vector `R_sigma` and
+the transition probability matrix `Q_sigma`.
+
+##### Parameters
+
+- `ddp::DisreteDP` : Object that contains the model parameters
+- `sigma::Vector{Int}`: policy rule vector
+
+##### Returns
+
+- `R_sigma::Array{Float64}`: Reward vector for `sigma`, of length n.
+
+- `Q_sigma::Array{Float64}`: Transition probability matrix for `sigma`,
+  of shape (n, n).
+
+"""
+function RQ_sigma{T<:Integer}(ddp::DiscreteDP, sigma::Array{T})
+    R_sigma = ddp.R[sigma]
+    # convert from linear index based on R to column number
+    ind = ind2sub(ddp, ddpr)
+    Q_sigma = hcat([getindex(ddp.Q, ind[i]..., Colon())[:] for i=1:num_states(ddp)]...)
+    return R_sigma, Q_sigma'
+end
+
+
+# ---------------- #
+# Internal methods #
+# ---------------- #
 
 """
 Return the `Vector` `max_a vals(s, a)`,  where `vals` is represented as a
@@ -151,172 +407,6 @@ function *{T}(A::Array{T,3}, v::Vector)
     out
 end
 
-"""
-The Bellman operator, which computes and returns the updated value function Tv
-for a value function v.
-
-##### Parameters
-
-- `ddp::DisreteDP` : Object that contains the model parameters
-- `ddpr::DPSolveResult` : Object that contains result variables
-
-##### Returns
-
-- `ddpr.Tv::Vector` : Updated value function vector
-
-##### Notes
-
-Updates `ddpr.Tv` and `ddpr.sigma` inplace
-
-"""
-function bellman_operator!(ddp::DiscreteDP, ddpr::DPSolveResult)
-    vals = ddp.R + ddp.beta * ddp.Q * ddpr.v
-    s_wise_max!(vals, ddpr.Tv, ddpr.sigma)
-    ddpr.Tv
-end
-
-"""
-The Bellman operator, which computes and returns the updated value function Tv
-for a given value function v.
-
-This function will fill the input `v` with `Tv` and the input `sigma` with the
-corresponding policy rule
-
-##### Parameters
-
-- `ddp::DisreteDP`: The ddp model
-- `v::Vector{T<:AbstractFloat}`: The current guess of the value function
-- `sigma::Vector`: A buffer array to hold the policy function. Initial
-  values not used and will be overwritten
-
-##### Returns
-
-- `Tv::Vector`: Updated value function vector
-- `sigma::Vector{T<:Integer}`: Policy rule
-"""
-function bellman_operator!{T<:AbstractFloat}(ddp::DiscreteDP, v::Vector{T},
-                                             sigma::Vector)
-    vals = ddp.R + ddp.beta * ddp.Q * v
-    s_wise_max!(vals, v, sigma)
-    v, sigma
-end
-
-# method to allow users to pass v as something like v=[1, 1, 1]
-bellman_operator!{T<:Real}(ddp::DiscreteDP, v::Vector{T}, sigma::Vector) =
-    bellman_operator!(ddp, convert(Vector{Float64}, v), sigma)
-
-"""
-The Bellman operator, which computes and returns the updated value function Tv
-for a given value function v.
-
-##### Parameters
-
-- `ddp::DisreteDP`: The ddp model
-- `v::Vector`: The current guess of the value function
-
-##### Returns
-
-- `Tv::Vector` : Updated value function vector
-"""
-bellman_operator(ddp::DiscreteDP, v::Vector) =
-    s_wise_max(ddp.R + ddp.beta * ddp.Q * v)
-
-
-"""
-Compute the v-greedy policy
-
-##### Parameters
-
-- `ddp::DisreteDP` : Object that contains the model parameters
-- `ddpr::DPSolveResult` : Object that contains result variables
-
-##### Returns
-
-- `sigma::Vector{Int}` : Array containing `v`-greedy policy rule
-
-##### Notes
-
-modifies ddpr.sigma and ddpr.Tv in place
-
-"""
-compute_greedy!(ddp::DiscreteDP, ddpr::DPSolveResult) =
-    (bellman_operator!(ddp, ddpr); ddpr.sigma)
-
-function compute_greedy(ddp::DiscreteDP, v::Vector)
-    Tv = similar(v, Float64)  # buffer so we don't change the input v
-    copy!(Tv, v)
-    sigma = ones(Int, length(v))
-    bellman_operator!(ddp, Tv, sigma)
-    sigma
-end
-
-#-Policy Iteration-#
-
-"""
-Method of `evaluate_policy` that extracts sigma from a `DPSolveResult`
-
-See other docstring for details
-"""
-evaluate_policy(ddp::DiscreteDP, ddpr::DPSolveResult) =
-    evaluate_policy(ddp, ddpr.sigma)
-
-"""
-Compute the value of a policy.
-
-##### Parameters
-
-- `ddp::DisreteDP` : Object that contains the model parameters
-- `sigma::Vector{T<:Integer}` : Policy rule vector
-
-##### Returns
-
-- `v_sigma::Array{Float64}` : Value vector of `sigma`, of length n.
-
-"""
-function evaluate_policy{T<:Integer}(ddp::DiscreteDP, sigma::Vector{T})
-    R_sigma, Q_sigma = RQ_sigma(ddp, sigma)
-    b = R_sigma
-    A = I - ddp.beta * Q_sigma
-    return A \ b
-end
-
-"""
-Solve the dynamic programming problem.
-
-##### Parameters
-
-- `ddp::DisreteDP` : Object that contains the Model Parameters
-- `method::Type{T<Algo}(VFI)`: Type name specifying solution method. Acceptable
-arguments are `VFI` for value function iteration or `PFI` for policy function
-iteration or `MPFI` for modified policy function iteration
-- `;max_iter::Int(250)` : Maximum number of iterations
-- `;epsilon::Float64(1e-3)` : Value for epsilon-optimality. Only used if
-`method` is `VFI`
-- `;k::Int(20)` : Number of iterations for partial policy evaluation in modified
-policy iteration (irrelevant for other methods).
-
-##### Returns
-
-- `ddpr::DPSolveResult{Algo}` : Optimization result represented as a
-DPSolveResult. See `DPSolveResult` for details.
-"""
-function solve{Algo<:DDPAlgorithm}(ddp::DiscreteDP, method::Type{Algo}=VFI;
-                                   max_iter::Integer=250, epsilon::Real=1e-3,
-                                   k::Integer=20)
-    ddpr = DPSolveResult{Algo}(ddp)
-    _solve!(ddp, ddpr, max_iter, epsilon, k)
-    ddpr.mc = MarkovChain(ddp, ddpr)
-    ddpr
-end
-
-function solve{Algo<:DDPAlgorithm}(ddp::DiscreteDP, v_init::Vector,
-                                   method::Type{Algo}=VFI; max_iter::Integer=250,
-                                   epsilon::Real=1e-3, k::Integer=20)
-    ddpr = DPSolveResult{Algo}(ddp, v_init)
-    _solve!(ddp, ddpr, max_iter, epsilon, k)
-    ddpr.mc = MarkovChain(ddp, ddpr)
-    ddpr
-end
 
 Base.ind2sub(ddp::DiscreteDP, ddpr::DPSolveResult) =
     map(x -> ind2sub(size(ddp.R), x)[2], ddpr.sigma)
@@ -358,7 +448,7 @@ NOTE: The epsilon is ignored in this method. It is only here so dispatch can
       See `solve` for further details
 """
 function _solve!(ddp::DiscreteDP, ddpr::DPSolveResult{PFI}, max_iter::Integer,
-                epsilon::Real, k::Integer)
+                 epsilon::Real, k::Integer)
     old_sigma = copy(ddpr.sigma)
 
     for i in 1:max_iter
@@ -416,57 +506,4 @@ function _solve!(ddp::DiscreteDP, ddpr::DPSolveResult{MPFI}, max_iter::Integer,
     end
 
     ddpr
-end
-
-#----------------------------#
-#-Suppoting Markov Functions-#
-#----------------------------#
-
-"""
-Returns the controlled Markov chain for a given policy `sigma`.
-
-##### Parameters
-
-- `ddp::DisreteDP` : Object that contains the model parameters
-- `ddpr::DPSolveResult` : Object that contains result variables
-
-##### Returns
-
-mc : MarkovChain
-     Controlled Markov chain.
-"""
-QuantEcon.MarkovChain(ddp::DiscreteDP, ddpr::DPSolveResult) =
-    MarkovChain(RQ_sigma(ddp, ddpr)[2])
-
-"""
-Method of `RQ_sigma` that extracts sigma from a `DPSolveResult`
-
-See other docstring for details
-"""
-RQ_sigma(ddp::DiscreteDP, ddpr::DPSolveResult) = RQ_sigma(ddp, ddpr.sigma)
-
-"""
-Given a policy `sigma`, return the reward vector `R_sigma` and
-the transition probability matrix `Q_sigma`.
-
-##### Parameters
-
-- `ddp::DisreteDP` : Object that contains the model parameters
-- `sigma::Vector{Int}`: policy rule vector
-
-##### Returns
-
-- `R_sigma::Array{Float64}`: Reward vector for `sigma`, of length n.
-
-- `Q_sigma::Array{Float64}`: Transition probability matrix for `sigma`,
-  of shape (n, n).
-
-"""
-function RQ_sigma{T<:Integer}(ddp::DiscreteDP, sigma::Array{T})
-    R_sigma = ddp.R[sigma]
-
-    # convert from linear index based on R to column number
-    ind = map(x->ind2sub(size(ddp.R), x), sigma)
-    Q_sigma = hcat([getindex(ddp.Q, ind[i]..., Colon())[:] for i=1:num_states(ddp)]...)
-    return R_sigma, Q_sigma'
 end

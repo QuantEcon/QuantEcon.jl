@@ -110,7 +110,7 @@ export
     random_markov_chain, random_stochastic_matrix,
 
 # ddp
-    DiscreteDP, VFI, PFI, MPFI, solve,
+    DiscreteDP, VFI, PFI, MPFI, solve, RQ_sigma,
     evaluate_policy, bellman_operator, compute_greedy,
     evaluate_policy!, bellman_operator!, compute_greedy!
 
