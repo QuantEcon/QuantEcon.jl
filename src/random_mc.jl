@@ -87,7 +87,7 @@ each row.
 ##### Arguments
 
 - `n::Integer` : Number of states.
-- `;k::Union{Integer, Void}(nothing)` : Number of nonzero entries in each
+- `k::Union{Integer, Void}(nothing)` : Number of nonzero entries in each
 column of the matrix. Set to n if note specified.
 
 ##### Returns
