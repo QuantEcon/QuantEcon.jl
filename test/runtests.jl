@@ -18,7 +18,7 @@ else
                                    "estspec", "kalman", "lae", "lqcontrol",
                                    "lqnash", "lss", "markov_approx",
                                    "matrix_eqn", "mc_tools", "quad", "quadsum",
-                                   "random_mc", "robustlq"])
+                                   "random_mc", "robustlq", "ddp"])
 end
 
 # n = min(8, CPU_CORES, length(tests))

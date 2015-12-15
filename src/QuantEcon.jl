@@ -104,23 +104,29 @@ export
     m_quadratic_sum,
 
 # random_mc
-    random_markov_chain, random_stochastic_matrix
+    random_markov_chain, random_stochastic_matrix,
+
+# ddp
+    DiscreteDP, VFI, PFI, MPFI, solve, RQ_sigma,
+    evaluate_policy, bellman_operator, compute_greedy,
+    evaluate_policy!, bellman_operator!, compute_greedy!
 
 include("util.jl")
 ##### includes
 include("arma.jl")
 include("compute_fp.jl")
+include("markov_approx.jl")
+include("mc_tools.jl")
+include("markov/ddp.jl")
 include("discrete_rv.jl")
 include("dists.jl")
 include("ecdf.jl")
 include("estspec.jl")
-include("mc_tools.jl")
 include("kalman.jl")
 include("lae.jl")
 include("lqcontrol.jl")
 include("lqnash.jl")
 include("lss.jl")
-include("markov_approx.jl")
 include("matrix_eqn.jl")
 include("robustlq.jl")
 include("quad.jl")
