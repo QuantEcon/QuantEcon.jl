@@ -104,7 +104,7 @@ export
     m_quadratic_sum,
 
 # random_mc
-    random_markov_chain, random_stochastic_matrix,
+    random_markov_chain, random_stochastic_matrix, random_discrete_dp,
 
 # ddp
     DiscreteDP, VFI, PFI, MPFI, solve, RQ_sigma,

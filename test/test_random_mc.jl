@@ -46,6 +46,29 @@ facts("Testing random_mc.jl") do
         # k > n
         @fact_throws random_markov_chain(2, 3)
     end
+
+    context("Test random_discrete_dp") do
+        num_states, num_actions = 5, 4
+        num_sa = num_states * num_actions
+        k = 3
+        ddp = random_discrete_dp(num_states, num_actions; k=k)
+
+        # Check shapes
+        @fact size(ddp.R) --> (num_states, num_actions)
+        @fact size(ddp.Q) --> (num_states, num_actions, num_states)
+
+        # Check ddp.Q[:, a, :] is a stochastic matrix for all actions `a`
+        @fact all(ddp.Q .>= 0) --> true
+        for a in 1:num_actions
+            P = reshape(ddp.Q[:, a, :], (num_states, num_states))
+            @fact all(x->isapprox(sum(x), 1),
+                      [P[i, :] for i in 1:size(P)[1]]) --> true
+        end
+
+        # Check number of nonzero entries for each state-action pair
+        @fact sum(ddp.Q .> 0, 3) -->
+            ones(Int, (num_states, num_actions, 1)) * k
+    end
 end  # facts
 
 end  # module

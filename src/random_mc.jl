@@ -1,11 +1,11 @@
 #=
-Generate a MarkovChain randomly.
+Generate MarkovChain and DiscreteDP instances randomly.
 
 @author : Daisuke Oyama
 
 =#
 import StatsBase: sample
-import QuantEcon: MarkovChain
+import QuantEcon: MarkovChain, DiscreteDP
 
 # random_markov_chain
 
@@ -81,70 +81,118 @@ end
 # random_stochastic_matrix
 
 """
-Return a randomly sampled n x n stochastic matrix.
-
-##### Arguments
-
-- `n::Integer` : Number of states.
-- `k::Integer` : Number of nonzero entries in each row of the matrix.
-
-##### Returns
-
-- `p::Array` : Stochastic matrix.
-
-"""
-function random_stochastic_matrix(n::Integer)
-    if n <= 0
-        throw(ArgumentError("n must be a positive integer"))
-    end
-
-    p = random_probvec(n, n)
-
-    return transpose(p)
-end
-
-
-"""
 Return a randomly sampled n x n stochastic matrix with k nonzero entries for
 each row.
 
 ##### Arguments
 
 - `n::Integer` : Number of states.
-- `k::Integer` : Number of nonzero entries in each row of the matrix.
+- `k::Union{Integer, Void}(nothing)` : Number of nonzero entries in each
+column of the matrix. Set to n if note specified.
 
 ##### Returns
 
 - `p::Array` : Stochastic matrix.
 
 """
-function random_stochastic_matrix(n::Integer, k::Integer)
+function random_stochastic_matrix(n::Integer, k::Union{Integer, Void}=nothing)
     if !(n > 0)
         throw(ArgumentError("n must be a positive integer"))
     end
-    if !(k > 0 && k <= n)
+    if k != nothing && !(k > 0 && k <= n)
         throw(ArgumentError("k must be an integer with 0 < k <= n"))
     end
 
-    k == n && return random_stochastic_matrix(n)
+    p = _random_stochastic_matrix(n, n, k=k)
+
+    return transpose(p)
+end
+
+
+"""
+Generate a "non-square column stochstic matrix" of shape (n, m), which contains
+as columns m probability vectors of length n with k nonzero entries.
+
+##### Arguments
+
+- `n::Integer` : Number of states.
+- `m::Integer` : Number of probability vectors.
+- `;k::Union{Integer, Void}(nothing)` : Number of nonzero entries in each
+column of the matrix. Set to n if note specified.
+
+##### Returns
+
+- `p::Array` : Array of shape (n, m) containing m probability vectors of length
+n as columns.
+
+"""
+function _random_stochastic_matrix(n::Integer, m::Integer;
+                                   k::Union{Integer, Void}=nothing)
+    if k == nothing
+        k = n
+    end
+    probvecs = random_probvec(k, m)
+
+    k == n && return probvecs
 
     # if k < n
-    probvecs = random_probvec(k, n)
-
     # Randomly sample row indices for each column for nonzero values
-    row_indices = Array(Int, k*n)
-    for j in 1:n
+    row_indices = Vector{Int}(k*m)
+    for j in 1:m
         row_indices[(j-1)*k+1:j*k] = sample(1:n, k, replace=false)
     end
 
-    p = zeros(n, n)
-    for j in 1:n
+    p = zeros(n, m)
+    for j in 1:m
         for i in 1:k
             p[row_indices[(j-1)*k+i], j] = probvecs[i, j]
         end
     end
 
-    return transpose(p)
+    return p
+end
+
+
+# random_discrete_dp
+
+"""
+Generate a DiscreteDP randomly. The reward values are drawn from the normal
+distribution with mean 0 and standard deviation `scale`.
+
+##### Arguments
+
+- `num_states::Integer` : Number of states.
+- `num_actions::Integer` : Number of actions.
+- `beta::Union{Float64, Void}(nothing)` : Discount factor. Randomly chosen from
+[0, 1) if not specified.
+- `;k::Union{Integer, Void}(nothing)` : Number of possible next states for each
+state-action pair. Equal to `num_states` if not specified.
+
+- `scale::Real(1)` : Standard deviation of the normal distribution for the
+reward values.
+
+##### Returns
+
+- `ddp::DiscreteDP` : An instance of DiscreteDP.
+
+"""
+function random_discrete_dp(num_states::Integer,
+                            num_actions::Integer,
+                            beta::Union{Real, Void}=nothing;
+                            k::Union{Integer, Void}=nothing,
+                            scale::Real=1)
+    L = num_states * num_actions
+    R = scale * randn(L)
+    Q = _random_stochastic_matrix(num_states, L; k=k)
+    if beta == nothing
+        beta = rand()
+    end
+
+    R = reshape(R, num_states, num_actions)
+    Q = reshape(transpose(Q), num_states, num_actions, num_states)
+
+    ddp = DiscreteDP(R, Q, beta)
+    return ddp
 end
 
 
