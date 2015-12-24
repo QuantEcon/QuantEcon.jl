@@ -388,14 +388,19 @@ Matrix multiplication over the last dimension of A
 
 =#
 function *{T}(A::Array{T,3}, v::Vector)
-    size(A, 3) ==  size(v, 1) || error("wrong dimensions")
-    out = Array(T, size(A)[1:2])
+    n1, n2, n3 = size(A)
+    size(v, 1) == n3 || error("wrong dimensions")
+    out = Array(T, n1, n2)
+    N = n1 * n2
 
-    # TODO: slicing A[i, j, :] is cache-unfriendly
-    for j=1:size(out, 2), i=1:size(out, 1)
-        out[i, j] = dot(A[i, j, :][:], v)
+    for i in 1:N
+        out[i] = A[i] * v[1]
     end
-    out
+    for k in 2:n1, i in 1:N
+        out[i] += A[(k-1)*N+i] * v[k]
+    end
+
+    return out
 end
 
 
