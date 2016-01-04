@@ -7,8 +7,8 @@ Utility functions used in the QuantEcon library
 
 =#
 
-meshgrid(x::Vector, y::Vector) = (repmat(x, 1, length(y))',
-                                  repmat(y, 1, length(x)))
+meshgrid(x::AbstractVector, y::AbstractVector) = (repmat(x, 1, length(y))',
+                                                  repmat(y, 1, length(x)))
 
 # function to return a Range object with points equivalent to calling
 # linspace(x_min, x_max, n_x). This is needed because we often use
