@@ -59,7 +59,9 @@ facts("Testing markov/dpp.jl") do
 
         for f in (bellman_operator, compute_greedy)
             for T in float_types
-                @fact f(ddp0, [1.0, 1.0]) --> f(ddp0, ones(T, 2))
+                f_f64 = f(ddp0, [1.0, 1.0])
+                f_T = f(ddp0, ones(T, 2))
+                @fact f_f64 --> roughly(convert(Vector{eltype(f_f64)}, f_T))
             end
 
             # only Integer subtypes can be Rational type params
@@ -128,14 +130,14 @@ facts("Testing markov/dpp.jl") do
     end
 
     context("test DiscreteDP{Rational,_,_,Rational} maintains Rational") do
-        ddp_rational = DiscreteDP(map(Rational{Int128}, R),
-                                  map(Rational{Int128}, Q),
-                                  map(Rational{Int128}, beta))
+        ddp_rational = DiscreteDP(map(Rational{BigInt}, R),
+                                  map(Rational{BigInt}, Q),
+                                  map(Rational{BigInt}, beta))
         # do minimal number of iterations to avoid overflow
-        vi = Rational{Int128}[1/2, 1/2]
-        @fact eltype(solve(ddp_rational, VFI; max_iter=1, epsilon=Inf).v) --> Rational{Int128}
-        @fact eltype(solve(ddp_rational, vi, PFI; max_iter=1).v) --> Rational{Int128}
-        @fact eltype(solve(ddp_rational, vi, MPFI; max_iter=1, k=1, epsilon=Inf).v) --> Rational{Int128}
+        vi = Rational{BigInt}[1//2, 1//2]
+        @fact eltype(solve(ddp_rational, VFI; max_iter=1, epsilon=Inf).v) --> Rational{BigInt}
+        @fact eltype(solve(ddp_rational, vi, PFI; max_iter=1).v) --> Rational{BigInt}
+        @fact eltype(solve(ddp_rational, vi, MPFI; max_iter=1, k=1, epsilon=Inf).v) --> Rational{BigInt}
     end
 
     context("test DiscreteDP{Rational{BigInt},_,_,Rational{BigInt}}  works") do
