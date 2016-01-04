@@ -388,14 +388,13 @@ Matrix multiplication over the last dimension of A
 
 =#
 function *{T}(A::Array{T,3}, v::Vector)
-    size(A, 3) ==  size(v, 1) || error("wrong dimensions")
-    out = Array(T, size(A)[1:2])
+    shape = size(A)
+    size(v, 1) == shape[end] || error("wrong dimensions")
 
-    # TODO: slicing A[i, j, :] is cache-unfriendly
-    for j=1:size(out, 2), i=1:size(out, 1)
-        out[i, j] = dot(A[i, j, :][:], v)
-    end
-    out
+    B = reshape(A, (prod(shape[1:end-1]), shape[end]))
+    out = B * v
+
+    return reshape(out, shape[1:end-1])
 end
 
 
