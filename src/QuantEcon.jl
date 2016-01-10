@@ -6,7 +6,7 @@ import Base: mean, std, var, show, isapprox
 
 # 3rd party
 using Distributions
-import Distributions: pdf, skewness
+import Distributions: pdf, skewness, BetaBinomial
 using DSP: TFFilter, freqz
 
 # useful types
@@ -119,7 +119,6 @@ include("markov_approx.jl")
 include("mc_tools.jl")
 include("markov/ddp.jl")
 include("discrete_rv.jl")
-include("dists.jl")
 include("ecdf.jl")
 include("estspec.jl")
 include("kalman.jl")

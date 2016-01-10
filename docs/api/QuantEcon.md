@@ -735,25 +735,6 @@ double optimal linear regulator problem.
 
 ---
 
-<a id="method__pdf.1" class="lexicon_definition"></a>
-#### pdf(d::QuantEcon.BetaBinomial) [¶](#method__pdf.1)
-Evaluate the pdf of the distributions at the points 0, 1, ..., k
-
-##### Arguments
-
-`d::BetaBinomial`: Instance of `BetaBinomial` type
-
-##### Returns
-
-- `probs::vector{Float64}`: pdf of the distribution `d`, at `0:d.k`
-
-
-
-*source:*
-[QuantEcon/src/dists.jl:64](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/dists.jl#L64)
-
----
-
 <a id="method__random_markov_chain.1" class="lexicon_definition"></a>
 #### random_markov_chain(n::Integer) [¶](#method__random_markov_chain.1)
 Return a randomly sampled MarkovChain instance with n states.

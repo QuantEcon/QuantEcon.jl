@@ -69,7 +69,7 @@
 
 [nnash(a,  b1,  b2,  r1,  r2,  q1,  q2,  s1,  s2,  w1,  w2,  m1,  m2)](QuantEcon.md#method__nnash.1)  Compute the limit of a Nash linear quadratic dynamic game.
 
-[pdf(d::QuantEcon.BetaBinomial)](QuantEcon.md#method__pdf.1)  Evaluate the pdf of the distributions at the points 0, 1, ..., k
+[pdf(d::Distributions.BetaBinomial)](http://distributionsjl.readthedocs.org/en/latest/univariate.html#beta-binomial-distribution)  Evaluate the pdf of the distributions at the points 0, 1, ..., k
 
 [random_markov_chain(n::Integer)](QuantEcon.md#method__random_markov_chain.1)  Return a randomly sampled MarkovChain instance with n states.
 
