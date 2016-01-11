@@ -1,49 +1,42 @@
-module TestLQNash
+@testset "Testing lqnash.jl" begin
 
-using QuantEcon
-using Base.Test
-using FactCheck
-
-# set up for when agents don't interact with each other
-a = [.95 0.
+    # set up for when agents don't interact with each other
+    a = [.95 0.
      0 .95]
-b1 = [.95; 0.]
-b2 = [0.; .95]
-r1 = [-.25 0.
-      0. 0.]
-r2 = [0. 0.
-      0. -.25]
-q1 = [-.15]
-q2 = [-.15]
+    b1 = [.95; 0.]
+    b2 = [0.; .95]
+    r1 = [-.25 0.
+        0. 0.]
+    r2 = [0. 0.
+        0. -.25]
+    q1 = [-.15]
+    q2 = [-.15]
 
-f1, f2, p1, p2 = nnash(a, b1, b2, r1, r2, q1, q2, 0, 0, 0, 0, 0, 0,
+    f1, f2, p1, p2 = nnash(a, b1, b2, r1, r2, q1, q2, 0, 0, 0, 0, 0, 0,
                        tol=1e-8, max_iter=10000)
 
-alq = .95
-blq = .95
-rlq = -.25
-qlq = -.15
+    alq = .95
+    blq = .95
+    rlq = -.25
+    qlq = -.15
 
-lq_obj = LQ(qlq, rlq, alq, blq, bet=1)
+    lq_obj = LQ(qlq, rlq, alq, blq, bet=1)
 
-p, f, d = stationary_values(lq_obj)
+    p_s, f, d = stationary_values(lq_obj)
 
+    @testset "Checking the policies" begin
 
-facts("Testing lqnash.jl") do
-
-    context("Checking the policies") do
-
-        @fact sum(f1) --> roughly(sum(f2))
-        @fact sum(f1) --> roughly(sum(f))
+        @test isapprox(sum(f1), sum(f2))
+        @test isapprox(sum(f1), sum(f))
     end
 
-    context("Checking the Value Function") do
+    @testset "Checking the Value Function" begin
 
-        @fact p1[1, 1] --> roughly(p2[2, 2])
-        @fact p1[1, 1] --> roughly(p[1])
+        @test isapprox(p1[1, 1], p2[2, 2])
+        @test isapprox(p1[1, 1], p_s[1])
     end
 
-    context("Judd test case")  do
+    @testset "Judd test case" begin
         # Define Parameters
         delta = 0.02
         d = [-1 0.5
@@ -111,10 +104,9 @@ facts("Testing lqnash.jl") do
 
         xbar_ml = [1.246871007582702, 1.246871007582685]
 
-        @fact f1 --> roughly(f1_ml)
-        @fact f2 --> roughly(f2_ml)
-        @fact xbar --> roughly(xbar_ml)
+        @test isapprox(f1, f1_ml)
+        @test isapprox(f2, f2_ml)
+        @test isapprox(xbar, xbar_ml)
 
     end
 end
-end  # module

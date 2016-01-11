@@ -1,15 +1,7 @@
-module TestQuadsum
-
-using QuantEcon
-using Base.Test
-using FactCheck
-
-
-rough_kwargs = Dict(:atol => 1e-10, :rtol => 1e-10)
-
-
-facts("Testing quadsums.jl") do
-    context("test simple var sum") do
+@testset "Testing quadsums.jl" begin
+    rough_kwargs = Dict(:atol => 1e-10, :rtol => 1e-10)
+    
+    @testset "test simple var sum" begin
         beta = .95
         A = 1.
         C = 0.
@@ -18,10 +10,10 @@ facts("Testing quadsums.jl") do
 
         val = var_quadratic_sum(A, C, H, beta, x0)
 
-        @fact val --> roughly(20.0; rough_kwargs...)
+        @test isapprox(val, 20.0; rough_kwargs...)
     end
 
-    context("test identity var sum") do
+    @testset "test identity var sum" begin
         beta = .95
         A = eye(3)
         C = zeros(3, 3)
@@ -30,8 +22,7 @@ facts("Testing quadsums.jl") do
 
         val = var_quadratic_sum(A, C, H, beta, x0)
 
-        @fact val --> roughly(60.0; rough_kwargs...)
+        @test isapprox(val, 60.0; rough_kwargs...)
     end
 
 end  # facts
-end  # module
