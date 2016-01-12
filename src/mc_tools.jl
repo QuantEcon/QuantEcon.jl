@@ -298,6 +298,9 @@ end
 """
 Simulate time series of state transitions of the Markov chain `mc`.
 
+The sample path from the `j`-th repetition of the simulation with initial state
+`init[i]` is stored in the `(j-1)*num_reps+i`-th column of the matrix X.
+
 ##### Arguments
 
 - `mc::MarkovChain` : MarkovChain instance.
