@@ -1,37 +1,49 @@
 using Compat  # for startswith
+using QuantEcon
+using DataStructures: counter
+using Distributions: LogNormal, pdf
 
-function test_file_string(s)
-    if !startswith("test_", s)
-        s = string("test_", s)
-    end
-
-    if !endswith(s, ".jl")
-        s = string(s, ".jl")
-    end
-    return Pkg.dir("QuantEcon", "test", s)
+if VERSION >= v"0.5-"
+    using Base.Test
+else
+    using BaseTestNext
+    const Test = BaseTestNext
 end
 
+tests = [
+        "arma",
+        "compute_fp",
+        "discrete_rv",
+        "ecdf",
+        "estspec",
+        "kalman",
+        "lae",
+        "lqcontrol",
+        "lqnash",
+        "lss",
+        "markov_approx",
+        "matrix_eqn",
+        "mc_tools",
+        "quad",
+        "quadsum",
+        "random_mc",
+        "robustlq",
+        "ddp"]
+
+
 if length(ARGS) > 0
-    tests = map(test_file_string, ARGS)
-else
-    tests = map(test_file_string, ["arma", "compute_fp", "discrete_rv", "ecdf",
-                                   "estspec", "kalman", "lae", "lqcontrol",
-                                   "lqnash", "lss", "markov_approx",
-                                   "matrix_eqn", "mc_tools", "quad", "quadsum",
-                                   "random_mc", "robustlq", "ddp"])
+    tests = ARGS
 end
 
 # n = min(8, CPU_CORES, length(tests))
 # n > 1 && addprocs(n)
 
-# @everywhere using FactCheck
-# @everywhere include(Pkg.dir("QuantEcon", "test", "util.jl"))
-using FactCheck
-include(Pkg.dir("QuantEcon", "test", "util.jl"))
 
-for test_file in tests
-    println("running for $test_file")
+srand(42)
+include("util.jl")
+
+for t in tests
+    test_file = "test_$t.jl"
+    print_with_color(:green, "* $test_file\n")
     include(test_file)
 end
-
-exitstatus()

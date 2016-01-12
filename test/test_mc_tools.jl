@@ -1,62 +1,3 @@
-module TestMCTools
-
-using QuantEcon
-using Base.Test
-using FactCheck
-srand(42)
-
-# these matrices come from RMT4 section 2.2.1
-mc1 = [1 0 0; .2 .5 .3; 0 0 1]
-mc2 = [.7 .3 0; 0 .5 .5; 0 .9 .1]
-mc3 = [0.4 0.6; 0.2 0.8]
-mc4 = eye(2)
-mc5 = [
-     0 1 0 0 0 0
-     1 0 0 0 0 0
-     1//2 0 0 1//2 0 0
-     0 0 0 0 1 0
-     0 0 0 0 0 1
-     0 0 0 1 0 0
-     ]
-mc5_stationary = zeros(Rational,6,2)
-mc5_stationary[[1,2]] = 1//2; mc5_stationary[[10,11,12]] = 1//3
-
-mc6 = [2//3 1//3; 1//4 3//4]  # Rational elements
-mc6_stationary = [3//7, 4//7]
-
-mc7 = [1 0; 0 1]
-mc7_stationary = [1 0;0 1]
-
-# Reducible mc with a unique recurrent class,
-# where n=2 is a transient state
-mc10 = [1. 0; 1. 0]
-mc10_stationary = [1., 0]
-
-mc1 = MarkovChain(mc1)
-mc2 = MarkovChain(mc2)
-mc3 = MarkovChain(mc3)
-mc4 = MarkovChain(mc4)
-mc5 = MarkovChain(mc5)
-mc6 = MarkovChain(mc6)
-mc7 = MarkovChain(mc7)
-mc10 = MarkovChain(mc10)
-
-# examples from
-# Graph-Theoretic Analysis of Finite Markov Chains by J.P. Jarvis & D. R. Shier
-
-fig1_p = zeros(Rational{Int64}, 5, 5)
-fig1_p[[3, 4, 9, 10, 11, 13, 18, 19, 22, 24]] =
-    [1//2, 2//5, 1//10, 1, 1, 1//5, 3//10, 1//5, 1, 3//10]
-fig2_p = zeros(Rational{Int64}, 5, 5)
-fig2_p[[3, 10, 11, 13, 14, 17, 18, 19, 22]] =
-    [1//3, 1, 1, 1//3, 1//2, 1//2, 1//3, 1//2, 1//2]
-
-fig1 = MarkovChain(convert(Matrix{Float64}, fig1_p))
-fig1_rat = MarkovChain(fig1_p)
-
-fig2 = MarkovChain(convert(Matrix{Float64}, fig2_p))
-fig2_rat = MarkovChain(fig2_p)
-
 function kmr_markov_matrix_sequential{T<:Real}(n::Integer, p::T, ε::T)
     """
     Generate the MarkovChain with the associated transition matrix from the KMR model with *sequential* move
@@ -84,63 +25,114 @@ function kmr_markov_matrix_sequential{T<:Real}(n::Integer, p::T, ε::T)
     return MarkovChain(x)
 end
 
-mc8 = kmr_markov_matrix_sequential(27, 1/3, 1e-2)
-mc9 = kmr_markov_matrix_sequential(3, 1/3, 1e-14)
+@testset "Testing mc_tools.jl" begin
+        
+    # these matrices come from RMT4 section 2.2.1
+    mc1 = [1 0 0; .2 .5 .3; 0 0 1]
+    mc2 = [.7 .3 0; 0 .5 .5; 0 .9 .1]
+    mc3 = [0.4 0.6; 0.2 0.8]
+    mc4 = eye(2)
+    mc5 = [
+         0 1 0 0 0 0
+         1 0 0 0 0 0
+         1//2 0 0 1//2 0 0
+         0 0 0 0 1 0
+         0 0 0 0 0 1
+         0 0 0 1 0 0
+         ]
+    mc5_stationary = zeros(Rational,6,2)
+    mc5_stationary[[1,2]] = 1//2; mc5_stationary[[10,11,12]] = 1//3
 
-tol = 1e-15
+    mc6 = [2//3 1//3; 1//4 3//4]  # Rational elements
+    mc6_stationary = [3//7, 4//7]
 
-facts("Testing mc_tools.jl") do
-    context("test mc_compute_stationary using exact solutions") do
-        @fact mc_compute_stationary(mc1) --> eye(3)[:, [1, 3]]
-        @fact mc_compute_stationary(mc2) --> roughly([0, 9/14, 5/14])
-        @fact mc_compute_stationary(mc3) --> roughly([1/4, 3/4])
-        @fact mc_compute_stationary(mc4) --> eye(2)
-        @fact mc_compute_stationary(mc5) --> mc5_stationary
-        @fact mc_compute_stationary(mc6) --> mc6_stationary
-        @fact mc_compute_stationary(mc7) --> mc7_stationary
-        @fact mc_compute_stationary(mc10) --> mc10_stationary
+    mc7 = [1 0; 0 1]
+    mc7_stationary = [1 0;0 1]
+
+    # Reducible mc with a unique recurrent class,
+    # where n=2 is a transient state
+    mc10 = [1. 0; 1. 0]
+    mc10_stationary = [1., 0]
+
+    mc1 = MarkovChain(mc1)
+    mc2 = MarkovChain(mc2)
+    mc3 = MarkovChain(mc3)
+    mc4 = MarkovChain(mc4)
+    mc5 = MarkovChain(mc5)
+    mc6 = MarkovChain(mc6)
+    mc7 = MarkovChain(mc7)
+    mc10 = MarkovChain(mc10)
+
+    # examples from
+    # Graph-Theoretic Analysis of Finite Markov Chains by J.P. Jarvis & D. R. Shier
+
+    fig1_p = zeros(Rational{Int64}, 5, 5)
+    fig1_p[[3, 4, 9, 10, 11, 13, 18, 19, 22, 24]] =
+        [1//2, 2//5, 1//10, 1, 1, 1//5, 3//10, 1//5, 1, 3//10]
+    fig2_p = zeros(Rational{Int64}, 5, 5)
+    fig2_p[[3, 10, 11, 13, 14, 17, 18, 19, 22]] =
+        [1//3, 1, 1, 1//3, 1//2, 1//2, 1//3, 1//2, 1//2]
+
+    fig1 = MarkovChain(convert(Matrix{Float64}, fig1_p))
+    fig1_rat = MarkovChain(fig1_p)
+
+    fig2 = MarkovChain(convert(Matrix{Float64}, fig2_p))
+    fig2_rat = MarkovChain(fig2_p)
+
+    mc8 = kmr_markov_matrix_sequential(27, 1/3, 1e-2)
+    mc9 = kmr_markov_matrix_sequential(3, 1/3, 1e-14)
+
+    tol = 1e-15
+    
+    @testset "test mc_compute_stationary using exact solutions" begin
+        @test mc_compute_stationary(mc1) == eye(3)[:, [1, 3]]
+        @test isapprox(mc_compute_stationary(mc2), [0, 9/14, 5/14])
+        @test isapprox(mc_compute_stationary(mc3), [1/4, 3/4])
+        @test mc_compute_stationary(mc4) == eye(2)
+        @test mc_compute_stationary(mc5) == mc5_stationary
+        @test mc_compute_stationary(mc6) == mc6_stationary
+        @test mc_compute_stationary(mc7) == mc7_stationary
+        @test mc_compute_stationary(mc10) == mc10_stationary
     end
 
-    context("test gth_solve with KMR matrices") do
+    @testset "test gth_solve with KMR matrices" begin
         for d in [mc8,mc9]
             x = mc_compute_stationary(d)
 
             # Check elements sum to one
-            @fact sum(x) --> roughly(1; atol=tol)
+            @test isapprox(sum(x), 1; atol=tol)
 
             # Check elements are nonnegative
             for i in 1:length(x)
-                @fact x[i] --> greater_than_or_equal(-tol)
+                @test x[i] >= -tol
             end
 
             # Check x is a left eigenvector of P
-            @fact vec(x'*d.p) --> roughly(x; atol=tol)
+            @test isapprox(vec(x'*d.p), x; atol=tol)
         end
     end
 
-    context("test MarkovChain throws errors") do
-        @fact_throws MarkovChain(rand(4, 5))  # not square
-        @fact_throws MarkovChain([0.0 0.5; 0.2 0.8])  # first row doesn't sum to 1
-        @fact_throws MarkovChain([-1 1; 0.2 0.8])  # negative element, but sums to 1
+    @testset "test MarkovChain throws errors" begin
+        @test_throws ArgumentError MarkovChain(rand(4, 5))  # not square
+        @test_throws ArgumentError MarkovChain([0.0 0.5; 0.2 0.8])  # first row doesn't sum to 1
+        @test_throws ArgumentError MarkovChain([-1 1; 0.2 0.8])  # negative element, but sums to 1
     end
 
-    context("test graph theoretic algorithms") do
+    @testset "test graph theoretic algorithms" begin
         for fig in [fig1, fig1_rat]
-            @fact recurrent_classes(fig) --> Vector[[2, 5]]
-            @fact communication_classes(fig) --> Vector[[2, 5], [1, 3, 4]]
-            @fact is_irreducible(fig) --> false
-            # @fact period(fig) --> 2
-            # @fact is_aperiodic(fig) --> false
+            @test recurrent_classes(fig) == Vector[[2, 5]]
+            @test communication_classes(fig) == Vector[[2, 5], [1, 3, 4]]
+            @test is_irreducible(fig) == false
+            # @test period(fig) == 2
+            # @test is_aperiodic(fig) == false
         end
 
         for fig in [fig2, fig2_rat]
-            @fact recurrent_classes(fig) --> Vector[[1, 3, 4]]
-            @fact communication_classes(fig) --> Vector[[1, 3, 4], [2, 5]]
-            @fact is_irreducible(fig) --> false
-            # @fact period(fig) --> 1
-            # @fact is_aperiodic(fig) --> true
+            @test recurrent_classes(fig) == Vector[[1, 3, 4]]
+            @test communication_classes(fig) == Vector[[1, 3, 4], [2, 5]]
+            @test is_irreducible(fig) == false
+            # @test period(fig) == 1
+            # @test is_aperiodic(fig) == true
         end
     end
-end  # facts
-
-end  # module
+end  # @testset

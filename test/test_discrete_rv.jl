@@ -1,21 +1,13 @@
-module TestDiscreteRv
+@testset "Testing discrete_rv.jl" begin
+    
+    # set up
+    n = 10
+    x = rand(n)
+    x ./= sum(x)
+    drv = DiscreteRV(x)
 
-using QuantEcon
-using Base.Test
-using FactCheck
-using DataStructures
-
-# set up
-srand(42)
-n = 10
-x = rand(n)
-x ./= sum(x)
-drv = DiscreteRV(x)
-
-
-facts("Testing discrete_rv.jl") do
     # test Q sums to 1
-    @fact drv.Q[end] --> roughly(1.0)
+    @test drv.Q[end] ≈ 1.0
 
     # test lln
     draws = draw(drv, 100000)
@@ -26,8 +18,6 @@ facts("Testing discrete_rv.jl") do
     end
     counts ./= sum(counts)
 
-    @fact Base.maxabs(counts - drv.q) --> roughly(0.0; atol=1e-2)
+    @test isapprox(Base.maxabs(counts - drv.q), 0.0; atol=1e-2)
 
-end  # facts
-end  # module
-
+end  # testset

@@ -1,70 +1,63 @@
-module TestRobustLQ
+@testset "Testing robustlq" begin
+    rough_kwargs = Dict(:atol => 1e-4, :rtol => 1e-4)
 
-using QuantEcon
-using Base.Test
-using FactCheck
+    # set up
+    a_0     = 100
+    a_1     = 0.5
+    ρ     = 0.9
+    sigma_d = 0.05
+    β    = 0.95
+    c       = 2
+    γ   = 50.0
+    θ   = 0.002
+    ac      = (a_0 - c) / 2.0
 
-rough_kwargs = Dict(:atol => 1e-4, :rtol => 1e-4)
+    R = [0   ac    0
+         ac  -a_1  0.5
+         0.  0.5   0]
 
-# set up
-a_0     = 100
-a_1     = 0.5
-ρ     = 0.9
-sigma_d = 0.05
-β    = 0.95
-c       = 2
-γ   = 50.0
-θ   = 0.002
-ac      = (a_0 - c) / 2.0
+    R = -R
+    Q = γ / 2
 
-R = [0   ac    0
-     ac  -a_1  0.5
-     0.  0.5   0]
+    A = [1. 0. 0.
+         0. 1. 0.
+         0. 0. ρ]
+    B = [0.0 1.0 0.0]'
+    C = [0.0 0.0 sigma_d]'
 
-R = -R
-Q = γ / 2
+    rblq = RBLQ(Q, R, A, B, C, β, θ)
+    lq = LQ(Q, R, A, B, C, β)
 
-A = [1. 0. 0.
-     0. 1. 0.
-     0. 0. ρ]
-B = [0.0 1.0 0.0]'
-C = [0.0 0.0 sigma_d]'
-
-rblq = RBLQ(Q, R, A, B, C, β, θ)
-lq = LQ(Q, R, A, B, C, β)
-
-Fr, Kr, Pr = robust_rule(rblq)
+    Fr, Kr, Pr = robust_rule(rblq)
 
 
-facts("Testing robustlq") do
     # test stuff
-    context("test robust vs simple") do
+    @testset "test robust vs simple" begin
         Fs, Ks, Ps = robust_rule_simple(rblq, Pr; tol=1e-12)
 
-        @fact Fr --> roughly(Fs; rough_kwargs...)
-        @fact Kr --> roughly(Ks; rough_kwargs...)
-        @fact Pr --> roughly(Ps; rough_kwargs...)
+        @test isapprox(Fr, Fs; rough_kwargs...)
+        @test isapprox(Kr, Ks; rough_kwargs...)
+        @test isapprox(Pr, Ps; rough_kwargs...)
     end
 
-    context("test f2k and k2f") do
+    @testset "test f2k and k2f" begin
         K_f2k, P_f2k = F_to_K(rblq, Fr)
         F_k2f, P_k2f = K_to_F(rblq, Kr)
 
-        @fact K_f2k --> roughly(Kr; rough_kwargs...)
-        @fact F_k2f --> roughly(Fr; rough_kwargs...)
-        @fact P_f2k --> roughly(P_k2f; rough_kwargs...)
+        @test isapprox(K_f2k, Kr; rough_kwargs...)
+        @test isapprox(F_k2f, Fr; rough_kwargs...)
+        @test isapprox(P_f2k, P_k2f; rough_kwargs...)
     end
 
-    context("test evaluate F") do
+    @testset "test evaluate F" begin
         Kf, Pf, df, Of, of =  evaluate_F(rblq, Fr)
 
-        @fact Pf --> roughly(Pr; rough_kwargs...)
-        @fact Kf --> roughly(Kr; rough_kwargs...)
+        @test isapprox(Pf, Pr; rough_kwargs...)
+        @test isapprox(Kf, Kr; rough_kwargs...)
     end
 
-    context("test no run-time error in robust_rule_simple") do
+    @testset "test no run-time error in robust_rule_simple" begin
         # this will just print out a warning
         robust_rule_simple(rblq, ones(Pr); tol=eps(), max_iter=1)
     end
-end  # facts
-end  # module
+end  # @testset

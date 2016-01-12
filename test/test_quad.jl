@@ -1,12 +1,5 @@
-module TestQuad
-
-include("util.jl")
-
-using QuantEcon
-using Base.Test
-using FactCheck
-
 # set up
+
 m = matread(quad_data_file_name)
 qnwfuncs = [qnwlege, qnwcheb, qnwsimp, qnwtrap, qnwbeta, qnwgamma,
             qnwequi, qnwnorm, qnwunif, qnwlogn]
@@ -52,10 +45,9 @@ x_unif_3, w_unif_3 = qnwunif(n_3, a_3, b_3)
 x_beta_3, w_beta_3 = qnwbeta(n_3, b_3, b_3+1.0)
 x_gamm_3, w_gamm_3 = qnwgamma(n_3, b_3, ones(3))
 
+@testset "Testing quad.jl" begin
 
-facts("Testing quad.jl") do
-
-    context("Testing method resolution") do
+    @testset "Testing method resolution" begin
 
         for f in qnwfuncs
             m1 = f(11, 1, 3)
@@ -67,16 +59,16 @@ facts("Testing quad.jl") do
             m7 = f([11], [1], [3])
 
             # Stack nodes/weights in columns
-            @fact [m1[1] m1[2]] --> roughly([m2[1] m2[2]])
-            @fact [m1[1] m1[2]] --> roughly([m3[1] m3[2]])
-            @fact [m1[1] m1[2]] --> roughly([m4[1] m4[2]])
-            @fact [m1[1] m1[2]] --> roughly([m5[1] m5[2]])
-            @fact [m1[1] m1[2]] --> roughly([m6[1] m6[2]])
-            @fact [m1[1] m1[2]] --> roughly([m7[1] m7[2]])
+            @test isapprox([m1[1] m1[2]], [m2[1] m2[2]])
+            @test isapprox([m1[1] m1[2]], [m3[1] m3[2]])
+            @test isapprox([m1[1] m1[2]], [m4[1] m4[2]])
+            @test isapprox([m1[1] m1[2]], [m5[1] m5[2]])
+            @test isapprox([m1[1] m1[2]], [m6[1] m6[2]])
+            @test isapprox([m1[1] m1[2]], [m7[1] m7[2]])
         end
     end
 
-    context("testing nodes/weights against Matlab") do
+    @testset "testing nodes/weights against Matlab" begin
         # generate names
         for name in ["cheb", "equiN", "equiW", "equiH", "lege", "norm",
                      "logn", "simp", "trap", "unif", "beta", "gamm"]
@@ -86,13 +78,13 @@ facts("Testing quad.jl") do
                 jl_x, jl_w = eval(symbol(x_str_name)), eval(symbol(w_str_name))
                 ml_x, ml_w = m[x_str_name],  m[w_str_name]
                 ml_x = d == 3 ? ml_x : squeeze(ml_x, 2)
-                @fact jl_x --> roughly(ml_x; atol=1e-5)
-                @fact jl_w --> roughly(squeeze(ml_w, 2); atol=1e-5)
+                @test isapprox(jl_x, ml_x; atol=1e-5)
+                @test isapprox(jl_w, squeeze(ml_w, 2); atol=1e-5)
             end
         end
     end
 
-    context("testing quadrect 1d against Matlab") do
+    @testset "testing quadrect 1d against Matlab" begin
         f1(x) = exp(-x)
         f2(x) = 1.0 ./ (1.0 + 25.0 .* x.^2.0)
         f3(x) = abs(x).^0.5
@@ -116,15 +108,15 @@ facts("Testing quad.jl") do
         #       random numbers than Matlab.
         ml_data_1d = m["int_1d"][:, 1:6, :]
 
-        @fact data1d[:, 1, :] --> roughly(ml_data_1d[:, 1, :])  # trap
-        @fact data1d[:, 2, :] --> roughly(ml_data_1d[:, 2, :])  # simp
-        @fact data1d[:, 3, :] --> roughly(ml_data_1d[:, 3, :])  # lege
-        @fact data1d[:, 4, :] --> roughly(ml_data_1d[:, 4, :])  # N
-        @fact data1d[:, 5, :] --> roughly(ml_data_1d[:, 5, :])  # W
-        @fact data1d[:, 6, :] --> roughly(ml_data_1d[:, 6, :])  # H
+        @test isapprox(data1d[:, 1, :], ml_data_1d[:, 1, :])  # trap
+        @test isapprox(data1d[:, 2, :], ml_data_1d[:, 2, :])  # simp
+        @test isapprox(data1d[:, 3, :], ml_data_1d[:, 3, :])  # lege
+        @test isapprox(data1d[:, 4, :], ml_data_1d[:, 4, :])  # N
+        @test isapprox(data1d[:, 5, :], ml_data_1d[:, 5, :])  # W
+        @test isapprox(data1d[:, 6, :], ml_data_1d[:, 6, :])  # H
     end
 
-    context("testing quadrect 2d against Matlab") do
+    @testset "testing quadrect 2d against Matlab" begin
         f1(x) = exp(x[:, 1] + x[:, 2])
         f2(x) = exp(- x[:, 1] .* cos(x[:, 2].^2))
 
@@ -147,18 +139,13 @@ facts("Testing quad.jl") do
         #       random numbers than Matlab.
         ml_data_2d1 = m["int_2d1"][:, 1:6]
 
-        @fact data2d1[:, 1] --> roughly(ml_data_2d1[:, 1])  # trap
-        @fact data2d1[:, 2] --> roughly(ml_data_2d1[:, 2])  # simp
-        @fact data2d1[:, 3] --> roughly(ml_data_2d1[:, 3])  # lege
-        @fact data2d1[:, 4] --> roughly(ml_data_2d1[:, 4])  # N
-        @fact data2d1[:, 5] --> roughly(ml_data_2d1[:, 5])  # W
-        @fact data2d1[:, 6] --> roughly(ml_data_2d1[:, 6])  # H
+        @test isapprox(data2d1[:, 1],ml_data_2d1[:, 1])  # trap
+        @test isapprox(data2d1[:, 2], ml_data_2d1[:, 2])  # simp
+        @test isapprox(data2d1[:, 3], ml_data_2d1[:, 3])  # lege
+        @test isapprox(data2d1[:, 4], ml_data_2d1[:, 4])  # N
+        @test isapprox(data2d1[:, 5], ml_data_2d1[:, 5])  # W
+        @test isapprox(data2d1[:, 6], ml_data_2d1[:, 6])  # H
     end
 
 
-end  # facts
-
-end  # module
-
-
-
+end  # @testset
