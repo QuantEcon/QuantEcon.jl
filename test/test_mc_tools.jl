@@ -26,7 +26,7 @@ function kmr_markov_matrix_sequential{T<:Real}(n::Integer, p::T, ε::T)
 end
 
 @testset "Testing mc_tools.jl" begin
-        
+
     # these matrices come from RMT4 section 2.2.1
     mc1 = [1 0 0; .2 .5 .3; 0 0 1]
     mc2 = [.7 .3 0; 0 .5 .5; 0 .9 .1]
@@ -83,7 +83,7 @@ end
     mc9 = kmr_markov_matrix_sequential(3, 1/3, 1e-14)
 
     tol = 1e-15
-    
+
     @testset "test mc_compute_stationary using exact solutions" begin
         @test mc_compute_stationary(mc1) == eye(3)[:, [1, 3]]
         @test isapprox(mc_compute_stationary(mc2), [0, 9/14, 5/14])
@@ -135,4 +135,33 @@ end
             # @test is_aperiodic(fig) == true
         end
     end
-end  # @testset
+
+    @testset "test simulate shape" begin
+        mc = mc3
+        ts_length = 10
+        init = [1, 2]
+        nums_reps = [3, 1]
+
+        @test size(simulate(mc, ts_length)) == (ts_length,)
+        @test size(simulate(mc, ts_length, init)) ==
+            (ts_length, length(init))
+        num_reps = nums_reps[1]
+        @test size(simulate(mc, ts_length, init, num_reps=num_reps)) ==
+            (ts_length, length(init)*num_reps)
+        for num_reps in nums_reps
+            @test size(simulate(mc, ts_length, num_reps=num_reps)) ==
+                (ts_length, num_reps)
+        end
+    end  # testset
+
+    @testset "test simulate init array" begin
+        mc = mc3
+        ts_length = 10
+        init = [1, 2]
+        num_reps = 3
+
+        X = simulate(mc, ts_length, init, num_reps=num_reps)
+        @test vec(X[1, :]) == repmat(init, num_reps)
+    end  # testset
+
+end  # testset
