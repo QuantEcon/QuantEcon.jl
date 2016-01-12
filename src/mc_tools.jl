@@ -306,19 +306,24 @@ The sample path from the `j`-th repetition of the simulation with initial state
 - `mc::MarkovChain` : MarkovChain instance.
 - `ts_length::Int` : Length of each simulation.
 - `init::Vector{Int}` : Vector containing initial states.
-- `;num_reps::Int(1)` : Number of repetitions of simulation.
+- `;num_reps::Union{Int, Void}(nothing)` : Number of repetitions of simulation.
 
 ##### Returns
 
 - `X::Array{Int}` : Array containing the sample paths as columns, of shape
-(ts_length, k), where k = length(init)*num_reps.
+(ts_length, k), where k = length(init) if num_reps=nothing, and k =
+length(init)*num_reps otherwise.
 
 """
 function simulate(mc::MarkovChain,
                   ts_length::Int,
                   init::Vector{Int};
-                  num_reps::Int=1)
-    k = length(init) * num_reps
+                  num_reps::Union{Int, Void}=nothing)
+    k = length(init)
+    if num_reps == nothing
+        num_reps = 1
+    end
+    k *= num_reps
     X = Array(Int, ts_length, k)
     X[1, :] = repmat(init, num_reps)
 
