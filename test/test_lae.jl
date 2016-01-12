@@ -1,16 +1,3 @@
-
-module TestLaeModule
-
-using QuantEcon
-
-if VERSION >= v"0.5-"
-    using Base.Test
-else
-    using BaseTestNext
-    const Test = BaseTestNext
-end
-using Distributions
-
 @testset "Testing lae.jl" begin
         
     # copied from the lae lecture
@@ -52,6 +39,3 @@ using Distributions
         @test size(lae_est(l, y)) == (n_y, )
     end
 end  # @testset
-
-end # module
-

@@ -1,23 +1,11 @@
-module TestDiscreteRv
-
-using QuantEcon
-using DataStructures
-if VERSION >= v"0.5-"
-    using Base.Test
-else
-    using BaseTestNext
-    const Test = BaseTestNext
-end
-
-# set up
-srand(42)
-n = 10
-x = rand(n)
-x ./= sum(x)
-drv = DiscreteRV(x)
-
-
 @testset "Testing discrete_rv.jl" begin
+    
+    # set up
+    n = 10
+    x = rand(n)
+    x ./= sum(x)
+    drv = DiscreteRV(x)
+
     # test Q sums to 1
     @test drv.Q[end] ≈ 1.0
 
@@ -33,5 +21,3 @@ drv = DiscreteRV(x)
     @test isapprox(Base.maxabs(counts - drv.q), 0.0; atol=1e-2)
 
 end  # testset
-
-end #module

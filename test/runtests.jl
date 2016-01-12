@@ -1,5 +1,7 @@
 using Compat  # for startswith
 using QuantEcon
+using DataStructures: counter
+using Distributions: LogNormal, pdf
 
 if VERSION >= v"0.5-"
     using Base.Test
