@@ -16,10 +16,7 @@ Notes
 2. This does not currently support state-action pair formulation, or sparse matrices
 
 =#
-
-#### DELETE IMPORT BELOW
 import Base.*
-import QuantEcon.MarkovChain
 
 #-----------------#
 #-Data Structures-#
@@ -39,27 +36,19 @@ DiscreteDP type for specifying paramters for discrete dynamic programming model
 - `ddp::DiscreteDP` : DiscreteDP object
 
 """
-
-abstract AbstractDiscreteDP
-
-type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real} <: AbstractDiscreteDP
+type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real}
     R::Array{T,NR}  #-Reward Array-#
     Q::Array{T,NQ}  #-Transition Probability Array-#
     beta::Tbeta     #-Discount Factor-#
 
     function DiscreteDP(R::Array, Q::Array, beta::Real)
-        # verify input integrity 1
-        NQ != 3 && throw(ArgumentError("Q must be 3-dimensional without s-a formulation"))
-        NR != 2 && throw(ArgumentError("R must be 2-dimensional without s-a formulation"))
+        # verify input integrity
+        !(NQ in [2, 3]) && throw(ArgumentError("Q must be 2- or 3-dimensional"))
+        !(NR in [1, 2]) && throw(ArgumentError("R must be 1- or 2-dimensional"))
         beta < 0 || beta >= 1 &&  throw(ArgumentError("beta must be [0, 1)"))
-        # verify input integrity 2
-        num_states, num_actions = size(R)
-        (size(Q) != (num_states,num_actions,num_states)) && throw(ArgumentError("shapes of R and Q must be (n,m) and (n,m,n)"))
-
-        # UNNECESSARY: num_sa_pairs = sum(R.> -Inf)
 
         # check feasibility
-        R_max = _s_wise_max(R)
+        R_max = s_wise_max(R)
         if any(R_max .== -Inf)
             # First state index such that all actions yield -Inf
             s = find(R_max .== -Inf) #-Only Gives True
@@ -71,69 +60,12 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real} <: AbstractDiscreteDP
     end
 end
 
-type DiscreteDP_sa{T<:Real,NQ,NR,Tbeta<:Real,Tind<:Integer} <: AbstractDiscreteDP
-    R::Array{T,NR}             #-Reward Array-#
-    Q::Array{T,NQ}             #-Transition Probability Array-#
-    beta::Tbeta                #-Discount Factor-#
-    s_indices::Vector{Tind}    #-State Indices-#
-    a_indices::Vector{Tind}    #-Action Indices-#
-    a_indptr::Vector{Tind}     #-Action Index Pointers-#
-
-    function DiscreteDP_sa(R::Array, Q::Array, beta::Real, s_indices::Vector, a_indices::Vector)
-        # verify input integrity 1
-        NQ != 2 && throw(ArgumentError("Q must be 2-dimensional with s-a formulation"))
-        NR != 1 && throw(ArgumentError("R must be 1-dimensional with s-a formulation"))
-        beta < 0 || beta >= 1 &&  throw(ArgumentError("beta must be [0, 1)"))
-        # verify input integrity 2
-        num_sa_pairs, num_states = size(Q)
-        length(R) != num_sa_pairs && throw(ArgumentError("shapes of R and Q must be (L,) and (L,n)"))
-        ([length(s_indices); length(a_indices)] != fill(num_sa_pairs,2)) && throw(ArgumentError("length of s_indices and a_indices must be equal to the number of s-a pairs"))
-
-        # UNNECESSARY: num_actions = maximum(a_indices)
-
-        if _has_sorted_sa_indices(s_indices,a_indices)
-          a_indptr = Array(Int64, num_states+1)
-          _generate_a_indptr!(num_states, s_indices, a_indptr)
-        else
-          # TODO: checked this part in a few instances, but needs more thorough testing
-          # transpose matrix to use Julia's CSC; now rows are actions and columns are states (this is why it's called as_ptr instead of sa_ptr)
-          as_ptr = sparse(a_indices, s_indices, collect(1:num_sa_pairs))
-          a_indices = as_ptr.rowval
-          a_indptr = as_ptr.colptr
-
-          R = R[as_ptr.nzval]
-          Q = Q[as_ptr.nzval,:]
-
-          _s_indices = Array(eltype(a_indices),num_sa_pairs)
-          for i in 1:num_states, j in a_indptr[i]:(a_indptr[i+1]-1)
-            _s_indices[j] = i
-          end
-          copy!(s_indices,_s_indices)
-        end
-
-        # check feasibility
-        diff = a_indptr[2:end]-a_indptr[1:end-1]
-        if any(diff .== 0.0)
-            # First state index such that no action is available
-            s = find(diff .== 0.0) #-Only Gives True
-            throw(ArgumentError("for every state at least one action
-                must be available: violated for state $s"))
-        end
-
-        new(R, Q, beta, s_indices, a_indices, a_indptr)
-    end
-end
-
 # necessary for dispatch to fill in type parameters {T,NQ,NR,Tbeta}
 DiscreteDP{T,NQ,NR,Tbeta}(R::Array{T,NR}, Q::Array{T,NQ}, beta::Tbeta) =
     DiscreteDP{T,NQ,NR,Tbeta}(R, Q, beta)
 
-DiscreteDP{T,NQ,NR,Tbeta,Tind}(R::Array{T,NR}, Q::Array{T,NQ}, beta::Tbeta, s_indices::Vector{Tind}, a_indices::Vector{Tind}) =
-        DiscreteDP_sa{T,NQ,NR,Tbeta,Tind}(R, Q, beta, s_indices, a_indices)
-
 #~Property Functions~#
 num_states(ddp::DiscreteDP) = size(ddp.R, 1)
-num_states(ddp::DiscreteDP_sa) = size(ddp.Q, 2)
 num_actions(ddp::DiscreteDP) = size(ddp.R, 2)
 
 abstract DDPAlgorithm
@@ -162,7 +94,7 @@ type DPSolveResult{Algo<:DDPAlgorithm,Tval<:Real}
     mc::MarkovChain
 
     function DPSolveResult(ddp::DiscreteDP)
-        v = _s_wise_max(ddp.R)                         #Initialise v with v_init
+        v = s_wise_max(ddp.R)                         #Initialise v with v_init
         ddpr = new(v, similar(v), 0, similar(v, Int))
 
         # fill in sigma with proper values
@@ -181,7 +113,7 @@ type DPSolveResult{Algo<:DDPAlgorithm,Tval<:Real}
 end
 
 # ------------------------ #
-# Bellman operator methods #
+# Bellman opertaor methods #
 # ------------------------ #
 
 """
@@ -190,7 +122,7 @@ for a value function v.
 
 ##### Parameters
 
-- `ddp::AbstractDisreteDP` : Object that contains the model parameters
+- `ddp::DisreteDP` : Object that contains the model parameters
 - `v::Vector{T<:AbstractFloat}`: The current guess of the value function
 - `Tv::Vector{T<:AbstractFloat}`: A buffer array to hold the updated value
   function. Initial value not used and will be overwritten
@@ -202,9 +134,9 @@ for a value function v.
 - `Tv::Vector` : Updated value function vector
 - `sigma::Vector` : Updated policiy function vector
 """
-function bellman_operator!(ddp::AbstractDiscreteDP, v::Vector, Tv::Vector, sigma::Vector)
+function bellman_operator!(ddp::DiscreteDP, v::Vector, Tv::Vector, sigma::Vector)
     vals = ddp.R + ddp.beta * ddp.Q * v
-    s_wise_max!(ddp, vals, Tv, sigma)
+    s_wise_max!(vals, Tv, sigma)
     Tv, sigma
 end
 
@@ -264,7 +196,7 @@ for a given value function v.
 - `Tv::Vector` : Updated value function vector
 """
 bellman_operator(ddp::DiscreteDP, v::Vector) =
-    _s_wise_max(ddp.R + ddp.beta * ddp.Q * v)
+    s_wise_max(ddp.R + ddp.beta * ddp.Q * v)
 
 # ---------------------- #
 # Compute greedy methods #
@@ -404,7 +336,7 @@ the transition probability matrix `Q_sigma`.
 
 ##### Parameters
 
-- `ddp::DisreteDP or DiscreteDP_sa` : Object that contains the model parameters
+- `ddp::DisreteDP` : Object that contains the model parameters
 - `sigma::Vector{Int}`: policy rule vector
 
 ##### Returns
@@ -423,33 +355,21 @@ function RQ_sigma{T<:Integer}(ddp::DiscreteDP, sigma::Array{T})
     return R_sigma, Q_sigma'
 end
 
-# TODO: express it in a similar way as above to exploit Julia's column major order
-function RQ_sigma{T<:Integer}(ddp::DiscreteDP_sa, sigma::Array{T})
-    sigma_indices = Array(T, num_states(ddp))
-    _find_indices!(ddp.a_indices, ddp.a_indptr, sigma, sigma_indices)
-    R_sigma = R[sigma_indices]
-    Q_sigma = Q[sigma_indices, :]
-    return R_sigma, Q_sigma
-end
-
 # ---------------- #
 # Internal methods #
 # ---------------- #
-
-s_wise_max!(ddp::DiscreteDP, vals::Matrix, out::Vector, out_argmax::Vector) = _s_wise_max!(vals, out, out_argmax)
-s_wise_max!(ddp::DiscreteDP_sa, vals::Vector, out::Vector, out_argmax::Vector) = _s_wise_max!(ddp.a_indices, ddp.a_indptr, vals, out, out_argmax)
 
 """
 Return the `Vector` `max_a vals(s, a)`,  where `vals` is represented as a
 `Matrix` of size `(num_states, num_actions)`.
 """
-_s_wise_max(vals::Matrix) = vec(maximum(vals, 2))
+s_wise_max(vals::Matrix) = vec(maximum(vals, 2))
 
 """
 Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
 `Matrix` of size `(num_states, num_actions)`.
 """
-_s_wise_max!(vals::Matrix, out::Vector) = maximum!(out, vals)
+s_wise_max!(vals::Matrix, out::Vector) = maximum!(out, vals)
 
 """
 Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
@@ -458,114 +378,8 @@ Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
 Also fills `out_argmax` with the linear index associated with the indmax in each
 row
 """
-_s_wise_max!(vals::Matrix, out::Vector, out_argmax::Vector) =
+s_wise_max!(vals::Matrix, out::Vector, out_argmax) =
     Base.findminmax!(Base.MoreFun(), fill!(out, -Inf) , out_argmax, vals)
-
-"""
-Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
-`Vector` of size `(num_sa_pairs,)`.
-"""
-# TODO: checked the following 2 methods in a few instances, but needs more thorough testing
-function _s_wise_max!(a_indices::Vector, a_indptr::Vector, vals::Vector, out::Vector)
-  n = length(out)
-  for i in 1:n
-    if a_indptr[i] != a_indptr[i+1]
-      m = a_indptr[i]
-      for j in a_indptr[i]+1:(a_indptr[i+1]-1)
-        if vals[j] > vals[m]
-          m = j
-        end
-      end
-      out[i] = vals[m]
-    end
-  end
-end
-
-"""
-Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
-`Vector` of size `(num_sa_pairs,)`.
-
-Also fills `out_argmax` with the linear index associated with the indmax in each
-row
-"""
-function _s_wise_max!(a_indices::Vector, a_indptr::Vector, vals::Vector, out::Vector, out_argmax::Vector)
-  n = length(out)
-  for i in 1:n
-    if a_indptr[i] != a_indptr[i+1]
-      m = a_indptr[i]
-      for j in a_indptr[i]+1:(a_indptr[i+1]-1)
-        if vals[j] > vals[m]
-          m = j
-        end
-      end
-      out[i] = vals[m]
-      out_argmax[i] = a_indices[m]
-    end
-  end
-end
-
-"""
-Check whether `s_indices` and `a_indices` are sorted in lexicographic order.
-
-Parameters
-----------
-s_indices, a_indices : Vectors
-
-Returns
--------
-bool: Whether `s_indices` and `a_indices` are sorted.
-"""
-function _has_sorted_sa_indices(s_indices::Vector, a_indices::Vector)
-  L = length(s_indices)
-  ev = NaN
-  for i in 1:L-1
-    ((s_indices[i] == s_indices[i+1]) && (a_indices[i] == a_indices[i+1])) && throw(ArgumentError("duplicate state-action pair"))
-    if s_indices[i] > s_indices[i+1]
-      ev = false
-      break
-    end
-    if (s_indices[i] == s_indices[i+1]) && (a_indices[i] > a_indices[i+1])
-      ev =  false
-      break
-    end
-    ev =  true
-  end
-  ev
-end
-
-"""
-Generate `a_indptr`; stored in `out`. `s_indices` is assumed to be
-in sorted order.
-
-Parameters
-----------
-num_states : Int
-
-s_indices : Vector{Int}
-
-out : Vector{Int} with length = num_states+1
-"""
-function _generate_a_indptr!(num_states::Int, s_indices::Vector, out::Vector)
-  idx = 1
-  out[1] = 1
-  for s in 1:num_states-1
-    while(s_indices[idx] == s)
-      idx += 1
-    end
-    out[s+1] = idx
-  end
-  out[num_states+1] = length(s_indices)+1 # need this +1 to be consistent with Julia's sparse pointers: colptr[i]:(colptr[i+1]-1)
-  out
-end
-
-function _find_indices!(a_indices::Vector, a_indptr::Vector, sigma::Vector, out::Vector)
-  n = length(sigma)
-  for i in 1:n, j in a_indptr[i]:(a_indptr[i+1]-1)
-    if sigma[i] == a_indices[j]
-      out[i] = j
-    end
-  end
-end
 
 #=
 Define Matrix Multiplication between 3-dimensional matrix and a vector
