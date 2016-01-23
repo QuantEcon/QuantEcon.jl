@@ -2,8 +2,9 @@
 Discrete Decision Processes
 
 @author : Daisuke Oyama, Spencer Lyon, Matthew McKay
+@contributor: Alberto Polo
 
-@date: 24/Sep/2015
+@date: 23/Jan/2016
 
 References
 ----------
@@ -12,14 +13,12 @@ http://quant-econ.net/jl/ddp.html
 
 Notes
 -----
-1. This currently implements ... Value Iteration, Policy Iteration, Modified Policy Iteration
-2. This does not currently support state-action pair formulation, or sparse matrices
+1. This currently implements ... Value Iteration, Policy Iteration, Modified Policy Iteration, also with state-action pair formulation
+2. This does not currently support sparse matrices
 
 =#
 
-#### DELETE IMPORT BELOW
 import Base.*
-import QuantEcon.MarkovChain
 
 #-----------------#
 #-Data Structures-#
@@ -56,8 +55,6 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real} <: AbstractDiscreteDP{T}
         num_states, num_actions = size(R)
         (size(Q) != (num_states,num_actions,num_states)) && throw(ArgumentError("shapes of R and Q must be (n,m) and (n,m,n)"))
 
-        # UNNECESSARY: num_sa_pairs = sum(R.> -Inf)
-
         # check feasibility
         R_max = _s_wise_max(R)
         if any(R_max .== -Inf)
@@ -89,13 +86,10 @@ type DiscreteDP_sa{T<:Real,NQ,NR,Tbeta<:Real,Tind<:Integer} <: AbstractDiscreteD
         length(R) != num_sa_pairs && throw(ArgumentError("shapes of R and Q must be (L,) and (L,n)"))
         ([length(s_indices); length(a_indices)] != fill(num_sa_pairs,2)) && throw(ArgumentError("length of s_indices and a_indices must be equal to the number of s-a pairs"))
 
-        # UNNECESSARY: num_actions = maximum(a_indices)
-
         if _has_sorted_sa_indices(s_indices,a_indices)
           a_indptr = Array(Int64, num_states+1)
           _generate_a_indptr!(num_states, s_indices, a_indptr)
         else
-          # TODO: checked this part in a few instances, but needs more thorough testing
           # transpose matrix to use Julia's CSC; now rows are actions and columns are states (this is why it's called as_ptr instead of sa_ptr)
           as_ptr = sparse(a_indices, s_indices, collect(1:num_sa_pairs))
           a_indices = as_ptr.rowval
@@ -468,7 +462,6 @@ _s_wise_max!(vals::Matrix, out::Vector, out_argmax::Vector) =
 Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
 `Vector` of size `(num_sa_pairs,)`.
 """
-# TODO: checked the following 2 methods in a few instances, but needs more thorough testing
 function _s_wise_max!(a_indices::Vector, a_indptr::Vector, vals::Vector, out::Vector)
   n = length(out)
   for i in 1:n
