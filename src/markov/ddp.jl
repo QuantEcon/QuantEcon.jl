@@ -2,9 +2,8 @@
 Discrete Decision Processes
 
 @author : Daisuke Oyama, Spencer Lyon, Matthew McKay
-@contributor: Alberto Polo
 
-@date: 23/Jan/2016
+@date: 24/Sep/2015
 
 References
 ----------
