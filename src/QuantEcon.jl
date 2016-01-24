@@ -109,7 +109,12 @@ export
 # ddp
     DiscreteDP, VFI, PFI, MPFI, solve, RQ_sigma,
     evaluate_policy, bellman_operator, compute_greedy,
-    evaluate_policy!, bellman_operator!, compute_greedy!
+    evaluate_policy!, bellman_operator!, compute_greedy!,
+
+# game_theory/normal_form_game
+    Player, best_response, best_responses, is_best_response, payoff_vector,
+    NormalFormGame, is_nash,
+    pure2mixed
 
 include("util.jl")
 ##### includes
@@ -121,6 +126,7 @@ include("markov/ddp.jl")
 include("discrete_rv.jl")
 include("ecdf.jl")
 include("estspec.jl")
+include("game_theory/normal_form_game.jl")
 include("kalman.jl")
 include("lae.jl")
 include("lqcontrol.jl")

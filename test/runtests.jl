@@ -27,7 +27,8 @@ tests = [
         "quadsum",
         "random_mc",
         "robustlq",
-        "ddp"]
+        "ddp",
+        "normal_form_game"]
 
 
 if length(ARGS) > 0
