@@ -57,8 +57,15 @@ end
 
 Player{N,T<:Real}(payoff_array::Array{T,N}) = Player{N,T}(payoff_array)
 
+Base.summary(player::Player) =
+    string(Base.dims2string(size(player.payoff_array)),
+           " ",
+           split(string(typeof(player)), ".")[end])
+
 function Base.show(io::IO, player::Player)
-    print(io, "Player in a $(player.num_opponents+1)-player normal form game")
+    print(io, summary(player))
+    println(io, ":")
+    Base.showarray(io, player.payoff_array, header=false)
 end
 
 # payoff_vector
@@ -437,8 +444,13 @@ function NormalFormGame{T<:Real}(payoffs::Matrix{T})
     end
 end
 
+Base.summary(g::NormalFormGame) =
+    string(Base.dims2string(g.nums_actions),
+           " ",
+           split(string(typeof(g)), ".")[end])
+
 function Base.show(io::IO, g::NormalFormGame)
-    print(io, "$(g.N)-player NormalFormGame")
+    print(io, summary(g))
 end
 
 function Base.getindex{N,T}(g::NormalFormGame{N,T},
