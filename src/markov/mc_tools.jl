@@ -36,6 +36,7 @@ Steady State Distributions for Markov Chains, " Operations Research (1985),
 University Press, 2009.
 
 """
+@inline check_stochastic_matrix(P) = maxabs(sum(P, 2) - 1) < 1e-15 ? true : false
 
 """
 Finite-state discrete-time Markov chain.
@@ -49,18 +50,19 @@ transitions.
 - `p::Matrix` The transition matrix. Must be square, all elements must be
 positive, and all rows must sum to unity
 """
-type MarkovChain{T<:Real}
-    p::Matrix{T} # valid stochastic matrix
+type MarkovChain{T, TM<:AbstractMatrix}
+    p::TM # valid stochastic matrix
 
-
-    function MarkovChain(p::Matrix)
+    function MarkovChain(p::AbstractMatrix)
         n, m = size(p)
 
-        if n != m
+        if eltype(p) != T
+            throw(ArgumentError("Types must be consistent with given matrix"))
+        elseif n != m
             throw(ArgumentError("stochastic matrix must be square"))
         elseif any(p.<0)
             throw(ArgumentError("stochastic matrix must have nonnegative elements"))
-        elseif any(x->!isapprox(sum(x), 1), [p[i, :] for i = 1:n])
+        elseif !check_stochastic_matrix(p)
             throw(ArgumentError("stochastic matrix rows must sum to 1"))
         end
 
@@ -69,7 +71,7 @@ type MarkovChain{T<:Real}
 end
 
 # Provide constructor that infers T from eltype of matrix
-MarkovChain{T<:Real}(p::Matrix{T}) = MarkovChain{T}(p)
+MarkovChain(p::AbstractMatrix) = MarkovChain{eltype(p), typeof(p)}(p)
 
 "Number of states in the markov chain `mc`"
 n_states(mc::MarkovChain) = size(mc.p, 1)
@@ -82,10 +84,10 @@ end
 
 # solve x(P-I)=0 by eigen decomposition
 "$(____solver_docs)"
-function eigen_solve{T}(p::Matrix{T})
-    ef = eigfact(p')
-    isunit = map(x->isapprox(x, 1), ef.values)
-    x = real(ef.vectors[:, isunit])
+function eigen_solve{T}(p::AbstractMatrix{T})
+    vals, vecs = eigs(p')
+    isunit = map(x->isapprox(x, 1), vals)
+    x = real(vecs[:, isunit])
     x ./= sum(x, 1) # normalisation
     for i = 1:length(x)
         x[i] = isapprox(x[i], zero(T)) ? zero(T) : x[i]
@@ -96,7 +98,7 @@ end
 
 # solve x(P-I)=0 by lu decomposition
 "$(____solver_docs)"
-function lu_solve{T}(p::Matrix{T})
+function lu_solve{T}(p::AbstractMatrix{T})
     n, m = size(p)
     x   = vcat(Array(T, n-1), one(T))
     u   = lufact(p' - one(p))[:U]
@@ -112,10 +114,10 @@ function lu_solve{T}(p::Matrix{T})
 end
 
 "$(____solver_docs)"
-gth_solve{T<:Integer}(a::Matrix{T}) = gth_solve(convert(Array{Rational, 2}, a))
+gth_solve{T<:Integer}(a::AbstractMatrix{T}) = gth_solve(convert(AbstractArray{Rational, 2}, a))
 
 # solve x(P-I)=0 by the GTH method
-function gth_solve{T<:Real}(original::Matrix{T})
+function gth_solve{T<:Real}(original::AbstractMatrix{T})
     a = copy(original)
     n = size(a, 1)
     x = zeros(T, n)
