@@ -29,13 +29,13 @@ vector of probabilities given by q.
 - `Q::Vector{T<:Real}`: The cumulative sum of q
 """
 type DiscreteRV{T<:Real}
-    q::Vector{T}
-    Q::Vector{T}
-    DiscreteRV(x::Vector{T}) = new(x, cumsum(x))
+    q::AbstractVector{T}
+    Q::AbstractVector{T}
+    DiscreteRV(x::AbstractVector{T}) = new(x, cumsum(x))
 end
 
 # outer constructor so people don't have to put {T} themselves
-DiscreteRV{T<:Real}(x::Vector{T}) = DiscreteRV{T}(x)
+DiscreteRV{T<:Real}(x::AbstractVector{T}) = DiscreteRV{T}(x)
 
 """
 Make a single draw from the discrete distribution
