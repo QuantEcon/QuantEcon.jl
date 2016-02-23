@@ -252,7 +252,7 @@ function _compute_sequence{T}(lq::LQ, x0::T, policies)
 
     x_path[1] = x0
     u_path[1] = -(first(policies)*x0)
-    w_path    = lq.C * randn(capT+1)
+    w_path = lq.C * randn(capT+1)
 
     for t = 2:capT
         f = policies[t]

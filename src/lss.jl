@@ -63,9 +63,9 @@ function LSS(A::ScalarOrArray, C::ScalarOrArray, G::ScalarOrArray,
     m = size(C, 2)
 
     # coerce shapes
-    A = reshape([A], n, n)
-    C = reshape([C], n, m)
-    G = reshape([G], k, n)
+    A = reshape(vcat(A), n, n)
+    C = reshape(vcat(C), n, m)
+    G = reshape(vcat(G), k, n)
 
     mu_0 = reshape([mu_0;], n)
 
