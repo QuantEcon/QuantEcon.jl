@@ -164,4 +164,8 @@ end
         @test vec(X[1, :]) == repmat(init, num_reps)
     end  # testset
 
+    @testset "Sparse Matrix " begin
+
+    end
+
 end  # testset
