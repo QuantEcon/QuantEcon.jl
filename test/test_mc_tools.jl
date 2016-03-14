@@ -137,35 +137,61 @@ end
     end
 
     @testset "test simulate shape" begin
-        mc = mc3
-        ts_length = 10
-        init = [1, 2]
-        nums_reps = [3, 1]
 
-        @test size(simulate(mc, ts_length)) == (ts_length,)
-        @test size(simulate(mc, ts_length, init)) ==
-            (ts_length, length(init))
-        num_reps = nums_reps[1]
-        @test size(simulate(mc, ts_length, init, num_reps=num_reps)) ==
-            (ts_length, length(init)*num_reps)
-        for num_reps in nums_reps
+        for mc in (mc3, MarkovChain(sparse(mc3.p)))
+            ts_length = 10
+            init = [1, 2]
+            nums_reps = [3, 1]
+
+            @test size(simulate(mc, ts_length)) == (ts_length,)
+            @test size(simulate(mc, ts_length, init)) ==
+                (ts_length, length(init))
+            num_reps = nums_reps[1]
+            @test size(simulate(mc, ts_length, init, num_reps=num_reps)) ==
+                (ts_length, length(init)*num_reps)
+            for num_reps in nums_reps
             @test size(simulate(mc, ts_length, num_reps=num_reps)) ==
-                (ts_length, num_reps)
+                    (ts_length, num_reps)
+            end
         end
     end  # testset
 
     @testset "test simulate init array" begin
-        mc = mc3
-        ts_length = 10
-        init = [1, 2]
-        num_reps = 3
+        for mc in (mc3, MarkovChain(sparse(mc3.p)))
+            mc = mc3
+            ts_length = 10
+            init = [1, 2]
+            num_reps = 3
 
-        X = simulate(mc, ts_length, init, num_reps=num_reps)
-        @test vec(X[1, :]) == repmat(init, num_reps)
+            X = simulate(mc, ts_length, init, num_reps=num_reps)
+            @test vec(X[1, :]) == repmat(init, num_reps)
+        end
     end  # testset
 
-    @testset "Sparse Matrix " begin
+    @testset "Sparse Matrix" begin
+        # use fig1_p from above because we already checked the graph theory
+        # algorithms for this stochastic matrix.
+        p = fig1_p
+        p_s = sparse(p)
 
+        @testset "constructors" begin
+            mc_s = MarkovChain(p_s)
+            @test isa(mc_s, MarkovChain{eltype(p), typeof(p_s)})
+        end
+
+        mc_s = MarkovChain(p_s)
+        mc = MarkovChain(p)
+
+        @testset "basic correspondence with dense version" begin
+            @test n_states(mc) == n_states(mc_s)
+            @test maxabs(mc.p - mc_s.p) == 0.0
+            @test recurrent_classes(mc) == recurrent_classes(mc_s)
+            @test communication_classes(mc) == communication_classes(mc_s)
+            @test is_irreducible(mc) == is_irreducible(mc_s)
+            @test is_aperiodic(mc) == is_aperiodic(mc_s)
+            @test period(mc) == period(mc_s)
+            @test maxabs(gth_solve(mc_s.p) - gth_solve(mc.p)) < 1e-15
+        end
     end
 
 end  # testset
