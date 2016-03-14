@@ -28,14 +28,14 @@ vector of probabilities given by q.
 - `q::Vector{T<:Real}`: A vector of non-negative probabilities that sum to 1
 - `Q::Vector{T<:Real}`: The cumulative sum of q
 """
-type DiscreteRV{T<:Real}
-    q::AbstractVector{T}
-    Q::AbstractVector{T}
-    DiscreteRV(x::AbstractVector{T}) = new(x, cumsum(x))
+type DiscreteRV{TV<:AbstractVector}
+    q::TV
+    Q::TV
+    DiscreteRV(x) = new(x, cumsum(x))
 end
 
 # outer constructor so people don't have to put {T} themselves
-DiscreteRV{T<:Real}(x::AbstractVector{T}) = DiscreteRV{T}(x)
+DiscreteRV{TV<:AbstractVector}(x::TV) = DiscreteRV{TV}(x)
 
 """
 Make a single draw from the discrete distribution
@@ -63,4 +63,4 @@ Make multiple draws from the discrete distribution represented by a
 
 - `out::Vector{Int}`: `k` draws from `d`
 """
-draw{T}(d::DiscreteRV{T}, k::Int) = Int[draw(d) for i=1:k]
+draw(d::DiscreteRV, k::Int) = Int[draw(d) for i=1:k]

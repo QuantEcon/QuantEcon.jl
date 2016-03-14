@@ -34,10 +34,6 @@ if length(ARGS) > 0
     tests = ARGS
 end
 
-# n = min(8, CPU_CORES, length(tests))
-# n > 1 && addprocs(n)
-
-
 srand(42)
 include("util.jl")
 
