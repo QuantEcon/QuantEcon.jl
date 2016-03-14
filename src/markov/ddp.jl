@@ -66,7 +66,7 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
             msg = "R must be 2-dimensional without s-a formulation"
             throw(ArgumentError(msg))
         end
-        beta < 0 || beta >= 1 &&  throw(ArgumentError("beta must be [0, 1)"))
+        (beta < 0 || beta >= 1) &&  throw(ArgumentError("beta must be [0, 1)"))
 
         # verify input integrity 2
         num_states, num_actions = size(R)
@@ -102,7 +102,7 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
         if NR != 1
             throw(ArgumentError("R must be 1-dimensional with s-a formulation"))
         end
-        beta < 0 || beta >= 1 && throw(ArgumentError("beta must be [0, 1)"))
+        (beta < 0 || beta >= 1) && throw(ArgumentError("beta must be [0, 1)"))
 
         # verify input integrity (same length)
         num_sa_pairs, num_states = size(Q)
@@ -128,7 +128,7 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
             n = maximum(s_indices)
             msg = "Duplicate s-a pair found"
             as_ptr = sparse(a_indices, s_indices, 1:num_sa_pairs, m, n,
-                            (x,y)->error(msg))
+                            (x,y)->throw(ArgumentError(msg)))
             a_indices = as_ptr.rowval
             a_indptr = as_ptr.colptr
 
@@ -541,8 +541,8 @@ s_wise_max!(vals::AbstractMatrix, out::Vector) = (println("calling this one! ");
 Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
 `AbstractMatrix` of size `(num_states, num_actions)`.
 
-Also fills `out_argmax` with the linear index associated with the indmax in each
-row
+Also fills `out_argmax` with the column number associated with the indmax in
+each row
 """
 function s_wise_max!(vals::AbstractMatrix, out::Vector, out_argmax::Vector)
     # naive implementation where I just iterate over the rows
@@ -562,11 +562,6 @@ function s_wise_max!(vals::AbstractMatrix, out::Vector, out_argmax::Vector)
         end
 
     end
-    # HACK: convert to linear index for intermediate testing
-    # sv = size(vals)
-    # for (i, c) in enumerate(out_argmax)
-    #     out_argmax[i] = sub2ind(sv, i, c)
-    # end
     out, out_argmax
 end
 
@@ -616,7 +611,6 @@ function s_wise_max!(a_indices::Vector, a_indptr::Vector, vals::Vector,
         if a_indptr[i] != a_indptr[i+1]
             m = a_indptr[i]
             for j in a_indptr[i]+1:(a_indptr[i+1]-1)
-                @show i, j, m, vals[j], vals[m]
                 if vals[j] > vals[m]
                     m = j
                 end
