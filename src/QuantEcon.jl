@@ -41,9 +41,11 @@ export
 
 # mc_tools
     MarkovChain,
-    mc_compute_stationary, mc_sample_path, mc_sample_path!,
+    mc_compute_stationary,
+    simulate, simulate!, simulate_values, simulate_values!,
+    simulation, value_simulation,
     period, is_irreducible, is_aperiodic, recurrent_classes,
-    communication_classes, simulate, n_states,
+    communication_classes, n_states,
 
 # gth_solve
     gth_solve,

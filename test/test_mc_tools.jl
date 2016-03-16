@@ -113,9 +113,17 @@ end
     end
 
     @testset "test MarkovChain throws errors" begin
-        @test_throws ArgumentError MarkovChain(rand(4, 5))  # not square
-        @test_throws ArgumentError MarkovChain([0.0 0.5; 0.2 0.8])  # first row doesn't sum to 1
-        @test_throws ArgumentError MarkovChain([-1 1; 0.2 0.8])  # negative element, but sums to 1
+        # not square
+        @test_throws DimensionMismatch MarkovChain(rand(4, 5))
+
+        # state_values to long
+        @test_throws DimensionMismatch MarkovChain([0.5 0.5; 0.2 0.8], rand(3))
+
+        # first row doesn't sum to 1
+        @test_throws ArgumentError MarkovChain([0.0 0.5; 0.2 0.8])
+
+        # negative element, but sums to 1
+        @test_throws ArgumentError MarkovChain([-1 1; 0.2 0.8])
     end
 
     @testset "test graph theoretic algorithms" begin
@@ -143,7 +151,7 @@ end
             init = [1, 2]
             nums_reps = [3, 1]
 
-            @test size(simulate(mc, ts_length)) == (ts_length,)
+            @test size(simulate(mc, ts_length)) == (ts_length,1)
             @test size(simulate(mc, ts_length, init)) ==
                 (ts_length, length(init))
             num_reps = nums_reps[1]
@@ -158,7 +166,6 @@ end
 
     @testset "test simulate init array" begin
         for mc in (mc3, MarkovChain(sparse(mc3.p)))
-            mc = mc3
             ts_length = 10
             init = [1, 2]
             num_reps = 3
@@ -193,5 +200,44 @@ end
             @test maxabs(gth_solve(mc_s.p) - gth_solve(mc.p)) < 1e-15
         end
     end
+
+    @testset "simulate_values" begin
+        for _mc in (mc3, MarkovChain(sparse(mc3.p)))
+            for T in [Float16, Float32, Float64, Int8, Int16, Int32, Int64]
+                mc = MarkovChain(_mc.p, rand(T, size(_mc.p, 1)))
+                ts_length = 10
+                init = [1, 2]
+                nums_reps = [3, 1]
+
+                @test size(@inferred(simulate_values(mc, ts_length))) == (ts_length,1)
+                @test size(@inferred(simulate_values(mc, ts_length, init))) ==
+                    (ts_length, length(init))
+                num_reps = nums_reps[1]
+                @test size(simulate(mc, ts_length, init, num_reps=num_reps)) ==
+                    (ts_length, length(init)*num_reps)
+                for num_reps in nums_reps
+                    @test size(simulate(mc, ts_length, num_reps=num_reps)) ==
+                        (ts_length, num_reps)
+                end
+            end  # state_values eltypes
+        end
+
+        @testset "test simulate_values init array" begin
+            for mc in (mc3, MarkovChain(sparse(mc3.p)))
+                ts_length = 10
+                init = [1, 2]
+                num_reps = 3
+
+                X = simulate(mc, ts_length, init, num_reps=num_reps)
+                @test vec(X[1, :]) == repmat(init, num_reps)
+            end
+        end  # testset
+    end
+
+    @testset "simulation and value_simulation" begin
+        @test size(@inferred(simulation(mc3, 10, 1))) == (10,)
+        @test size(@inferred(value_simulation(mc3, 10, 1))) == (10,)
+    end
+
 
 end  # testset
