@@ -34,8 +34,8 @@ should span
 
 ##### Returns
 
-- `y::Vector{Real}` : Nodes in the state space
-- `Π::Matrix{Real}` Matrix transition probabilities for Markov Process
+- `mc::MarkovChain{Float64}` : Markov chain holding the state values and
+transition matrix
 
 """
 function tauchen(N::Integer, ρ::Real, σ::Real, μ::Real=0.0, n_std::Integer=3)
@@ -75,7 +75,11 @@ function tauchen(N::Integer, ρ::Real, σ::Real, μ::Real=0.0, n_std::Integer=3)
 
     y .+= μ / (1 - ρ) # center process around its mean (wbar / (1 - rho))
 
-    return y, Π
+    # renormalize. In some test cases the rows sum to something that is 2e-15
+    # away from 1.0, which caused problems in the MarkovChain constructor
+    Π = Π./sum(Π, 2)
+
+    MarkovChain(Π, y)
 end
 
 
@@ -96,8 +100,8 @@ where ε_t ~ N (0, σ^2)
 
 ##### Returns
 
-- `y::Vector{Real}` : Nodes in the state space
-- `Θ::Matrix{Real}` Matrix transition probabilities for Markov Process
+- `mc::MarkovChain{Float64}` : Markov chain holding the state values and
+transition matrix
 
 """
 function rouwenhorst(N::Integer, ρ::Real, σ::Real, μ::Real=0.0)
@@ -107,14 +111,15 @@ function rouwenhorst(N::Integer, ρ::Real, σ::Real, μ::Real=0.0)
     ψ = sqrt(N-1) * σ_y
     m = μ / (1 - ρ)
 
-    return rouwenhorst(p, p, m, ψ, N)
+    state_values, p = _rouwenhorst(p, p, m, ψ, N)
+    MarkovChain(p, state_values)
 end
 
-function rouwenhorst(p::Real, q::Real, m::Real, Δ::Real, n::Integer)
+function _rouwenhorst(p::Real, q::Real, m::Real, Δ::Real, n::Integer)
     if n == 2
-        return Real[m-Δ, m+Δ], [p 1-p; 1-q q]
+        return [m-Δ, m+Δ],  [p 1-p; 1-q q]
     else
-        _, θ_nm1 = rouwenhorst(p, q, m, Δ, n-1)
+        _, θ_nm1 = _rouwenhorst(p, q, m, Δ, n-1)
         θN = p    *[θ_nm1 zeros(n-1, 1); zeros(1, n)] +
              (1-p)*[zeros(n-1, 1) θ_nm1; zeros(1, n)] +
              q    *[zeros(1, n); zeros(n-1, 1) θ_nm1] +

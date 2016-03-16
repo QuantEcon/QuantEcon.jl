@@ -5,26 +5,15 @@
 
     ρ, σ_u = rand(2)
     μ = 0.0
-    
-    for n=3:25
-        x, P = rouwenhorst(n, ρ, σ_u, μ)
 
-        @test size(P, 1) == size(P, 2)
-        @test ndims(x) == 1
-        @test ndims(P) == 2
-        @test isapprox(sum(P, 2), ones(n, 1); rough_kwargs...)
-        @test all(P .>= 0.0) == true
-        @test isapprox(sum(x) , 0.0; rough_kwargs...)
+    for n=3:25
+        mc = rouwenhorst(n, ρ, σ_u, μ)
+
+        @test isapprox(sum(mc.state_values) , 0.0; rough_kwargs...)
 
         for m=1:4
-            x, P = tauchen(n, ρ, σ_u, μ, m)
-
-            @test size(P, 1) == size(P, 2)
-            @test ndims(x) == 1
-            @test ndims(P) == 2
-            @test isapprox(sum(P, 2), ones(n, 1); rough_kwargs...)
-            @test all(P .>= 0.0) == true
-            @test isapprox(sum(x), 0.0; rough_kwargs...)
+            mc = tauchen(n, ρ, σ_u, μ, m)
+            @test isapprox(sum(mc.state_values), 0.0; rough_kwargs...)
         end
     end
 end  # @testset
