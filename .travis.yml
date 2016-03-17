@@ -3,6 +3,9 @@ sudo: false
 julia:
     - 0.4
     - nightly
+matrix:
+  allow_failures:
+    - julia: nightly    
 notifications:
     email: false
 script:
