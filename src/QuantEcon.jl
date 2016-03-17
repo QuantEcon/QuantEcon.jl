@@ -41,8 +41,11 @@ export
 
 # mc_tools
     MarkovChain,
-    mc_compute_stationary, mc_sample_path, mc_sample_path!,
-    period, is_irreducible, is_aperiodic, recurrent_classes, communication_classes, simulate,
+    mc_compute_stationary,
+    simulate, simulate!, simulate_values, simulate_values!,
+    simulation, value_simulation,
+    period, is_irreducible, is_aperiodic, recurrent_classes,
+    communication_classes, n_states,
 
 # gth_solve
     gth_solve,
@@ -115,9 +118,10 @@ include("util.jl")
 ##### includes
 include("arma.jl")
 include("compute_fp.jl")
-include("markov_approx.jl")
-include("mc_tools.jl")
+include("markov/markov_approx.jl")
+include("markov/mc_tools.jl")
 include("markov/ddp.jl")
+include("markov/random_mc.jl")
 include("discrete_rv.jl")
 include("ecdf.jl")
 include("estspec.jl")
@@ -130,6 +134,5 @@ include("matrix_eqn.jl")
 include("robustlq.jl")
 include("quad.jl")
 include("quadsums.jl")
-include("random_mc.jl")
 
 end # module
