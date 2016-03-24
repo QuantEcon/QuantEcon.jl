@@ -22,9 +22,8 @@ Documentation for the library: [quantecon.github.io/QuantEcon.jl/](http://quante
 
 ## Additional Links
 
-1. [Project Coordinators](http://quantecon.org/about/#people)
-2. [Lead Developers](http://quantecon.org/about/#people)
-3. [QuantEcon Course Website](http://quant-econ.net)
+1. [Developer Info](http://quantecon.org/get_involved.html)
+2. [QuantEcon Course Website](http://quant-econ.net)
 
 ### License
 
