@@ -1,4 +1,4 @@
-VERSION >= v"0.4.0-dev+6521" && __precompile__()
+__precompile__()
 
 module QuantEcon
 
@@ -84,8 +84,7 @@ export
     smooth, periodogram, ar_periodogram,
 
 # util
-    meshgrid,
-    linspace_range,
+    meshgrid, gridmake, gridmake!, ckron,
 
 # robustlq
     RBLQ,
@@ -99,7 +98,6 @@ export
     qnwlege, qnwcheb, qnwsimp, qnwtrap, qnwbeta, qnwgamma, qnwequi, qnwnorm,
     qnwunif, qnwlogn,
     quadrect,
-    gridmake,
     do_quad,
 
 # quadsums

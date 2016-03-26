@@ -30,21 +30,6 @@ x_unif_1, w_unif_1 = qnwunif(n, a, b)
 x_beta_1, w_beta_1 = qnwbeta(n, b, b+1)
 x_gamm_1, w_gamm_1 = qnwgamma(n, b)
 
-# 3-d nodes and weights
-x_cheb_3, w_cheb_3 = qnwcheb(n_3, a_3, b_3)
-x_equiN_3, w_equiN_3 = qnwequi(n_3, a_3, b_3, "N")
-x_equiW_3, w_equiW_3 = qnwequi(n_3, a_3, b_3, "W")
-x_equiH_3, w_equiH_3 = qnwequi(n_3, a_3, b_3, "H")
-# rng(42); x_equiR_3, w_equiR_3 = qnwequi(n_3, a_3, b_3, "R")
-x_lege_3, w_lege_3 = qnwlege(n_3, a_3, b_3)
-x_norm_3, w_norm_3 = qnwnorm(n_3, mu_3d, sigma2_3d)
-x_logn_3, w_logn_3 = qnwlogn(n_3, mu_3d, sigma2_3d)
-x_simp_3, w_simp_3 = qnwsimp(n_3, a_3, b_3)
-x_trap_3, w_trap_3 = qnwtrap(n_3, a_3, b_3)
-x_unif_3, w_unif_3 = qnwunif(n_3, a_3, b_3)
-x_beta_3, w_beta_3 = qnwbeta(n_3, b_3, b_3+1.0)
-x_gamm_3, w_gamm_3 = qnwgamma(n_3, b_3, ones(3))
-
 @testset "Testing quad.jl" begin
 
     @testset "Testing method resolution" begin
@@ -72,15 +57,13 @@ x_gamm_3, w_gamm_3 = qnwgamma(n_3, b_3, ones(3))
         # generate names
         for name in ["cheb", "equiN", "equiW", "equiH", "lege", "norm",
                      "logn", "simp", "trap", "unif", "beta", "gamm"]
-            for d in [1, 3]
-                x_str_name = "x_$(name)_$(d)"
-                w_str_name = "w_$(name)_$(d)"
-                jl_x, jl_w = eval(symbol(x_str_name)), eval(symbol(w_str_name))
-                ml_x, ml_w = m[x_str_name],  m[w_str_name]
-                ml_x = d == 3 ? ml_x : squeeze(ml_x, 2)
-                @test isapprox(jl_x, ml_x; atol=1e-5)
-                @test isapprox(jl_w, squeeze(ml_w, 2); atol=1e-5)
-            end
+            x_str_name = "x_$(name)_1"
+            w_str_name = "w_$(name)_1"
+            jl_x, jl_w = eval(symbol(x_str_name)), eval(symbol(w_str_name))
+            ml_x, ml_w = m[x_str_name],  m[w_str_name]
+            ml_x = squeeze(ml_x, 2)
+            @test isapprox(jl_x, ml_x; atol=1e-5)
+            @test isapprox(jl_w, squeeze(ml_w, 2); atol=1e-5)
         end
     end
 
