@@ -14,52 +14,6 @@ Miranda, Mario J, and Paul L Fackler. Applied Computational Economics
 and Finance, MIT Press, 2002.
 =#
 
-## ---------------- ##
-#- Helper Functions -#
-## ---------------- ##
-
-function fix!{T <: Real}(x::Array{T}, out::Array{Int})
-    for i=1:length(x)  # use linear indexing
-        out[i] = fix(x[i])
-    end
-    return out
-end
-
-fix{T <: Real}(x::Array{T}) = fix!(x, similar(x, Int))
-
-fix{T <: Real}(x::T) = round(Int, x >= 0 ? floor(x) : ceil(x))
-
-ckron(A::Array, B::Array) = kron(A, B)
-ckron(arrays::Array...) = reduce(kron, arrays)
-
-
-# TODO: this gridmake works, but I don't like it.
-function gridmake(arrays::Vector...)
-    shapes = Int[size(e, 1) for e in arrays]
-
-    n = length(arrays)
-    l = prod(shapes)
-    out = Array(Float64, l, n)
-
-    shapes = shapes[end:-1:1]
-    sh = vcat([1], shapes[1:end-1]...)
-    repititions = cumprod(sh)
-    repititions = repititions[end:-1:1]
-
-    for i=1:n
-        arr = arrays[i]
-        outer = repititions[i]
-        inner = round(Int, floor(l / (outer * size(arr, 1))))
-        out[:, i] = repeat(arrays[i], inner=[inner], outer=[outer])
-    end
-    return out
-end
-
-
-## ------------------ ##
-#- Exported Functions -#
-## ------------------ ##
-
 const qnw_func_notes = """
 ##### Notes
 
