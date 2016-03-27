@@ -15,4 +15,3 @@ pages:
 - Overview: 'api/index.md'
 - API Docs:
   - QuantEcon: 'api/QuantEcon.md'
-  - Models: 'api/QuantEcon.Models.md'

@@ -1,11 +1,7 @@
 using Docile, Lexicon, QuantEcon
 
 const api_directory = "api"
-const modules = [QuantEcon, QuantEcon.Models]
-
-# const nb_src_dir = joinpath(dirname(dirname(@__FILE__)), "solutions")
-# const nb_output_dir = joinpath(dirname(dirname(@__FILE__)), "solutions")
-# const nb_list = filter(x->endswith(x, "ipynb"), readdir(nb_src_dir))
+const modules = [QuantEcon]
 
 cd(dirname(@__FILE__)) do
     # Generate and save the contents of docstrings as markdown files.
@@ -22,12 +18,6 @@ cd(dirname(@__FILE__)) do
         all changes to the originating docstrings/files rather than these ones.
         """)
     end
-
-    # for nb in nb_list
-    #     nb_path = joinpath(nb_src_dir, nb)
-    #     md_path = joinpath(nb_output_dir, replace(nb, ".ipynb", ".md"))
-    #     run(`ipython nbconvert --to markdown $nb_path --output=$md_path`)
-    # end
 
     # info("Adding all documentation changes in $(api_directory) to this commit.")
     # success(`git add $(api_directory)`) || exit(1)
@@ -54,10 +44,7 @@ cd(dirname(dirname(@__FILE__))) do
     - Overview: 'api/index.md'
     - API Docs:
       - QuantEcon: 'api/QuantEcon.md'
-      - Models: 'api/QuantEcon.Models.md'
     """
-
-    # TODO: add the solutions if I figure out how to get them to render properly
 
     open("mkdocs.yml", "w") do f
         write(f, yaml)

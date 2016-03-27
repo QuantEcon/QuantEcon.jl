@@ -25,7 +25,7 @@ formed by `[a, b]`
 
 
 *source:*
-[QuantEcon/src/quad.jl:815](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/quad.jl#L815)
+[QuantEcon/src/quad.jl:769](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/quad.jl#L769)
 
 ---
 
@@ -40,7 +40,7 @@ Evaluate the empirical cdf at one or more points
 
 
 *source:*
-[QuantEcon/src/ecdf.jl:35](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/ecdf.jl#L35)
+[QuantEcon/src/ecdf.jl:35](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/ecdf.jl#L35)
 
 ---
 
@@ -69,7 +69,33 @@ are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`
 
 
 *source:*
-[QuantEcon/src/estspec.jl:115](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/estspec.jl#L115)
+[QuantEcon/src/estspec.jl:115](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/estspec.jl#L115)
+
+---
+
+<a id="function__simulate_values.1" class="lexicon_definition"></a>
+#### QuantEcon.simulate_values [¶](#function__simulate_values.1)
+ Like `simulate(::MarkovChain, args...; kwargs...)`, but instead of
+returning integers specifying the state indices, this routine returns the
+values of the `mc.state_values` at each of those indices. See docstring
+for `simulate` for more information
+
+
+*source:*
+[QuantEcon/src/markov/mc_tools.jl:361](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/mc_tools.jl#L361)
+
+---
+
+<a id="function__simulate_values.2" class="lexicon_definition"></a>
+#### QuantEcon.simulate_values! [¶](#function__simulate_values.2)
+ Like `simulate(::MarkovChain, args...; kwargs...)`, but instead of
+returning integers specifying the state indices, this routine returns the
+values of the `mc.state_values` at each of those indices. See docstring
+for `simulate` for more information
+
+
+*source:*
+[QuantEcon/src/markov/mc_tools.jl:361](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/mc_tools.jl#L361)
 
 ---
 
@@ -91,7 +117,7 @@ Compute agent 2's best cost-minimizing response `K`, given `F`.
 
 
 *source:*
-[QuantEcon/src/robustlq.jl:245](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/robustlq.jl#L245)
+[QuantEcon/src/robustlq.jl:245](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/robustlq.jl#L245)
 
 ---
 
@@ -113,7 +139,43 @@ Compute agent 1's best cost-minimizing response `K`, given `F`.
 
 
 *source:*
-[QuantEcon/src/robustlq.jl:277](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/robustlq.jl#L277)
+[QuantEcon/src/robustlq.jl:277](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/robustlq.jl#L277)
+
+---
+
+<a id="method__rq_sigma.1" class="lexicon_definition"></a>
+#### RQ_sigma(ddp::QuantEcon.DiscreteDP{T<:Real, NQ, NR, Tbeta<:Real, Tind},  ddpr::QuantEcon.DPSolveResult{Algo<:QuantEcon.DDPAlgorithm, Tval<:Real}) [¶](#method__rq_sigma.1)
+Method of `RQ_sigma` that extracts sigma from a `DPSolveResult`
+
+See other docstring for details
+
+
+*source:*
+[QuantEcon/src/markov/ddp.jl:483](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/ddp.jl#L483)
+
+---
+
+<a id="method__rq_sigma.2" class="lexicon_definition"></a>
+#### RQ_sigma{T<:Integer}(ddp::QuantEcon.DiscreteDP{T, 3, 2, Tbeta, Tind},  sigma::Array{T<:Integer, N}) [¶](#method__rq_sigma.2)
+Given a policy `sigma`, return the reward vector `R_sigma` and
+the transition probability matrix `Q_sigma`.
+
+##### Parameters
+
+- `ddp::DiscreteDP` : Object that contains the model parameters
+- `sigma::Vector{Int}`: policy rule vector
+
+##### Returns
+
+- `R_sigma::Array{Float64}`: Reward vector for `sigma`, of length n.
+
+- `Q_sigma::Array{Float64}`: Transition probability matrix for `sigma`,
+  of shape (n, n).
+
+
+
+*source:*
+[QuantEcon/src/markov/ddp.jl:502](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/ddp.jl#L502)
 
 ---
 
@@ -139,7 +201,7 @@ are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`
 
 
 *source:*
-[QuantEcon/src/estspec.jl:136](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/estspec.jl#L136)
+[QuantEcon/src/estspec.jl:136](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/estspec.jl#L136)
 
 ---
 
@@ -165,7 +227,7 @@ are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`
 
 
 *source:*
-[QuantEcon/src/estspec.jl:136](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/estspec.jl#L136)
+[QuantEcon/src/estspec.jl:136](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/estspec.jl#L136)
 
 ---
 
@@ -191,7 +253,7 @@ are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`
 
 
 *source:*
-[QuantEcon/src/estspec.jl:136](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/estspec.jl#L136)
+[QuantEcon/src/estspec.jl:136](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/estspec.jl#L136)
 
 ---
 
@@ -209,7 +271,7 @@ and the inverse Fourier transform.
 
 
 *source:*
-[QuantEcon/src/arma.jl:137](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/arma.jl#L137)
+[QuantEcon/src/arma.jl:137](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/arma.jl#L137)
 
 ---
 
@@ -237,7 +299,94 @@ and also returning
 
 
 *source:*
-[QuantEcon/src/robustlq.jl:116](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/robustlq.jl#L116)
+[QuantEcon/src/robustlq.jl:116](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/robustlq.jl#L116)
+
+---
+
+<a id="method__bellman_operator.1" class="lexicon_definition"></a>
+#### bellman_operator!(ddp::QuantEcon.DiscreteDP{T<:Real, NQ, NR, Tbeta<:Real, Tind},  ddpr::QuantEcon.DPSolveResult{Algo<:QuantEcon.DDPAlgorithm, Tval<:Real}) [¶](#method__bellman_operator.1)
+Apply the Bellman operator using `v=ddpr.v`, `Tv=ddpr.Tv`, and `sigma=ddpr.sigma`
+
+##### Notes
+
+Updates `ddpr.Tv` and `ddpr.sigma` inplace
+
+
+
+*source:*
+[QuantEcon/src/markov/ddp.jl:303](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/ddp.jl#L303)
+
+---
+
+<a id="method__bellman_operator.2" class="lexicon_definition"></a>
+#### bellman_operator!(ddp::QuantEcon.DiscreteDP{T<:Real, NQ, NR, Tbeta<:Real, Tind},  v::Array{T, 1},  Tv::Array{T, 1},  sigma::Array{T, 1}) [¶](#method__bellman_operator.2)
+The Bellman operator, which computes and returns the updated value function Tv
+for a value function v.
+
+##### Parameters
+
+- `ddp::DiscreteDP` : Object that contains the model parameters
+- `v::Vector{T<:AbstractFloat}`: The current guess of the value function
+- `Tv::Vector{T<:AbstractFloat}`: A buffer array to hold the updated value
+  function. Initial value not used and will be overwritten
+- `sigma::Vector`: A buffer array to hold the policy function. Initial
+  values not used and will be overwritten
+
+##### Returns
+
+- `Tv::Vector` : Updated value function vector
+- `sigma::Vector` : Updated policiy function vector
+
+
+*source:*
+[QuantEcon/src/markov/ddp.jl:289](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/ddp.jl#L289)
+
+---
+
+<a id="method__bellman_operator.3" class="lexicon_definition"></a>
+#### bellman_operator!{T<:AbstractFloat}(ddp::QuantEcon.DiscreteDP{T<:Real, NQ, NR, Tbeta<:Real, Tind},  v::Array{T<:AbstractFloat, 1},  sigma::Array{T, 1}) [¶](#method__bellman_operator.3)
+The Bellman operator, which computes and returns the updated value function Tv
+for a given value function v.
+
+This function will fill the input `v` with `Tv` and the input `sigma` with the
+corresponding policy rule
+
+##### Parameters
+
+- `ddp::DiscreteDP`: The ddp model
+- `v::Vector{T<:AbstractFloat}`: The current guess of the value function. This
+  array will be overwritten
+- `sigma::Vector`: A buffer array to hold the policy function. Initial
+  values not used and will be overwritten
+
+##### Returns
+
+- `Tv::Vector`: Updated value function vector
+- `sigma::Vector{T<:Integer}`: Policy rule
+
+
+*source:*
+[QuantEcon/src/markov/ddp.jl:326](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/ddp.jl#L326)
+
+---
+
+<a id="method__bellman_operator.4" class="lexicon_definition"></a>
+#### bellman_operator(ddp::QuantEcon.DiscreteDP{T<:Real, NQ, NR, Tbeta<:Real, Tind},  v::Array{T, 1}) [¶](#method__bellman_operator.4)
+The Bellman operator, which computes and returns the updated value function Tv
+for a given value function v.
+
+##### Parameters
+
+- `ddp::DiscreteDP`: The ddp model
+- `v::Vector`: The current guess of the value function
+
+##### Returns
+
+- `Tv::Vector` : Updated value function vector
+
+
+*source:*
+[QuantEcon/src/markov/ddp.jl:350](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/ddp.jl#L350)
 
 ---
 
@@ -260,7 +409,7 @@ beta^t x_t' K'K x_t with x_{t+1} = (A - BF + CK) x_t.
 
 
 *source:*
-[QuantEcon/src/robustlq.jl:305](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/robustlq.jl#L305)
+[QuantEcon/src/robustlq.jl:305](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/robustlq.jl#L305)
 
 ---
 
@@ -301,7 +450,31 @@ x_star = compute_fixed_point(x->T(x, 0.3), 0.4)  # (4μ - 1)/(4μ)
 
 
 *source:*
-[QuantEcon/src/compute_fp.jl:50](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/compute_fp.jl#L50)
+[QuantEcon/src/compute_fp.jl:50](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/compute_fp.jl#L50)
+
+---
+
+<a id="method__compute_greedy.1" class="lexicon_definition"></a>
+#### compute_greedy!(ddp::QuantEcon.DiscreteDP{T<:Real, NQ, NR, Tbeta<:Real, Tind},  ddpr::QuantEcon.DPSolveResult{Algo<:QuantEcon.DDPAlgorithm, Tval<:Real}) [¶](#method__compute_greedy.1)
+Compute the v-greedy policy
+
+##### Parameters
+
+- `ddp::DiscreteDP` : Object that contains the model parameters
+- `ddpr::DPSolveResult` : Object that contains result variables
+
+##### Returns
+
+- `sigma::Vector{Int}` : Array containing `v`-greedy policy rule
+
+##### Notes
+
+modifies ddpr.sigma and ddpr.Tv in place
+
+
+
+*source:*
+[QuantEcon/src/markov/ddp.jl:374](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/ddp.jl#L374)
 
 ---
 
@@ -329,7 +502,7 @@ represents `x_t`
 
 
 *source:*
-[QuantEcon/src/lqcontrol.jl:315](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/lqcontrol.jl#L315)
+[QuantEcon/src/lqcontrol.jl:315](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/lqcontrol.jl#L315)
 
 ---
 
@@ -357,7 +530,7 @@ represents `x_t`
 
 
 *source:*
-[QuantEcon/src/lqcontrol.jl:315](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/lqcontrol.jl#L315)
+[QuantEcon/src/lqcontrol.jl:315](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/lqcontrol.jl#L315)
 
 ---
 
@@ -379,12 +552,12 @@ The D operator, mapping P into
 
 
 *source:*
-[QuantEcon/src/robustlq.jl:87](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/robustlq.jl#L87)
+[QuantEcon/src/robustlq.jl:87](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/robustlq.jl#L87)
 
 ---
 
 <a id="method__draw.1" class="lexicon_definition"></a>
-#### draw(d::QuantEcon.DiscreteRV{T<:Real}) [¶](#method__draw.1)
+#### draw(d::QuantEcon.DiscreteRV{TV1<:AbstractArray{T, 1}, TV2<:AbstractArray{T, 1}}) [¶](#method__draw.1)
 Make a single draw from the discrete distribution
 
 ##### Arguments
@@ -397,12 +570,12 @@ Make a single draw from the discrete distribution
 
 
 *source:*
-[QuantEcon/src/discrete_rv.jl:51](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/discrete_rv.jl#L51)
+[QuantEcon/src/discrete_rv.jl:56](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/discrete_rv.jl#L56)
 
 ---
 
 <a id="method__draw.2" class="lexicon_definition"></a>
-#### draw{T}(d::QuantEcon.DiscreteRV{T},  k::Int64) [¶](#method__draw.2)
+#### draw(d::QuantEcon.DiscreteRV{TV1<:AbstractArray{T, 1}, TV2<:AbstractArray{T, 1}},  k::Int64) [¶](#method__draw.2)
 Make multiple draws from the discrete distribution represented by a
 `DiscreteRV` instance
 
@@ -417,7 +590,7 @@ Make multiple draws from the discrete distribution represented by a
 
 
 *source:*
-[QuantEcon/src/discrete_rv.jl:66](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/discrete_rv.jl#L66)
+[QuantEcon/src/discrete_rv.jl:71](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/discrete_rv.jl#L71)
 
 ---
 
@@ -443,7 +616,68 @@ x' P_F x + d_F.
 
 
 *source:*
-[QuantEcon/src/robustlq.jl:332](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/robustlq.jl#L332)
+[QuantEcon/src/robustlq.jl:332](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/robustlq.jl#L332)
+
+---
+
+<a id="method__evaluate_policy.1" class="lexicon_definition"></a>
+#### evaluate_policy(ddp::QuantEcon.DiscreteDP{T<:Real, NQ, NR, Tbeta<:Real, Tind},  ddpr::QuantEcon.DPSolveResult{Algo<:QuantEcon.DDPAlgorithm, Tval<:Real}) [¶](#method__evaluate_policy.1)
+Method of `evaluate_policy` that extracts sigma from a `DPSolveResult`
+
+See other docstring for details
+
+
+*source:*
+[QuantEcon/src/markov/ddp.jl:393](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/ddp.jl#L393)
+
+---
+
+<a id="method__evaluate_policy.2" class="lexicon_definition"></a>
+#### evaluate_policy{T<:Integer}(ddp::QuantEcon.DiscreteDP{T<:Real, NQ, NR, Tbeta<:Real, Tind},  sigma::Array{T<:Integer, 1}) [¶](#method__evaluate_policy.2)
+Compute the value of a policy.
+
+##### Parameters
+
+- `ddp::DiscreteDP` : Object that contains the model parameters
+- `sigma::Vector{T<:Integer}` : Policy rule vector
+
+##### Returns
+
+- `v_sigma::Array{Float64}` : Value vector of `sigma`, of length n.
+
+
+
+*source:*
+[QuantEcon/src/markov/ddp.jl:409](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/ddp.jl#L409)
+
+---
+
+<a id="method__gth_solve.1" class="lexicon_definition"></a>
+#### gth_solve{T<:Integer}(a::AbstractArray{T<:Integer, 2}) [¶](#method__gth_solve.1)
+solve x(P-I)=0 using an algorithm presented by Grassmann-Taksar-Heyman (GTH)
+
+##### Arguments
+
+- `p::Matrix` : valid stochastic matrix
+
+##### Returns
+
+- `x::Matrix`: A matrix whose columns contain stationary vectors of `p`
+
+##### References
+
+The following references were consulted for the GTH algorithm
+
+- W. K. Grassmann, M. I. Taksar and D. P. Heyman, "Regenerative Analysis and
+Steady State Distributions for Markov Chains, " Operations Research (1985),
+1107-1116.
+- W. J. Stewart, Probability, Markov Chains, Queues, and Simulation, Princeton
+University Press, 2009.
+
+
+
+*source:*
+[QuantEcon/src/markov/mc_tools.jl:91](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/mc_tools.jl#L91)
 
 ---
 
@@ -466,7 +700,7 @@ response. We take psi[1] as unity.
 
 
 *source:*
-[QuantEcon/src/arma.jl:162](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/arma.jl#L162)
+[QuantEcon/src/arma.jl:162](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/arma.jl#L162)
 
 ---
 
@@ -487,7 +721,7 @@ values in the array y.
 
 
 *source:*
-[QuantEcon/src/lae.jl:58](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/lae.jl#L58)
+[QuantEcon/src/lae.jl:58](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/lae.jl#L58)
 
 ---
 
@@ -516,19 +750,17 @@ for convergence that the eigenvalues of B have moduli bounded by unity
 
 
 *source:*
-[QuantEcon/src/quadsums.jl:81](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/quadsums.jl#L81)
+[QuantEcon/src/quadsums.jl:81](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/quadsums.jl#L81)
 
 ---
 
 <a id="method__mc_compute_stationary.1" class="lexicon_definition"></a>
-#### mc_compute_stationary{T}(mc::QuantEcon.MarkovChain{T}) [¶](#method__mc_compute_stationary.1)
+#### mc_compute_stationary{T}(mc::QuantEcon.MarkovChain{T, TM<:AbstractArray{T, 2}, TV<:AbstractArray{T, 1}}) [¶](#method__mc_compute_stationary.1)
 calculate the stationary distributions associated with a N-state markov chain
 
 ##### Arguments
 
 - `mc::MarkovChain` : MarkovChain instance containing a valid stochastic matrix
-- `;method::Symbol(:gth)`: One of `gth`, `lu`, and `eigen`; specifying which
-of the three `_solve` methods to use.
 
 ##### Returns
 
@@ -538,148 +770,16 @@ distribution of `mc.p`
 
 
 *source:*
-[QuantEcon/src/mc_tools.jl:195](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/mc_tools.jl#L195)
+[QuantEcon/src/markov/mc_tools.jl:174](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/mc_tools.jl#L174)
 
 ---
 
-<a id="method__mc_sample_path.1" class="lexicon_definition"></a>
-#### mc_sample_path!(mc::QuantEcon.MarkovChain{T<:Real},  samples::Array{T, N}) [¶](#method__mc_sample_path.1)
-Fill `samples` with samples from the Markov chain `mc`
-
-##### Arguments
-
-- `mc::MarkovChain` : MarkovChain instance containing a valid stochastic matrix
-- `samples::Array{Int}` : Pre-allocated vector of integers to be filled with
-samples from the markov chain `mc`. The first element will be used as the
-initial state and all other elements will be over-written.
-
-##### Returns
-
-None modifies `samples` in place
-
+<a id="method__n_states.1" class="lexicon_definition"></a>
+#### n_states(mc::QuantEcon.MarkovChain{T, TM<:AbstractArray{T, 2}, TV<:AbstractArray{T, 1}}) [¶](#method__n_states.1)
+Number of states in the markov chain `mc`
 
 *source:*
-[QuantEcon/src/mc_tools.jl:288](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/mc_tools.jl#L288)
-
----
-
-<a id="method__mc_sample_path.2" class="lexicon_definition"></a>
-#### mc_sample_path(mc::QuantEcon.MarkovChain{T<:Real}) [¶](#method__mc_sample_path.2)
-Simulate a Markov chain starting from an initial distribution
-
-##### Arguments
-
-- `mc::MarkovChain` : MarkovChain instance containing a valid stochastic matrix
-- `init::Vector` : A vector of length `n_state(mc)` specifying the number
-probability of being in seach state in the initial period
-- `sample_size::Int(1000)`: The number of samples to collect
-- `;burn::Int(0)`: The burn in length. Routine drops first `burn` of the
-`sample_size` total samples collected
-
-##### Returns
-
-- `samples::Vector{Int}`: Vector of simulated states
-
-
-
-*source:*
-[QuantEcon/src/mc_tools.jl:257](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/mc_tools.jl#L257)
-
----
-
-<a id="method__mc_sample_path.3" class="lexicon_definition"></a>
-#### mc_sample_path(mc::QuantEcon.MarkovChain{T<:Real},  init::Array{T, 1}) [¶](#method__mc_sample_path.3)
-Simulate a Markov chain starting from an initial distribution
-
-##### Arguments
-
-- `mc::MarkovChain` : MarkovChain instance containing a valid stochastic matrix
-- `init::Vector` : A vector of length `n_state(mc)` specifying the number
-probability of being in seach state in the initial period
-- `sample_size::Int(1000)`: The number of samples to collect
-- `;burn::Int(0)`: The burn in length. Routine drops first `burn` of the
-`sample_size` total samples collected
-
-##### Returns
-
-- `samples::Vector{Int}`: Vector of simulated states
-
-
-
-*source:*
-[QuantEcon/src/mc_tools.jl:257](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/mc_tools.jl#L257)
-
----
-
-<a id="method__mc_sample_path.4" class="lexicon_definition"></a>
-#### mc_sample_path(mc::QuantEcon.MarkovChain{T<:Real},  init::Array{T, 1},  sample_size::Int64) [¶](#method__mc_sample_path.4)
-Simulate a Markov chain starting from an initial distribution
-
-##### Arguments
-
-- `mc::MarkovChain` : MarkovChain instance containing a valid stochastic matrix
-- `init::Vector` : A vector of length `n_state(mc)` specifying the number
-probability of being in seach state in the initial period
-- `sample_size::Int(1000)`: The number of samples to collect
-- `;burn::Int(0)`: The burn in length. Routine drops first `burn` of the
-`sample_size` total samples collected
-
-##### Returns
-
-- `samples::Vector{Int}`: Vector of simulated states
-
-
-
-*source:*
-[QuantEcon/src/mc_tools.jl:257](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/mc_tools.jl#L257)
-
----
-
-<a id="method__mc_sample_path.5" class="lexicon_definition"></a>
-#### mc_sample_path(mc::QuantEcon.MarkovChain{T<:Real},  init::Int64) [¶](#method__mc_sample_path.5)
-Simulate a Markov chain starting from an initial state
-
-##### Arguments
-
-- `mc::MarkovChain` : MarkovChain instance containing a valid stochastic matrix
-- `init::Int(rand(1:n_states(mc)))` : The index of the initial state. This should
-be an integer between 1 and `n_states(mc)`
-- `sample_size::Int(1000)`: The number of samples to collect
-- `;burn::Int(0)`: The burn in length. Routine drops first `burn` of the
-`sample_size` total samples collected
-
-##### Returns
-
-- `samples::Vector{Int}`: Vector of simulated states
-
-
-
-*source:*
-[QuantEcon/src/mc_tools.jl:230](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/mc_tools.jl#L230)
-
----
-
-<a id="method__mc_sample_path.6" class="lexicon_definition"></a>
-#### mc_sample_path(mc::QuantEcon.MarkovChain{T<:Real},  init::Int64,  sample_size::Int64) [¶](#method__mc_sample_path.6)
-Simulate a Markov chain starting from an initial state
-
-##### Arguments
-
-- `mc::MarkovChain` : MarkovChain instance containing a valid stochastic matrix
-- `init::Int(rand(1:n_states(mc)))` : The index of the initial state. This should
-be an integer between 1 and `n_states(mc)`
-- `sample_size::Int(1000)`: The number of samples to collect
-- `;burn::Int(0)`: The burn in length. Routine drops first `burn` of the
-`sample_size` total samples collected
-
-##### Returns
-
-- `samples::Vector{Int}`: Vector of simulated states
-
-
-
-*source:*
-[QuantEcon/src/mc_tools.jl:230](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/mc_tools.jl#L230)
+[QuantEcon/src/markov/mc_tools.jl:61](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/mc_tools.jl#L61)
 
 ---
 
@@ -731,7 +831,63 @@ double optimal linear regulator problem.
 
 
 *source:*
-[QuantEcon/src/lqnash.jl:57](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/lqnash.jl#L57)
+[QuantEcon/src/lqnash.jl:57](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/lqnash.jl#L57)
+
+---
+
+<a id="method__random_discrete_dp.1" class="lexicon_definition"></a>
+#### random_discrete_dp(num_states::Integer,  num_actions::Integer) [¶](#method__random_discrete_dp.1)
+Generate a DiscreteDP randomly. The reward values are drawn from the normal
+distribution with mean 0 and standard deviation `scale`.
+
+##### Arguments
+
+- `num_states::Integer` : Number of states.
+- `num_actions::Integer` : Number of actions.
+- `beta::Union{Float64, Void}(nothing)` : Discount factor. Randomly chosen from
+[0, 1) if not specified.
+- `;k::Union{Integer, Void}(nothing)` : Number of possible next states for each
+state-action pair. Equal to `num_states` if not specified.
+
+- `scale::Real(1)` : Standard deviation of the normal distribution for the
+reward values.
+
+##### Returns
+
+- `ddp::DiscreteDP` : An instance of DiscreteDP.
+
+
+
+*source:*
+[QuantEcon/src/markov/random_mc.jl:179](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/random_mc.jl#L179)
+
+---
+
+<a id="method__random_discrete_dp.2" class="lexicon_definition"></a>
+#### random_discrete_dp(num_states::Integer,  num_actions::Integer,  beta::Union{Real, Void}) [¶](#method__random_discrete_dp.2)
+Generate a DiscreteDP randomly. The reward values are drawn from the normal
+distribution with mean 0 and standard deviation `scale`.
+
+##### Arguments
+
+- `num_states::Integer` : Number of states.
+- `num_actions::Integer` : Number of actions.
+- `beta::Union{Float64, Void}(nothing)` : Discount factor. Randomly chosen from
+[0, 1) if not specified.
+- `;k::Union{Integer, Void}(nothing)` : Number of possible next states for each
+state-action pair. Equal to `num_states` if not specified.
+
+- `scale::Real(1)` : Standard deviation of the normal distribution for the
+reward values.
+
+##### Returns
+
+- `ddp::DiscreteDP` : An instance of DiscreteDP.
+
+
+
+*source:*
+[QuantEcon/src/markov/random_mc.jl:179](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/random_mc.jl#L179)
 
 ---
 
@@ -765,7 +921,7 @@ stochastic matrix:
 
 
 *source:*
-[QuantEcon/src/random_mc.jl:39](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/random_mc.jl#L39)
+[QuantEcon/src/markov/random_mc.jl:39](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/random_mc.jl#L39)
 
 ---
 
@@ -800,39 +956,20 @@ stochastic matrix:
 
 
 *source:*
-[QuantEcon/src/random_mc.jl:74](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/random_mc.jl#L74)
+[QuantEcon/src/markov/random_mc.jl:74](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/random_mc.jl#L74)
 
 ---
 
 <a id="method__random_stochastic_matrix.1" class="lexicon_definition"></a>
 #### random_stochastic_matrix(n::Integer) [¶](#method__random_stochastic_matrix.1)
-Return a randomly sampled n x n stochastic matrix.
-
-##### Arguments
-
-- `n::Integer` : Number of states.
-- `k::Integer` : Number of nonzero entries in each row of the matrix.
-
-##### Returns
-
-- `p::Array` : Stochastic matrix.
-
-
-
-*source:*
-[QuantEcon/src/random_mc.jl:96](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/random_mc.jl#L96)
-
----
-
-<a id="method__random_stochastic_matrix.2" class="lexicon_definition"></a>
-#### random_stochastic_matrix(n::Integer,  k::Integer) [¶](#method__random_stochastic_matrix.2)
 Return a randomly sampled n x n stochastic matrix with k nonzero entries for
 each row.
 
 ##### Arguments
 
 - `n::Integer` : Number of states.
-- `k::Integer` : Number of nonzero entries in each row of the matrix.
+- `k::Union{Integer, Void}(nothing)` : Number of nonzero entries in each
+column of the matrix. Set to n if note specified.
 
 ##### Returns
 
@@ -841,12 +978,34 @@ each row.
 
 
 *source:*
-[QuantEcon/src/random_mc.jl:121](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/random_mc.jl#L121)
+[QuantEcon/src/markov/random_mc.jl:98](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/random_mc.jl#L98)
+
+---
+
+<a id="method__random_stochastic_matrix.2" class="lexicon_definition"></a>
+#### random_stochastic_matrix(n::Integer,  k::Union{Integer, Void}) [¶](#method__random_stochastic_matrix.2)
+Return a randomly sampled n x n stochastic matrix with k nonzero entries for
+each row.
+
+##### Arguments
+
+- `n::Integer` : Number of states.
+- `k::Union{Integer, Void}(nothing)` : Number of nonzero entries in each
+column of the matrix. Set to n if note specified.
+
+##### Returns
+
+- `p::Array` : Stochastic matrix.
+
+
+
+*source:*
+[QuantEcon/src/markov/random_mc.jl:98](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/random_mc.jl#L98)
 
 ---
 
 <a id="method__recurrent_classes.1" class="lexicon_definition"></a>
-#### recurrent_classes(mc::QuantEcon.MarkovChain{T<:Real}) [¶](#method__recurrent_classes.1)
+#### recurrent_classes(mc::QuantEcon.MarkovChain{T, TM<:AbstractArray{T, 2}, TV<:AbstractArray{T, 1}}) [¶](#method__recurrent_classes.1)
 Find the recurrent classes of the `MarkovChain`
 
 ##### Arguments
@@ -861,7 +1020,7 @@ recurrent classes of the transition matrix for p
 
 
 *source:*
-[QuantEcon/src/mc_tools.jl:162](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/mc_tools.jl#L162)
+[QuantEcon/src/markov/mc_tools.jl:143](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/mc_tools.jl#L143)
 
 ---
 
@@ -893,7 +1052,7 @@ function
 
 
 *source:*
-[QuantEcon/src/robustlq.jl:154](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/robustlq.jl#L154)
+[QuantEcon/src/robustlq.jl:154](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/robustlq.jl#L154)
 
 ---
 
@@ -927,7 +1086,7 @@ function
 
 
 *source:*
-[QuantEcon/src/robustlq.jl:202](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/robustlq.jl#L202)
+[QuantEcon/src/robustlq.jl:202](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/robustlq.jl#L202)
 
 ---
 
@@ -961,7 +1120,7 @@ function
 
 
 *source:*
-[QuantEcon/src/robustlq.jl:202](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/robustlq.jl#L202)
+[QuantEcon/src/robustlq.jl:202](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/robustlq.jl#L202)
 
 ---
 
@@ -983,13 +1142,13 @@ where ε_t ~ N (0, σ^2)
 
 ##### Returns
 
-- `y::Vector{Real}` : Nodes in the state space
-- `Θ::Matrix{Real}` Matrix transition probabilities for Markov Process
+- `mc::MarkovChain{Float64}` : Markov chain holding the state values and
+transition matrix
 
 
 
 *source:*
-[QuantEcon/src/markov_approx.jl:103](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/markov_approx.jl#L103)
+[QuantEcon/src/markov/markov_approx.jl:107](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/markov_approx.jl#L107)
 
 ---
 
@@ -1011,13 +1170,103 @@ where ε_t ~ N (0, σ^2)
 
 ##### Returns
 
-- `y::Vector{Real}` : Nodes in the state space
-- `Θ::Matrix{Real}` Matrix transition probabilities for Markov Process
+- `mc::MarkovChain{Float64}` : Markov chain holding the state values and
+transition matrix
 
 
 
 *source:*
-[QuantEcon/src/markov_approx.jl:103](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/markov_approx.jl#L103)
+[QuantEcon/src/markov/markov_approx.jl:107](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/markov_approx.jl#L107)
+
+---
+
+<a id="method__simulate.1" class="lexicon_definition"></a>
+#### simulate!(mc::QuantEcon.MarkovChain{T, TM<:AbstractArray{T, 2}, TV<:AbstractArray{T, 1}},  X::Array{Int64, 2}) [¶](#method__simulate.1)
+Fill `X` with sample paths of the Markov chain `mc` as columns.
+
+##### Arguments
+
+- `mc::MarkovChain` : MarkovChain instance.
+- `X::Matrix{Int}` : Preallocated matrix of integers to be filled with sample
+paths of the markov chain `mc`. The elements in `X[1, :]` will be used as the
+initial states.
+
+
+
+*source:*
+[QuantEcon/src/markov/mc_tools.jl:270](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/mc_tools.jl#L270)
+
+---
+
+<a id="method__simulate.2" class="lexicon_definition"></a>
+#### simulate(mc::QuantEcon.MarkovChain{T, TM<:AbstractArray{T, 2}, TV<:AbstractArray{T, 1}},  ts_length::Int64) [¶](#method__simulate.2)
+Simulate time series of state transitions of the Markov chain `mc`.
+
+##### Arguments
+
+- `mc::MarkovChain` : MarkovChain instance.
+- `ts_length::Int` : Length of each simulation.
+- `;num_reps::Union{Int, Void}(nothing)` : Number of repetitions of simulation.
+
+##### Returns
+
+- `X::Matrix{Int}` : Array containing the sample paths as columns, of shape
+(ts_length, k), where k = num_reps
+
+
+
+*source:*
+[QuantEcon/src/markov/mc_tools.jl:254](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/mc_tools.jl#L254)
+
+---
+
+<a id="method__simulate.3" class="lexicon_definition"></a>
+#### simulate(mc::QuantEcon.MarkovChain{T, TM<:AbstractArray{T, 2}, TV<:AbstractArray{T, 1}},  ts_length::Int64,  init::Array{Int64, 1}) [¶](#method__simulate.3)
+Simulate time series of state transitions of the Markov chain `mc`.
+
+The sample path from the `j`-th repetition of the simulation with initial state
+`init[i]` is stored in the `(j-1)*num_reps+i`-th column of the matrix X.
+
+##### Arguments
+
+- `mc::MarkovChain` : MarkovChain instance.
+- `ts_length::Int` : Length of each simulation.
+- `init::Vector{Int}` : Vector containing initial states.
+- `;num_reps::Int(1)` : Number of repetitions of simulation for each element
+of `init`
+
+##### Returns
+
+- `X::Matrix{Int}` : Array containing the sample paths as columns, of shape
+(ts_length, k), where k = length(init)* num_reps
+
+
+
+*source:*
+[QuantEcon/src/markov/mc_tools.jl:210](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/mc_tools.jl#L210)
+
+---
+
+<a id="method__simulate.4" class="lexicon_definition"></a>
+#### simulate(mc::QuantEcon.MarkovChain{T, TM<:AbstractArray{T, 2}, TV<:AbstractArray{T, 1}},  ts_length::Int64,  init::Int64) [¶](#method__simulate.4)
+Simulate time series of state transitions of the Markov chain `mc`.
+
+##### Arguments
+
+- `mc::MarkovChain` : MarkovChain instance.
+- `ts_length::Int` : Length of each simulation.
+- `init::Int` : Initial state.
+- `;num_reps::Int(1)` : Number of repetitions of simulation
+
+##### Returns
+
+- `X::Matrix{Int}` : Array containing the sample paths as columns, of shape
+(ts_length, k), where k = num_reps
+
+
+
+*source:*
+[QuantEcon/src/markov/mc_tools.jl:236](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/mc_tools.jl#L236)
 
 ---
 
@@ -1039,7 +1288,47 @@ Compute a simulated sample path assuming Gaussian shocks.
 
 
 *source:*
-[QuantEcon/src/arma.jl:194](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/arma.jl#L194)
+[QuantEcon/src/arma.jl:194](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/arma.jl#L194)
+
+---
+
+<a id="method__simulation.2" class="lexicon_definition"></a>
+#### simulation(mc::QuantEcon.MarkovChain{T, TM<:AbstractArray{T, 2}, TV<:AbstractArray{T, 1}},  ts_length::Int64) [¶](#method__simulation.2)
+Simulate time series of state transitions of the Markov chain `mc`.
+
+##### Arguments
+
+- `mc::MarkovChain` : MarkovChain instance.
+- `ts_length::Int` : Length of each simulation.
+- `init_state::Int(rand(1:n_states(mc)))` : Initial state.
+
+##### Returns
+
+- `x::Vector`: A vector of transition indices for a single simulation
+
+
+*source:*
+[QuantEcon/src/markov/mc_tools.jl:301](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/mc_tools.jl#L301)
+
+---
+
+<a id="method__simulation.3" class="lexicon_definition"></a>
+#### simulation(mc::QuantEcon.MarkovChain{T, TM<:AbstractArray{T, 2}, TV<:AbstractArray{T, 1}},  ts_length::Int64,  init_state::Int64) [¶](#method__simulation.3)
+Simulate time series of state transitions of the Markov chain `mc`.
+
+##### Arguments
+
+- `mc::MarkovChain` : MarkovChain instance.
+- `ts_length::Int` : Length of each simulation.
+- `init_state::Int(rand(1:n_states(mc)))` : Initial state.
+
+##### Returns
+
+- `x::Vector`: A vector of transition indices for a single simulation
+
+
+*source:*
+[QuantEcon/src/markov/mc_tools.jl:301](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/mc_tools.jl#L301)
 
 ---
 
@@ -1048,7 +1337,7 @@ Compute a simulated sample path assuming Gaussian shocks.
 Version of `smooth` where `window_len` and `window` are keyword arguments
 
 *source:*
-[QuantEcon/src/estspec.jl:70](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/estspec.jl#L70)
+[QuantEcon/src/estspec.jl:70](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/estspec.jl#L70)
 
 ---
 
@@ -1069,7 +1358,7 @@ are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`
 
 
 *source:*
-[QuantEcon/src/estspec.jl:30](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/estspec.jl#L30)
+[QuantEcon/src/estspec.jl:30](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/estspec.jl#L30)
 
 ---
 
@@ -1090,7 +1379,7 @@ are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`
 
 
 *source:*
-[QuantEcon/src/estspec.jl:30](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/estspec.jl#L30)
+[QuantEcon/src/estspec.jl:30](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/estspec.jl#L30)
 
 ---
 
@@ -1124,7 +1413,7 @@ for convergence that the eigenvalues of `B` have moduli bounded by unity
 
 
 *source:*
-[QuantEcon/src/matrix_eqn.jl:30](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/matrix_eqn.jl#L30)
+[QuantEcon/src/matrix_eqn.jl:30](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/matrix_eqn.jl#L30)
 
 ---
 
@@ -1158,7 +1447,7 @@ for convergence that the eigenvalues of `B` have moduli bounded by unity
 
 
 *source:*
-[QuantEcon/src/matrix_eqn.jl:30](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/matrix_eqn.jl#L30)
+[QuantEcon/src/matrix_eqn.jl:30](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/matrix_eqn.jl#L30)
 
 ---
 
@@ -1198,7 +1487,7 @@ WEIGHTING MATRICES." Taiwanese Journal of Mathematics 14, no. 3A (2010): pp-935.
 
 
 *source:*
-[QuantEcon/src/matrix_eqn.jl:96](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/matrix_eqn.jl#L96)
+[QuantEcon/src/matrix_eqn.jl:96](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/matrix_eqn.jl#L96)
 
 ---
 
@@ -1238,7 +1527,61 @@ WEIGHTING MATRICES." Taiwanese Journal of Mathematics 14, no. 3A (2010): pp-935.
 
 
 *source:*
-[QuantEcon/src/matrix_eqn.jl:96](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/matrix_eqn.jl#L96)
+[QuantEcon/src/matrix_eqn.jl:96](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/matrix_eqn.jl#L96)
+
+---
+
+<a id="method__solve.1" class="lexicon_definition"></a>
+#### solve{Algo<:QuantEcon.DDPAlgorithm, T}(ddp::QuantEcon.DiscreteDP{T, NQ, NR, Tbeta<:Real, Tind},  method::Type{Algo<:QuantEcon.DDPAlgorithm}) [¶](#method__solve.1)
+Solve the dynamic programming problem.
+
+##### Parameters
+
+- `ddp::DiscreteDP` : Object that contains the Model Parameters
+- `method::Type{T<Algo}(VFI)`: Type name specifying solution method. Acceptable
+arguments are `VFI` for value function iteration or `PFI` for policy function
+iteration or `MPFI` for modified policy function iteration
+- `;max_iter::Int(250)` : Maximum number of iterations
+- `;epsilon::Float64(1e-3)` : Value for epsilon-optimality. Only used if
+`method` is `VFI`
+- `;k::Int(20)` : Number of iterations for partial policy evaluation in modified
+policy iteration (irrelevant for other methods).
+
+##### Returns
+
+- `ddpr::DPSolveResult{Algo}` : Optimization result represented as a
+DPSolveResult. See `DPSolveResult` for details.
+
+
+*source:*
+[QuantEcon/src/markov/ddp.jl:440](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/ddp.jl#L440)
+
+---
+
+<a id="method__solve.2" class="lexicon_definition"></a>
+#### solve{T}(ddp::QuantEcon.DiscreteDP{T, NQ, NR, Tbeta<:Real, Tind}) [¶](#method__solve.2)
+Solve the dynamic programming problem.
+
+##### Parameters
+
+- `ddp::DiscreteDP` : Object that contains the Model Parameters
+- `method::Type{T<Algo}(VFI)`: Type name specifying solution method. Acceptable
+arguments are `VFI` for value function iteration or `PFI` for policy function
+iteration or `MPFI` for modified policy function iteration
+- `;max_iter::Int(250)` : Maximum number of iterations
+- `;epsilon::Float64(1e-3)` : Value for epsilon-optimality. Only used if
+`method` is `VFI`
+- `;k::Int(20)` : Number of iterations for partial policy evaluation in modified
+policy iteration (irrelevant for other methods).
+
+##### Returns
+
+- `ddpr::DPSolveResult{Algo}` : Optimization result represented as a
+DPSolveResult. See `DPSolveResult` for details.
+
+
+*source:*
+[QuantEcon/src/markov/ddp.jl:440](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/ddp.jl#L440)
 
 ---
 
@@ -1271,7 +1614,7 @@ then the function computes the response at the frequencies given by the array
 
 
 *source:*
-[QuantEcon/src/arma.jl:116](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/arma.jl#L116)
+[QuantEcon/src/arma.jl:116](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/arma.jl#L116)
 
 ---
 
@@ -1298,7 +1641,7 @@ addition to returning them
 
 
 *source:*
-[QuantEcon/src/lqcontrol.jl:204](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/lqcontrol.jl#L204)
+[QuantEcon/src/lqcontrol.jl:204](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/lqcontrol.jl#L204)
 
 ---
 
@@ -1310,7 +1653,7 @@ See docstring for stationary_values! for more explanation
 
 
 *source:*
-[QuantEcon/src/lqcontrol.jl:229](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/lqcontrol.jl#L229)
+[QuantEcon/src/lqcontrol.jl:229](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/lqcontrol.jl#L229)
 
 ---
 
@@ -1335,13 +1678,13 @@ should span
 
 ##### Returns
 
-- `y::Vector{Real}` : Nodes in the state space
-- `Π::Matrix{Real}` Matrix transition probabilities for Markov Process
+- `mc::MarkovChain{Float64}` : Markov chain holding the state values and
+transition matrix
 
 
 
 *source:*
-[QuantEcon/src/markov_approx.jl:41](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/markov_approx.jl#L41)
+[QuantEcon/src/markov/markov_approx.jl:41](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/markov_approx.jl#L41)
 
 ---
 
@@ -1366,13 +1709,13 @@ should span
 
 ##### Returns
 
-- `y::Vector{Real}` : Nodes in the state space
-- `Π::Matrix{Real}` Matrix transition probabilities for Markov Process
+- `mc::MarkovChain{Float64}` : Markov chain holding the state values and
+transition matrix
 
 
 
 *source:*
-[QuantEcon/src/markov_approx.jl:41](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/markov_approx.jl#L41)
+[QuantEcon/src/markov/markov_approx.jl:41](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/markov_approx.jl#L41)
 
 ---
 
@@ -1397,13 +1740,13 @@ should span
 
 ##### Returns
 
-- `y::Vector{Real}` : Nodes in the state space
-- `Π::Matrix{Real}` Matrix transition probabilities for Markov Process
+- `mc::MarkovChain{Float64}` : Markov chain holding the state values and
+transition matrix
 
 
 
 *source:*
-[QuantEcon/src/markov_approx.jl:41](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/markov_approx.jl#L41)
+[QuantEcon/src/markov/markov_approx.jl:41](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/markov_approx.jl#L41)
 
 ---
 
@@ -1429,7 +1772,47 @@ returning them
 
 
 *source:*
-[QuantEcon/src/lqcontrol.jl:162](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/lqcontrol.jl#L162)
+[QuantEcon/src/lqcontrol.jl:162](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/lqcontrol.jl#L162)
+
+---
+
+<a id="method__value_simulation.1" class="lexicon_definition"></a>
+#### value_simulation(mc::QuantEcon.MarkovChain{T, TM<:AbstractArray{T, 2}, TV<:AbstractArray{T, 1}},  ts_length::Int64) [¶](#method__value_simulation.1)
+Simulate time series of state transitions of the Markov chain `mc`.
+
+##### Arguments
+
+- `mc::MarkovChain` : MarkovChain instance.
+- `ts_length::Int` : Length of each simulation.
+- `init_state::Int(rand(1:n_states(mc)))` : Initial state.
+
+##### Returns
+
+- `x::Vector`: A vector of state values along a simulated path
+
+
+*source:*
+[QuantEcon/src/markov/mc_tools.jl:373](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/mc_tools.jl#L373)
+
+---
+
+<a id="method__value_simulation.2" class="lexicon_definition"></a>
+#### value_simulation(mc::QuantEcon.MarkovChain{T, TM<:AbstractArray{T, 2}, TV<:AbstractArray{T, 1}},  ts_length::Int64,  init_state::Int64) [¶](#method__value_simulation.2)
+Simulate time series of state transitions of the Markov chain `mc`.
+
+##### Arguments
+
+- `mc::MarkovChain` : MarkovChain instance.
+- `ts_length::Int` : Length of each simulation.
+- `init_state::Int(rand(1:n_states(mc)))` : Initial state.
+
+##### Returns
+
+- `x::Vector`: A vector of state values along a simulated path
+
+
+*source:*
+[QuantEcon/src/markov/mc_tools.jl:373](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/mc_tools.jl#L373)
 
 ---
 
@@ -1468,7 +1851,7 @@ The formula for computing q(x_0) is q(x_0) = x_0' Q x_0 + v where
 
 
 *source:*
-[QuantEcon/src/quadsums.jl:41](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/quadsums.jl#L41)
+[QuantEcon/src/quadsums.jl:41](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/quadsums.jl#L41)
 
 ---
 
@@ -1521,42 +1904,50 @@ quad_plot(lp)
 
 
 *source:*
-[QuantEcon/src/arma.jl:64](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/arma.jl#L64)
+[QuantEcon/src/arma.jl:64](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/arma.jl#L64)
 
 ---
 
-<a id="type__betabinomial.1" class="lexicon_definition"></a>
-#### QuantEcon.BetaBinomial [¶](#type__betabinomial.1)
-The Beta-Binomial distribution
+<a id="type__discretedp.1" class="lexicon_definition"></a>
+#### QuantEcon.DiscreteDP{T<:Real, NQ, NR, Tbeta<:Real, Tind} [¶](#type__discretedp.1)
+DiscreteDP type for specifying paramters for discrete dynamic programming model
 
-##### Fields
+##### Parameters
 
-- `n, a, b::Float64` The three paramters to the distribution
+- `R::Array{T,NR}` : Reward Array
+- `Q::Array{T,NQ}` : Transition Probability Array
+- `beta::Float64`  : Discount Factor
+- `s_indices::Nullable{Vector{Tind}}`: State Indices. Null unless using
+  SA formulation
+- `a_indices::Nullable{Vector{Tind}}`: Action Indices. Null unless using
+  SA formulation
+- `a_indptr::Nullable{Vector{Tind}}`: Action Index Pointers. Null unless using
+  SA formulation
 
-##### Notes
+##### Returns
 
-See also http://en.wikipedia.org/wiki/Beta-binomial_distribution
+- `ddp::DiscreteDP` : DiscreteDP object
 
 
 
 *source:*
-[QuantEcon/src/dists.jl:27](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/dists.jl#L27)
+[QuantEcon/src/markov/ddp.jl:51](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/ddp.jl#L51)
 
 ---
 
 <a id="type__discreterv.1" class="lexicon_definition"></a>
-#### QuantEcon.DiscreteRV{T<:Real} [¶](#type__discreterv.1)
+#### QuantEcon.DiscreteRV{TV1<:AbstractArray{T, 1}, TV2<:AbstractArray{T, 1}} [¶](#type__discreterv.1)
 Generates an array of draws from a discrete random variable with
 vector of probabilities given by q.
 
 ##### Fields
 
-- `q::Vector{T<:Real}`: A vector of non-negative probabilities that sum to 1
-- `Q::Vector{T<:Real}`: The cumulative sum of q
+- `q::AbstractVector`: A vector of non-negative probabilities that sum to 1
+- `Q::AbstractVector`: The cumulative sum of q
 
 
 *source:*
-[QuantEcon/src/discrete_rv.jl:31](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/discrete_rv.jl#L31)
+[QuantEcon/src/discrete_rv.jl:31](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/discrete_rv.jl#L31)
 
 ---
 
@@ -1571,7 +1962,7 @@ observations.
 
 
 *source:*
-[QuantEcon/src/ecdf.jl:20](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/ecdf.jl#L20)
+[QuantEcon/src/ecdf.jl:20](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/ecdf.jl#L20)
 
 ---
 
@@ -1590,7 +1981,7 @@ any kind of `AbstractArray` and will be coerced into an `n x 1` vector.
 
 
 *source:*
-[QuantEcon/src/lae.jl:34](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/lae.jl#L34)
+[QuantEcon/src/lae.jl:34](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/lae.jl#L34)
 
 ---
 
@@ -1647,12 +2038,12 @@ V(x) = x'Px + d
 
 
 *source:*
-[QuantEcon/src/lqcontrol.jl:67](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/lqcontrol.jl#L67)
+[QuantEcon/src/lqcontrol.jl:67](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/lqcontrol.jl#L67)
 
 ---
 
 <a id="type__markovchain.1" class="lexicon_definition"></a>
-#### QuantEcon.MarkovChain{T<:Real} [¶](#type__markovchain.1)
+#### QuantEcon.MarkovChain{T, TM<:AbstractArray{T, 2}, TV<:AbstractArray{T, 1}} [¶](#type__markovchain.1)
 Finite-state discrete-time Markov chain.
 
 It stores useful information such as the stationary distributions, and
@@ -1666,7 +2057,7 @@ positive, and all rows must sum to unity
 
 
 *source:*
-[QuantEcon/src/mc_tools.jl:52](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/mc_tools.jl#L52)
+[QuantEcon/src/markov/mc_tools.jl:30](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/mc_tools.jl#L30)
 
 ---
 
@@ -1702,9 +2093,22 @@ the state space system. `C` should be n x j
 
 
 *source:*
-[QuantEcon/src/robustlq.jl:44](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/robustlq.jl#L44)
+[QuantEcon/src/robustlq.jl:44](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/robustlq.jl#L44)
 
 ## Internal
+
+---
+
+<a id="method___.1" class="lexicon_definition"></a>
+#### *{T}(A::Array{T, 3},  v::Array{T, 1}) [¶](#method___.1)
+Define Matrix Multiplication between 3-dimensional matrix and a vector
+
+Matrix multiplication over the last dimension of A
+
+
+
+*source:*
+[QuantEcon/src/markov/ddp.jl:695](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/ddp.jl#L695)
 
 ---
 
@@ -1714,7 +2118,7 @@ Private method implementing `compute_sequence` when state is a scalar
 
 
 *source:*
-[QuantEcon/src/lqcontrol.jl:270](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/lqcontrol.jl#L270)
+[QuantEcon/src/lqcontrol.jl:270](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/lqcontrol.jl#L270)
 
 ---
 
@@ -1724,7 +2128,103 @@ Private method implementing `compute_sequence` when state is a scalar
 
 
 *source:*
-[QuantEcon/src/lqcontrol.jl:247](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/lqcontrol.jl#L247)
+[QuantEcon/src/lqcontrol.jl:247](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/lqcontrol.jl#L247)
+
+---
+
+<a id="method___generate_a_indptr.1" class="lexicon_definition"></a>
+#### _generate_a_indptr!(num_states::Int64,  s_indices::Array{T, 1},  out::Array{T, 1}) [¶](#method___generate_a_indptr.1)
+Generate `a_indptr`; stored in `out`. `s_indices` is assumed to be
+in sorted order.
+
+Parameters
+----------
+num_states : Int
+
+s_indices : Vector{Int}
+
+out : Vector{Int} with length = num_states+1
+
+
+*source:*
+[QuantEcon/src/markov/ddp.jl:664](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/ddp.jl#L664)
+
+---
+
+<a id="method___has_sorted_sa_indices.1" class="lexicon_definition"></a>
+#### _has_sorted_sa_indices(s_indices::Array{T, 1},  a_indices::Array{T, 1}) [¶](#method___has_sorted_sa_indices.1)
+Check whether `s_indices` and `a_indices` are sorted in lexicographic order.
+
+Parameters
+----------
+s_indices, a_indices : Vectors
+
+Returns
+-------
+bool: Whether `s_indices` and `a_indices` are sorted.
+
+
+*source:*
+[QuantEcon/src/markov/ddp.jl:637](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/ddp.jl#L637)
+
+---
+
+<a id="method___random_stochastic_matrix.1" class="lexicon_definition"></a>
+#### _random_stochastic_matrix(n::Integer,  m::Integer) [¶](#method___random_stochastic_matrix.1)
+Generate a "non-square column stochstic matrix" of shape (n, m), which contains
+as columns m probability vectors of length n with k nonzero entries.
+
+##### Arguments
+
+- `n::Integer` : Number of states.
+- `m::Integer` : Number of probability vectors.
+- `;k::Union{Integer, Void}(nothing)` : Number of nonzero entries in each
+column of the matrix. Set to n if note specified.
+
+##### Returns
+
+- `p::Array` : Array of shape (n, m) containing m probability vectors of length
+n as columns.
+
+
+
+*source:*
+[QuantEcon/src/markov/random_mc.jl:129](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/random_mc.jl#L129)
+
+---
+
+<a id="method___solve.1" class="lexicon_definition"></a>
+#### _solve!(ddp::QuantEcon.DiscreteDP{T<:Real, NQ, NR, Tbeta<:Real, Tind},  ddpr::QuantEcon.DPSolveResult{QuantEcon.MPFI, Tval<:Real},  max_iter::Integer,  epsilon::Real,  k::Integer) [¶](#method___solve.1)
+Modified Policy Function Iteration
+
+
+*source:*
+[QuantEcon/src/markov/ddp.jl:766](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/ddp.jl#L766)
+
+---
+
+<a id="method___solve.2" class="lexicon_definition"></a>
+#### _solve!(ddp::QuantEcon.DiscreteDP{T<:Real, NQ, NR, Tbeta<:Real, Tind},  ddpr::QuantEcon.DPSolveResult{QuantEcon.PFI, Tval<:Real},  max_iter::Integer,  epsilon::Real,  k::Integer) [¶](#method___solve.2)
+Policy Function Iteration
+
+NOTE: The epsilon is ignored in this method. It is only here so dispatch can
+      go from `solve(::DiscreteDP, ::Type{Algo})` to any of the algorithms.
+      See `solve` for further details
+
+
+*source:*
+[QuantEcon/src/markov/ddp.jl:741](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/ddp.jl#L741)
+
+---
+
+<a id="method___solve.3" class="lexicon_definition"></a>
+#### _solve!(ddp::QuantEcon.DiscreteDP{T<:Real, NQ, NR, Tbeta<:Real, Tind},  ddpr::QuantEcon.DPSolveResult{QuantEcon.VFI, Tval<:Real},  max_iter::Integer,  epsilon::Real,  k::Integer) [¶](#method___solve.3)
+Impliments Value Iteration
+NOTE: See `solve` for further details
+
+
+*source:*
+[QuantEcon/src/markov/ddp.jl:709](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/ddp.jl#L709)
 
 ---
 
@@ -1735,7 +2235,7 @@ Version of default constuctor making `bet` `capT` `rf` keyword arguments
 
 
 *source:*
-[QuantEcon/src/lqcontrol.jl:131](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/lqcontrol.jl#L131)
+[QuantEcon/src/lqcontrol.jl:131](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/lqcontrol.jl#L131)
 
 ---
 
@@ -1746,7 +2246,7 @@ Version of default constuctor making `bet` `capT` `rf` keyword arguments
 
 
 *source:*
-[QuantEcon/src/lqcontrol.jl:131](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/lqcontrol.jl#L131)
+[QuantEcon/src/lqcontrol.jl:131](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/lqcontrol.jl#L131)
 
 ---
 
@@ -1757,7 +2257,7 @@ Version of default constuctor making `bet` `capT` `rf` keyword arguments
 
 
 *source:*
-[QuantEcon/src/lqcontrol.jl:131](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/lqcontrol.jl#L131)
+[QuantEcon/src/lqcontrol.jl:131](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/lqcontrol.jl#L131)
 
 ---
 
@@ -1789,7 +2289,7 @@ horizon problem. Must be symmetric and nonnegative definite.
 
 
 *source:*
-[QuantEcon/src/lqcontrol.jl:107](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/lqcontrol.jl#L107)
+[QuantEcon/src/lqcontrol.jl:107](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/lqcontrol.jl#L107)
 
 ---
 
@@ -1821,7 +2321,7 @@ horizon problem. Must be symmetric and nonnegative definite.
 
 
 *source:*
-[QuantEcon/src/lqcontrol.jl:107](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/lqcontrol.jl#L107)
+[QuantEcon/src/lqcontrol.jl:107](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/lqcontrol.jl#L107)
 
 ---
 
@@ -1853,16 +2353,76 @@ horizon problem. Must be symmetric and nonnegative definite.
 
 
 *source:*
-[QuantEcon/src/lqcontrol.jl:107](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/lqcontrol.jl#L107)
+[QuantEcon/src/lqcontrol.jl:107](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/lqcontrol.jl#L107)
 
 ---
 
-<a id="method__n_states.1" class="lexicon_definition"></a>
-#### n_states(mc::QuantEcon.MarkovChain{T<:Real}) [¶](#method__n_states.1)
-Number of states in the markov chain `mc`
+<a id="method__call.7" class="lexicon_definition"></a>
+#### call(::Type{QuantEcon.MarkovChain{T, TM<:AbstractArray{T, 2}, TV<:AbstractArray{T, 1}}},  ddp::QuantEcon.DiscreteDP{T<:Real, NQ, NR, Tbeta<:Real, Tind},  ddpr::QuantEcon.DPSolveResult{Algo<:QuantEcon.DDPAlgorithm, Tval<:Real}) [¶](#method__call.7)
+Returns the controlled Markov chain for a given policy `sigma`.
+
+##### Parameters
+
+- `ddp::DiscreteDP` : Object that contains the model parameters
+- `ddpr::DPSolveResult` : Object that contains result variables
+
+##### Returns
+
+mc : MarkovChain
+     Controlled Markov chain.
+
 
 *source:*
-[QuantEcon/src/mc_tools.jl:75](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/mc_tools.jl#L75)
+[QuantEcon/src/markov/ddp.jl:475](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/ddp.jl#L475)
+
+---
+
+<a id="method__call.8" class="lexicon_definition"></a>
+#### call{T, NQ, NR, Tbeta, Tind}(::Type{QuantEcon.DiscreteDP{T<:Real, NQ, NR, Tbeta<:Real, Tind}},  R::AbstractArray{T, NR},  Q::AbstractArray{T, NQ},  beta::Tbeta,  s_indices::Array{Tind, 1},  a_indices::Array{Tind, 1}) [¶](#method__call.8)
+DiscreteDP type for specifying parameters for discrete dynamic programming
+model State-Action Pair Formulation
+
+##### Parameters
+
+- `R::Array{T,NR}` : Reward Array
+- `Q::Array{T,NQ}` : Transition Probability Array
+- `beta::Float64`  : Discount Factor
+- `s_indices::Nullable{Vector{Tind}}`: State Indices. Null unless using
+  SA formulation
+- `a_indices::Nullable{Vector{Tind}}`: Action Indices. Null unless using
+  SA formulation
+- `a_indptr::Nullable{Vector{Tind}}`: Action Index Pointers. Null unless using
+  SA formulation
+
+##### Returns
+
+- `ddp::DiscreteDP` : Constructor for DiscreteDP object
+
+
+
+*source:*
+[QuantEcon/src/markov/ddp.jl:201](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/ddp.jl#L201)
+
+---
+
+<a id="method__call.9" class="lexicon_definition"></a>
+#### call{T, NQ, NR, Tbeta}(::Type{QuantEcon.DiscreteDP{T<:Real, NQ, NR, Tbeta<:Real, Tind}},  R::Array{T, NR},  Q::Array{T, NQ},  beta::Tbeta) [¶](#method__call.9)
+DiscreteDP type for specifying parameters for discrete dynamic programming
+model Dense Matrix Formulation
+
+##### Parameters
+
+- `R::Array{T,NR}` : Reward Array
+- `Q::Array{T,NQ}` : Transition Probability Array
+- `beta::Float64`  : Discount Factor
+
+##### Returns
+
+- `ddp::DiscreteDP` : Constructor for DiscreteDP object
+
+
+*source:*
+[QuantEcon/src/markov/ddp.jl:177](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/ddp.jl#L177)
 
 ---
 
@@ -1872,8 +2432,8 @@ Return m randomly sampled probability vectors of size k.
 
 ##### Arguments
 
-- `k::Integer` : Number of probability vectors.
-- `m::Integer` : Size of each probability vectors.
+- `k::Integer` : Size of each probability vector.
+- `m::Integer` : Number of probability vectors.
 
 ##### Returns
 
@@ -1882,5 +2442,86 @@ Return m randomly sampled probability vectors of size k.
 
 
 *source:*
-[QuantEcon/src/random_mc.jl:166](https://github.com/QuantEcon/QuantEcon.jl/tree/6024293d59435bb1a33776e96e36544f10b1b6b3/src/random_mc.jl#L166)
+[QuantEcon/src/markov/random_mc.jl:214](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/random_mc.jl#L214)
+
+---
+
+<a id="method__s_wise_max.1" class="lexicon_definition"></a>
+#### s_wise_max!(a_indices::Array{T, 1},  a_indptr::Array{T, 1},  vals::Array{T, 1},  out::Array{T, 1}) [¶](#method__s_wise_max.1)
+Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
+`Vector` of size `(num_sa_pairs,)`.
+
+
+*source:*
+[QuantEcon/src/markov/ddp.jl:583](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/ddp.jl#L583)
+
+---
+
+<a id="method__s_wise_max.2" class="lexicon_definition"></a>
+#### s_wise_max!(a_indices::Array{T, 1},  a_indptr::Array{T, 1},  vals::Array{T, 1},  out::Array{T, 1},  out_argmax::Array{T, 1}) [¶](#method__s_wise_max.2)
+Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
+`Vector` of size `(num_sa_pairs,)`.
+
+Also fills `out_argmax` with the cartesiean index associated with the indmax in
+each row
+
+
+*source:*
+[QuantEcon/src/markov/ddp.jl:607](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/ddp.jl#L607)
+
+---
+
+<a id="method__s_wise_max.3" class="lexicon_definition"></a>
+#### s_wise_max!(vals::AbstractArray{T, 2},  out::Array{T, 1}) [¶](#method__s_wise_max.3)
+Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
+`AbstractMatrix` of size `(num_states, num_actions)`.
+
+
+*source:*
+[QuantEcon/src/markov/ddp.jl:538](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/ddp.jl#L538)
+
+---
+
+<a id="method__s_wise_max.4" class="lexicon_definition"></a>
+#### s_wise_max!(vals::AbstractArray{T, 2},  out::Array{T, 1},  out_argmax::Array{T, 1}) [¶](#method__s_wise_max.4)
+Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
+`AbstractMatrix` of size `(num_states, num_actions)`.
+
+Also fills `out_argmax` with the column number associated with the indmax in
+each row
+
+
+*source:*
+[QuantEcon/src/markov/ddp.jl:547](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/ddp.jl#L547)
+
+---
+
+<a id="method__s_wise_max.5" class="lexicon_definition"></a>
+#### s_wise_max(vals::AbstractArray{T, 2}) [¶](#method__s_wise_max.5)
+Return the `Vector` `max_a vals(s, a)`,  where `vals` is represented as a
+`AbstractMatrix` of size `(num_states, num_actions)`.
+
+
+*source:*
+[QuantEcon/src/markov/ddp.jl:532](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/ddp.jl#L532)
+
+---
+
+<a id="type__dpsolveresult.1" class="lexicon_definition"></a>
+#### QuantEcon.DPSolveResult{Algo<:QuantEcon.DDPAlgorithm, Tval<:Real} [¶](#type__dpsolveresult.1)
+DPSolveResult is an object for retaining results and associated metadata after
+solving the model
+
+##### Parameters
+
+- `ddp::DiscreteDP` : DiscreteDP object
+
+##### Returns
+
+- `ddpr::DPSolveResult` : DiscreteDP Results object
+
+
+
+*source:*
+[QuantEcon/src/markov/ddp.jl:241](https://github.com/QuantEcon/QuantEcon.jl/tree/39874ebc82545eccb5cf03b4b45cb24079d7c73b/src/markov/ddp.jl#L241)
 
