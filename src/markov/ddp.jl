@@ -523,7 +523,7 @@ end
 s_wise_max(ddp::DiscreteDP, vals::AbstractMatrix) = s_wise_max(vals)
 
 s_wise_max!(ddp::DiscreteDP, vals::AbstractMatrix, out::Vector, out_argmax::Vector) =
-    s_wise_max!(vals, out, out_argmax)
+    s_wise_max!(vals', out, out_argmax)
 
 """
 Return the `Vector` `max_a vals(s, a)`,  where `vals` is represented as a
@@ -539,25 +539,26 @@ s_wise_max!(vals::AbstractMatrix, out::Vector) = (println("calling this one! ");
 
 """
 Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
-`AbstractMatrix` of size `(num_states, num_actions)`.
+`AbstractMatrix` of size `(num_actions, num_states)`.
 
 Also fills `out_argmax` with the column number associated with the indmax in
 each row
 """
 function s_wise_max!(vals::AbstractMatrix, out::Vector, out_argmax::Vector)
-    # naive implementation where I just iterate over the rows
+    length(out) == length(out_argmax) == size(vals, 1) || throw(DimensionMismatch())
+
     nr, nc = size(vals)
-    for i_r in 1:nr
+    for i_c in 1:nc # index over columns
         # reset temporaries
         cur_max = -Inf
-        out_argmax[i_r] = 1
+        out_argmax[i_c] = 1
 
-        for i_c in 1:nc
+        for i_r in 1:nr # index over rows
             @inbounds v_rc = vals[i_r, i_c]
             if v_rc > cur_max
-                out[i_r] = v_rc
-                out_argmax[i_r] = i_c
-                cur_max = v_rc
+                out[i_c]        = v_rc
+                out_argmax[i_c] = i_r
+                cur_max         = v_rc
             end
         end
 
