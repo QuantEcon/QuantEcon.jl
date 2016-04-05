@@ -22,7 +22,7 @@ Notes
 
 =#
 
-import Base.*
+import Base: *, ctranspose
 
 #------------------------#
 #-Types and Constructors-#
@@ -66,27 +66,34 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
             msg = "R must be 2-dimensional without s-a formulation"
             throw(ArgumentError(msg))
         end
-        (beta < 0 || beta >= 1) &&  throw(ArgumentError("beta must be [0, 1)"))
 
-        # verify input integrity 2
-        num_states, num_actions = size(R)
-        if size(Q) != (num_states, num_actions, num_states)
-            throw(ArgumentError("shapes of R and Q must be (n,m) and (n,m,n)"))
-        end
+        s, a = size(R)
 
-        # check feasibility
+        # check feasibility of beta
+        (0 <= beta < 1) || ArgumentError("beta must be in [0, 1)")
+
+        # verify dimensions of Q
+        size(Q) == (s, s, a) || throw(ArgumentError("shapes of R and Q must be (s, a) and (s, s, a)"))
+
+        # check feasibility of R
         R_max = s_wise_max(R)
-        if any(R_max .== -Inf)
+        if any(isinf(R_max))
             # First state index such that all actions yield -Inf
-            s = find(R_max .== -Inf) #-Only Gives True
+            s = find(isinf(R_max)) #-Only Gives True
             throw(ArgumentError("for every state the reward must be finite for
-                some action: violated for state $s"))
+                some action: violated for state(s) $(s)"))
         end
+
+        all(Q .>= 0) || throw(ArgumentError("Q must have nonnegative elements"))
+
+        # check columns of Q sum to 1
+        cols = sum(Q, 1)
+        isapprox(cols, ones(cols)) || throw(ArgumentError("columns of Q must sum to 1"))
 
         # here the indices and indptr are null.
         s_indices = Nullable{Vector{Int}}()
         a_indices = Nullable{Vector{Int}}()
-        a_indptr = Nullable{Vector{Int}}()
+        a_indptr  = Nullable{Vector{Int}}()
 
         new(R, Q, beta, s_indices, a_indices, a_indptr)
     end
@@ -376,8 +383,10 @@ for a given value function v.
 
 - `Tv::Vector` : Updated value function vector
 """
-bellman_operator(ddp::DiscreteDP, v::Vector) =
-    s_wise_max(ddp, ddp.R + ddp.beta * ddp.Q * v)
+bellman_operator(ddp::DiscreteDP, v::Vector) = begin
+    vals = ddp.R + ddp.beta * ddp.Q * v
+    s_wise_max(ddp, vals)
+end
 
 # ---------------------- #
 # Compute greedy methods #
@@ -514,8 +523,7 @@ Returns the controlled Markov chain for a given policy `sigma`.
 mc : MarkovChain
      Controlled Markov chain.
 """
-QuantEcon.MarkovChain(ddp::DiscreteDP, ddpr::DPSolveResult) =
-    MarkovChain(RQ_sigma(ddp, ddpr)[2])
+QuantEcon.MarkovChain(ddp::DiscreteDP, ddpr::DPSolveResult) = MarkovChain(RQ_sigma(ddp, ddpr)[2])
 
 """
 Method of `RQ_sigma` that extracts sigma from a `DPSolveResult`
@@ -541,15 +549,28 @@ the transition probability matrix `Q_sigma`.
   of shape (n, n).
 
 """
-function RQ_sigma{T<:Integer}(ddp::DDP, sigma::Array{T})
-    R_sigma = [ddp.R[i, sigma[i]] for i in 1:length(sigma)]
-    Q_sigma = hcat([getindex(ddp.Q, i, sigma[i], Colon())[:] for i=1:num_states(ddp)]...)
-    return R_sigma, Q_sigma'
+function RQ_sigma{T,Tbeta,Tind,U<:Integer}(ddp::DDP{T,Tbeta,Tind}, sigma::Vector{U})
+    s, s_, a = size(ddp.Q)
+    msg = "length of policy vector ($(length(sigma))) does not match number of actions in model ($a)"
+    length(sigma) == s || throw(ArgumentError(msg))
+
+    R_sigma = Vector{T}(a)
+    Q_sigma = Matrix{T}(a, s)
+
+    for (i, s) in enumerate(sigma)
+        R_sigma[i]    = ddp.R[s, i]
+        Q_sigma[i, :] = ddp.Q[:, i, s]
+    end
+
+    return R_sigma, Q_sigma
 end
 
 # TODO: express it in a similar way as above to exploit Julia's column major order
-function RQ_sigma{T<:Integer}(ddp::DDPsa, sigma::Array{T})
-    sigma_indices = Array(T, num_states(ddp))
+function RQ_sigma{U<:Integer}(ddp::DDPsa, sigma::Vector{U})
+    msg = "length of policy vector ($(length(sigma))) does not match number of actions in model ($num_states(ddp))"
+    length(sigma) == num_states(ddp) || throw(ArgumentError(msg))
+
+    sigma_indices = Vector{U}(num_states(ddp))
     _find_indices!(get(ddp.a_indices), get(ddp.a_indptr), sigma, sigma_indices)
     R_sigma = ddp.R[sigma_indices]
     Q_sigma = ddp.Q[sigma_indices, :]
@@ -571,7 +592,7 @@ s_wise_max!(ddp::DiscreteDP, vals::AbstractMatrix, out::Vector, out_argmax::Vect
 Return the `Vector` `max_a vals(s, a)`,  where `vals` is represented as a
 `AbstractMatrix` of size `(num_states, num_actions)`.
 """
-s_wise_max(vals::AbstractMatrix) = vec(maximum(vals, 2))
+s_wise_max(vals::AbstractMatrix) = vec(maximum(vals, 1))
 
 """
 Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
@@ -581,25 +602,26 @@ s_wise_max!(vals::AbstractMatrix, out::Vector) = (println("calling this one! ");
 
 """
 Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
-`AbstractMatrix` of size `(num_states, num_actions)`.
+`AbstractMatrix` of size `(num_actions, num_states)`.
 
 Also fills `out_argmax` with the column number associated with the indmax in
 each row
 """
 function s_wise_max!(vals::AbstractMatrix, out::Vector, out_argmax::Vector)
-    # naive implementation where I just iterate over the rows
+    length(out) == length(out_argmax) == size(vals, 1) || throw(DimensionMismatch())
+
     nr, nc = size(vals)
-    for i_r in 1:nr
+    for i_c in 1:nc # index over columns
         # reset temporaries
         cur_max = -Inf
-        out_argmax[i_r] = 1
+        out_argmax[i_c] = 1
 
-        for i_c in 1:nc
+        for i_r in 1:nr # index over rows
             @inbounds v_rc = vals[i_r, i_c]
             if v_rc > cur_max
-                out[i_r] = v_rc
-                out_argmax[i_r] = i_c
-                cur_max = v_rc
+                out[i_c]        = v_rc
+                out_argmax[i_c] = i_r
+                cur_max         = v_rc
             end
         end
 
@@ -625,7 +647,7 @@ Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
 function s_wise_max!(a_indices::Vector, a_indptr::Vector, vals::Vector,
                       out::Vector)
     n = length(out)
-    for i in 1:n
+    @inbounds for i in 1:n
         if a_indptr[i] != a_indptr[i+1]
             m = a_indptr[i]
             for j in a_indptr[i]+1:(a_indptr[i+1]-1)
@@ -734,14 +756,29 @@ Define Matrix Multiplication between 3-dimensional matrix and a vector
 Matrix multiplication over the last dimension of A
 
 """
-function *{T}(A::Array{T,3}, v::Vector)
-    shape = size(A)
-    size(v, 1) == shape[end] || error("wrong dimensions")
+function ctranspose{T}(A::Array{T,3})
+    m, n, o = size(A)
+    B = Array{T}(o, m, n)
+    @inbounds for i in 1:m, j in 1:n, k in 1:o
+        # permute indices
+        B[k,i,j] = A[i,j,k]
+    end
+    return B
+end
 
-    B = reshape(A, (prod(shape[1:end-1]), shape[end]))
-    out = B * v
+function *{T,U}(Q::Array{T,3}, v::Vector{U})
+    s, s_, a = size(Q)
+    msg = "inappropriate dimension stochastic maxtrix"
+    s == s_ || throw(ArgumentError(msg))
+    s == length(v) || throw(DimensionMismatch())
 
-    return reshape(out, shape[1:end-1])
+    R = Array{promote_type(T,U)}(a, s)
+
+    @inbounds for i in 1:s, j in 1:a
+        R[j, i] = dot(v, Q[:, i, j])
+    end
+
+    return R
 end
 
 """
