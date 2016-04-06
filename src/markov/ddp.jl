@@ -75,7 +75,7 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
         end
 
         # check feasibility
-        R_max = s_wise_max(R)
+        R_max = s_wise_max(R')
         if any(R_max .== -Inf)
             # First state index such that all actions yield -Inf
             s = find(R_max .== -Inf) #-Only Gives True
@@ -288,6 +288,7 @@ for a value function v.
 """
 function bellman_operator!(ddp::DiscreteDP, v::Vector, Tv::Vector, sigma::Vector)
     vals = ddp.R + ddp.beta * ddp.Q * v
+    vals = isa(vals, Matrix) ? vals' : vals
     s_wise_max!(ddp, vals, Tv, sigma)
     Tv, sigma
 end
@@ -347,8 +348,11 @@ for a given value function v.
 
 - `Tv::Vector` : Updated value function vector
 """
-bellman_operator(ddp::DiscreteDP, v::Vector) =
-    s_wise_max(ddp, ddp.R + ddp.beta * ddp.Q * v)
+bellman_operator(ddp::DiscreteDP, v::Vector) = begin
+    vals = ddp.R + ddp.beta * ddp.Q * v
+    vals = isa(vals, Matrix) ? vals' : isa(vals, Vector) ? vals : throw("something messed up")
+    s_wise_max(ddp, vals)
+end
 
 # ---------------------- #
 # Compute greedy methods #
@@ -523,13 +527,13 @@ end
 s_wise_max(ddp::DiscreteDP, vals::AbstractMatrix) = s_wise_max(vals)
 
 s_wise_max!(ddp::DiscreteDP, vals::AbstractMatrix, out::Vector, out_argmax::Vector) =
-    s_wise_max!(vals', out, out_argmax)
+    s_wise_max!(vals, out, out_argmax)
 
 """
 Return the `Vector` `max_a vals(s, a)`,  where `vals` is represented as a
 `AbstractMatrix` of size `(num_states, num_actions)`.
 """
-s_wise_max(vals::AbstractMatrix) = vec(maximum(vals, 2))
+s_wise_max(vals::AbstractMatrix) = vec(maximum(vals, 1))
 
 """
 Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
