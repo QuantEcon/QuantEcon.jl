@@ -18,7 +18,10 @@ Tests for markov/ddp.jl
 
     # Formulation with Dense Matrices R: n x m, Q: n x m x n
     n, m = 2, 2  # number of states, number of actions
-    R = [5.0 10.0; -1.0 -Inf]
+
+    # Note that this R is transposed!!!!!!
+    R = [5.0 10.0; -1.0 -Inf]'
+
     Q = Array(Float64, n, m, n)
     Q[:, :, 1] = [0.5 0.0; 0.0 0.0]
     Q[:, :, 2] = [0.5 1.0; 1.0 1.0]
@@ -29,7 +32,9 @@ Tests for markov/ddp.jl
     L = 3  # Number of state-action pairs
     s_indices = [1, 1, 2]
     a_indices = [1, 2, 1]
-    R_sa = [R[1, 1], R[1, 2], R[2, 1]]
+
+    # Have to untranspose R here!!!!!!
+    R_sa = [R'[1, 1], R'[1, 2], R'[2, 1]]
     Q_sa = spzeros(L, n)
     Q_sa[1, :] = Q[1, 1, :]
     Q_sa[2, :] = Q[1, 2, :]
@@ -47,11 +52,9 @@ Tests for markov/ddp.jl
     v_star = [(5-5.5*beta)/((1-0.5*beta)*(1-beta)), -1/(1-beta)]
     sigma_star = [1, 1]
 
-    @testset "bellman_operator methods" begin
+    @testset "bellman_operator methods" for ddp in ddp0_collection
         # Check both Dense and State-Action Pair Formulation
-        for ddp in ddp0_collection
-        	@test isapprox(bellman_operator(ddp, v_star), v_star)
-    	end
+    	@test isapprox(bellman_operator(ddp, v_star), v_star)
     end
 
     @testset "RQ_sigma" begin
@@ -62,7 +65,7 @@ Tests for markov/ddp.jl
             r, q = RQ_sigma(ddp0, sig)
 
             for i_r in 1:nr
-                @test r[i_r] == ddp0.R[i_r, sig[i_r]]
+                @test r[i_r] == ddp0.R[sig[i_r], i_r]
                 for i_c in 1:length(sig)
                     @test vec(q[i_c, :]) == vec(ddp0.Q[i_c, sig[i_c], :])
                 end
@@ -72,52 +75,47 @@ Tests for markov/ddp.jl
         # TODO: add test for DDPsa
     end
 
-    @testset "compute_greedy methods" begin
+    @testset "compute_greedy methods" for ddp in ddp0_collection
         # Check both Dense and State-Action Pair Formulation
-        for ddp in ddp0_collection
-        	@test compute_greedy(ddp, v_star) == sigma_star
-    	end
+    	@test compute_greedy(ddp, v_star) == sigma_star
     end
 
-    @testset "evaluate_policy methods" begin
+    @testset "evaluate_policy methods" for ddp in ddp0_collection
         # Check both Dense and State-Action Pair Formulation
-        for ddp in ddp0_collection
-        	@test isapprox(evaluate_policy(ddp, sigma_star), v_star)
+    	@test isapprox(evaluate_policy(ddp, sigma_star), v_star)
+    end
+
+
+    float_types = (Float16, Float32, Float64, BigFloat)
+    int_types   = (Int8,  Int16,  Int32,  Int64,  Int128,
+                   UInt8, UInt16, UInt32, UInt64, UInt128)
+
+    @testset "methods for subtypes != (Float64, Int)" for ddp in ddp0_collection
+        for f in (bellman_operator, compute_greedy)
+            for T in float_types
+                f_f64 = f(ddp, [1.0, 1.0])
+                f_T = f(ddp, ones(T, 2))
+                @test isapprox(f_f64, convert(Vector{eltype(f_f64)}, f_T))
+            end
+
+            # only Integer subtypes can be Rational type params
+            # NOTE: Only the integer types below don't overflow for this example
+            for T in [Int64, Int128]
+                @test f(ddp, [1//1, 1//1]) == f(ddp, ones(Rational{T}, 2))
+            end
         end
-    end
 
-    @testset "methods for subtypes != (Float64, Int)" begin
-        float_types = [Float16, Float32, Float64, BigFloat]
-        int_types = [Int8, Int16, Int32, Int64, Int128,
-                     UInt8, UInt16, UInt32, UInt64, UInt128]
+        for T in float_types, S in int_types
+            v = ones(T, 2)
+            s = ones(S, 2)
+            # just test that we can call the method and the result is
+            # deterministic
+            @test bellman_operator!(ddp, v, s) == bellman_operator!(ddp, v, s)
+        end
 
-        for ddp in ddp0_collection
-            for f in (bellman_operator, compute_greedy)
-                for T in float_types
-                    f_f64 = f(ddp, [1.0, 1.0])
-                    f_T = f(ddp, ones(T, 2))
-                    @test isapprox(f_f64, convert(Vector{eltype(f_f64)}, f_T))
-                end
-
-                # only Integer subtypes can be Rational type params
-                # NOTE: Only the integer types below don't overflow for this example
-                for T in [Int64, Int128]
-                    @test f(ddp, [1//1, 1//1]) == f(ddp, ones(Rational{T}, 2))
-                end
-            end
-
-            for T in float_types, S in int_types
-                v = ones(T, 2)
-                s = ones(S, 2)
-                # just test that we can call the method and the result is
-                # deterministic
-                @test bellman_operator!(ddp, v, s) == bellman_operator!(ddp, v, s)
-            end
-
-            for T in int_types
-                s = T[1, 1]
-                @test isapprox(evaluate_policy(ddp, s), v_star)
-            end
+        for T in int_types
+            s = T[1, 1]
+            @test isapprox(evaluate_policy(ddp, s), v_star)
         end
     end
 
@@ -128,40 +126,36 @@ Tests for markov/ddp.jl
         @test maxabs(res.Tv - 500.0) > 0
     end
 
-    @testset "value_iteration" begin
+    @testset "value_iteration" for ddp_item in ddp0_collection
         # Check both Dense and State-Action Pair Formulation
-        for ddp_item in ddp0_collection
-            # Compute Result
-            res = solve(ddp_item, VFI)
-            v_init = [0.0, 0.0]
-            res_init = solve(ddp_item, v_init, VFI; epsilon=epsilon)
+        # Compute Result
+        res = solve(ddp_item, VFI)
+        v_init = [0.0, 0.0]
+        res_init = solve(ddp_item, v_init, VFI; epsilon=epsilon)
 
-            # Check v is an epsilon/2-approxmation of v_star
-            @test maxabs(res.v - v_star) < epsilon/2
-            @test maxabs(res_init.v - v_star)    < epsilon/2
+        # Check v is an epsilon/2-approxmation of v_star
+        @test maxabs(res.v - v_star) < epsilon/2
+        @test maxabs(res_init.v - v_star)    < epsilon/2
 
-            # Check sigma == sigma_star.
-            # NOTE we need to convert from linear to row-by-row index
-            @test res.sigma == sigma_star
-            @test res_init.sigma == sigma_star
-        end
+        # Check sigma == sigma_star.
+        # NOTE we need to convert from linear to row-by-row index
+        @test res.sigma == sigma_star
+        @test res_init.sigma == sigma_star
     end
 
-    @testset "policy_iteration" begin
+    @testset "policy_iteration" for ddp_item in ddp0_collection
         # Check both Dense and State-Action Pair Formulation
-        for ddp_item in ddp0_collection
-            res = solve(ddp_item, PFI)
-            v_init = [0.0, 1.0]
-            res_init = solve(ddp_item, v_init, PFI)
+        res = solve(ddp_item, PFI)
+        v_init = [0.0, 1.0]
+        res_init = solve(ddp_item, v_init, PFI)
 
-            # Check v == v_star
-            @test isapprox(res.v, v_star)
-            @test isapprox(res_init.v, v_star)
+        # Check v == v_star
+        @test isapprox(res.v, v_star)
+        @test isapprox(res_init.v, v_star)
 
-            # Check sigma == sigma_star
-            @test res.sigma == sigma_star
-            @test res_init.sigma == sigma_star
-        end
+        # Check sigma == sigma_star
+        @test res.sigma == sigma_star
+        @test res_init.sigma == sigma_star
     end
 
     @testset "DiscreteDP{Rational,_,_,Rational} maintains Rational" begin
@@ -264,7 +258,7 @@ Tests for markov/ddp.jl
         @testset "feasbile action pair" begin
             #Dense Matrix
             n, m = 2, 2
-            _R = [-Inf -Inf; 1.0 2.0]
+            _R = [-Inf -Inf; 1.0 2.0]'
 
             _Q = Array(Float64, n, m, n)
             _Q[:, :, 1] = [0.5 0.0; 0.0 0.0]

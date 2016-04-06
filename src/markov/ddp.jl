@@ -69,13 +69,13 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
         (beta < 0 || beta >= 1) &&  throw(ArgumentError("beta must be [0, 1)"))
 
         # verify input integrity 2
-        num_states, num_actions = size(R)
+        num_actions, num_states = size(R)
         if size(Q) != (num_states, num_actions, num_states)
             throw(ArgumentError("shapes of R and Q must be (n,m) and (n,m,n)"))
         end
 
         # check feasibility
-        R_max = s_wise_max(R')
+        R_max = s_wise_max(R)
         if any(R_max .== -Inf)
             # First state index such that all actions yield -Inf
             s = find(R_max .== -Inf) #-Only Gives True
@@ -287,8 +287,8 @@ for a value function v.
 - `sigma::Vector` : Updated policiy function vector
 """
 function bellman_operator!(ddp::DiscreteDP, v::Vector, Tv::Vector, sigma::Vector)
-    vals = ddp.R + ddp.beta * ddp.Q * v
-    vals = isa(vals, Matrix) ? vals' : vals
+    Qv   = ddp.Q * v
+    vals = ddp.R + ddp.beta * (isa(Qv, Matrix) ? (Qv)' : Qv)
     s_wise_max!(ddp, vals, Tv, sigma)
     Tv, sigma
 end
@@ -349,8 +349,8 @@ for a given value function v.
 - `Tv::Vector` : Updated value function vector
 """
 bellman_operator(ddp::DiscreteDP, v::Vector) = begin
-    vals = ddp.R + ddp.beta * ddp.Q * v
-    vals = isa(vals, Matrix) ? vals' : isa(vals, Vector) ? vals : throw("something messed up")
+    Qv   = ddp.Q * v
+    vals = ddp.R + ddp.beta * (isa(Qv, Matrix) ? (Qv)' : Qv)
     s_wise_max(ddp, vals)
 end
 
@@ -504,7 +504,7 @@ the transition probability matrix `Q_sigma`.
 
 """
 function RQ_sigma{T<:Integer}(ddp::DDP, sigma::Array{T})
-    R_sigma = [ddp.R[i, sigma[i]] for i in 1:length(sigma)]
+    R_sigma = [ddp.R[sigma[i], i] for i in 1:length(sigma)]
     Q_sigma = hcat([getindex(ddp.Q, i, sigma[i], Colon())[:] for i=1:num_states(ddp)]...)
     return R_sigma, Q_sigma'
 end
