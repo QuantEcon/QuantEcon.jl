@@ -144,8 +144,32 @@ recurrent_classes(mc::MarkovChain) = attracting_components(DiGraph(mc.p))
 
 communication_classes(mc::MarkovChain) = strongly_connected_components(DiGraph(mc.p))
 
+"""
+Indicate whether the Markov chain is irreducible.
+
+##### Arguments
+
+- `mc::MarkovChain` : MarkovChain instance containing a valid stochastic matrix
+
+##### Returns
+
+- Bool (true or false)
+
+"""
 is_irreducible(mc::MarkovChain) =  is_strongly_connected(DiGraph(mc.p))
 
+"""
+Indicate whether the Markov chain is aperiodic.
+
+##### Arguments
+
+- `mc::MarkovChain` : MarkovChain instance containing a valid stochastic matrix
+
+##### Returns
+
+- Bool (true or false)
+
+"""
 is_aperiodic(mc::MarkovChain) = period(mc) == 1
 
 function period(mc::MarkovChain)

@@ -98,7 +98,23 @@ function simulate(lss::LSS, ts_length=100)
     return x, y
 end
 
+"""
+Simulate num_reps observations of x_T and y_T given x_0 ~ N(mu_0, Sigma_0).
 
+#### Arguments
+
+- `lss::LSS` An instance of the Gaussian linear state space model.
+- `T::Int = 10` The period that we want to replicate values for.
+- `num_reps::Int = 100` The number of replications we want
+
+#### Returns
+
+- `x::Matrix` An n x num_reps matrix, where the j-th column is the j_th
+              observation of x_T 
+- `y::Matrix` An k x num_reps matrix, where the j-th column is the j_th
+              observation of y_T 
+
+"""
 function replicate(lss::LSS, t=10, num_reps=100)
     x = Array(Float64, lss.n, num_reps)
     for j=1:num_reps
@@ -112,7 +128,18 @@ end
 
 replicate(lss::LSS; t=10, num_reps=100) = replicate(lss, t, num_reps)
 
+"""
+Create a generator to calculate the population mean and
+variance-convariance matrix for both x_t and y_t, starting at
+the initial condition (self.mu_0, self.Sigma_0).  Each iteration
+produces a 4-tuple of items (mu_x, mu_y, Sigma_x, Sigma_y) for
+the next period.
 
+#### Arguments
+
+- `lss::LSS` An instance of the Gaussian linear state space model 
+
+"""
 function moment_sequence(lss::LSS)
     A, C, G = lss.A, lss.C, lss.G
     mu_x, Sigma_x = copy(lss.mu_0), copy(lss.Sigma_0)
@@ -126,7 +153,25 @@ function moment_sequence(lss::LSS)
     end
 end
 
+"""
+Compute the moments of the stationary distributions of x_t and
+y_t if possible.  Computation is by iteration, starting from the
+initial conditions lss.mu_0 and lss.Sigma_0
 
+#### Arguments
+
+- `lss::LSS` An instance of the Guassian linear state space model
+- `;max_iter::Int = 200` The maximum number of iterations allowed
+- `;tol::Float64 = 1e-5` The tolerance level one wishes to achieve
+
+#### Returns
+
+- `mu_x::Vector` Represents the stationary mean of x_t
+- `mu_y::Vector`Represents the stationary mean of y_t
+- `Sigma_x::Matrix` Represents the var-cov matrix
+- `Sigma_y::Matrix` Represents the var-cov matrix
+
+"""
 function stationary_distributions(lss::LSS; max_iter=200, tol=1e-5)
     # Initialize iteration
     m = @task moment_sequence(lss)
