@@ -142,6 +142,19 @@ recurrent classes of the transition matrix for p
 """
 recurrent_classes(mc::MarkovChain) = attracting_components(DiGraph(mc.p))
 
+"""
+A communication class of the Markov Chain `X_t` or of the stochastic matrix `p`
+is a strongly connected component of the directed graph associated with `p`
+
+#### Arguments
+
+- `mc::MarkovChain` MarkovChain instance containing a valid stochastic matrix
+
+### Returns
+
+- `x::Vector{Vector{Int64}}` An array of the associated strongly connected components
+
+"""
 communication_classes(mc::MarkovChain) = strongly_connected_components(DiGraph(mc.p))
 
 """

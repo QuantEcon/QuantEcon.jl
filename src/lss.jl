@@ -41,7 +41,31 @@ end
     (f1.mu_0 == f2.mu_0) && (f1.Sigma_0 == f2.Sigma_0)
 
 Base.rand{T}(d::FakeMVTNorm{T}) = copy(d.mu_0)
+"""
+A type that describes the Gaussian Linear State Space Model 
+of the form: 
 
+    x_{t+1} = A x_t + C w_{t+1}
+
+        y_t = G x_t
+
+where {w_t} and {v_t} are independent and standard normal with dimensions
+k and l respectively.  The initial conditions are mu_0 and Sigma_0 for x_0
+~ N(mu_0, Sigma_0).  When Sigma_0=0, the draw of x_0 is exactly mu_0.
+
+#### Fields
+
+- `A::Matrix` Part of the state transition equation.  It should be `n x n`
+- `C::Matrix` Part of the state transition equation.  It should be `n x m`
+- `G::Matrix` Part of the observation equation.  It should be `k x n`
+- `k::Int` Dimension
+- `n::Int` Dimension
+- `m::Int` Dimension
+- `mu_0::Vector` This is the mean of initial draw and is of length `n`
+- `Sigma_0::Matrix` This is the variance of the initial draw and is `n x n` and
+                    also should be positive definite and symmetric
+
+"""
 type LSS
     A::Matrix
     C::Matrix
