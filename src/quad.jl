@@ -50,9 +50,6 @@ $(qnw_func_notes)
 
 $(qnw_refs)
 """
-:qnwlege
-
-## 1d versions
 function qnwlege(n::Int, a::Real, b::Real)
     maxit = 10000
     m = fix((n + 1) / 2.0)
@@ -118,8 +115,6 @@ $(qnw_func_notes)
 
 $(qnw_refs)
 """
-:qnwcheb
-
 function qnwcheb(n::Int, a::Real, b::Real)
     nodes = (b+a)/2 - (b-a)/2 .* cos(pi/n .* (0.5:(n-0.5)))
     weights = ((b-a)/n) .* (cos(pi/n .* (collect(1:n)-0.5)*collect(0:2:n-1)')
@@ -158,8 +153,6 @@ the mean and variance of a 1d normal distribution
 
 $(qnw_refs)
 """
-:qnwnorm
-
 function qnwnorm(n::Int)
     maxit = 100
     pim4 = 1 / pi^(0.25)
@@ -239,8 +232,6 @@ $(qnw_func_notes)
 
 $(qnw_refs)
 """
-:qnwsimp
-
 function qnwsimp(n::Int, a::Real, b::Real)
     if n<=1
         error("In qnwsimp: n must be integer greater than one.")
@@ -276,8 +267,6 @@ $(qnw_func_notes)
 
 $(qnw_refs)
 """
-:qnwtrap
-
 function qnwtrap(n::Int, a::Real, b::Real)
     if n < 1
         error("n must be at least 1")
@@ -307,8 +296,6 @@ $(qnw_func_notes)
 
 $(qnw_refs)
 """
-:qnwbeta
-
 function qnwbeta(n::Int, a::Real, b::Real)
     a -= 1
     b -= 1
@@ -417,8 +404,6 @@ $(qnw_func_notes)
 
 $(qnw_refs)
 """
-:qnwgamma
-
 function qnwgamma(n::Int, a::Real=1.0, b::Real=1.0)
     a < 0 && error("shape parameter must be positive")
     b < 0 && error("scale parameter must be positive")
@@ -681,8 +666,6 @@ $(qnw_func_notes)
 $(qnw_refs)
 
 """
-:qnwequi
-
 function qnwequi(n::Int, a::Vector, b::Vector, kind::AbstractString="N")
     # error checking
     n_a, n_b = length(a), length(b)
@@ -766,8 +749,6 @@ spanned by `nodes`.
 formed by `[a, b]`
 
 """
-:do_quad
-
 function do_quad(f::Function, nodes::Array, weights::Vector, args...;
                  kwargs...)
     return dot(f(nodes, args...; kwargs...), weights)
@@ -808,9 +789,6 @@ formed by `[a, b]`
 $(qnw_refs)
 
 """
-:quadrect
-
-
 function quadrect(f::Function, n, a, b, kind="lege", args...; kwargs...)
     if lowercase(kind)[1] == 'l'
         nodes, weights = qnwlege(n, a, b)
