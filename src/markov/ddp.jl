@@ -221,8 +221,37 @@ num_states(ddp::DDPsa) = size(ddp.Q, 2)
 num_actions(ddp::DiscreteDP) = size(ddp.R, 2)
 
 abstract DDPAlgorithm
+"""
+This refers to the Value Iteration solution algorithm.
+
+References
+----------
+
+http://quant-econ.net/jl/ddp.html
+
+"""
 immutable VFI <: DDPAlgorithm end
+
+"""
+This refers to the Policy Iteration solution algorithm.
+
+References
+----------
+
+http://quant-econ.net/jl/ddp.html
+
+"""
 immutable PFI <: DDPAlgorithm end
+
+"""
+This refers to the Modified Policy Iteration solution algorithm.
+
+References
+----------
+
+http://quant-econ.net/jl/ddp.html
+
+"""
 immutable MPFI <: DDPAlgorithm end
 
 """
