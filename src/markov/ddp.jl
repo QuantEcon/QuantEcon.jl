@@ -403,6 +403,19 @@ modifies ddpr.sigma and ddpr.Tv in place
 compute_greedy!(ddp::DiscreteDP, ddpr::DPSolveResult) =
     (bellman_operator!(ddp, ddpr); ddpr.sigma)
 
+"""
+Compute the v-greedy policy.
+
+#### Arguments
+
+- `v::Vector` Value function vector of length `n`
+- `ddp::DiscreteDP` Object that contains the model parameters
+
+#### Returns
+
+- `sigma:: v-greedy policy vector, of length `n`
+
+"""
 function compute_greedy{TV<:Real}(ddp::DiscreteDP, v::Vector{TV})
     Tv = similar(v)
     sigma = ones(Int, length(v))
