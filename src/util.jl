@@ -13,37 +13,58 @@ fix(x::Real) = x >= 0 ? floor(Int, x) : ceil(Int, x)
 fix!{T<:Real}(x::AbstractArray{T}, out::Array{Int}) = map!(fix, out, x)
 fix{T<:Real}(x::AbstractArray{T}) = fix!(x, similar(x, Int))
 
-ckron(A::Array, B::Array) = kron(A, B)
-ckron(arrays::Array...) = reduce(kron, arrays)
+"""
+`fix(x)`
 
+Round `x` towards zero. For arrays there is a mutating version `fix!`
+"""
+fix
+
+ckron(A::AbstractArray, B::AbstractArray) = kron(A, B)
+ckron(arrays::AbstractArray...) = reduce(kron, arrays)
+
+"""
+`ckron(arrays::AbstractArray...)`
+
+Repeatedly apply kronecker products to the arrays. Equilvalent to
+`reduce(kron, arrays)`
+"""
+ckron
+
+"""
+`gridmake!(out::AbstractMatrix, arrays::AbstractVector...)`
+
+Like `gridmake`, but fills a pre-populated array. `out` must have size
+`prod(map(length, arrays), length(arrays))`
+"""
 function gridmake!(out, arrays::AbstractVector...)
-    arr = arrays[1]
-    typ = eltype(arr)
-    l = 1; for a in arrays; l *= length(a); end
+    lens = Int[length(e) for e in arrays]
+
     n = length(arrays)
+    l = prod(lens)
     @assert size(out) == (l, n)
 
-    l_i = length(arr)
-    m = Int(l / l_i)
+    reverse!(lens)
+    repititions = cumprod(vcat(1, lens[1:end-1]))
+    reverse!(repititions)
+    reverse!(lens)  # put lens back in correct order
 
-    # fill this column
-    row = 1
-    @inbounds for el in arr, i = 1:m
-        out[row, 1] = el
-        row += 1
-    end
-
-    if n > 1
-        # recursively call to fill upper right block for columns 2:end
-        gridmake!(sub(out, 1:m, 2:n), arrays[2:end]...)
-
-        # extract upper right block and fill in lower middle block for columns
-        # 2:end
-        @inbounds for j in 2:l_i
-            out[(j-1)*m+1:(j)*m, 2:end] = sub(out, 1:m, 2:n)
+    @inbounds for col=1:n
+        row = 1
+        arr = arrays[col]
+        outer = repititions[col]
+        inner = floor(Int, l / (outer * lens[col]))
+        for _ in 1:outer
+            for ix in 1:lens[col]
+                v = arr[ix]
+                for _ in 1:inner
+                    out[row, col] = v
+                    row += 1
+                end
+            end
         end
     end
-    out
+    return out
 end
 
 function gridmake(arrays::AbstractVector...)
@@ -58,3 +79,33 @@ function gridmake{T}(arrays::AbstractVector{T}...)
     out = Array(T, prod([length(a) for a in  arrays]), length(arrays))
     gridmake!(out, arrays...)
 end
+
+"""
+`gridmake(arrays::AbstractVector...)`
+
+Expand one or more vectors into a matrix where rows span the cartesian product
+of combinations of the input vectors. Each input array will correspond to one
+column of the output matrix. The first array varies the fastest (see example)
+
+##### Example
+
+```jlcon
+julia> x = [1, 2, 3]; y = [10, 20]; z = [100, 200];
+
+julia> gridmake(x, y, z)
+12x3 Array{Int64,2}:
+ 1  10  100
+ 2  10  100
+ 3  10  100
+ 1  20  100
+ 2  20  100
+ 3  20  100
+ 1  10  200
+ 2  10  200
+ 3  10  200
+ 1  20  200
+ 2  20  200
+ 3  20  200
+```
+"""
+gridmake
