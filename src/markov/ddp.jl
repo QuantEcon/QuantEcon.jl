@@ -221,8 +221,37 @@ num_states(ddp::DDPsa) = size(ddp.Q, 2)
 num_actions(ddp::DiscreteDP) = size(ddp.R, 2)
 
 abstract DDPAlgorithm
+"""
+This refers to the Value Iteration solution algorithm.
+
+References
+----------
+
+http://quant-econ.net/jl/ddp.html
+
+"""
 immutable VFI <: DDPAlgorithm end
+
+"""
+This refers to the Policy Iteration solution algorithm.
+
+References
+----------
+
+http://quant-econ.net/jl/ddp.html
+
+"""
 immutable PFI <: DDPAlgorithm end
+
+"""
+This refers to the Modified Policy Iteration solution algorithm.
+
+References
+----------
+
+http://quant-econ.net/jl/ddp.html
+
+"""
 immutable MPFI <: DDPAlgorithm end
 
 """
@@ -374,6 +403,19 @@ modifies ddpr.sigma and ddpr.Tv in place
 compute_greedy!(ddp::DiscreteDP, ddpr::DPSolveResult) =
     (bellman_operator!(ddp, ddpr); ddpr.sigma)
 
+"""
+Compute the v-greedy policy.
+
+#### Arguments
+
+- `v::Vector` Value function vector of length `n`
+- `ddp::DiscreteDP` Object that contains the model parameters
+
+#### Returns
+
+- `sigma:: v-greedy policy vector, of length `n`
+
+"""
 function compute_greedy{TV<:Real}(ddp::DiscreteDP, v::Vector{TV})
     Tv = similar(v)
     sigma = ones(Int, length(v))
