@@ -22,7 +22,7 @@ Notes
 
 =#
 
-import Base.*
+import Base: *, ctranspose
 
 #------------------------#
 #-Types and Constructors-#
@@ -287,8 +287,7 @@ for a value function v.
 - `sigma::Vector` : Updated policiy function vector
 """
 function bellman_operator!(ddp::DiscreteDP, v::Vector, Tv::Vector, sigma::Vector)
-    Qv   = ddp.Q * v
-    vals = ddp.R + ddp.beta * (isa(Qv, Matrix) ? (Qv)' : Qv)
+    vals = ddp.R + ddp.beta * ddp.Q * v
     s_wise_max!(ddp, vals, Tv, sigma)
     Tv, sigma
 end
@@ -349,8 +348,7 @@ for a given value function v.
 - `Tv::Vector` : Updated value function vector
 """
 bellman_operator(ddp::DiscreteDP, v::Vector) = begin
-    Qv   = ddp.Q * v
-    vals = ddp.R + ddp.beta * (isa(Qv, Matrix) ? (Qv)' : Qv)
+    vals = ddp.R + ddp.beta * ddp.Q * v
     s_wise_max(ddp, vals)
 end
 
@@ -697,15 +695,32 @@ Define Matrix Multiplication between 3-dimensional matrix and a vector
 Matrix multiplication over the last dimension of A
 
 """
-function *{T}(A::Array{T,3}, v::Vector)
-    shape = size(A)
-    size(v, 1) == shape[end] || error("wrong dimensions")
-
-    B = reshape(A, (prod(shape[1:end-1]), shape[end]))
-    out = B * v
-
-    return reshape(out, shape[1:end-1])
+function ctranspose{T}(A::Array{T,3})
+    m, n, o = size(A)
+    B = Array{T}(o, m, n)
+    @inbounds for i in 1:m, j in 1:n, k in 1:o
+        # permute indices
+        B[k,i,j] = A[i,j,k]
+    end
+    return B
 end
+
+function *{T,U}(_Q::Array{T,3}, v::Vector{U})
+    Q = _Q'
+    s, s_, a = size(Q)
+    msg = "inappropriate dimension stochastic maxtrix"
+    s == s_ || throw(ArgumentError(msg))
+    s == length(v) || throw(DimensionMismatch())
+
+    R = Array{promote_type(T,U)}(a, s)
+
+    @inbounds for i in 1:s, j in 1:a
+        R[j, i] = dot(v, Q[:, i, j])
+    end
+
+    return R
+end
+
 
 """
 Impliments Value Iteration

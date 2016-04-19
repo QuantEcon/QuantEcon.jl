@@ -19,22 +19,20 @@ Tests for markov/ddp.jl
     # Formulation with Dense Matrices R: n x m, Q: n x m x n
     n, m = 2, 2  # number of states, number of actions
 
-    # Note that this R is transposed!!!!!!
-    R = [5.0 10.0; -1.0 -Inf]'
+    R = [5.0 10.0; -1.0 -Inf]
 
     Q = Array(Float64, n, m, n)
     Q[:, :, 1] = [0.5 0.0; 0.0 0.0]
     Q[:, :, 2] = [0.5 1.0; 1.0 1.0]
 
-    ddp0 = DiscreteDP(R, Q, beta)
+    ddp0 = DiscreteDP(R', Q, beta)
 
     # Formulation with state-action pairs
     L = 3  # Number of state-action pairs
     s_indices = [1, 1, 2]
     a_indices = [1, 2, 1]
 
-    # Have to untranspose R here!!!!!!
-    R_sa = [R'[1, 1], R'[1, 2], R'[2, 1]]
+    R_sa = [R[1, 1], R[1, 2], R[2, 1]]
     Q_sa = spzeros(L, n)
     Q_sa[1, :] = Q[1, 1, :]
     Q_sa[2, :] = Q[1, 2, :]
@@ -158,10 +156,12 @@ Tests for markov/ddp.jl
         @test res_init.sigma == sigma_star
     end
 
+    ddp_rational = DiscreteDP(convert(Array{Rational{BigInt}}, R'),
+                              convert(Array{Rational{BigInt}}, Q),
+                              convert(Rational{BigInt},  beta))
+
     @testset "DiscreteDP{Rational,_,_,Rational} maintains Rational" begin
-        ddp_rational = DiscreteDP(map(Rational{BigInt}, R),
-                                  map(Rational{BigInt}, Q),
-                                  map(Rational{BigInt}, beta))
+
         # do minimal number of iterations to avoid overflow
         vi = Rational{BigInt}[1//2, 1//2]
         @test eltype(solve(ddp_rational, VFI; max_iter=1, epsilon=Inf).v) == Rational{BigInt}
@@ -170,9 +170,7 @@ Tests for markov/ddp.jl
     end
 
     @testset "DiscreteDP{Rational{BigInt},_,_,Rational{BigInt}}  works" begin
-        ddp_rational = DiscreteDP(map(Rational{BigInt}, R),
-                                  map(Rational{BigInt}, Q),
-                                  map(Rational{BigInt}, beta))
+
         # do minimal number of iterations to avoid overflow
         r1 = solve(ddp_rational, PFI)
         r2 = solve(ddp_rational, MPFI)
