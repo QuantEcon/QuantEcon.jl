@@ -50,6 +50,10 @@ Tests for markov/ddp.jl
     v_star = [(5-5.5*beta)/((1-0.5*beta)*(1-beta)), -1/(1-beta)]
     sigma_star = [1, 1]
 
+    ddp_rational = DiscreteDP(convert(Array{Rational{BigInt}}, R'),
+                              convert(Array{Rational{BigInt}}, Q),
+                              convert(Rational{BigInt},  beta))
+
     @testset "bellman_operator methods" for ddp in ddp0_collection
         # Check both Dense and State-Action Pair Formulation
     	@test isapprox(bellman_operator(ddp, v_star), v_star)
@@ -155,10 +159,6 @@ Tests for markov/ddp.jl
         @test res.sigma == sigma_star
         @test res_init.sigma == sigma_star
     end
-
-    ddp_rational = DiscreteDP(convert(Array{Rational{BigInt}}, R'),
-                              convert(Array{Rational{BigInt}}, Q),
-                              convert(Rational{BigInt},  beta))
 
     @testset "DiscreteDP{Rational,_,_,Rational} maintains Rational" begin
 
