@@ -10,7 +10,6 @@ Tests for markov/ddp.jl
 =#
 
 @testset "Testing markov/dpp.jl" begin
-
     #-Setup-#
 
     # Example from Puterman 2005, Section 3.1
@@ -21,11 +20,11 @@ Tests for markov/ddp.jl
 
     R = [5.0 10.0; -1.0 -Inf]
 
-    Q = Array(Float64, n, m, n)
+    Q = Array{Float64}(n, m, n)
     Q[:, :, 1] = [0.5 0.0; 0.0 0.0]
     Q[:, :, 2] = [0.5 1.0; 1.0 1.0]
 
-    ddp0 = DiscreteDP(R', Q, beta)
+    ddp0 = DiscreteDP(R', Q', beta)
 
     # Formulation with state-action pairs
     L = 3  # Number of state-action pairs
@@ -51,7 +50,7 @@ Tests for markov/ddp.jl
     sigma_star = [1, 1]
 
     ddp_rational = DiscreteDP(convert(Array{Rational{BigInt}}, R'),
-                              convert(Array{Rational{BigInt}}, Q),
+                              convert(Array{Rational{BigInt}}, Q'),
                               convert(Rational{BigInt},  beta))
 
     @testset "bellman_operator methods" for ddp in ddp0_collection
@@ -59,21 +58,13 @@ Tests for markov/ddp.jl
     	@test isapprox(bellman_operator(ddp, v_star), v_star)
     end
 
-    @testset "RQ_sigma" begin
-        nr, nc = size(R)
-        # test for DDP
-        sigmas = ([1, 1], [1, 2], [2, 1], [2, 2])
-        for sig in sigmas
-            r, q = RQ_sigma(ddp0, sig)
+    @testset "RQ_sigma" for sig in ([1, 1], [1, 2], [2, 1], [2, 2])
+        r, q = RQ_sigma(ddp0, sig)
 
-            for i_r in 1:nr
-                @test r[i_r] == ddp0.R[sig[i_r], i_r]
-                for i_c in 1:length(sig)
-                    @test vec(q[i_c, :]) == vec(ddp0.Q[i_c, sig[i_c], :])
-                end
-            end
+        for (i,s) in enumerate(sig)
+            @test r[i] == ddp0.R[s, i]
+            @test vec(q[i, :]) == vec(ddp0.Q[:, i, s])
         end
-
         # TODO: add test for DDPsa
     end
 
@@ -87,10 +78,9 @@ Tests for markov/ddp.jl
     	@test isapprox(evaluate_policy(ddp, sigma_star), v_star)
     end
 
-
     float_types = (Float16, Float32, Float64, BigFloat)
-    int_types   = (Int8,  Int16,  Int32,  Int64,  Int128,
-                   UInt8, UInt16, UInt32, UInt64, UInt128)
+    int_types = (Int8,  Int16,  Int32,  Int64,  Int128,
+                 UInt8, UInt16, UInt32, UInt64, UInt128)
 
     @testset "methods for subtypes != (Float64, Int)" for ddp in ddp0_collection
         for f in (bellman_operator, compute_greedy)
@@ -102,7 +92,7 @@ Tests for markov/ddp.jl
 
             # only Integer subtypes can be Rational type params
             # NOTE: Only the integer types below don't overflow for this example
-            for T in [Int64, Int128]
+            for T in (Int64, Int128)
                 @test f(ddp, [1//1, 1//1]) == f(ddp, ones(Rational{T}, 2))
             end
         end
@@ -137,7 +127,7 @@ Tests for markov/ddp.jl
 
         # Check v is an epsilon/2-approxmation of v_star
         @test maxabs(res.v - v_star) < epsilon/2
-        @test maxabs(res_init.v - v_star)    < epsilon/2
+        @test maxabs(res_init.v - v_star) < epsilon/2
 
         # Check sigma == sigma_star.
         # NOTE we need to convert from linear to row-by-row index
@@ -145,11 +135,11 @@ Tests for markov/ddp.jl
         @test res_init.sigma == sigma_star
     end
 
-    @testset "policy_iteration" for ddp_item in ddp0_collection
+    @testset "policy_iteration" for ddp in ddp0_collection
         # Check both Dense and State-Action Pair Formulation
-        res = solve(ddp_item, PFI)
+        res = solve(ddp, PFI)
         v_init = [0.0, 1.0]
-        res_init = solve(ddp_item, v_init, PFI)
+        res_init = solve(ddp, v_init, PFI)
 
         # Check v == v_star
         @test isapprox(res.v, v_star)
@@ -161,7 +151,6 @@ Tests for markov/ddp.jl
     end
 
     @testset "DiscreteDP{Rational,_,_,Rational} maintains Rational" begin
-
         # do minimal number of iterations to avoid overflow
         vi = Rational{BigInt}[1//2, 1//2]
         @test eltype(solve(ddp_rational, VFI; max_iter=1, epsilon=Inf).v) == Rational{BigInt}
@@ -169,7 +158,7 @@ Tests for markov/ddp.jl
         @test eltype(solve(ddp_rational, vi, MPFI; max_iter=1, k=1, epsilon=Inf).v) == Rational{BigInt}
     end
 
-    @testset "DiscreteDP{Rational{BigInt},_,_,Rational{BigInt}}  works" begin
+    @testset "DiscreteDP{Rational{BigInt},_,_,Rational{BigInt}} works" begin
 
         # do minimal number of iterations to avoid overflow
         r1 = solve(ddp_rational, PFI)
@@ -182,30 +171,28 @@ Tests for markov/ddp.jl
         @test r1.mc.p == r3.mc.p
     end
 
-    @testset "modified_policy_iteration" begin
-        for ddp_item in ddp0_collection
-            res = solve(ddp_item, MPFI)
-            v_init = [0.0, 1.0]
-            res_init = solve(ddp_item, v_init, MPFI)
+    @testset "modified_policy_iteration" for ddp_item in ddp0_collection
+        res = solve(ddp_item, MPFI)
+        v_init = [0.0, 1.0]
+        res_init = solve(ddp_item, v_init, MPFI)
 
-                    # Check v is an epsilon/2-approxmation of v_star
-            @test maxabs(res.v - v_star) < epsilon/2
-            @test maxabs(res_init.v - v_star) < epsilon/2
+        # Check v is an epsilon/2-approxmation of v_star
+        @test maxabs(res.v - v_star) < epsilon/2
+        @test maxabs(res_init.v - v_star) < epsilon/2
 
-            # Check sigma == sigma_star
-            @test res.sigma == sigma_star
-            @test res_init.sigma == sigma_star
+        # Check sigma == sigma_star
+        @test res.sigma == sigma_star
+        @test res_init.sigma == sigma_star
 
-            #Test Modified Policy Iteration k0
-            k = 0
-            res = solve(ddp_item, MPFI; max_iter=max_iter, epsilon=epsilon, k=k)
+        #Test Modified Policy Iteration k0
+        k = 0
+        res = solve(ddp_item, MPFI; max_iter=max_iter, epsilon=epsilon, k=k)
 
-            # Check v is an epsilon/2-approxmation of v_star
-            @test maxabs(res.v - v_star) < epsilon/2
+        # Check v is an epsilon/2-approxmation of v_star
+        @test maxabs(res.v - v_star) < epsilon/2
 
-            # Check sigma == sigma_star
-            @test res.sigma == sigma_star
-        end
+        # Check sigma == sigma_star
+        @test res.sigma == sigma_star
     end
 
     @testset "DDPsa constructor" begin
@@ -258,7 +245,7 @@ Tests for markov/ddp.jl
             n, m = 2, 2
             _R = [-Inf -Inf; 1.0 2.0]'
 
-            _Q = Array(Float64, n, m, n)
+            _Q = Array{Float64}(n, m, n)
             _Q[:, :, 1] = [0.5 0.0; 0.0 0.0]
             _Q[:, :, 2] = [0.5 1.0; 1.0 1.0]
             _beta = 0.95
@@ -282,9 +269,7 @@ Tests for markov/ddp.jl
     @testset "ddp_negative_inf_error()" begin
         # Dense Matrix
         n, m = 3, 2
-        R = [0 1;
-             0 -Inf;
-            -Inf -Inf]
+        R = [0 1; 0 -Inf; -Inf -Inf]
         Q = fill(1.0/n, n, m, n)
         beta = 0.95
 
