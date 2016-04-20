@@ -501,14 +501,30 @@ the transition probability matrix `Q_sigma`.
   of shape (n, n).
 
 """
-function RQ_sigma{T<:Integer}(ddp::DDP, sigma::Array{T})
-    R_sigma = [ddp.R[sigma[i], i] for i in 1:length(sigma)]
-    Q_sigma = hcat([getindex(ddp.Q, i, sigma[i], Colon())[:] for i=1:num_states(ddp)]...)
-    return R_sigma, Q_sigma'
+function RQ_sigma{T,Tbeta,Tind,U<:Integer}(ddp::DDP{T,Tbeta,Tind}, sigma::Vector{U})
+    Q = ddp.Q'
+    s, s_, a = size(Q)
+    msg = "length of policy vector ($(length(sigma))) does not match number of actions in model ($a)"
+    length(sigma) == s || throw(ArgumentError(msg))
+
+    R_sigma = Vector{T}(a)
+    Q_sigma = Matrix{T}(a, s)
+
+    @inbounds for i in 1:a
+        R_sigma[i] = ddp.R[sigma[i], i]
+    end
+    @inbounds for i in 1:s
+        Q_sigma[i, :] = Q[:, i, sigma[i]]
+    end
+
+    return R_sigma, Q_sigma
 end
 
 # TODO: express it in a similar way as above to exploit Julia's column major order
-function RQ_sigma{T<:Integer}(ddp::DDPsa, sigma::Array{T})
+function RQ_sigma{U<:Integer}(ddp::DDPsa, sigma::Vector{U})
+    msg = "length of policy vector ($(length(sigma))) does not match number of actions in model ($num_states(ddp))"
+    length(sigma) == num_states(ddp) || throw(ArgumentError(msg))
+
     sigma_indices = Array(T, num_states(ddp))
     _find_indices!(get(ddp.a_indices), get(ddp.a_indptr), sigma, sigma_indices)
     R_sigma = ddp.R[sigma_indices]
