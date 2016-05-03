@@ -1,18 +1,18 @@
 @testset "util.jl" begin
 
     @testset "gridmake" begin
-        want = [1  4  6
-                1  4  7
-                1  5  6
-                1  5  7
-                2  4  6
-                2  4  7
-                2  5  6
-                2  5  7
-                3  4  6
-                3  4  7
-                3  5  6
-                3  5  7]
+        want = [1 4 6
+                2 4 6
+                3 4 6
+                1 5 6
+                2 5 6
+                3 5 6
+                1 4 7
+                2 4 7
+                3 4 7
+                1 5 7
+                2 5 7
+                3 5 7]
 
         # test allocating version
         @test want == @inferred gridmake([1, 2, 3], [4, 5], [6, 7])
