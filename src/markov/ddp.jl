@@ -592,7 +592,7 @@ s_wise_max!(ddp::DiscreteDP, vals::AbstractMatrix, out::Vector, out_argmax::Vect
 Return the `Vector` `max_a vals(s, a)`,  where `vals` is represented as a
 `AbstractMatrix` of size `(num_states, num_actions)`.
 """
-s_wise_max(vals::AbstractMatrix) = vec(maximum(vals, 1))
+s_wise_max(vals::AbstractMatrix) = vec(maximum(vals, 2))
 
 """
 Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
