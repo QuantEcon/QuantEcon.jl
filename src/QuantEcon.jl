@@ -110,7 +110,7 @@ export
 # ddp
     DiscreteDP, VFI, PFI, MPFI, solve, RQ_sigma,
     evaluate_policy, bellman_operator, compute_greedy,
-    evaluate_policy!, bellman_operator!, compute_greedy!
+    bellman_operator!, compute_greedy!
 
 include("util.jl")
 ##### includes
