@@ -40,7 +40,7 @@ type MarkovChain{T, TM<:AbstractMatrix, TV<:AbstractVector}
         n != m &&
             throw(DimensionMismatch("stochastic matrix must be square"))
 
-        any(p.<0) &&
+        minimum(p) <0 &&
             throw(ArgumentError("stochastic matrix must have nonnegative elements"))
 
         !check_stochastic_matrix(p) &&
