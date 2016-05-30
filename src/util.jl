@@ -70,7 +70,8 @@ end
 function gridmake(arrays::AbstractVector...)
     l = prod([length(a) for a in  arrays])
     T = reduce(promote_type, [eltype(a) for a in arrays])
-    gridmake!(Array(T, l, length(arrays)), arrays...)
+    out = Array(T, l, length(arrays))
+    gridmake!(out, arrays...)
     out
 end
 
@@ -78,6 +79,12 @@ end
 function gridmake{T}(arrays::AbstractVector{T}...)
     out = Array(T, prod([length(a) for a in  arrays]), length(arrays))
     gridmake!(out, arrays...)
+end
+
+function gridmake(t::Tuple)
+    all(map(x -> isa(x, Integer), t)) ||
+        error("gridmake(::Tuple) only valid when all elements are integers")
+    gridmake(map(x->1:x, t)...)::Matrix{Int}
 end
 
 """
