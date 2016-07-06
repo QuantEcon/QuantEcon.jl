@@ -95,6 +95,12 @@ end
         @test mc_compute_stationary(mc10) == mc10_stationary
     end
 
+    @testset "test mc_compute_stationary with reducible mc with integers" begin
+        mc_int = MarkovChain([0 1 0; 1 0 0; 0 0 1])
+        mc_int_stationary = [1//2  0//1; 1//2  0//1; 0//1  1//1]
+        @test mc_compute_stationary(mc_int) == mc_int_stationary
+    end
+
     @testset "test stationary_distributions" begin
         mc_int = MarkovChain([0 1 0; 1 0 0; 0 0 1])
         mc_int_stationary_dists = Vector[[1//2,1//2,0//1], [0//1,0//1,1//1]]
