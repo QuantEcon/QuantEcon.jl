@@ -225,6 +225,42 @@ function mc_compute_stationary{T}(mc::MarkovChain{T})
 end
 
 """
+Compute stationary distributions of the Markov chain `mc`, one for each
+recurrent class.
+
+##### Arguments
+
+- `mc::MarkovChain{T}` : MarkovChain instance.
+
+##### Returns
+
+- `stationary_dists::Vector{Vector{T1}}` : Array of vectors that represent
+  stationary distributions, where the element type `T1` is `Rational` is `T` is
+  `Int` (and equal to `T` otherwise).
+
+"""
+function stationary_distributions{T<:Real}(mc::MarkovChain{T})
+    n = n_states(mc)
+    rec_classes = recurrent_classes(mc)
+    T1 = ifelse(T <: Integer, Rational{T}, T)  # TODO: Resolve type-instability
+    stationary_dists = Array(Vector{T1}, length(rec_classes))
+
+    if length(rec_classes) == 1  # unique recurrent class
+        stationary_dists[1] = gth_solve(mc.p)
+    else  # more than one recurrent classes
+        for i in 1:length(rec_classes)
+            rec_class = rec_classes[i]
+            dist = zeros(T1, n)
+            dist[rec_class] = gth_solve(sub(mc.p, rec_class, rec_class))
+            stationary_dists[i] = dist
+        end
+    end
+
+    return stationary_dists
+end
+
+
+"""
 Simulate time series of state transitions of the Markov chain `mc`.
 
 The sample path from the `j`-th repetition of the simulation with initial state
