@@ -89,7 +89,7 @@ University Press, 2009.
 
 """
 gth_solve{T<:Integer}(a::AbstractMatrix{T}) =
-    gth_solve(convert(AbstractArray{Rational, 2}, a))
+    gth_solve(convert(AbstractArray{Rational{T}, 2}, a))
 
 # solve x(P-I)=0 by the GTH method
 function gth_solve{T<:Real}(original::AbstractMatrix{T})
