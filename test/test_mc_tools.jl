@@ -104,7 +104,7 @@ end
     @testset "test stationary_distributions" begin
         mc_int = MarkovChain([0 1 0; 1 0 0; 0 0 1])
         mc_int_stationary_dists = Vector[[1//2,1//2,0//1], [0//1,0//1,1//1]]
-        @test stationary_distributions(mc_int) == mc_int_stationary_dists
+        @test @inferred(stationary_distributions(mc_int)) == mc_int_stationary_dists
     end
 
     @testset "test gth_solve with KMR matrices" begin
