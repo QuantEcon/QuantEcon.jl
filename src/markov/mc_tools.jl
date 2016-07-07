@@ -239,24 +239,26 @@ recurrent class.
   `Int` (and equal to `T` otherwise).
 
 """
-function stationary_distributions{T<:Real}(mc::MarkovChain{T})
-    n = n_states(mc)
-    rec_classes = recurrent_classes(mc)
-    T1 = ifelse(T <: Integer, Rational{T}, T)  # TODO: Resolve type-instability
-    stationary_dists = Array(Vector{T1}, length(rec_classes))
+for (S, ex) in ((Real, :(T)), (Integer, :(Rational{T})))
+    @eval function stationary_distributions{T<:$S}(mc::MarkovChain{T})
+        n = n_states(mc)
+        rec_classes = recurrent_classes(mc)
+        T1 = $ex
+        stationary_dists = Array(Vector{T1}, length(rec_classes))
 
-    if length(rec_classes) == 1  # unique recurrent class
-        stationary_dists[1] = gth_solve(mc.p)
-    else  # more than one recurrent classes
-        for i in 1:length(rec_classes)
-            rec_class = rec_classes[i]
-            dist = zeros(T1, n)
-            dist[rec_class] = gth_solve(sub(mc.p, rec_class, rec_class))
-            stationary_dists[i] = dist
+        if length(rec_classes) == 1  # unique recurrent class
+            stationary_dists[1] = gth_solve(mc.p)
+        else  # more than one recurrent classes
+            for i in 1:length(rec_classes)
+                rec_class = rec_classes[i]
+                dist = zeros(T1, n)
+                dist[rec_class] = gth_solve(sub(mc.p, rec_class, rec_class))
+                stationary_dists[i] = dist
+            end
         end
-    end
 
-    return stationary_dists
+        return stationary_dists
+    end
 end
 
 
