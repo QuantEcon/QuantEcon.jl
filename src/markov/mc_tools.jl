@@ -224,21 +224,7 @@ function mc_compute_stationary{T}(mc::MarkovChain{T})
     return stationary_dists
 end
 
-"""
-Compute stationary distributions of the Markov chain `mc`, one for each
-recurrent class.
 
-##### Arguments
-
-- `mc::MarkovChain{T}` : MarkovChain instance.
-
-##### Returns
-
-- `stationary_dists::Vector{Vector{T1}}` : Array of vectors that represent
-  stationary distributions, where the element type `T1` is `Rational` is `T` is
-  `Int` (and equal to `T` otherwise).
-
-"""
 for (S, ex) in ((Real, :(T)), (Integer, :(Rational{T})))
     @eval function stationary_distributions{T<:$S}(mc::MarkovChain{T})
         n = n_states(mc)
@@ -260,6 +246,22 @@ for (S, ex) in ((Real, :(T)), (Integer, :(Rational{T})))
         return stationary_dists
     end
 end
+
+@doc """
+Compute stationary distributions of the Markov chain `mc`, one for each
+recurrent class.
+
+##### Arguments
+
+- `mc::MarkovChain{T}` : MarkovChain instance.
+
+##### Returns
+
+- `stationary_dists::Vector{Vector{T1}}` : Array of vectors that represent
+  stationary distributions, where the element type `T1` is `Rational` is `T` is
+  `Int` (and equal to `T` otherwise).
+
+""" stationary_distributions
 
 
 """
