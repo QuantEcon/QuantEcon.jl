@@ -18,14 +18,16 @@ import LightGraphs: DiGraph, period, attracting_components,
 """
 Finite-state discrete-time Markov chain.
 
-It stores useful information such as the stationary distributions, and
-communication, recurrent, and cyclic classes, and allows simulation of state
-transitions.
+Methods are available that provide useful information such as the stationary
+distributions, and communication and recurrent classes, and allow simulation of
+state transitions.
 
 ##### Fields
 
-- `p::Matrix` The transition matrix. Must be square, all elements must be
-positive, and all rows must sum to unity
+- `p::AbstractMatrix` : The transition matrix. Must be square, all elements
+must be nonnegative, and all rows must sum to unity.
+- `state_values::AbstractVector` : Vector containing the values associated with
+the states.
 """
 type MarkovChain{T, TM<:AbstractMatrix, TV<:AbstractVector}
     p::TM # valid stochastic matrix
@@ -57,13 +59,13 @@ end
 MarkovChain(p::AbstractMatrix, state_values=1:size(p, 1)) =
     MarkovChain{eltype(p), typeof(p), typeof(state_values)}(p, state_values)
 
-"Number of states in the markov chain `mc`"
+"Number of states in the Markov chain `mc`"
 n_states(mc::MarkovChain) = size(mc.p, 1)
 
 function Base.show{T,TM}(io::IO, mc::MarkovChain{T,TM})
     println(io, "Discrete Markov Chain")
     println(io, "stochastic matrix of type $TM:")
-    println(io, mc.p)
+    print(io, mc.p)
 end
 
 """
@@ -128,63 +130,75 @@ function gth_solve{T<:Real}(original::AbstractMatrix{T})
 end
 
 """
-Find the recurrent classes of the `MarkovChain`
+Find the recurrent classes of the Markov chain `mc`.
 
 ##### Arguments
 
-- `mc::MarkovChain` : MarkovChain instance containing a valid stochastic matrix
+- `mc::MarkovChain` : MarkovChain instance.
 
 ##### Returns
 
-- `x::Vector{Vector}`: A `Vector` containing `Vector{Int}`s that describe the
-recurrent classes of the transition matrix for p
+- `::Vector{Vector{Int}}` : Vector of vectors that describe the recurrent
+classes of `mc`.
 
 """
 recurrent_classes(mc::MarkovChain) = attracting_components(DiGraph(mc.p))
 
 """
-A communication class of the Markov Chain `X_t` or of the stochastic matrix `p`
-is a strongly connected component of the directed graph associated with `p`
+Find the communication classes of the Markov chain `mc`.
 
 #### Arguments
 
-- `mc::MarkovChain` MarkovChain instance containing a valid stochastic matrix
+- `mc::MarkovChain` : MarkovChain instance.
 
 ### Returns
 
-- `x::Vector{Vector{Int64}}` An array of the associated strongly connected components
+- `::Vector{Vector{Int}}` : Vector of vectors that describe the communication
+classes of `mc`.
 
 """
 communication_classes(mc::MarkovChain) = strongly_connected_components(DiGraph(mc.p))
 
 """
-Indicate whether the Markov chain is irreducible.
+Indicate whether the Markov chain `mc` is irreducible.
 
 ##### Arguments
 
-- `mc::MarkovChain` : MarkovChain instance containing a valid stochastic matrix
+- `mc::MarkovChain` : MarkovChain instance.
 
 ##### Returns
 
-- Bool (true or false)
+- `::Bool`
 
 """
 is_irreducible(mc::MarkovChain) =  is_strongly_connected(DiGraph(mc.p))
 
 """
-Indicate whether the Markov chain is aperiodic.
+Indicate whether the Markov chain `mc` is aperiodic.
 
 ##### Arguments
 
-- `mc::MarkovChain` : MarkovChain instance containing a valid stochastic matrix
+- `mc::MarkovChain` : MarkovChain instance.
 
 ##### Returns
 
-- Bool (true or false)
+- `::Bool`
 
 """
 is_aperiodic(mc::MarkovChain) = period(mc) == 1
 
+"""
+Return the period of the Markov chain `mc`.
+
+##### Arguments
+
+- `mc::MarkovChain` : MarkovChain instance.
+
+##### Returns
+
+- `::Int` : Period of `mc`.
+
+"""
 function period(mc::MarkovChain)
     g = DiGraph(mc.p)
     recurrent = attracting_components(g)
@@ -257,8 +271,8 @@ recurrent class.
 
 ##### Returns
 
-- `stationary_dists::Vector{Vector{T1}}` : Array of vectors that represent
-  stationary distributions, where the element type `T1` is `Rational` is `T` is
+- `stationary_dists::Vector{Vector{T1}}` : Vector of vectors that represent
+  stationary distributions, where the element type `T1` is `Rational` if `T` is
   `Int` (and equal to `T` otherwise).
 
 """ stationary_distributions
@@ -276,12 +290,12 @@ The sample path from the `j`-th repetition of the simulation with initial state
 - `ts_length::Int` : Length of each simulation.
 - `init::Vector{Int}` : Vector containing initial states.
 - `;num_reps::Int(1)` : Number of repetitions of simulation for each element
-of `init`
+of `init`.
 
 ##### Returns
 
 - `X::Matrix{Int}` : Array containing the sample paths as columns, of shape
-(ts_length, k), where k = length(init)* num_reps
+(ts_length, k), where k = length(init)* num_reps.
 
 """
 function simulate(mc::MarkovChain, ts_length::Int, init::Vector{Int};
@@ -302,12 +316,12 @@ Simulate time series of state transitions of the Markov chain `mc`.
 - `mc::MarkovChain` : MarkovChain instance.
 - `ts_length::Int` : Length of each simulation.
 - `init::Int` : Initial state.
-- `;num_reps::Int(1)` : Number of repetitions of simulation
+- `;num_reps::Int(1)` : Number of repetitions of simulation.
 
 ##### Returns
 
 - `X::Matrix{Int}` : Array containing the sample paths as columns, of shape
-(ts_length, k), where k = num_reps
+(ts_length, k), where k = num_reps.
 
 """
 simulate(mc::MarkovChain, ts_length::Int, init::Int; num_reps::Int=1) =
@@ -325,7 +339,7 @@ Simulate time series of state transitions of the Markov chain `mc`.
 ##### Returns
 
 - `X::Matrix{Int}` : Array containing the sample paths as columns, of shape
-(ts_length, k), where k = num_reps
+(ts_length, k), where k = num_reps.
 
 """
 function simulate(mc::MarkovChain, ts_length::Int; num_reps::Int=1)
@@ -373,7 +387,7 @@ Simulate time series of state transitions of the Markov chain `mc`.
 
 ##### Returns
 
-- `x::Vector`: A vector of transition indices for a single simulation
+- `x::Vector`: A vector of transition indices for a single simulation.
 """
 function simulation(mc::MarkovChain, ts_length::Int,
                     init_state::Int=rand(1:n_states(mc)))
@@ -430,7 +444,7 @@ end
 @doc """ Like `simulate(::MarkovChain, args...; kwargs...)`, but instead of
 returning integers specifying the state indices, this routine returns the
 values of the `mc.state_values` at each of those indices. See docstring
-for `simulate` for more information
+for `simulate` for more information.
 """ simulate_values, simulate_values!
 
 
@@ -445,7 +459,7 @@ Simulate time series of state transitions of the Markov chain `mc`.
 
 ##### Returns
 
-- `x::Vector`: A vector of state values along a simulated path
+- `x::Vector`: A vector of state values along a simulated path.
 """
 function value_simulation(mc::MarkovChain, ts_length::Int,
                           init_state::Int=rand(1:n_states(mc)))
