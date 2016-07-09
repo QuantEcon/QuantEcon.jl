@@ -168,7 +168,7 @@ end
     @testset "test MarkovChain with Float64" begin
         for test_dict in testcases_Float64
             mc = MarkovChain(test_dict["P"])
-            stationary_dists = stationary_distributions(mc)
+            stationary_dists = @inferred stationary_distributions(mc)
             @test isapprox(stationary_dists, test_dict["stationary_dists"])
             @test isequal(
                 sort(communication_classes(mc), by=(x->x[1])),
@@ -203,7 +203,7 @@ end
     @testset "test MarkovChain with Rational" begin
         for test_dict in testcases_Rational
             mc = MarkovChain(test_dict["P"])
-            stationary_dists = stationary_distributions(mc)
+            stationary_dists = @inferred stationary_distributions(mc)
             @test isequal(stationary_dists, test_dict["stationary_dists"])
             @test isequal(
                 sort(communication_classes(mc), by=(x->x[1])),
@@ -265,7 +265,7 @@ end
     @testset "test MarkovChain with Int" begin
         for test_dict in testcases_Int
             mc = MarkovChain(test_dict["P"])
-            stationary_dists = stationary_distributions(mc)
+            stationary_dists = @inferred stationary_distributions(mc)
             @test isequal(stationary_dists, test_dict["stationary_dists"])
             @test isequal(
                 sort(communication_classes(mc), by=(x->x[1])),
@@ -288,7 +288,7 @@ end
                                                          testcases_Rational,
                                                          testcases_Int)]
             mc = MarkovChain(sparse(test_dict["P"]))
-            stationary_dists = stationary_distributions(mc)
+            stationary_dists = @inferred stationary_distributions(mc)
             @test isapprox(stationary_dists, test_dict["stationary_dists"])
             @test isequal(
                 sort(communication_classes(mc), by=(x->x[1])),
