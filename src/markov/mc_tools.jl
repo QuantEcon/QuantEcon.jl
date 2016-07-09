@@ -202,12 +202,14 @@ Return the period of the Markov chain `mc`.
 function period(mc::MarkovChain)
     g = DiGraph(mc.p)
     recurrent = attracting_components(g)
-    periods   = Int[]
 
+    d = 1
     for r in recurrent
-        push!(periods, period(g[r]))
+        pd = period(g[r])
+        d *= div(pd, gcd(pd, d))
     end
-    return lcm(periods)
+
+    return d
 end
 """
 calculate the stationary distributions associated with a N-state markov chain
