@@ -69,19 +69,35 @@ function Base.show{T,TM}(io::IO, mc::MarkovChain{T,TM})
 end
 
 """
-solve x(P-I)=0 using an algorithm presented by Grassmann-Taksar-Heyman (GTH)
+This routine computes the stationary distribution of an irreducible Markov
+transition matrix (stochastic matrix) or transition rate matrix (generator
+matrix) `A`.
+
+More generally, given a Metzler matrix (square matrix whose off-diagonal
+entries are all nonnegative) `A`, this routine solves for a nonzero solution
+`x` to `x (A - D) = 0`, where `D` is the diagonal matrix for which the rows of
+`A - D` sum to zero (i.e., `D_{ii} = \sum_j A_{ij}` for all `i`). One (and only
+one, up to normalization) nonzero solution exists corresponding to each
+reccurent class of `A`, and in particular, if `A` is irreducible, there is a
+unique solution; when there are more than one solution, the routine returns the
+solution that contains in its support the first index `i` such that no path
+connects `i` to any index larger than `i`. The solution is normalized so that
+its 1-norm equals one. This routine implements the Grassmann-Taksar-Heyman
+(GTH) algorithm (Grassmann, Taksar, and Heyman 1985), a numerically stable
+variant of Gaussian elimination, where only the off-diagonal entries of `A` are
+used as the input data. For a nice exposition of the algorithm, see Stewart
+(2009), Chapter 10.
 
 ##### Arguments
 
-- `p::Matrix` : valid stochastic matrix
+- `A::Matrix{T}` : Stochastic matrix or generator matrix. Must be of shape n x
+  n.
 
 ##### Returns
 
-- `x::Matrix`: A matrix whose columns contain stationary vectors of `p`
+- `x::Vector{T}` : Stationary distribution of `A`.
 
 ##### References
-
-The following references were consulted for the GTH algorithm
 
 - W. K. Grassmann, M. I. Taksar and D. P. Heyman, "Regenerative Analysis and
 Steady State Distributions for Markov Chains, " Operations Research (1985),
@@ -96,6 +112,10 @@ gth_solve{T<:Real}(A::Matrix{T}) = gth_solve!(copy(A))
 gth_solve{T<:Integer}(A::Matrix{T}) =
     gth_solve!(convert(Matrix{Rational{T}}, A))
 
+"""
+Same as `gth_solve`, but overwrite the input `A`, instead of creating a copy.
+
+"""
 function gth_solve!{T<:Real}(A::Matrix{T})
     n = size(A, 1)
     x = zeros(T, n)
