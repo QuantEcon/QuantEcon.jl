@@ -304,61 +304,7 @@ end
         end
     end
 
-    # these matrices come from RMT4 section 2.2.1
-    mc1 = [1 0 0; .2 .5 .3; 0 0 1]
-    mc2 = [.7 .3 0; 0 .5 .5; 0 .9 .1]
-    mc3 = [0.4 0.6; 0.2 0.8]
-    mc4 = eye(2)
-    mc5 = [
-         0 1 0 0 0 0
-         1 0 0 0 0 0
-         1//2 0 0 1//2 0 0
-         0 0 0 0 1 0
-         0 0 0 0 0 1
-         0 0 0 1 0 0
-         ]
-    mc5_stationary = zeros(Rational,6,2)
-    mc5_stationary[[1,2]] = 1//2; mc5_stationary[[10,11,12]] = 1//3
-
-    mc6 = [2//3 1//3; 1//4 3//4]  # Rational elements
-    mc6_stationary = [3//7, 4//7]
-
-    mc7 = [1 0; 0 1]
-    mc7_stationary = [1 0;0 1]
-
-    # Reducible mc with a unique recurrent class,
-    # where n=2 is a transient state
-    mc10 = [1. 0; 1. 0]
-    mc10_stationary = [1., 0]
-
-    mc1 = MarkovChain(mc1)
-    mc2 = MarkovChain(mc2)
-    mc3 = MarkovChain(mc3)
-    mc4 = MarkovChain(mc4)
-    mc5 = MarkovChain(mc5)
-    mc6 = MarkovChain(mc6)
-    mc7 = MarkovChain(mc7)
-    mc10 = MarkovChain(mc10)
-
     tol = 1e-15
-
-    @testset "test mc_compute_stationary using exact solutions" begin
-        @test mc_compute_stationary(mc1) == eye(3)[:, [1, 3]]
-        @test isapprox(mc_compute_stationary(mc2), [0, 9/14, 5/14])
-        @test isapprox(mc_compute_stationary(mc3), [1/4, 3/4])
-        @test mc_compute_stationary(mc4) == eye(2)
-        @test mc_compute_stationary(mc5) == mc5_stationary
-        @test mc_compute_stationary(mc6) == mc6_stationary
-        @test mc_compute_stationary(mc7) == mc7_stationary
-        @test mc_compute_stationary(mc10) == mc10_stationary
-    end
-
-    @testset "test mc_compute_stationary with reducible mc with integers" begin
-        mc_int = MarkovChain([0 1 0; 1 0 0; 0 0 1])
-        mc_int_stationary = [1//2  0//1; 1//2  0//1; 0//1  1//1]
-        @test mc_compute_stationary(mc_int) == mc_int_stationary
-    end
-
     kmr_matrices = (
         kmr_markov_matrix_sequential(27, 1/3, 1e-2),
         kmr_markov_matrix_sequential(3, 1/3, 1e-14)
@@ -413,6 +359,8 @@ end
         # negative element, but sums to 1
         @test_throws ArgumentError MarkovChain([-1 1; 0.2 0.8])
     end
+
+    mc3 = MarkovChain([0.4 0.6; 0.2 0.8])
 
     @testset "test simulate shape" begin
 

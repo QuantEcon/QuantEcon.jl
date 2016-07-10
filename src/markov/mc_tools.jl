@@ -230,34 +230,6 @@ function period(mc::MarkovChain)
 
     return d
 end
-"""
-calculate the stationary distributions associated with a N-state markov chain
-
-##### Arguments
-
-- `mc::MarkovChain` : MarkovChain instance containing a valid stochastic matrix
-
-##### Returns
-
-- `dists::Matrix{Float64}`: N x M matrix where each column is a stationary
-distribution of `mc.p`
-
-"""
-function mc_compute_stationary{T}(mc::MarkovChain{T})
-    recurrent = recurrent_classes(mc)
-
-    # unique recurrent class
-    length(recurrent) == 1 && return gth_solve(mc.p)
-
-    # more than one recurrent classes
-    stationary_dists = Array(T, n_states(mc), length(recurrent))
-    for (i, class) in enumerate(recurrent)
-        dist        = zeros(T, n_states(mc))
-        dist[class] = gth_solve(mc.p[class, class]) # recast to correct dimension
-        stationary_dists[:, i] = dist
-    end
-    return stationary_dists
-end
 
 
 for (S, ex_T, ex_gth) in ((Real, :(T), :(gth_solve!)),
