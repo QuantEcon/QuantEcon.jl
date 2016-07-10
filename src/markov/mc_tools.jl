@@ -90,21 +90,18 @@ Steady State Distributions for Markov Chains, " Operations Research (1985),
 University Press, 2009.
 
 """
-gth_solve{T<:Integer}(a::AbstractMatrix{T}) =
-    gth_solve(convert(AbstractArray{Rational{T}, 2}, a))
+gth_solve{T<:Real}(A::Matrix{T}) = gth_solve!(copy(A))
 
-# solve x(P-I)=0 by the GTH method
-function gth_solve{T<:Real}(original::AbstractMatrix{T})
-    # NOTE: the full here will convert a sparse matrix to dense before the gth
-    #       algorithm begins. Given the nature of the algorithm this will
-    #       almost certainly be more efficient than operating on the sparse
-    #       matrix itself.
-    a = copy(full(original))
-    n = size(a, 1)
+# convert already makes a copy, hence gth_solve!
+gth_solve{T<:Integer}(A::Matrix{T}) =
+    gth_solve!(convert(Matrix{Rational{T}}, A))
+
+function gth_solve!{T<:Real}(A::Matrix{T})
+    n = size(A, 1)
     x = zeros(T, n)
 
     @inbounds for k in 1:n-1
-        scale = sum(a[k, k+1:n])
+        scale = sum(A[k, k+1:n])
         if scale <= zero(T)
             # There is one (and only one) recurrent class contained in
             # {1, ..., k};
@@ -112,21 +109,23 @@ function gth_solve{T<:Real}(original::AbstractMatrix{T})
             n = k
             break
         end
-        a[k+1:n, k] /= scale
+        A[k+1:n, k] /= scale
 
         for j in k+1:n, i in k+1:n
-            a[i, j] += a[i, k] * a[k, j]
+            A[i, j] += A[i, k] * A[k, j]
         end
     end
 
     # backsubstitution
     x[n] = 1
     @inbounds for k in n-1:-1:1, i in k+1:n
-        x[k] += x[i] * a[i, k]
+        x[k] += x[i] * A[i, k]
     end
 
     # normalisation
-    x / sum(x)
+    x /= sum(x)
+
+    return x
 end
 
 """
@@ -241,22 +240,22 @@ function mc_compute_stationary{T}(mc::MarkovChain{T})
 end
 
 
-for (S, ex) in ((Real, :(T)), (Integer, :(Rational{T})))
+for (S, ex_T, ex_gth) in ((Real, :(T), :(gth_solve!)),
+                          (Integer, :(Rational{T}), :(gth_solve)))
     @eval function stationary_distributions{T<:$S}(mc::MarkovChain{T})
         n = n_states(mc)
         rec_classes = recurrent_classes(mc)
-        T1 = $ex
+        T1 = $ex_T
         stationary_dists = Array(Vector{T1}, length(rec_classes))
 
-        if length(rec_classes) == 1  # unique recurrent class
-            stationary_dists[1] = gth_solve(mc.p)
-        else  # more than one recurrent classes
-            for i in 1:length(rec_classes)
-                rec_class = rec_classes[i]
-                dist = zeros(T1, n)
-                dist[rec_class] = gth_solve(sub(mc.p, rec_class, rec_class))
-                stationary_dists[i] = dist
-            end
+        for (i, rec_class) in enumerate(rec_classes)
+            dist = zeros(T1, n)
+            # * mc.p[rec_class, rec_class] is a copy, hence gth_solve!
+            #   while gth_solve for Int matrix
+            # * full is to convert a sparse matrix to a dense matrix
+            A = full(mc.p[rec_class, rec_class])
+            dist[rec_class] = $ex_gth(A)
+            stationary_dists[i] = dist
         end
 
         return stationary_dists

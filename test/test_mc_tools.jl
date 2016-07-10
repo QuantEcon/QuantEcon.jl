@@ -467,7 +467,8 @@ end
             @test is_irreducible(mc) == is_irreducible(mc_s)
             @test is_aperiodic(mc) == is_aperiodic(mc_s)
             @test period(mc) == period(mc_s)
-            @test maxabs(gth_solve(mc_s.p) - gth_solve(mc.p)) < 1e-15
+            @test isapprox(stationary_distributions(mc_s),
+                           stationary_distributions(mc))
         end
     end
 
