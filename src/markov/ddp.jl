@@ -84,11 +84,11 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
         end
 
         # here the indices and indptr are null.
-        s_indices = Nullable{Vector{Int}}()
-        a_indices = Nullable{Vector{Int}}()
+        _s_indices = Nullable{Vector{Int}}()
+        _a_indices = Nullable{Vector{Int}}()
         a_indptr = Nullable{Vector{Int}}()
 
-        new(R, Q, beta, s_indices, a_indices, a_indptr)
+        new(R, Q, beta, _s_indices, _a_indices, a_indptr)
     end
 
     # Note: We left R, Q as type Array to produce more helpful error message with regards to shape.
@@ -129,17 +129,16 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
             msg = "Duplicate s-a pair found"
             as_ptr = sparse(a_indices, s_indices, 1:num_sa_pairs, m, n,
                             (x,y)->throw(ArgumentError(msg)))
-            a_indices = as_ptr.rowval
+            _a_indices = as_ptr.rowval
             a_indptr = as_ptr.colptr
 
             R = R[as_ptr.nzval]
             Q = Q[as_ptr.nzval, :]
 
-            _s_indices = Array(eltype(a_indices), num_sa_pairs)
+            _s_indices = Array(eltype(_a_indices), num_sa_pairs)
             for i in 1:num_states, j in a_indptr[i]:(a_indptr[i+1]-1)
                 _s_indices[j] = i
             end
-            copy!(s_indices, _s_indices)
         end
 
         # check feasibility
@@ -152,11 +151,11 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
         end
 
         # package into nullables before constructing type
-        s_indices = Nullable{Vector{Tind}}(s_indices)
-        a_indices = Nullable{Vector{Tind}}(a_indices)
+        _s_indices = Nullable{Vector{Tind}}(_s_indices)
+        _a_indices = Nullable{Vector{Tind}}(_a_indices)
         a_indptr = Nullable{Vector{Tind}}(a_indptr)
 
-        new(R, full(Q), beta, s_indices, a_indices, a_indptr)
+        new(R, full(Q), beta, _s_indices, _a_indices, a_indptr)
     end
 end
 
