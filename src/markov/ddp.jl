@@ -316,7 +316,7 @@ for a value function v.
 - `sigma::Vector` : Updated policiy function vector
 """
 function bellman_operator!(ddp::DiscreteDP, v::Vector, Tv::Vector, sigma::Vector)
-    vals = ddp.R + ddp.beta * ddp.Q * v
+    vals = ddp.R + ddp.beta * (ddp.Q * v)
     s_wise_max!(ddp, vals, Tv, sigma)
     Tv, sigma
 end
@@ -377,7 +377,7 @@ for a given value function v.
 - `Tv::Vector` : Updated value function vector
 """
 bellman_operator(ddp::DiscreteDP, v::Vector) =
-    s_wise_max(ddp, ddp.R + ddp.beta * ddp.Q * v)
+    s_wise_max(ddp, ddp.R + ddp.beta * (ddp.Q * v))
 
 # ---------------------- #
 # Compute greedy methods #
