@@ -327,6 +327,35 @@ end
         end
     end
 
+    @testset "test gth_solve with generator matrices" begin
+        P_dict_Int = Dict(
+            "P" => [-3 3; 4 -4],
+            "stationary_dist" => [4//7, 3//7],
+        )
+
+        P_dict_Float64 = Dict(
+            "P" => [-3. 3.; 4. -4.],
+            "stationary_dist" => [4/7, 3/7],
+        )
+
+        x = gth_solve(P_dict_Int["P"])
+        @test isequal(x, P_dict_Int["stationary_dist"])
+
+        x = gth_solve(P_dict_Float64["P"])
+        @test isapprox(x, P_dict_Float64["stationary_dist"])
+    end
+
+    @testset "test gth_solve with reducible matrix" begin
+        P_dict = Dict(
+            "P" => [0.4 0 0.6 0; 0 0 0 1; 0.2 0 0.8 0; 0 1 0 0],
+            # Stationary dist for the recurrent class {1, 3}
+            "stationary_dist" => [0.25, 0, 0.75, 0],
+        )
+
+        x = gth_solve(P_dict["P"])
+        @test isapprox(x, P_dict["stationary_dist"])
+    end
+
     @testset "test MarkovChain with KMR matrices" begin
         for P in kmr_matrices
             mc = MarkovChain(P)
