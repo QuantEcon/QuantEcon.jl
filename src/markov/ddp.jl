@@ -120,6 +120,8 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
 
         if _has_sorted_sa_indices(s_indices, a_indices)
             a_indptr = Array(Int64, num_states+1)
+            _a_indices = copy(a_indices)
+            _s_indices = copy(s_indices)
             _generate_a_indptr!(num_states, s_indices, a_indptr)
         else
             # transpose matrix to use Julia's CSC; now rows are actions and
