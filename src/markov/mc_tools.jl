@@ -244,8 +244,9 @@ for (S, ex_T, ex_gth) in ((Real, :(T), :(gth_solve!)),
             dist = zeros(T1, n)
             # * mc.p[rec_class, rec_class] is a copy, hence gth_solve!
             #   while gth_solve for Int matrix
-            # * full is to convert a sparse matrix to a dense matrix
-            A = full(mc.p[rec_class, rec_class])
+            # * todense is to convert a sparse matrix to a dense matrix
+            #   with eltype T1
+            A = todense(T1, mc.p[rec_class, rec_class])
             dist[rec_class] = $ex_gth(A)
             stationary_dists[i] = dist
         end
@@ -269,6 +270,24 @@ recurrent class.
   `Int` (and equal to `T` otherwise).
 
 """ stationary_distributions
+
+
+"""Custom version of `full`, which allows convertion to type T"""
+# From base/sparse/sparsematrix.jl
+function todense(T::Type, S::SparseMatrixCSC)
+    A = zeros(T, S.m, S.n)
+    for Sj in 1:S.n
+        for Sk in nzrange(S, Sj)
+            Si = S.rowval[Sk]
+            Sv = S.nzval[Sk]
+            A[Si, Sj] = Sv
+        end
+    end
+    return A
+end
+
+"""If A is already dense, return A as is"""
+todense(::Type, A::Array) = A
 
 
 """
