@@ -276,23 +276,23 @@ function _compute_sequence{T}(lq::LQ, x0::Vector{T}, policies)
 
     x_path = Array(T, n, capT+1)
     u_path = Array(T, k, capT)
-    w_path = [vec(C*randn(j)) for i=1:(capT+1)]
+    w_path = C*randn(j, capT+1)
 
     x_path[:, 1] = x0
     u_path[:, 1] = -(first(policies)*x0)
 
     for t = 2:capT
         f = policies[t]
-        x_path[:, t] = A*x_path[: ,t-1] + B*u_path[:, t-1] + w_path[t]
+        x_path[:, t] = A*x_path[: ,t-1] + B*u_path[:, t-1] + w_path[:, t]
         u_path[:, t] = -(f*x_path[:, t])
     end
-    x_path[:, end] = A*x_path[:, capT] + B*u_path[:, capT] + w_path[end]
+    x_path[:, end] = A*x_path[:, capT] + B*u_path[:, capT] + w_path[:, end]
 
     x_path, u_path, w_path
 end
 
 """
-Compute and return the optimal state and control sequence, assuming w ~ N(0,1)
+Compute and return the optimal state and control sequence, assuming innovation N(0,1)
 
 ##### Arguments
 
@@ -308,8 +308,8 @@ only for `min(ts_length, lq.capT)`
 represents `x_t`
 - `u_path::Matrix{Float64}` : A k x T matrix, where the t-th column represents
 `u_t`
-- `w_path::Matrix{Float64}` : A j x T+1 matrix, where the t-th column represents
-`lq.C*w_t`
+- `w_path::Matrix{Float64}` : A n x T+1 matrix, where the t-th column represents
+`lq.C*N(0,1)`
 
 """
 function compute_sequence(lq::LQ, x0::ScalarOrArray, ts_length::Integer=100)
