@@ -36,8 +36,6 @@ DiscreteDP type for specifying paramters for discrete dynamic programming model
 - `R::Array{T,NR}` : Reward Array
 - `Q::Array{T,NQ}` : Transition Probability Array
 - `beta::Float64`  : Discount Factor
-- `s_indices::Nullable{Vector{Tind}}`: State Indices. Null unless using
-  SA formulation
 - `a_indices::Nullable{Vector{Tind}}`: Action Indices. Null unless using
   SA formulation
 - `a_indptr::Nullable{Vector{Tind}}`: Action Index Pointers. Null unless using
@@ -52,7 +50,6 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
     R::Array{T,NR}                     # Reward Array
     Q::Array{T,NQ}                     # Transition Probability Array
     beta::Tbeta                        # Discount Factor
-    s_indices::Nullable{Vector{Tind}}  # State Indices
     a_indices::Nullable{Vector{Tind}}  # Action Indices
     a_indptr::Nullable{Vector{Tind}}   # Action Index Pointers
 
@@ -84,11 +81,10 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
         end
 
         # here the indices and indptr are null.
-        _s_indices = Nullable{Vector{Int}}()
         _a_indices = Nullable{Vector{Int}}()
         a_indptr = Nullable{Vector{Int}}()
 
-        new(R, Q, beta, _s_indices, _a_indices, a_indptr)
+        new(R, Q, beta, _a_indices, a_indptr)
     end
 
     # Note: We left R, Q as type Array to produce more helpful error message with regards to shape.
@@ -121,7 +117,6 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
         if _has_sorted_sa_indices(s_indices, a_indices)
             a_indptr = Array(Int64, num_states+1)
             _a_indices = copy(a_indices)
-            _s_indices = copy(s_indices)
             _generate_a_indptr!(num_states, s_indices, a_indptr)
         else
             # transpose matrix to use Julia's CSC; now rows are actions and
@@ -136,11 +131,6 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
 
             R = R[as_ptr.nzval]
             Q = Q[as_ptr.nzval, :]
-
-            _s_indices = Array(eltype(_a_indices), num_sa_pairs)
-            for i in 1:num_states, j in a_indptr[i]:(a_indptr[i+1]-1)
-                _s_indices[j] = i
-            end
         end
 
         # check feasibility
@@ -153,11 +143,10 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
         end
 
         # package into nullables before constructing type
-        _s_indices = Nullable{Vector{Tind}}(_s_indices)
         _a_indices = Nullable{Vector{Tind}}(_a_indices)
         a_indptr = Nullable{Vector{Tind}}(a_indptr)
 
-        new(R, full(Q), beta, _s_indices, _a_indices, a_indptr)
+        new(R, full(Q), beta, _a_indices, a_indptr)
     end
 end
 
