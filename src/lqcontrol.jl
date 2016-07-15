@@ -321,7 +321,7 @@ function compute_sequence(lq::LQ, x0::ScalarOrArray, ts_length::Integer=100)
     else
         capT = min(ts_length, lq.capT)
         policies = Array(typeof(lq.F), capT)
-        for t = 1:capT
+        for t = capT:-1:1
             update_values!(lq)
             policies[t] = lq.F
         end
