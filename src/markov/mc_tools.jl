@@ -376,7 +376,7 @@ function simulate!(mc::MarkovChain, X::Matrix{Int})
     # NOTE: ensure dense array and transpose before slicing the array. Then
     #       when passing to DiscreteRV use `sub` to avoid allocating again
     p = full(mc.p)'
-    P_dist = [DiscreteRV(sub(p, :, i)) for i in 1:n]
+    P_dist = [DiscreteRV(view(p, :, i)) for i in 1:n]
 
     ts_length, k = size(X)
 
@@ -439,7 +439,7 @@ function simulate_values!(mc::MarkovChain, init_state::Vector{Int}, X::Matrix)
     # NOTE: ensure dense array and transpose before slicing the array. Then
     #       when passing to DiscreteRV use `sub` to avoid allocating again
     p = full(mc.p)'
-    P_dist = [DiscreteRV(sub(p, :, i)) for i in 1:n]
+    P_dist = [DiscreteRV(view(p, :, i)) for i in 1:n]
 
     ts_length, k = size(X)
 

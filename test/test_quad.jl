@@ -75,7 +75,7 @@ x_gamm_3, w_gamm_3 = qnwgamma(n_3, b_3, ones(3))
             for d in [1, 3]
                 x_str_name = "x_$(name)_$(d)"
                 w_str_name = "w_$(name)_$(d)"
-                jl_x, jl_w = eval(symbol(x_str_name)), eval(symbol(w_str_name))
+                jl_x, jl_w = eval(Symbol(x_str_name)), eval(Symbol(w_str_name))
                 ml_x, ml_w = m[x_str_name],  m[w_str_name]
                 ml_x = d == 3 ? ml_x : squeeze(ml_x, 2)
                 @test isapprox(jl_x, ml_x; atol=1e-5)

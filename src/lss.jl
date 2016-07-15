@@ -42,8 +42,8 @@ end
 
 Base.rand{T}(d::FakeMVTNorm{T}) = copy(d.mu_0)
 """
-A type that describes the Gaussian Linear State Space Model 
-of the form: 
+A type that describes the Gaussian Linear State Space Model
+of the form:
 
     x_{t+1} = A x_t + C w_{t+1}
 
@@ -128,18 +128,18 @@ Simulate num_reps observations of x_T and y_T given x_0 ~ N(mu_0, Sigma_0).
 #### Arguments
 
 - `lss::LSS` An instance of the Gaussian linear state space model.
-- `T::Int = 10` The period that we want to replicate values for.
+- `t::Int = 10` The period that we want to replicate values for.
 - `num_reps::Int = 100` The number of replications we want
 
 #### Returns
 
 - `x::Matrix` An n x num_reps matrix, where the j-th column is the j_th
-              observation of x_T 
+              observation of x_T
 - `y::Matrix` An k x num_reps matrix, where the j-th column is the j_th
-              observation of y_T 
+              observation of y_T
 
 """
-function replicate(lss::LSS, t=10, num_reps=100)
+function replicate(lss::LSS, t::Integer, num_reps::Integer=100)
     x = Array(Float64, lss.n, num_reps)
     for j=1:num_reps
         x_t, _ = simulate(lss, t+1)
@@ -150,7 +150,8 @@ function replicate(lss::LSS, t=10, num_reps=100)
     return x, y
 end
 
-replicate(lss::LSS; t=10, num_reps=100) = replicate(lss, t, num_reps)
+replicate(lss::LSS; t::Integer=10, num_reps::Integer=100) =
+    replicate(lss, t, num_reps)
 
 """
 Create a generator to calculate the population mean and
@@ -161,7 +162,7 @@ the next period.
 
 #### Arguments
 
-- `lss::LSS` An instance of the Gaussian linear state space model 
+- `lss::LSS` An instance of the Gaussian linear state space model
 
 """
 function moment_sequence(lss::LSS)

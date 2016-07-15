@@ -27,7 +27,7 @@ are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`
 
 - `out::Array`: The array of smoothed data
 """
-function smooth(x::Array, window_len::Int=7, window::AbstractString="hanning")
+function smooth(x::Array, window_len::Int, window::AbstractString="hanning")
     if length(x) < window_len
         throw(ArgumentError("Input vector length must be >= window length"))
     end
@@ -136,7 +136,7 @@ are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`
 function ar_periodogram(x::Array, window::AbstractString="hanning", window_len::Int=7)
     # run regression
     x_current, x_lagged = x[2:end], x[1:end-1]  # x_t and x_{t-1}
-    coefs = linreg(x_lagged, x_current)
+    coefs = collect(linreg(x_lagged, x_current))
 
     # get estimated values and compute residual
     est = [ones(x_lagged) x_lagged] * coefs
