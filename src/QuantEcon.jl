@@ -8,6 +8,7 @@ import Base: mean, std, var, show, isapprox
 using Distributions
 import Distributions: pdf, skewness, BetaBinomial
 using DSP: TFFilter, freqz
+using Primes
 
 # useful types
 typealias ScalarOrArray{T} Union{T, Array{T}}
