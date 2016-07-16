@@ -3,4 +3,5 @@ DSP
 Distributions 0.8.9
 LightGraphs
 Primes
-Compat
+Compat 0.8.4
+StatsBase
