@@ -113,7 +113,7 @@ function solve_discrete_riccati(A::ScalarOrArray, B::ScalarOrArray,
     BTA = B' * A
 
     for gamma in candidates
-        Z = R + gamma .* BB
+        Z = reshape(R + gamma .* BB, n, n)
         cn = cond(Z)
         if isfinite(cn)
             Q_tilde = -Q + N' * (Z \ (N + gamma .* BTA)) + gamma .* I
