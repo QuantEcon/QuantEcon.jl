@@ -382,7 +382,7 @@ function simulate!(mc::MarkovChain, X::Matrix{Int})
 
     for i in 1:k
         for t in 1:ts_length-1
-            X[t+1, i] = draw(P_dist[X[t]])
+            X[t+1, i] = draw(P_dist[X[t,i]])
         end
     end
     X
