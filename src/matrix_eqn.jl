@@ -113,7 +113,7 @@ function solve_discrete_riccati(A::ScalarOrArray, B::ScalarOrArray,
     BTA = B' * A
 
     for gamma in candidates
-        Z = reshape(R + gamma .* BB, n, n)
+        Z = getZ(R, gamma, BB)
         cn = cond(Z)
         if isfinite(cn)
             Q_tilde = -Q + N' * (Z \ (N + gamma .* BTA)) + gamma .* I
@@ -168,3 +168,48 @@ function solve_discrete_riccati(A::ScalarOrArray, B::ScalarOrArray,
 
     return H0 + gamma .* I  # Return X
 end
+
+"""
+Simple method to return an element Z in the Riccati equation solver whose type is Float64 (to be accepted by the cond() function)
+
+##### Arguments
+
+- `BB::Float64` : result of B' * B
+- `gamma::Float64` : parameter in the Riccati equation solver
+- `R::Float64`
+
+##### Returns
+- `::Float64` : element Z in the Riccati equation solver
+
+"""
+getZ(R::Float64, gamma::Float64, BB::Float64) = R + gamma * BB
+
+"""
+Simple method to return an element Z in the Riccati equation solver whose type is Float64 (to be accepted by the cond() function)
+
+##### Arguments
+
+- `BB::Array{Float64, 1}` : result of B' * B
+- `gamma::Float64` : parameter in the Riccati equation solver
+- `R::Float64`
+
+##### Returns
+- `::Float64` : element Z in the Riccati equation solver
+
+"""
+getZ(R::Float64, gamma::Float64, BB::Array{Float64, 1}) = R + gamma * BB[1]
+
+"""
+Simple method to return an element Z in the Riccati equation solver whose type is Matrix (to be accepted by the cond() function)
+
+##### Arguments
+
+- `BB::Matrix` : result of B' * B
+- `gamma::Float64` : parameter in the Riccati equation solver
+- `R::Matrix`
+
+##### Returns
+- `::Matrix` : element Z in the Riccati equation solver
+
+"""
+getZ(R::Matrix, gamma::Float64, BB::Matrix) = R + gamma .* BB
