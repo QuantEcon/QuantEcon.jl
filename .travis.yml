@@ -2,16 +2,17 @@ language: julia
 sudo: false
 julia:
     - 0.4
+    - 0.5
     - nightly
 matrix:
   allow_failures:
     - julia: nightly    
 notifications:
     email: false
-script:
-    - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-    - julia -e 'Pkg.clone(pwd()); Pkg.build("QuantEcon")'
-    - julia -e 'Pkg.test("QuantEcon", coverage=true)'
+#script: # use the default script setting which is equivalent to the following
+#    - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+#    - julia -e 'Pkg.clone(pwd()); Pkg.build("QuantEcon")'
+#    - julia -e 'Pkg.test("QuantEcon", coverage=true)'
 after_success:
     - echo $TRAVIS_JULIA_VERSION
     - julia -e 'Pkg.add("Coverage"); cd(Pkg.dir("QuantEcon")); using Coverage; Coveralls.submit(process_folder()); Codecov.submit(process_folder())'
