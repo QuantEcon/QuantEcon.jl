@@ -189,7 +189,7 @@ Simple method to return an element Z in the Riccati equation solver whose type i
 
 ##### Arguments
 
-- `BB::Array{Float64, 1}` : result of B' * B
+- `BB::Union{Vector, Matrix}` : result of B' * B
 - `gamma::Float64` : parameter in the Riccati equation solver
 - `R::Float64`
 
@@ -197,7 +197,7 @@ Simple method to return an element Z in the Riccati equation solver whose type i
 - `::Float64` : element Z in the Riccati equation solver
 
 """
-getZ(R::Float64, gamma::Float64, BB::Array{Float64, 1}) = R + gamma * BB[1]
+getZ(R::Float64, gamma::Float64, BB::Union{Vector, Matrix}) = R + gamma * BB[1]
 
 """
 Simple method to return an element Z in the Riccati equation solver whose type is Matrix (to be accepted by the cond() function)
