@@ -328,11 +328,13 @@ same as the type of the state values of `mc`
     - blank: random initial condition for each chain
     - scalar: same initial condition for each chain
     - vector: cycle through the elements, applying each as an
-      initial condition
+      initial condition until all columns have an initial condition 
+      (allows for more columns than initial conditions)
 """
 
-function simulate!(mc::MarkovChain, X::Matrix;
-                   init=rand(1:n_states(mc), size(X, 2)))
+function simulate!(X::Union{AbstractVector,AbstractMatrix},
+                   mc::MarkovChain; init=rand(1:n_states(mc), size(X, 2)))
+
     # Note: eltype(X) must be the same as eltype(mc.state_values)
     if eltype(X) != eltype(mc.state_values)
         throw(ArgumentError("Types in X must be the same as the types of the
@@ -343,13 +345,12 @@ function simulate!(mc::MarkovChain, X::Matrix;
     
     # if init is a vector, assign initial conditions to columns of X
     # otherwise, just start each column at the same initial condition
-    real_init = Array(Int, k, )
     if length(init) > 1
         real_init = collect(take(cycle(init), k))
     else
-        real_init = round(Int, init.*ones(k, ))
+        real_init = init .* ones(Int, k)
     end
-    X[1, :] = mc.state_values[real_init]'
+    X[1, :] = mc.state_values[real_init]
 
     n = size(mc.p, 1)
 
@@ -410,23 +411,23 @@ of the sample paths of the Markov chain `mc`.
     - blank: random initial condition for each chain
     - scalar: same initial condition for each chain
     - vector: cycle through the elements, applying each as an
-      initial condition
+      initial condition until all columns have an initial condition 
+      (allows for more columns than initial conditions)
 """
 
-function simulate_indices!(mc::MarkovChain, X::Matrix{Int};
-                           init=rand(1:n_states(mc), size(X, 2)))
+function simulate_indices!{T<:Integer}(X::Union{AbstractVector{T},AbstractMatrix{T}},
+                           mc::MarkovChain; init=rand(1:n_states(mc), size(X, 2)))
 
     ts_length, k = size(X)
    
     # if init is a vector, assign initial conditions to columns of X
     # otherwise, just start each column at the same initial condition
-    real_init = Array(Int, k, )
     if length(init) > 1
         real_init = collect(take(cycle(init), k))
     else
-        real_init = round(Int, init.*ones(k, ))
+        real_init = init .* ones(Int, k)
     end
-    X[1, :] = real_init'
+    X[1, :] = real_init
 
     n = size(mc.p, 1)
 
