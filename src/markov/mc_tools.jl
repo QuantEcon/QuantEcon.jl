@@ -309,7 +309,7 @@ ts_length
 function simulate(mc::MarkovChain, ts_length::Int;
                   init::Int=rand(1:n_states(mc)))
     X = Array(eltype(mc.state_values), ts_length, 1)
-    simulate!(mc, X; init=init)
+    simulate!(X, mc; init=init)
     return vec(X)
 end
 
@@ -393,7 +393,7 @@ ts_length
 function simulate_indices(mc::MarkovChain, ts_length::Int;
                           init::Int=rand(1:n_states(mc)))
     X = Array(Int, ts_length, 1)
-    simulate_indices!(mc, X; init=init)
+    simulate_indices!(X, mc; init=init)
     return vec(X)
 end
 
