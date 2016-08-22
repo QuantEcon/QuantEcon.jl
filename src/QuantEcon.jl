@@ -44,8 +44,7 @@ export
 # mc_tools
     MarkovChain,
     stationary_distributions,
-    simulate, simulate!, simulate_values, simulate_values!,
-    simulation, value_simulation,
+    simulate, simulate!, simulate_indices, simulate_indices!,
     period, is_irreducible, is_aperiodic, recurrent_classes,
     communication_classes, n_states,
 
