@@ -291,86 +291,68 @@ todense(::Type, A::Array) = A
 
 
 """
-Simulate time series of state transitions of the Markov chain `mc`.
+Simulate one sample path of the Markov chain `mc`.
+The resulting vector has the state values of `mc` as elements.
 
-The sample path from the `j`-th repetition of the simulation with initial state
-`init[i]` is stored in the `(j-1)*num_reps+i`-th column of the matrix X.
-
-##### Arguments
+### Arguments
 
 - `mc::MarkovChain` : MarkovChain instance.
-- `ts_length::Int` : Length of each simulation.
-- `init::Vector{Int}` : Vector containing initial states.
-- `;num_reps::Int(1)` : Number of repetitions of simulation for each element
-of `init`.
+- `ts_length::Int` : Length of simulation
+- `;init::Int=rand(1:n_states(mc))` : Initial state 
 
-##### Returns
+### Returns
 
-- `X::Matrix{Int}` : Array containing the sample paths as columns, of shape
-(ts_length, k), where k = length(init)* num_reps.
-
+- `X::Vector` : Vector containing the sample path, with length 
+ts_length
 """
-function simulate(mc::MarkovChain, ts_length::Int, init::Vector{Int};
-                  num_reps::Int=1)
-    k = length(init)*num_reps
-    X = Array(Int, ts_length, k)
-    X[1, :] = repmat(init, num_reps)
 
-    simulate!(mc, X)
-    return X
+function simulate(mc::MarkovChain, ts_length::Int;
+                  init::Int=rand(1:n_states(mc)))
+    X = Array(eltype(mc.state_values), ts_length, 1)
+    simulate!(X, mc; init=init)
+    return vec(X)
 end
 
-"""
-Simulate time series of state transitions of the Markov chain `mc`.
-
-##### Arguments
-
-- `mc::MarkovChain` : MarkovChain instance.
-- `ts_length::Int` : Length of each simulation.
-- `init::Int` : Initial state.
-- `;num_reps::Int(1)` : Number of repetitions of simulation.
-
-##### Returns
-
-- `X::Matrix{Int}` : Array containing the sample paths as columns, of shape
-(ts_length, k), where k = num_reps.
-
-"""
-simulate(mc::MarkovChain, ts_length::Int, init::Int; num_reps::Int=1) =
-    simulate(mc, ts_length, [init], num_reps=num_reps)
-
-"""
-Simulate time series of state transitions of the Markov chain `mc`.
-
-##### Arguments
-
-- `mc::MarkovChain` : MarkovChain instance.
-- `ts_length::Int` : Length of each simulation.
-- `;num_reps::Union{Int, Void}(nothing)` : Number of repetitions of simulation.
-
-##### Returns
-
-- `X::Matrix{Int}` : Array containing the sample paths as columns, of shape
-(ts_length, k), where k = num_reps.
-
-"""
-function simulate(mc::MarkovChain, ts_length::Int; num_reps::Int=1)
-    init = rand(1:size(mc.p, 1), num_reps)
-    return simulate(mc, ts_length, init)
-end
 
 """
 Fill `X` with sample paths of the Markov chain `mc` as columns.
+The resulting matrix has the state values of `mc` as elements.
 
-##### Arguments
+### Arguments
 
+- `X::Matrix` : Preallocated matrix to be filled with sample paths
+of the Markov chain `mc`. The element types in `X` should be the 
+same as the type of the state values of `mc`
 - `mc::MarkovChain` : MarkovChain instance.
-- `X::Matrix{Int}` : Preallocated matrix of integers to be filled with sample
-paths of the markov chain `mc`. The elements in `X[1, :]` will be used as the
-initial states.
-
+- `;init=rand(1:n_states(mc))` : Can be one of the following
+    - blank: random initial condition for each chain
+    - scalar: same initial condition for each chain
+    - vector: cycle through the elements, applying each as an
+      initial condition until all columns have an initial condition 
+      (allows for more columns than initial conditions)
 """
-function simulate!(mc::MarkovChain, X::Matrix{Int})
+
+function simulate!(X::Union{AbstractVector,AbstractMatrix},
+                   mc::MarkovChain; init=rand(1:n_states(mc), size(X, 2)))
+
+    # Note: eltype(X) must be the same as eltype(mc.state_values)
+    if eltype(X) != eltype(mc.state_values)
+        throw(ArgumentError("Types in X must be the same as the types of the
+        Markov state values"))
+    end
+
+    ts_length = size(X, 1)
+    k = size(X, 2)
+    
+    # if init is a vector, assign initial conditions to columns of X
+    # otherwise, just start each column at the same initial condition
+    if length(init) > 1
+        real_init = collect(take(cycle(init), k))
+    else
+        real_init = init .* ones(Int, k)
+    end
+    X[1, :] = mc.state_values[real_init]
+
     n = size(mc.p, 1)
 
     # NOTE: ensure dense array and transpose before slicing the array. Then
@@ -378,7 +360,83 @@ function simulate!(mc::MarkovChain, X::Matrix{Int})
     p = full(mc.p)'
     P_dist = [DiscreteRV(view(p, :, i)) for i in 1:n]
 
-    ts_length, k = size(X)
+    for i in 1:k
+        i_state = real_init[i]
+        for t in 1:ts_length-1
+            i_state = draw(P_dist[i_state])
+            X[t+1, i] = mc.state_values[i_state]
+        end
+    end
+    X
+
+end
+
+# ------------------------ #
+# simulate_indices methods #
+# ------------------------ #
+
+"""
+Simulate one sample path of the Markov chain `mc`.
+The resulting vector has the indices of the state values of `mc` as elements.
+
+### Arguments
+
+- `mc::MarkovChain` : MarkovChain instance.
+- `ts_length::Int` : Length of simulation
+- `;init::Int=rand(1:n_states(mc))` : Initial state 
+
+### Returns
+
+- `X::Vector{Int}` : Vector containing the sample path, with length 
+ts_length
+"""
+
+function simulate_indices(mc::MarkovChain, ts_length::Int;
+                          init::Int=rand(1:n_states(mc)))
+    X = Array(Int, ts_length, 1)
+    simulate_indices!(X, mc; init=init)
+    return vec(X)
+end
+
+
+"""
+Fill `X` with sample paths of the Markov chain `mc` as columns.
+The resulting matrix has the indices of the state values of `mc` as elements.
+
+### Arguments
+
+- `X::Matrix{Int}` : Preallocated matrix to be filled with indices
+of the sample paths of the Markov chain `mc`.
+- `mc::MarkovChain` : MarkovChain instance.
+- `;init=rand(1:n_states(mc))` : Can be one of the following
+    - blank: random initial condition for each chain
+    - scalar: same initial condition for each chain
+    - vector: cycle through the elements, applying each as an
+      initial condition until all columns have an initial condition 
+      (allows for more columns than initial conditions)
+"""
+
+function simulate_indices!{T<:Integer}(X::Union{AbstractVector{T},AbstractMatrix{T}},
+                           mc::MarkovChain; init=rand(1:n_states(mc), size(X, 2)))
+
+    ts_length = size(X, 1)
+    k = size(X, 2)
+   
+    # if init is a vector, assign initial conditions to columns of X
+    # otherwise, just start each column at the same initial condition
+    if length(init) > 1
+        real_init = collect(take(cycle(init), k))
+    else
+        real_init = init .* ones(Int, k)
+    end
+    X[1, :] = real_init
+
+    n = size(mc.p, 1)
+
+    # NOTE: ensure dense array and transpose before slicing the array. Then
+    #       when passing to DiscreteRV use `sub` to avoid allocating again
+    p = full(mc.p)'
+    P_dist = [DiscreteRV(view(p, :, i)) for i in 1:n]
 
     for i in 1:k
         for t in 1:ts_length-1
@@ -386,94 +444,5 @@ function simulate!(mc::MarkovChain, X::Matrix{Int})
         end
     end
     X
-end
 
-"""
-Simulate time series of state transitions of the Markov chain `mc`.
-
-##### Arguments
-
-- `mc::MarkovChain` : MarkovChain instance.
-- `ts_length::Int` : Length of each simulation.
-- `init_state::Int(rand(1:n_states(mc)))` : Initial state.
-
-##### Returns
-
-- `x::Vector`: A vector of transition indices for a single simulation.
-"""
-function simulation(mc::MarkovChain, ts_length::Int,
-                    init_state::Int=rand(1:n_states(mc)))
-    simulate(mc, ts_length, init_state; num_reps=1)[:, 1]
-end
-
-# ----------------------- #
-# simulate_values methods #
-# ----------------------- #
-
-function simulate_values(mc::MarkovChain,
-                         ts_length::Int,
-                         init_state::Vector{Int};
-                         num_reps::Int=1)
-    k = length(init_state)*num_reps
-    X = Array(eltype(mc.state_values), ts_length, k)
-    init_state = repmat(init_state, num_reps)
-    X[1, :] = mc.state_values[init_state]
-
-    simulate_values!(mc, init_state, X)
-    return X
-end
-
-function simulate_values(mc::MarkovChain, ts_length::Int, init_state::Int;
-                         num_reps::Int=1)
-    simulate_values(mc, ts_length, [init_state], num_reps=num_reps)
-end
-
-function simulate_values(mc::MarkovChain, ts_length::Int; num_reps::Int=1)
-    init_state = rand(1:size(mc.p, 1), num_reps)
-    simulate_values(mc, ts_length, init_state)
-end
-
-function simulate_values!(mc::MarkovChain, init_state::Vector{Int}, X::Matrix)
-    n = size(mc.p, 1)
-
-    # NOTE: ensure dense array and transpose before slicing the array. Then
-    #       when passing to DiscreteRV use `sub` to avoid allocating again
-    p = full(mc.p)'
-    P_dist = [DiscreteRV(view(p, :, i)) for i in 1:n]
-
-    ts_length, k = size(X)
-
-    for i in 1:k
-        i_state = init_state[i]
-        for t in 1:ts_length-1
-            i_state = draw(P_dist[i_state])
-            X[t+1, i] = mc.state_values[i_state]
-        end
-    end
-    X
-end
-
-@doc """ Like `simulate(::MarkovChain, args...; kwargs...)`, but instead of
-returning integers specifying the state indices, this routine returns the
-values of the `mc.state_values` at each of those indices. See docstring
-for `simulate` for more information.
-""" simulate_values, simulate_values!
-
-
-"""
-Simulate time series of state transitions of the Markov chain `mc`.
-
-##### Arguments
-
-- `mc::MarkovChain` : MarkovChain instance.
-- `ts_length::Int` : Length of each simulation.
-- `init_state::Int(rand(1:n_states(mc)))` : Initial state.
-
-##### Returns
-
-- `x::Vector`: A vector of state values along a simulated path.
-"""
-function value_simulation(mc::MarkovChain, ts_length::Int,
-                          init_state::Int=rand(1:n_states(mc)))
-    simulate_values(mc, ts_length, init_state; num_reps=1)[:, 1]
 end
