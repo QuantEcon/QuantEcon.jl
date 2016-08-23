@@ -341,7 +341,8 @@ function simulate!(X::Union{AbstractVector,AbstractMatrix},
         Markov state values"))
     end
 
-    ts_length, k = size(X)
+    ts_length = size(X, 1)
+    k = size(X, 2)
     
     # if init is a vector, assign initial conditions to columns of X
     # otherwise, just start each column at the same initial condition
@@ -418,7 +419,8 @@ of the sample paths of the Markov chain `mc`.
 function simulate_indices!{T<:Integer}(X::Union{AbstractVector{T},AbstractMatrix{T}},
                            mc::MarkovChain; init=rand(1:n_states(mc), size(X, 2)))
 
-    ts_length, k = size(X)
+    ts_length = size(X, 1)
+    k = size(X, 2)
    
     # if init is a vector, assign initial conditions to columns of X
     # otherwise, just start each column at the same initial condition
