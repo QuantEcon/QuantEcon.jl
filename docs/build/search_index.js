@@ -13,31 +13,23 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "QuantEcon.jl",
     "category": "section",
-    "text": "QuantEcon.jl is a Julia package for doing quantitative economics.The library is split into two modules: QuantEcon and QuantEcon.Models. The main QuantEcon module includes various tools and the QuantEcon.Models module leverages these tools to provide implementations of standard economic models.Many of the concepts in the library are discussed in the lectures on the website quant-econ.net.For a listing of the functions, methods, and types provided by the library see the [Overview] page.For more detailed documentation of each object in each of the two modules see the Library/QuantEcon and Library/[QuantEcon.Models] pages.Some examples of usage can be found in the examples directory or the listing of exercise solutions that accompany the lectures on quant-econ.net."
+    "text": "QuantEcon.jl is a Julia package for doing quantitative economics.Many of the concepts in the library are discussed in the lectures on the website quant-econ.net.For more detailed documentation of each object in the library, see the API/QuantEcon page.Some examples of usage can be found in the examples directory, in the exercise solutions that accompany the lectures on quant-econ.net, or in the notebook archive at quant-econ.org."
 },
 
 {
-    "location": "man/guide.html#",
-    "page": "User Guide",
-    "title": "User Guide",
-    "category": "page",
-    "text": ""
-},
-
-{
-    "location": "man/guide.html#User-Guide-1",
-    "page": "User Guide",
-    "title": "User Guide",
-    "category": "section",
-    "text": ""
-},
-
-{
-    "location": "man/guide.html#Installation-1",
-    "page": "User Guide",
+    "location": "index.html#Installation-1",
+    "page": "Home",
     "title": "Installation",
     "category": "section",
-    "text": "To install the package, open a Julia session and typePkg.add(\"QuantEcon\")"
+    "text": "To install the package, open a Julia session and typePkg.add(\"QuantEcon\")This installs the QuantEcon package through the Julia package manager (via git) to the default Julia library location ~/.julia/v0.XX/QuantEcon."
+},
+
+{
+    "location": "index.html#Usage-1",
+    "page": "Home",
+    "title": "Usage",
+    "category": "section",
+    "text": "Once installed, the QuantEcon package can bu used by typingusing QuantEcon"
 },
 
 {
@@ -1046,6 +1038,38 @@ var documenterSearchIndex = {"docs": [
     "title": "Index",
     "category": "section",
     "text": "Pages = [\"QuantEcon.md\"]"
+},
+
+{
+    "location": "man/contributing.html#",
+    "page": "Contributing",
+    "title": "Contributing",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "man/contributing.html#Contributing-1",
+    "page": "Contributing",
+    "title": "Contributing",
+    "category": "section",
+    "text": "We welcome submission of algorithms and high quality code on all topics concerning quantitative economics.Less experienced developers who wish to get involved can help improve documentation, contribute notebooks or work on smaller enhancements.A good place to start is by visiting the project issue tracker.If you are new to open source development please consider reading this page first."
+},
+
+{
+    "location": "man/contributing.html#General-Information-1",
+    "page": "Contributing",
+    "title": "General Information",
+    "category": "section",
+    "text": "As a programming language, Julia is still new and thus some aspects of the language are still evolving as it matures. As a result there may be some changes from time to time in styles and conventions. The upside is that it is fast and quickly being adopted by the broader scientific computing community.The Julia style guide is a good starting point for some Julia programming conventions."
+},
+
+{
+    "location": "man/contributing.html#Writing-Tests-1",
+    "page": "Contributing",
+    "title": "Writing Tests",
+    "category": "section",
+    "text": "One prerequisite for contributions to QuantEcon is that all functions and methods should be paired with tests verifying that they are functioning correctly. This type of unit testing is almost universal across a quality software projects. A guide to writing tests in Julia is currently in work."
 },
 
 ]}
