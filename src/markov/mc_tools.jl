@@ -320,10 +320,10 @@ The resulting matrix has the state values of `mc` as elements.
 
 ### Arguments
 
-- `mc::MarkovChain` : MarkovChain instance.
 - `X::Matrix` : Preallocated matrix to be filled with sample paths
 of the Markov chain `mc`. The element types in `X` should be the 
 same as the type of the state values of `mc`
+- `mc::MarkovChain` : MarkovChain instance.
 - `;init=rand(1:n_states(mc))` : Can be one of the following
     - blank: random initial condition for each chain
     - scalar: same initial condition for each chain
@@ -405,9 +405,9 @@ The resulting matrix has the indices of the state values of `mc` as elements.
 
 ### Arguments
 
-- `mc::MarkovChain` : MarkovChain instance.
 - `X::Matrix{Int}` : Preallocated matrix to be filled with indices
 of the sample paths of the Markov chain `mc`.
+- `mc::MarkovChain` : MarkovChain instance.
 - `;init=rand(1:n_states(mc))` : Can be one of the following
     - blank: random initial condition for each chain
     - scalar: same initial condition for each chain
