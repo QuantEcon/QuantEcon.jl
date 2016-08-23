@@ -57,7 +57,7 @@ phi = 0.5
 theta = [0.0, -0.8]
 sigma = 1.0
 lp = ARMA(phi, theta, sigma)
-require(joinpath(Pkg.dir("QuantEcon"), "examples", "arma_plots.jl"))
+require(joinpath(dirname(@__FILE__),"..", "examples", "arma_plots.jl"))
 quad_plot(lp)
 ```
 """
