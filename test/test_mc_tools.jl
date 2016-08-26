@@ -391,34 +391,41 @@ end
 
     mc3 = MarkovChain([0.4 0.6; 0.2 0.8])
 
-    @testset "test simulate shape" begin
+    @testset "test simulate_indices shape" begin
 
         for mc in (mc3, MarkovChain(sparse(mc3.p)))
             ts_length = 10
-            init = [1, 2]
-            nums_reps = [3, 1]
+            init = 2
+            nums_sims = [3, 1]
 
-            @test size(simulate(mc, ts_length)) == (ts_length,1)
-            @test size(simulate(mc, ts_length, init)) ==
-                (ts_length, length(init))
-            num_reps = nums_reps[1]
-            @test size(simulate(mc, ts_length, init, num_reps=num_reps)) ==
-                (ts_length, length(init)*num_reps)
-            for num_reps in nums_reps
-            @test size(simulate(mc, ts_length, num_reps=num_reps)) ==
-                    (ts_length, num_reps)
+            @test size(simulate_indices(mc, ts_length)) == (ts_length,)
+            @test size(simulate_indices(mc, ts_length; init=init)) ==
+                       (ts_length, )
+            for num_sims in nums_sims
+                X = Array(Int64, ts_length, num_sims)
+                @test size(simulate_indices!(X, mc)) == 
+                           (ts_length, num_sims)
+                @test size(simulate_indices!(X, mc; init=init)) == 
+                           (ts_length, num_sims)
             end
         end
     end  # testset
 
-    @testset "test simulate init array" begin
+    @testset "test simulate_indices init array" begin
         for mc in (mc3, MarkovChain(sparse(mc3.p)))
             ts_length = 10
-            init = [1, 2]
-            num_reps = 3
+            init = 2
+            Y = simulate_indices(mc, ts_length; init=init)
+            @test Y[1] == init
 
-            X = simulate(mc, ts_length, init, num_reps=num_reps)
-            @test vec(X[1, :]) == repmat(init, num_reps)
+            num_sims = 5
+            X = Array(Int64, ts_length, num_sims)
+            simulate_indices!(X, mc; init=init)
+            @test vec(X[1, :]) == init .* ones(Int, num_sims)
+
+            init = [2, 1]
+            simulate_indices!(X, mc; init=init)
+            @test vec(X[1, :]) == collect(take(cycle(init), num_sims))
         end
     end  # testset
 
@@ -449,43 +456,42 @@ end
         end
     end
 
-    @testset "simulate_values" begin
+    @testset "simulate" begin
         for _mc in (mc3, MarkovChain(sparse(mc3.p)))
             for T in [Float16, Float32, Float64, Int8, Int16, Int32, Int64]
                 mc = MarkovChain(_mc.p, rand(T, size(_mc.p, 1)))
                 ts_length = 10
-                init = [1, 2]
-                nums_reps = [3, 1]
+                init = 2
+                nums_sims = [3, 1]
 
-                @test size(@inferred(simulate_values(mc, ts_length))) == (ts_length,1)
-                @test size(@inferred(simulate_values(mc, ts_length, init))) ==
-                    (ts_length, length(init))
-                num_reps = nums_reps[1]
-                @test size(simulate(mc, ts_length, init, num_reps=num_reps)) ==
-                    (ts_length, length(init)*num_reps)
-                for num_reps in nums_reps
-                    @test size(simulate(mc, ts_length, num_reps=num_reps)) ==
-                        (ts_length, num_reps)
+                @test size(@inferred(simulate(mc, ts_length))) == (ts_length,)
+                for num_sims in nums_sims
+                    X = Array(T, ts_length, num_sims)
+                    @test size(simulate!(X, mc)) == 
+                           (ts_length, num_sims)
+                    @test size(simulate!(X, mc; init=init)) == 
+                           (ts_length, num_sims)
                 end
             end  # state_values eltypes
         end
 
-        @testset "test simulate_values init array" begin
+        @testset "test simulate init array" begin
             for mc in (mc3, MarkovChain(sparse(mc3.p)))
                 ts_length = 10
-                init = [1, 2]
-                num_reps = 3
+                init = 2
+                Y = simulate(mc, ts_length; init=init)
+                @test Y[1] == mc.state_values[init]
 
-                X = simulate(mc, ts_length, init, num_reps=num_reps)
-                @test vec(X[1, :]) == repmat(init, num_reps)
+                num_sims = 5
+                X = Array(eltype(mc.state_values), ts_length, num_sims)
+                simulate!(X, mc; init=init)
+                @test vec(X[1, :]) == mc.state_values[init .* ones(Int, num_sims)]
+
+                init = [2, 1]
+                simulate!(X, mc; init=init)
+                @test vec(X[1, :]) == mc.state_values[collect(take(cycle(init), num_sims))]
             end
         end  # testset
     end
-
-    @testset "simulation and value_simulation" begin
-        @test size(@inferred(simulation(mc3, 10, 1))) == (10,)
-        @test size(@inferred(value_simulation(mc3, 10, 1))) == (10,)
-    end
-
 
 end  # testset
