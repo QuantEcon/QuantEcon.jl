@@ -73,13 +73,13 @@ function tauchen(N::Integer, ρ::Real, σ::Real, μ::Real=0.0, n_std::Integer=3)
     #       the cdf with a function that allows the distribution of input
     #       arguments to be [μ/(1 - ρ), 1] instead of [0, 1]
 
-    y .+= μ / (1 - ρ) # center process around its mean (wbar / (1 - rho))
+    yy = zeros(size(y)) .+ (μ / (1 - ρ)) # center process around its mean (wbar / (1 - rho)) in new variable
 
     # renormalize. In some test cases the rows sum to something that is 2e-15
     # away from 1.0, which caused problems in the MarkovChain constructor
     Π = Π./sum(Π, 2)
 
-    MarkovChain(Π, y)
+    MarkovChain(Π, yy)
 end
 
 
