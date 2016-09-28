@@ -66,7 +66,7 @@ function compute_fixed_point{TV}(T::Function, v::TV; err_tol=1e-3,
     if iterate < max_iter && verbose
         println("Converged in $iterate steps")
     elseif iterate == max_iter
-        warn("max_iter exceeded in compute_fixed_point")
+        warn("max_iter attained in compute_fixed_point")
     end
 
     return v
