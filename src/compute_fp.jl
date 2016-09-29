@@ -29,9 +29,10 @@ be an approximation to the fixed point of `T`.
 * `v::TV`: The initial condition. An object of type `TV`
 * `;err_tol(1e-3)`: Stopping tolerance for iterations
 * `;max_iter(50)`: Maximum number of iterations
-* `;verbose(true)`: Whether or not to print status updates to the user
-* `;print_skip(10)` : if `verbose` is true, how many iterations to apply between
-  print messages
+* `;verbose(2)`: Level of feedback (0 for no output, 1 for warnings only, 2
+        for warning and convergence messages during iteration)
+* `;print_skip(10)` : if `verbose == 2`, how many iterations to apply between
+        print messages
 
 ##### Returns
 ---
@@ -47,15 +48,24 @@ x_star = compute_fixed_point(x->T(x, 0.3), 0.4)  # (4μ - 1)/(4μ)
 ```
 
 """
-function compute_fixed_point{TV}(T::Function, v::TV; err_tol=1e-3,
-                                 max_iter=50, verbose=true, print_skip=10)
+function compute_fixed_point{TV}(T::Function, 
+                                v::TV; 
+                                err_tol=1e-4,
+                                max_iter=100, 
+                                verbose=2, 
+                                print_skip=10)
+
+    if !(verbose in (0, 1, 2))
+        throw(ArgumentError("verbose should be 0, 1 or 2"))
+    end
+
     iterate = 0
     err = err_tol + 1
     while iterate < max_iter && err > err_tol
         new_v = T(v)::TV
         iterate += 1
         err = Base.maxabs(new_v - v)
-        if verbose
+        if verbose == 2
             if iterate % print_skip == 0
                 println("Compute iterate $iterate with error $err")
             end
@@ -63,10 +73,15 @@ function compute_fixed_point{TV}(T::Function, v::TV; err_tol=1e-3,
         v = new_v
     end
 
-    if iterate < max_iter && verbose
-        println("Converged in $iterate steps")
-    elseif iterate == max_iter
+    if verbose == 1 && iterate == max_iter
         warn("max_iter attained in compute_fixed_point")
+    end
+    if verbose == 2
+        if iterate < max_iter && verbose == 2
+            println("Converged in $iterate steps")
+        elseif iterate == max_iter
+            warn("max_iter attained in compute_fixed_point")
+        end
     end
 
     return v
