@@ -27,7 +27,10 @@ tests = [
         "quadsum",
         "random_mc",
         "robustlq",
-        "ddp"]
+        "ddp",
+        "zeros",
+        "optimization"
+        ]
 
 
 if length(ARGS) > 0
