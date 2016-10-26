@@ -22,7 +22,7 @@ Notes
 
 =#
 
-import Base.*
+import Base: *
 
 #------------------------#
 #-Types and Constructors-#

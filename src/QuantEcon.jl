@@ -97,7 +97,7 @@ export
 
 # quad
     qnwlege, qnwcheb, qnwsimp, qnwtrap, qnwbeta, qnwgamma, qnwequi, qnwnorm,
-    qnwunif, qnwlogn,
+    qnwunif, qnwlogn, qnwmonomial1, qnwmonomial2,
     quadrect,
     do_quad,
 
@@ -111,7 +111,11 @@ export
 # ddp
     DiscreteDP, VFI, PFI, MPFI, solve, RQ_sigma,
     evaluate_policy, bellman_operator, compute_greedy,
-    bellman_operator!, compute_greedy!, num_states
+    bellman_operator!, compute_greedy!, num_states,
+
+# zeros / optimization
+    bisect, brenth, brent, ridder, expand_bracket, divide_bracket,
+    golden_method
 
 include("util.jl")
 ##### includes
@@ -133,5 +137,7 @@ include("matrix_eqn.jl")
 include("robustlq.jl")
 include("quad.jl")
 include("quadsums.jl")
+include("zeros.jl")
+include("optimization.jl")
 
 end # module
