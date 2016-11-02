@@ -359,9 +359,8 @@ ts_length
 """
 function simulate(mc::MarkovChain, ts_length::Int;
                   init::Int=rand(1:n_states(mc)))
-    X = Array(eltype(mc), ts_length, 1)
+    X = Array(eltype(mc), ts_length)
     simulate!(X, mc; init=init)
-    return vec(X)
 end
 
 
@@ -389,9 +388,7 @@ function simulate!(X::Union{AbstractVector,AbstractMatrix},
 
     for (i, init) in enumerate(take(cycle(init), size(X, 2)))
         mcs.mcis.init = init
-        for (t, item) in enumerate(mcs)
-            X[t, i] = item
-        end
+        copy!(view(X, :, i), mcs)
     end
     X
 end
@@ -417,9 +414,8 @@ ts_length
 """
 function simulate_indices(mc::MarkovChain, ts_length::Int;
                           init::Int=rand(1:n_states(mc)))
-    X = Array(Int, ts_length, 1)
+    X = Array(Int, ts_length)
     simulate_indices!(X, mc; init=init)
-    return vec(X)
 end
 
 
@@ -445,9 +441,7 @@ function simulate_indices!{T<:Integer}(X::Union{AbstractVector{T},AbstractMatrix
 
     for (i, init) in enumerate(take(cycle(init), size(X, 2)))
         mcis.init = init
-        for (t, item) in enumerate(mcis)
-            X[t, i] = item
-        end
+        copy!(view(X, :, i), mcis)
     end
     X
 end
