@@ -403,9 +403,9 @@ end
                        (ts_length, )
             for num_sims in nums_sims
                 X = Array(Int64, ts_length, num_sims)
-                @test size(simulate_indices!(X, mc)) == 
+                @test size(simulate_indices!(X, mc)) ==
                            (ts_length, num_sims)
-                @test size(simulate_indices!(X, mc; init=init)) == 
+                @test size(simulate_indices!(X, mc; init=init)) ==
                            (ts_length, num_sims)
             end
         end
@@ -467,9 +467,9 @@ end
                 @test size(@inferred(simulate(mc, ts_length))) == (ts_length,)
                 for num_sims in nums_sims
                     X = Array(T, ts_length, num_sims)
-                    @test size(simulate!(X, mc)) == 
+                    @test size(simulate!(X, mc)) ==
                            (ts_length, num_sims)
-                    @test size(simulate!(X, mc; init=init)) == 
+                    @test size(simulate!(X, mc; init=init)) ==
                            (ts_length, num_sims)
                 end
             end  # state_values eltypes
@@ -492,6 +492,51 @@ end
                 @test vec(X[1, :]) == mc.state_values[collect(take(cycle(init), num_sims))]
             end
         end  # testset
+    end
+
+    @testset "simulate iterators" begin
+        p = [0.0 1.0 0.0 0.0
+             0.0 0.0 1.0 0.0
+             0.0 0.0 0.0 1.0
+             1.0 0.0 0.0 0.0]
+        mc = MarkovChain(p, [10.0, 20.0, 30.0, 40.0])
+
+        mcis = MCIndSimulator(mc, 50, 1)
+
+        want = collect(take(cycle(1:4), 50))
+        have = Array(Int, 50)
+        for (ix, i) in enumerate(mcis)
+            have[ix] = i
+        end
+        @test have == want
+
+        @test start(mcis) == (1, 0)
+        for i in 1:49
+            @test !done(mcis, (1, i))
+        end
+        @test done(mcis, (1, 50))
+        @test length(mcis) == 50
+        @test Base.iteratorsize(mcis) == Base.HasLength()
+        @test eltype(mcis) == Int
+
+        mcs = MCSimulator(mc, 50, 1)
+        want = collect(take(cycle([10, 20, 30, 40]), 50))
+        have = zeros(Float64, 50)
+        for (ix, i) in enumerate(mcs)
+            have[ix] = i
+        end
+
+        @test have == want
+
+        @test start(mcs) == (1, 0)
+        for i in 1:49
+            @test !done(mcs, (1, i))
+        end
+        @test done(mcs, (1, 50))
+        @test length(mcs) == 50
+        @test Base.iteratorsize(mcs) == Base.HasLength()
+        @test eltype(mcs) == Float64
+
     end
 
 end  # testset
