@@ -117,8 +117,8 @@ $(qnw_refs)
 """
 function qnwcheb(n::Int, a::Real, b::Real)
     nodes = (b+a)/2 - (b-a)/2 .* cos(pi/n .* (0.5:(n-0.5)))
-    weights = ((b-a)/n) .* (cos(pi/n .* (collect(1:n)-0.5)*collect(0:2:n-1)')
-                            *vcat(1, -2./(collect(1:2:n-2).*collect(3:2:n))))
+    weights = ((b-a)/n) .* (cos(pi/n .* ((1:n)-0.5)*(2:2:n-1)') *
+                            (-2.0 ./ ((1:2:n-2).*(3:2:n))) + 1)
     return nodes, weights
 end
 
@@ -182,7 +182,7 @@ function qnwnorm(n::Int)
         while it < maxit
             it += 1
             p1 = pim4
-            p2 = 0
+            p2 = 0.0
 
             for j=1:n
                 p3 = p2
@@ -209,10 +209,8 @@ function qnwnorm(n::Int)
         weights[n+1-i] = weights[i]
     end
 
-    weights ./= sqrt(pi)
-    nodes *= sqrt(2)
-
-    nodes = ndims(nodes) == 2 && size(nodes, 2) == 1 ? squeeze(nodes, 2): nodes
+    weights = weights ./ sqrt(pi)
+    nodes = sqrt(2) .* nodes
 
     return nodes, weights
 end
@@ -244,7 +242,7 @@ function qnwsimp(n::Int, a::Real, b::Real)
 
     dx = (b - a) / (n - 1)
     nodes = collect(a:dx:b)
-    weights = repeat([2.0, 4.0], outer=Int[(n + 1.0) / 2.0])
+    weights = repmat([2.0, 4.0], Int((n + 1) / 2))
     weights = weights[1:n]
     weights[1] = 1
     weights[end] = 1
@@ -537,23 +535,19 @@ function qnwnorm(n::Vector{Int}, mu::Vector, sig2::Matrix=eye(length(n)))
         error("n and mu must have same number of elements")
     end
 
-    nodes = Vector{Float64}[]
-    weights = Vector{Float64}[]
+    _nodes = Array(Vector{Float64}, n_n)
+    _weights = Array(Vector{Float64}, n_n)
 
-    for i=1:n_n
-        _1d = qnwnorm(n[i])
-        push!(nodes, _1d[1])
-        push!(weights, _1d[2])
+    for i in 1:n_n
+        _nodes[i], _weights[i] = qnwnorm(n[i])
     end
 
-    weights = ckron(weights[end:-1:1]...)
-    nodes = gridmake(nodes...)
+    weights = ckron(_weights[end:-1:1]...)
+    nodes = gridmake(_nodes...)
 
     new_sig2 = chol(sig2)
 
     nodes = nodes * new_sig2 .+ mu'
-
-    nodes = size(nodes, 2) == 1 ? squeeze(nodes, 2) : nodes
 
     return nodes, weights
 end
@@ -701,8 +695,6 @@ function qnwequi(n::Int, a::Vector, b::Vector, kind::AbstractString="N")
     nodes = a' .+ nodes .* r'  # use broadcasting here.
     weights = fill((prod(r) / n), n)
 
-    nodes = size(nodes, 2) == 1 ? squeeze(nodes, 2) : nodes
-
     return nodes, weights
 end
 
@@ -725,8 +717,11 @@ qnwequi(n::Int, a::Real, b::Vector, kind::AbstractString="N") =
 qnwequi(n::Int, a::Vector, b::Real, kind::AbstractString="N") =
     qnwequi(n, a, fill(b, length(a)), kind)
 
-qnwequi(n::Int, a::Real, b::Real, kind::AbstractString="N") =
-    qnwequi(n, [a], [b], kind)
+function qnwequi(n::Int, a::Real, b::Real, kind::AbstractString="N")
+    n, w = qnwequi(n, [a], [b], kind)
+    @assert size(n, 2) == 1
+    n[:, 1], w
+end
 
 
 
