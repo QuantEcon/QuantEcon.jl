@@ -6,7 +6,8 @@ julia:
     - nightly
 matrix:
   allow_failures:
-    - julia: nightly    
+    - julia: nightly
+    - julia: 0.4
 notifications:
     email: false
 #script: # use the default script setting which is equivalent to the following
