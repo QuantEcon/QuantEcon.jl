@@ -317,7 +317,6 @@ end
 
 Base.done(mcis::MCIndSimulator, s::Tuple{Int,Int}) = s[2] >= mcis.len
 Base.length(mcis::MCIndSimulator) = mcis.len
-Base.iteratorsize(mcis::MCIndSimulator) = Base.HasLength()
 Base.eltype(mcis::MCIndSimulator) = Int
 
 type MCSimulator{T<:MCIndSimulator}
@@ -339,8 +338,11 @@ Base.eltype(mcs::MCSimulator) = eltype(mcs.mcis.mc)
 Base.start(mcs::MCSimulator) = start(mcs.mcis)
 Base.done(mcs::MCSimulator, state::Tuple{Int,Int}) = done(mcs.mcis, state)
 Base.length(mcs::MCSimulator) = length(mcs.mcis)
-Base.iteratorsize(mcs::MCSimulator) = Base.iteratorsize(mcs.mcis)
 
+if isdefined(Base, :iteratorsize)
+    Base.iteratorsize(mcis::MCIndSimulator) = Base.HasLength()
+    Base.iteratorsize(mcs::MCSimulator) = Base.iteratorsize(mcs.mcis)
+end
 
 """
 Simulate one sample path of the Markov chain `mc`.
