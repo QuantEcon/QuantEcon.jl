@@ -12,7 +12,7 @@
     β    = .95
     n    = 0.
     capT = 1
-    lq_scalar = LQ(q, r, a, b, c, n, β, capT, rf)
+    lq_scalar = LQ(q, r, a, b, c, n, bet=β, capT=capT, rf=rf)
 
     Q  = [0. 0.; 0. 1]
     R  = [1. 0.; 0. 0]
@@ -20,7 +20,7 @@
     A  = fill(0.95, 2, 2)
     B  = fill(-1.0, 2, 2)
     lq_mat = LQ(Q, R, A, B, bet=β, capT=capT, rf=rf)
-    
+
     @testset "Test scalar sequences with exact by hand solution" begin
         x0 = 2.0
         x_seq, u_seq, w_seq = compute_sequence(lq_scalar, x0)
