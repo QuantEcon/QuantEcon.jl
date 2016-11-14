@@ -42,7 +42,7 @@ export
     draw,
 
 # mc_tools
-    MarkovChain,
+    MarkovChain, MCIndSimulator, MCSimulator,
     stationary_distributions,
     simulate, simulate!, simulate_indices, simulate_indices!,
     period, is_irreducible, is_aperiodic, recurrent_classes,
