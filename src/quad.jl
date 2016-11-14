@@ -571,8 +571,11 @@ qnwnorm(n::Int, mu::Vector, sig2::Real) =
 qnwnorm(n::Int, mu::Real, sig2::Matrix=eye(length(mu))) =
     qnwnorm(fill(n, size(sig2, 1)), fill(mu, size(sig2, 1)), sig2)
 
-qnwnorm(n::Int, mu::Real, sig2::Real) =
-    qnwnorm([n], [mu], fill(convert(Float64, sig2), 1, 1))
+function qnwnorm(n::Int, mu::Real, sig2::Real)
+    n, w = qnwnorm([n], [mu], fill(convert(Float64, sig2), 1, 1))
+    @assert size(n, 2) == 1
+    n[:, 1], w
+end
 
 qnwnorm(n::Vector{Int}, mu::Vector, sig2::Vector) =
     qnwnorm(n, mu, diagm(convert(Array{Float64}, sig2)))
