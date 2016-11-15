@@ -50,13 +50,24 @@ x_gamm_3, w_gamm_3 = qnwgamma(n_3, b_3, ones(3))
     @testset "Testing method resolution" begin
 
         for f in qnwfuncs
-            m1 = @inferred f(11, 1, 3)
-            m2 = @inferred f([11], 1, 3)
-            m3 = @inferred f(11, [1], 3)
-            m4 = @inferred f(11, 1, [3])
-            m5 = @inferred f([11], [1], 3)
-            m6 = @inferred f([11], 1, [3])
-            m7 = @inferred f([11], [1], [3])
+            if VERSION >= v"0.5-"
+                m1 = @inferred f(11, 1, 3)
+                m2 = @inferred f([11], 1, 3)
+                m3 = @inferred f(11, [1], 3)
+                m4 = @inferred f(11, 1, [3])
+                m5 = @inferred f([11], [1], 3)
+                m6 = @inferred f([11], 1, [3])
+                m7 = @inferred f([11], [1], [3])
+            else
+                # type inference doesn't get this right on 0.4...
+                m1 = f(11, 1, 3)
+                m2 = f([11], 1, 3)
+                m3 = f(11, [1], 3)
+                m4 = f(11, 1, [3])
+                m5 = f([11], [1], 3)
+                m6 = f([11], 1, [3])
+                m7 = f([11], [1], [3])
+            end
 
             # Stack nodes/weights in columns
             @test isapprox([m1[1] m1[2]], [m2[1] m2[2]])

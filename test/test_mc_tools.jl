@@ -516,7 +516,6 @@ end
         end
         @test done(mcis, (1, 50))
         @test length(mcis) == 50
-        @test Base.iteratorsize(mcis) == Base.HasLength()
         @test eltype(mcis) == Int
 
         mcs = MCSimulator(mc, 50, 1)
@@ -534,9 +533,12 @@ end
         end
         @test done(mcs, (1, 50))
         @test length(mcs) == 50
-        @test Base.iteratorsize(mcs) == Base.HasLength()
         @test eltype(mcs) == Float64
 
+        if isdefined(Base, :iteratorsize)
+            @test Base.iteratorsize(mcs) == Base.HasLength()
+            @test Base.iteratorsize(mcis) == Base.HasLength()
+        end
     end
 
 end  # testset
