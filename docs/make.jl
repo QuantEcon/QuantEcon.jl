@@ -2,7 +2,7 @@ using Documenter, QuantEcon
 
 makedocs(
     modules = [QuantEcon],
-    format = Documenter.Formats.HTML,
+    format = :html,
     sitename = "QuantEcon.jl",
     pages = Any[ # Compat: `Any` for 0.4 compat
         "Home" => "index.md",
