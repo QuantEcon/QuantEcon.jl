@@ -49,7 +49,7 @@ end
 """
 Perform linear interpolation at the point `xp`.
 """
-function (li::LinInterp)(xp::Number)
+@compat function (li::LinInterp)(xp::Number)
     ix = searchsortedfirst(li.breaks, xp)
 
     # handle corner cases
