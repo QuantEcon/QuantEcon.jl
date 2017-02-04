@@ -115,9 +115,14 @@ export
 
 # zeros / optimization
     bisect, brenth, brent, ridder, expand_bracket, divide_bracket,
-    golden_method
+    golden_method,
+
+# interp
+    interp, LinInterp
+
 
 include("util.jl")
+include("interp.jl")
 ##### includes
 include("arma.jl")
 include("compute_fp.jl")
