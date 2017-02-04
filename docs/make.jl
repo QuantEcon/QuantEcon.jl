@@ -14,11 +14,11 @@ makedocs(
     ]
 )
 
-# deploydocs(
-#     repo = "github.com/QuantEcon/QuantEcon.jl.git",
-#     branch = "gh-pages",
-#     target = "build",
-#     julia  = "nightly",
-#     deps = nothing,
-#     make = nothing,
-# )
+deploydocs(
+    repo = "github.com/QuantEcon/QuantEcon.jl.git",
+    branch = "gh-pages",
+    target = "build",
+    julia  = "release",
+    deps = nothing,
+    make = nothing,
+)

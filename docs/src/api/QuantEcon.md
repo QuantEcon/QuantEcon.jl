@@ -1,5 +1,12 @@
 # QuantEcon
 
+```@meta
+CurrentModule = QuantEcon
+DocTestSetup  = quote
+    using QuantEcon
+end
+```
+
 API documentation
 
 ```@contents

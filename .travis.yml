@@ -13,7 +13,5 @@ notifications:
 after_success:
     - echo $TRAVIS_JULIA_VERSION
     - julia -e 'Pkg.add("Coverage"); cd(Pkg.dir("QuantEcon")); using Coverage; Coveralls.submit(process_folder()); Codecov.submit(process_folder())'
-# uncomment the following code to enable deployment of documentation after each
-# new commit
-#     - julia -e 'Pkg.add("Documenter")'
-#     - julia -e 'cd(Pkg.dir("QuantEcon")); include(joinpath("docs", "make.jl"))'
+    - julia -e 'Pkg.add("Documenter")'
+    - julia -e 'cd(Pkg.dir("QuantEcon")); include(joinpath("docs", "make.jl"))'
