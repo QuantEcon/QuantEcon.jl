@@ -9,7 +9,7 @@ using Distributions
 import Distributions: pdf, skewness, BetaBinomial
 using DSP: TFFilter, freqz
 using Primes: primes
-using Compat: view, @compat
+using Compat
 
 # useful types
 typealias ScalarOrArray{T} Union{T, Array{T}}
