@@ -6,3 +6,4 @@ site/
 *.tags*
 
 docs/build
+docs/serve

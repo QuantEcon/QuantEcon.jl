@@ -46,9 +46,6 @@ function LinInterp{TB<:AbstractVector,TV<:AbstractVector}(b::TB, v::TV)
     LinInterp{TB,TV}(b, v)
 end
 
-"""
-Perform linear interpolation at the point `xp`.
-"""
 @compat function (li::LinInterp)(xp::Number)
     ix = searchsortedfirst(li.breaks, xp)
 
