@@ -18,7 +18,7 @@ deploydocs(
     repo = "github.com/QuantEcon/QuantEcon.jl.git",
     branch = "gh-pages",
     target = "build",
-    julia  = "release",
+    julia  = "0.5",
     deps = nothing,
     make = nothing,
 )
