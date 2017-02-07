@@ -115,7 +115,7 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
         end
 
         if _has_sorted_sa_indices(s_indices, a_indices)
-            a_indptr = Array(Int64, num_states+1)
+            a_indptr = Array{Int64}(num_states+1)
             _a_indices = copy(a_indices)
             _generate_a_indptr!(num_states, s_indices, a_indptr)
         else
@@ -539,7 +539,7 @@ end
 
 # TODO: express it in a similar way as above to exploit Julia's column major order
 function RQ_sigma{T<:Integer}(ddp::DDPsa, sigma::Array{T})
-    sigma_indices = Array(T, num_states(ddp))
+    sigma_indices = Array{T}(num_states(ddp))
     _find_indices!(get(ddp.a_indices), get(ddp.a_indptr), sigma, sigma_indices)
     R_sigma = ddp.R[sigma_indices]
     Q_sigma = ddp.Q[sigma_indices, :]
@@ -602,7 +602,7 @@ end
 
 function s_wise_max(ddp::DDPsa, vals::Vector)
     s_wise_max!(get(ddp.a_indices), get(ddp.a_indptr), vals,
-                 Array(Float64, num_states(ddp)))
+                 Array{Float64}(num_states(ddp)))
 end
 
 s_wise_max!(ddp::DDPsa, vals::Vector, out::Vector, out_argmax::Vector) =
@@ -751,7 +751,7 @@ function _solve!(ddp::DiscreteDP, ddpr::DPSolveResult{VFI}, max_iter::Integer,
         bellman_operator!(ddp, ddpr)
 
         # compute error and update the v inside ddpr
-        err = maxabs(ddpr.Tv .- ddpr.v)
+        err = maximum(abs, ddpr.Tv .- ddpr.v)
         copy!(ddpr.v, ddpr.Tv)
         ddpr.num_iter += 1
 

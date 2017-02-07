@@ -11,6 +11,10 @@ using DSP: TFFilter, freqz
 using Primes: primes
 using Compat: view, @compat
 
+@static if isdefined(Base, :Iterators)
+    using Base.Iterators: cycle, take
+end
+
 # useful types
 typealias ScalarOrArray{T} Union{T, Array{T}}
 

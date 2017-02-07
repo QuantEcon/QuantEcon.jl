@@ -100,7 +100,7 @@ function nnash(a, b1, b2, r1, r2, q1, q2, s1, s2, w1, w2, m1, m2;
         p1 = (a2'*p1*a2) .+ r1 .+ (f2'*s1*f2) .- (a2'*p1*b1 .+ w1 .- f2'*m1)*f1
         p2 = (a1'*p2*a1) .+ r2 .+ (f1'*s2*f1) .- (a1'*p2*b2 .+ w2 .- f1'*m2)*f2
 
-        dd = maximum(abs(f10 .- f1) + abs(f20 .- f2))
+        dd = maximum(abs.(f10 .- f1) + abs.(f20 .- f2))
         its = its + 1
         if its > max_iter
             error("Reached max iterations, no convergence")

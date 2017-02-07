@@ -73,7 +73,7 @@ end
 
 function periodogram(x::Vector)
     n = length(x)
-    I_w = abs(fft(x)).^2 ./ n
+    I_w = abs.(fft(x)).^2 ./ n
     w = 2pi * (0:n-1) ./ n  # Fourier frequencies
 
     # int rounds to nearest integer. We want to round up or take 1/2 + 1 to
@@ -148,7 +148,7 @@ function ar_periodogram(x::Array, window::AbstractString="hanning", window_len::
     w, I_w = periodogram(e_hat, window, window_len)
 
     # recolor and return
-    I_w = I_w ./ abs(1 - phi .* exp(im.*w)).^2
+    I_w = I_w ./ abs.(1 .- phi .* exp.(im.*w)).^2
 
     return w, I_w
 end

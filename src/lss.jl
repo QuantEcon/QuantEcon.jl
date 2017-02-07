@@ -111,7 +111,7 @@ end
 
 
 function simulate(lss::LSS, ts_length=100)
-    x = Array(Float64, lss.n, ts_length)
+    x = Array{Float64}(lss.n, ts_length)
     x[:, 1] = rand(lss.dist)
     w = randn(lss.m, ts_length - 1)
     for t=1:ts_length-1
@@ -140,7 +140,7 @@ Simulate num_reps observations of x_T and y_T given x_0 ~ N(mu_0, Sigma_0).
 
 """
 function replicate(lss::LSS, t::Integer, num_reps::Integer=100)
-    x = Array(Float64, lss.n, num_reps)
+    x = Array{Float64}(lss.n, num_reps)
     for j=1:num_reps
         x_t, _ = simulate(lss, t+1)
         x[:, j] = x_t[:, end]

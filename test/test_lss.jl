@@ -13,7 +13,7 @@
     ss1 = LSS(A, C, G, mu_0, Sigma_0)
 
     vals = stationary_distributions(ss, max_iter=1000, tol=1e-9)
-    
+
     @testset "test stationarity" begin
         vals = stationary_distributions(ss, max_iter=1000, tol=1e-9)
         ssmux, ssmuy, sssigx, sssigy = vals
@@ -56,6 +56,16 @@
         for nm in fieldnames(ss)
             @test getfield(ss, nm) == getfield(other_ss, nm)
         end
+    end
+
+    @testset "test moment iterator" begin
+        m = QuantEcon.LSSMoments(ss)
+
+        # never done
+        @test !done(m, 1)
+
+        # start should give us mu_0, Sigma_0
+        @test start(m) == (ss.mu_0, ss.Sigma_0)
     end
 
 

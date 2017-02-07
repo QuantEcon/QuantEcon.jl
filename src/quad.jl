@@ -80,7 +80,7 @@ function qnwlege(n::Int, a::Real, b::Real)
         z1 = z
         z = z1 - p1./pp
 
-        err = Base.maxabs(z - z1)
+        err = Base.maximum(abs, z - z1)
         if err < 1e-14
             break
         end
@@ -535,8 +535,8 @@ function qnwnorm(n::Vector{Int}, mu::Vector, sig2::Matrix=eye(length(n)))
         error("n and mu must have same number of elements")
     end
 
-    _nodes = Array(Vector{Float64}, n_n)
-    _weights = Array(Vector{Float64}, n_n)
+    _nodes = Array{Vector{Float64}}(n_n)
+    _weights = Array{Vector{Float64}}(n_n)
 
     for i in 1:n_n
         _nodes[i], _weights[i] = qnwnorm(n[i])
@@ -637,7 +637,7 @@ end
 
 
 ## qnwequi
-const equidist_pp = sqrt(primes(7920))  # good for d <= 1000
+const equidist_pp = sqrt.(primes(7920))  # good for d <= 1000
 
 
 """

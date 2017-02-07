@@ -1,3 +1,7 @@
+@static if isdefined(Base, :Iterators)
+    using Base.Iterators: take, cycle
+end
+
 function kmr_markov_matrix_sequential{T<:Real}(n::Integer, p::T, ε::T)
     """
     Generate the markov matrix for the KMR model with *sequential* move
@@ -402,7 +406,7 @@ end
             @test size(simulate_indices(mc, ts_length; init=init)) ==
                        (ts_length, )
             for num_sims in nums_sims
-                X = Array(Int64, ts_length, num_sims)
+                X = Array{Int64}(ts_length, num_sims)
                 @test size(simulate_indices!(X, mc)) ==
                            (ts_length, num_sims)
                 @test size(simulate_indices!(X, mc; init=init)) ==
@@ -419,7 +423,7 @@ end
             @test Y[1] == init
 
             num_sims = 5
-            X = Array(Int64, ts_length, num_sims)
+            X = Array{Int64}(ts_length, num_sims)
             simulate_indices!(X, mc; init=init)
             @test vec(X[1, :]) == init .* ones(Int, num_sims)
 
@@ -445,7 +449,7 @@ end
 
         @testset "basic correspondence with dense version" begin
             @test n_states(mc) == n_states(mc_s)
-            @test maxabs(mc.p - mc_s.p) == 0.0
+            @test maximum(abs, mc.p - mc_s.p) == 0.0
             @test recurrent_classes(mc) == recurrent_classes(mc_s)
             @test communication_classes(mc) == communication_classes(mc_s)
             @test is_irreducible(mc) == is_irreducible(mc_s)
@@ -466,7 +470,7 @@ end
 
                 @test size(@inferred(simulate(mc, ts_length))) == (ts_length,)
                 for num_sims in nums_sims
-                    X = Array(T, ts_length, num_sims)
+                    X = Array{T}(ts_length, num_sims)
                     @test size(simulate!(X, mc)) ==
                            (ts_length, num_sims)
                     @test size(simulate!(X, mc; init=init)) ==
@@ -483,7 +487,7 @@ end
                 @test Y[1] == mc.state_values[init]
 
                 num_sims = 5
-                X = Array(eltype(mc.state_values), ts_length, num_sims)
+                X = Array{eltype(mc.state_values)}(ts_length, num_sims)
                 simulate!(X, mc; init=init)
                 @test vec(X[1, :]) == mc.state_values[init .* ones(Int, num_sims)]
 
@@ -504,7 +508,7 @@ end
         mcis = MCIndSimulator(mc, 50, 1)
 
         want = collect(take(cycle(1:4), 50))
-        have = Array(Int, 50)
+        have = Array{Int}(50)
         for (ix, i) in enumerate(mcis)
             have[ix] = i
         end

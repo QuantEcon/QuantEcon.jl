@@ -101,7 +101,7 @@ x_gamm_3, w_gamm_3 = qnwgamma(n_3, b_3, ones(3))
         f3(x) = abs(x).^0.5
 
         # dim 1: num nodes, dim2: method, dim3:func
-        data1d = Array(Float64, 6, 6, 3)
+        data1d = Array{Float64}(6, 6, 3)
         kinds = ["trap", "simp", "lege", "N", "W", "H"]
         n_nodes = [5, 11, 21, 51, 101, 401]  # number of nodes
         a, b = -1, 1
@@ -135,7 +135,7 @@ x_gamm_3, w_gamm_3 = qnwgamma(n_3, b_3, ones(3))
         b = ([1.0, 2.0], [1.0, 1.0])
 
         # dim 1: num nodes, dim2: method
-        data2d1 = Array(Float64, 6, 6)
+        data2d1 = Array{Float64}(6, 6)
         kinds = ["lege", "trap", "simp", "N", "W", "H"]
         n_nodes = [5, 11, 21, 51, 101, 401]  # number of nodes
 

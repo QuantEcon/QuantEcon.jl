@@ -2,7 +2,7 @@
 
     # uniform interpolation
     breaks = linspace(-3, 3, 100)
-    vals = map(exp, breaks)
+    vals = exp.(breaks)
 
     li = interp(breaks, vals)
     li2 = LinInterp(breaks, vals)

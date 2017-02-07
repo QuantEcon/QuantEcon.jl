@@ -19,7 +19,7 @@ function golden_method(f::Function, a::AbstractVector, b::AbstractVector;
         f1[i] = f2[i]
         d *= α2
         x2 = x1 + s.*(i- ~i).*d
-        s = sign(x2 - x1)
+        s = sign.(x2 .- x1)
         f2 = f(x2)
     end
 

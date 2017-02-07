@@ -12,12 +12,12 @@
     # test lln
     draws = draw(drv, 100000)
     c = counter(draws)
-    counts = Array(Float64, n)
+    counts = Array{Float64}(n)
     for i=1:n
         counts[i] = c[i]
     end
     counts ./= sum(counts)
 
-    @test isapprox(Base.maxabs(counts - drv.q), 0.0; atol=1e-2)
+    @test isapprox(Base.maximum(abs, counts - drv.q), 0.0; atol=1e-2)
 
 end  # testset

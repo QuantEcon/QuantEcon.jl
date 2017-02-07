@@ -70,14 +70,14 @@ end
 function gridmake(arrays::AbstractVector...)
     l = prod([length(a) for a in  arrays])
     T = reduce(promote_type, [eltype(a) for a in arrays])
-    out = Array(T, l, length(arrays))
+    out = Array{T}(l, length(arrays))
     gridmake!(out, arrays...)
     out
 end
 
 # type stable version if all arrays have the same eltype
 function gridmake{T}(arrays::AbstractVector{T}...)
-    out = Array(T, prod([length(a) for a in  arrays]), length(arrays))
+    out = Array{T}(prod([length(a) for a in  arrays]), length(arrays))
     gridmake!(out, arrays...)
 end
 
