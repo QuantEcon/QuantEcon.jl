@@ -521,8 +521,8 @@ for f in [:qnwlege, :qnwcheb, :qnwsimp, :qnwtrap, :qnwbeta, :qnwgamma]
                 push!(weights, _1d[2])
             end
             weights = ckron(weights[end:-1:1]...)
-            nodes = gridmake(nodes...)
-            return nodes, weights
+            nodes_out = gridmake(nodes...)::Matrix{Float64}
+            return nodes_out, weights
         end
     end  # @eval
 end
@@ -543,11 +543,12 @@ function qnwnorm(n::Vector{Int}, mu::Vector, sig2::Matrix=eye(length(n)))
     end
 
     weights = ckron(_weights[end:-1:1]...)
-    nodes = gridmake(_nodes...)
+    nodes = gridmake(_nodes...)::Matrix{Float64}
 
     new_sig2 = chol(sig2)
 
-    nodes = nodes * new_sig2 .+ mu'
+    A_mul_B!(nodes, nodes, new_sig2)
+    broadcast!(+, nodes, nodes, mu')
 
     return nodes, weights
 end
