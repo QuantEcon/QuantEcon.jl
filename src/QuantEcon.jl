@@ -16,7 +16,7 @@ using Compat: view, @compat
 end
 
 # useful types
-typealias ScalarOrArray{T} Union{T, Array{T}}
+@compat ScalarOrArray{T} = Union{T,Array{T}}
 
 
 export

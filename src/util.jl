@@ -79,6 +79,7 @@ end
 function gridmake{T}(arrays::AbstractVector{T}...)
     out = Array{T}(prod([length(a) for a in  arrays]), length(arrays))
     gridmake!(out, arrays...)
+    out
 end
 
 function gridmake(t::Tuple)
