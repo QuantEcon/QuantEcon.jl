@@ -67,12 +67,14 @@ function gridmake!(out, arrays::AbstractVector...)
     return out
 end
 
-function gridmake(arrays::AbstractVector...)
-    l = prod([length(a) for a in  arrays])
+@generated function gridmake(arrays::AbstractVector...)
     T = reduce(promote_type, [eltype(a) for a in arrays])
-    out = Array{T}(l, length(arrays))
-    gridmake!(out, arrays...)
-    out
+    quote
+        l = prod([length(a) for a in  arrays])
+        out = Array{$T}(l, length(arrays))
+        gridmake!(out, arrays...)
+        out
+    end
 end
 
 # type stable version if all arrays have the same eltype
@@ -88,12 +90,23 @@ function gridmake(t::Tuple)
     gridmake(map(x->1:x, t)...)::Matrix{Int}
 end
 
-"""
-`gridmake(arrays::AbstractVector...)`
+@generated function gridmake(arrays::Union{AbstractVector,AbstractMatrix}...)
+    T = reduce(promote_type, [eltype(a) for a in arrays])
+    quote
+        args = collect(Base.flatten([[view(arr, :, i) for i in 1:size(arr, 2)] for arr in arrays]))
+        l = prod([length(a) for a in args])
+        out = Array{$T}(l, length(args))
+        gridmake!(out, args...)
+    end
+end
 
-Expand one or more vectors into a matrix where rows span the cartesian product
-of combinations of the input vectors. Each input array will correspond to one
-column of the output matrix. The first array varies the fastest (see example)
+"""
+`gridmake(arrays::Union{AbstractVector,AbstractMatrix}...)`
+
+Expand one or more vectors (or matrices) into a matrix where rows span the
+cartesian product of combinations of the input arrays. Each column of the input
+arrays will correspond to one column of the output matrix. The first array
+varies the fastest (see example)
 
 ##### Example
 
