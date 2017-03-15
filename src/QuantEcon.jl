@@ -9,7 +9,7 @@ using Distributions
 import Distributions: pdf, skewness, BetaBinomial
 using DSP: TFFilter, freqz
 using Primes: primes
-using Compat: view
+using Compat: view, @compat
 
 # useful types
 typealias ScalarOrArray{T} Union{T, Array{T}}
@@ -42,7 +42,7 @@ export
     draw,
 
 # mc_tools
-    MarkovChain,
+    MarkovChain, MCIndSimulator, MCSimulator,
     stationary_distributions,
     simulate, simulate!, simulate_indices, simulate_indices!,
     period, is_irreducible, is_aperiodic, recurrent_classes,
@@ -115,9 +115,14 @@ export
 
 # zeros / optimization
     bisect, brenth, brent, ridder, expand_bracket, divide_bracket,
-    golden_method
+    golden_method,
+
+# interp
+    interp, LinInterp
+
 
 include("util.jl")
+include("interp.jl")
 ##### includes
 include("arma.jl")
 include("compute_fp.jl")

@@ -80,7 +80,7 @@ end
 
 
 function LSS(A::ScalarOrArray, C::ScalarOrArray, G::ScalarOrArray,
-             mu_0::ScalarOrArray=zeros(size(G, 2)),
+             mu_0::ScalarOrArray,
              Sigma_0::Matrix=zeros(size(G, 2), size(G, 2)))
     k = size(G, 1)
     n = size(G, 2)

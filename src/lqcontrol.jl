@@ -79,6 +79,8 @@ type LQ
     F::ScalarOrArray # policy rule
 end
 
+
+
 """
 Main constructor for LQ type
 
@@ -108,8 +110,8 @@ function LQ(Q::ScalarOrArray,
             R::ScalarOrArray,
             A::ScalarOrArray,
             B::ScalarOrArray,
-            C::ScalarOrArray,
-            N::ScalarOrArray,
+            C::ScalarOrArray=zeros(size(R, 1)),
+            N::ScalarOrArray=zero(B'A);
             bet::ScalarOrArray=1.0,
             capT::Union{Int,Void}=nothing,
             rf::ScalarOrArray=fill(NaN, size(R)...))
@@ -121,23 +123,6 @@ function LQ(Q::ScalarOrArray,
     d = 0.0
 
     LQ(Q, R, A, B, C, N, bet, capT, rf, P, d, F)
-end
-
-
-"""
-Version of default constuctor making `bet` `capT` `rf` keyword arguments
-
-"""
-function LQ(Q::ScalarOrArray,
-            R::ScalarOrArray,
-            A::ScalarOrArray,
-            B::ScalarOrArray,
-            C::ScalarOrArray=zeros(size(R, 1)),
-            N::ScalarOrArray=zero(B'A);
-            bet::ScalarOrArray=1.0,
-            capT::Union{Int,Void}=nothing,
-            rf::ScalarOrArray=fill(NaN, size(R)...))
-    LQ(Q, R, A, B, C, N, bet, capT, rf)
 end
 
 """
@@ -233,9 +218,9 @@ function stationary_values(lq::LQ)
              copy(lq.B),
              copy(lq.C),
              copy(lq.N),
-             copy(lq.bet),
-             lq.capT,
-             copy(lq.rf))
+             bet=copy(lq.bet),
+             capT=lq.capT,
+             rf=copy(lq.rf))
 
     stationary_values!(_lq)
     return _lq.P, _lq.F, _lq.d

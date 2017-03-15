@@ -29,7 +29,8 @@ tests = [
         "robustlq",
         "ddp",
         "zeros",
-        "optimization"
+        "optimization",
+        "interp",
         ]
 
 

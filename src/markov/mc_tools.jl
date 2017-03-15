@@ -59,6 +59,8 @@ end
 MarkovChain(p::AbstractMatrix, state_values=1:size(p, 1)) =
     MarkovChain{eltype(p), typeof(p), typeof(state_values)}(p, state_values)
 
+Base.eltype{T,TM,TV}(mc::MarkovChain{T,TM,TV}) = eltype(TV)
+
 "Number of states in the Markov chain `mc`"
 n_states(mc::MarkovChain) = size(mc.p, 1)
 
@@ -290,6 +292,58 @@ end
 todense(::Type, A::Array) = A
 
 
+type MCIndSimulator{T<:MarkovChain,S}
+    mc::T
+    len::Int
+    init::Int
+    drvs::S
+end
+
+function MCIndSimulator(mc::MarkovChain, len::Int, init::Int)
+    # NOTE: ensure dense array and transpose before slicing the array. Then
+    #       when passing to DiscreteRV use `sub` to avoid allocating again
+    p = full(mc.p)'
+    drvs = [DiscreteRV(view(p, :, i)) for i in 1:size(mc.p, 1)]
+    MCIndSimulator(mc, len, init, drvs)
+end
+
+
+Base.start(mcis::MCIndSimulator) = (mcis.init, 0)
+
+function Base.next(mcis::MCIndSimulator, state::Tuple{Int,Int})
+    ix, t = state
+    (ix, (draw(mcis.drvs[ix]), t+1))
+end
+
+Base.done(mcis::MCIndSimulator, s::Tuple{Int,Int}) = s[2] >= mcis.len
+Base.length(mcis::MCIndSimulator) = mcis.len
+Base.eltype(mcis::MCIndSimulator) = Int
+
+type MCSimulator{T<:MCIndSimulator}
+    mcis::T
+end
+
+function MCSimulator(mc::MarkovChain, len::Int, init::Int)
+    MCSimulator(MCIndSimulator(mc, len, init))
+end
+
+# only need to implement next and eltype differently...
+function Base.next(mcs::MCSimulator, state::Tuple{Int,Int})
+    ix, new_state = next(mcs.mcis, state)
+    (mcs.mcis.mc.state_values[ix], new_state)
+end
+Base.eltype(mcs::MCSimulator) = eltype(mcs.mcis.mc)
+
+# ...the rest of the interface can derive from mcis
+Base.start(mcs::MCSimulator) = start(mcs.mcis)
+Base.done(mcs::MCSimulator, state::Tuple{Int,Int}) = done(mcs.mcis, state)
+Base.length(mcs::MCSimulator) = length(mcs.mcis)
+
+if isdefined(Base, :iteratorsize)
+    Base.iteratorsize(mcis::MCIndSimulator) = Base.HasLength()
+    Base.iteratorsize(mcs::MCSimulator) = Base.iteratorsize(mcs.mcis)
+end
+
 """
 Simulate one sample path of the Markov chain `mc`.
 The resulting vector has the state values of `mc` as elements.
@@ -298,19 +352,17 @@ The resulting vector has the state values of `mc` as elements.
 
 - `mc::MarkovChain` : MarkovChain instance.
 - `ts_length::Int` : Length of simulation
-- `;init::Int=rand(1:n_states(mc))` : Initial state 
+- `;init::Int=rand(1:n_states(mc))` : Initial state
 
 ### Returns
 
-- `X::Vector` : Vector containing the sample path, with length 
+- `X::Vector` : Vector containing the sample path, with length
 ts_length
 """
-
 function simulate(mc::MarkovChain, ts_length::Int;
                   init::Int=rand(1:n_states(mc)))
-    X = Array(eltype(mc.state_values), ts_length, 1)
+    X = Array(eltype(mc), ts_length)
     simulate!(X, mc; init=init)
-    return vec(X)
 end
 
 
@@ -321,54 +373,26 @@ The resulting matrix has the state values of `mc` as elements.
 ### Arguments
 
 - `X::Matrix` : Preallocated matrix to be filled with sample paths
-of the Markov chain `mc`. The element types in `X` should be the 
+of the Markov chain `mc`. The element types in `X` should be the
 same as the type of the state values of `mc`
 - `mc::MarkovChain` : MarkovChain instance.
 - `;init=rand(1:n_states(mc))` : Can be one of the following
     - blank: random initial condition for each chain
     - scalar: same initial condition for each chain
     - vector: cycle through the elements, applying each as an
-      initial condition until all columns have an initial condition 
+      initial condition until all columns have an initial condition
       (allows for more columns than initial conditions)
 """
 
 function simulate!(X::Union{AbstractVector,AbstractMatrix},
                    mc::MarkovChain; init=rand(1:n_states(mc), size(X, 2)))
+    mcs = MCSimulator(mc, size(X, 1), init[1])
 
-    # Note: eltype(X) must be the same as eltype(mc.state_values)
-    if eltype(X) != eltype(mc.state_values)
-        throw(ArgumentError("Types in X must be the same as the types of the
-        Markov state values"))
-    end
-
-    ts_length = size(X, 1)
-    k = size(X, 2)
-    
-    # if init is a vector, assign initial conditions to columns of X
-    # otherwise, just start each column at the same initial condition
-    if length(init) > 1
-        real_init = collect(take(cycle(init), k))
-    else
-        real_init = init .* ones(Int, k)
-    end
-    X[1, :] = mc.state_values[real_init]
-
-    n = size(mc.p, 1)
-
-    # NOTE: ensure dense array and transpose before slicing the array. Then
-    #       when passing to DiscreteRV use `sub` to avoid allocating again
-    p = full(mc.p)'
-    P_dist = [DiscreteRV(view(p, :, i)) for i in 1:n]
-
-    for i in 1:k
-        i_state = real_init[i]
-        for t in 1:ts_length-1
-            i_state = draw(P_dist[i_state])
-            X[t+1, i] = mc.state_values[i_state]
-        end
+    for (i, init) in enumerate(take(cycle(init), size(X, 2)))
+        mcs.mcis.init = init
+        copy!(view(X, :, i), mcs)
     end
     X
-
 end
 
 # ------------------------ #
@@ -383,19 +407,17 @@ The resulting vector has the indices of the state values of `mc` as elements.
 
 - `mc::MarkovChain` : MarkovChain instance.
 - `ts_length::Int` : Length of simulation
-- `;init::Int=rand(1:n_states(mc))` : Initial state 
+- `;init::Int=rand(1:n_states(mc))` : Initial state
 
 ### Returns
 
-- `X::Vector{Int}` : Vector containing the sample path, with length 
+- `X::Vector{Int}` : Vector containing the sample path, with length
 ts_length
 """
-
 function simulate_indices(mc::MarkovChain, ts_length::Int;
                           init::Int=rand(1:n_states(mc)))
-    X = Array(Int, ts_length, 1)
+    X = Array(Int, ts_length)
     simulate_indices!(X, mc; init=init)
-    return vec(X)
 end
 
 
@@ -412,37 +434,16 @@ of the sample paths of the Markov chain `mc`.
     - blank: random initial condition for each chain
     - scalar: same initial condition for each chain
     - vector: cycle through the elements, applying each as an
-      initial condition until all columns have an initial condition 
+      initial condition until all columns have an initial condition
       (allows for more columns than initial conditions)
 """
-
 function simulate_indices!{T<:Integer}(X::Union{AbstractVector{T},AbstractMatrix{T}},
                            mc::MarkovChain; init=rand(1:n_states(mc), size(X, 2)))
+    mcis = MCIndSimulator(mc, size(X, 1), init[1])
 
-    ts_length = size(X, 1)
-    k = size(X, 2)
-   
-    # if init is a vector, assign initial conditions to columns of X
-    # otherwise, just start each column at the same initial condition
-    if length(init) > 1
-        real_init = collect(take(cycle(init), k))
-    else
-        real_init = init .* ones(Int, k)
-    end
-    X[1, :] = real_init
-
-    n = size(mc.p, 1)
-
-    # NOTE: ensure dense array and transpose before slicing the array. Then
-    #       when passing to DiscreteRV use `sub` to avoid allocating again
-    p = full(mc.p)'
-    P_dist = [DiscreteRV(view(p, :, i)) for i in 1:n]
-
-    for i in 1:k
-        for t in 1:ts_length-1
-            X[t+1, i] = draw(P_dist[X[t,i]])
-        end
+    for (i, init) in enumerate(take(cycle(init), size(X, 2)))
+        mcis.init = init
+        copy!(view(X, :, i), mcis)
     end
     X
-
 end

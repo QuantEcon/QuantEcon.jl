@@ -4,3 +4,6 @@ site/
 *.cov
 *.juliahistory
 *.tags*
+
+docs/build
+docs/serve
