@@ -88,7 +88,7 @@ Rouwenhorst's method to approximate AR(1) processes.
 
 The process follows
 
-    y_t = μ + ρ y_{t-1} + ε_t,
+    y_t = (1-ρ)μ + ρ y_{t-1} + ε_t,
 
 where ε_t ~ N (0, σ^2)
 
@@ -109,7 +109,7 @@ function rouwenhorst(N::Integer, ρ::Real, σ::Real, μ::Real=0.0)
     p  = (1+ρ)/2
     Θ = [p 1-p; 1-p p]
     ψ = sqrt(N-1) * σ_y
-    m = μ / (1 - ρ)
+    m = μ
 
     state_values, p = _rouwenhorst(p, p, m, ψ, N)
     MarkovChain(p, state_values)
@@ -130,3 +130,4 @@ function _rouwenhorst(p::Real, q::Real, m::Real, Δ::Real, n::Integer)
         return linspace(m-Δ, m+Δ, n), θN
     end
 end
+
