@@ -49,7 +49,7 @@ function smooth(x::Array, window_len::Int, window::AbstractString="hanning")
                    )
 
     # Reflect x around x[0] and x[-1] prior to convolution
-    k = round(Int, window_len / 2)
+    k = ceil(Int, window_len / 2)
     xb = x[1:k]   # First k elements
     xt = x[end-k+1:end]  # Last k elements
     s = [reverse(xb); x; reverse(xt)]
