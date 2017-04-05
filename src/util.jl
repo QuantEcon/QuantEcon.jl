@@ -68,10 +68,15 @@ function gridmake!(out, arrays::Union{AbstractVector,AbstractMatrix}...)
 end
 
 @generated function gridmake(arrays::AbstractArray...)
-    T = reduce(promote_type, [eltype(a) for a in arrays])
+    T = reduce(promote_type, eltype(a) for a in arrays)
     quote
-        l = prod(_ -> size(_, 1), arrays)
-        out = Array{$T}(l, sum(_ -> size(_, 2), arrays))
+        l = 1
+        n = 0
+        for arr in arrays
+            l *= size(arr, 1)
+            n += size(arr, 2)
+        end
+        out = Array{$T}(l, n)
         gridmake!(out, arrays...)
         out
     end
