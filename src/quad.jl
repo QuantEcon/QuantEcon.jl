@@ -60,7 +60,7 @@ function qnwlege(n::Int, a::Real, b::Real)
     weights = copy(nodes)
     i = 1:m
 
-    z = cos(pi * (i - 0.25) ./ (n + 0.5))
+    z = cos.(pi * (i - 0.25) ./ (n + 0.5))
 
     # allocate memory for loop arrays
     p3 = similar(z)
@@ -116,8 +116,8 @@ $(qnw_func_notes)
 $(qnw_refs)
 """
 function qnwcheb(n::Int, a::Real, b::Real)
-    nodes = (b+a)/2 - (b-a)/2 .* cos(pi/n .* (0.5:(n-0.5)))
-    weights = ((b-a)/n) .* (cos(pi/n .* ((1:n)-0.5)*(2:2:n-1)') *
+    nodes = (b+a)/2 - (b-a)/2 .* cos.(pi/n .* (0.5:(n-0.5)))
+    weights = ((b-a)/n) .* (cos.(pi/n .* ((1:n)-0.5)*(2:2:n-1)') *
                             (-2.0 ./ ((1:2:n-2).*(3:2:n))) + 1)
     return nodes, weights
 end
@@ -633,7 +633,7 @@ $(qnw_refs)
 """
 function qnwlogn(n, mu, sig2)
     nodes, weights = qnwnorm(n, mu, sig2)
-    return exp(nodes), weights
+    return exp.(nodes), weights
 end
 
 
