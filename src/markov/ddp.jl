@@ -53,7 +53,7 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
     a_indices::Nullable{Vector{Tind}}  # Action Indices
     a_indptr::Nullable{Vector{Tind}}   # Action Index Pointers
 
-    @compat function (::Type{DiscreteDP{T,NQ,NR,Tbeta,Tind}}){T,NQ,NR,Tbeta,Tind}(
+    function (::Type{DiscreteDP{T,NQ,NR,Tbeta,Tind}}){T,NQ,NR,Tbeta,Tind}(
             R::Array, Q::Array, beta::Real
         )
         # verify input integrity 1
@@ -92,7 +92,7 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
     # Note: We left R, Q as type Array to produce more helpful error message with regards to shape.
     # R and Q are dense Arrays
 
-    @compat function (::Type{DiscreteDP{T,NQ,NR,Tbeta,Tind}}){T,NQ,NR,Tbeta,Tind}(
+    function (::Type{DiscreteDP{T,NQ,NR,Tbeta,Tind}}){T,NQ,NR,Tbeta,Tind}(
             R::AbstractArray, Q::AbstractArray, beta::Real, s_indices::Vector,
             a_indices::Vector
         )
@@ -269,7 +269,7 @@ type DPSolveResult{Algo<:DDPAlgorithm,Tval<:Real}
     sigma::Array{Int,1}
     mc::MarkovChain
 
-    @compat function (::Type{DPSolveResult{Algo,Tval}}){Algo,Tval}(
+    function (::Type{DPSolveResult{Algo,Tval}}){Algo,Tval}(
             ddp::DiscreteDP
         )
         v = s_wise_max(ddp, ddp.R) # Initialise v with v_init
@@ -281,7 +281,7 @@ type DPSolveResult{Algo<:DDPAlgorithm,Tval<:Real}
     end
 
     # method to pass initial value function (skip the s-wise max)
-    @compat function (::Type{DPSolveResult{Algo,Tval}}){Algo,Tval}(
+    function (::Type{DPSolveResult{Algo,Tval}}){Algo,Tval}(
             ddp::DiscreteDP, v::Vector
         )
         ddpr = new{Algo,Tval}(v, similar(v), 0, similar(v, Int))

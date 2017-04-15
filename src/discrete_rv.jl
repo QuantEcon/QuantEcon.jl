@@ -31,7 +31,7 @@ vector of probabilities given by q.
 type DiscreteRV{TV1<:AbstractVector, TV2<:AbstractVector}
     q::TV1
     Q::TV2
-    @compat function (::Type{DiscreteRV{TV1,TV2}}){TV1,TV2}(q, Q)
+    function (::Type{DiscreteRV{TV1,TV2}}){TV1,TV2}(q, Q)
         abs(Q[end] - 1) > 1e-10 && error("q should sum to 1")
         new{TV1,TV2}(q, Q)
     end

@@ -28,7 +28,7 @@ immutable LinInterp{TB<:AbstractVector,TV<:AbstractVector}
     vals::TV
     _n::Int
 
-    @compat function (::Type{LinInterp{TB,TV}}){TB,TV}(b::TB, v::TV)
+    function (::Type{LinInterp{TB,TV}}){TB,TV}(b::TB, v::TV)
         if size(b, 1) != size(v, 1)
             m = "breaks and vals must have same number of elements"
             throw(DimensionMismatch(m))

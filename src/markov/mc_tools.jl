@@ -33,7 +33,7 @@ type MarkovChain{T, TM<:AbstractMatrix, TV<:AbstractVector}
     p::TM # valid stochastic matrix
     state_values::TV
 
-    @compat function (::Type{MarkovChain{T,TM,TV}}){T,TM,TV}(p::AbstractMatrix, state_values)
+    function (::Type{MarkovChain{T,TM,TV}}){T,TM,TV}(p::AbstractMatrix, state_values)
         n, m = size(p)
 
         eltype(p) != T &&
