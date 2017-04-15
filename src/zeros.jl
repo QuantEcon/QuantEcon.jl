@@ -218,8 +218,7 @@ function bisect{T<:AbstractFloat}(f::Function, x1::T, x2::T; maxiter::Int=500,
 end
 
 ## Brent's algorithm
-
-abstract BrentExtrapolation
+@compat abstract type BrentExtrapolation end
 
 immutable BrentQuadratic <: BrentExtrapolation
 end

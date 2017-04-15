@@ -158,7 +158,7 @@ immutable LSSMoments
 end
 
 Base.start(L::LSSMoments) = (copy(L.lss.mu_0), copy(L.lss.Sigma_0))
-Base.done(L::LSSMoments, _) = false
+Base.done(L::LSSMoments, x) = false
 function Base.next(L::LSSMoments, moms)
     A, C, G = L.lss.A, L.lss.C, L.lss.G
     mu_x, Sigma_x = moms

@@ -40,7 +40,7 @@ Like `gridmake`, but fills a pre-populated array. `out` must have size
 function gridmake!(out, arrays::Union{AbstractVector,AbstractMatrix}...)
     lens = Int[size(e, 1) for e in arrays]
 
-    n = sum(_ -> size(_, 2), arrays)
+    n = sum(_i -> size(_i, 2), arrays)
     l = prod(lens)
     @assert size(out) == (l, n)
 

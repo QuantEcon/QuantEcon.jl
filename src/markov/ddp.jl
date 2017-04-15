@@ -53,7 +53,9 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
     a_indices::Nullable{Vector{Tind}}  # Action Indices
     a_indptr::Nullable{Vector{Tind}}   # Action Index Pointers
 
-    function DiscreteDP(R::Array, Q::Array, beta::Real)
+    @compat function (::Type{DiscreteDP{T,NQ,NR,Tbeta,Tind}}){T,NQ,NR,Tbeta,Tind}(
+            R::Array, Q::Array, beta::Real
+        )
         # verify input integrity 1
         if NQ != 3
             msg = "Q must be 3-dimensional without s-a formulation"
@@ -84,13 +86,16 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
         _a_indices = Nullable{Vector{Int}}()
         a_indptr = Nullable{Vector{Int}}()
 
-        new(R, Q, beta, _a_indices, a_indptr)
+        new{T,NQ,NR,Tbeta,Tind}(R, Q, beta, _a_indices, a_indptr)
     end
 
     # Note: We left R, Q as type Array to produce more helpful error message with regards to shape.
     # R and Q are dense Arrays
-    function DiscreteDP(R::AbstractArray, Q::AbstractArray, beta::Real,
-                        s_indices::Vector, a_indices::Vector)
+
+    @compat function (::Type{DiscreteDP{T,NQ,NR,Tbeta,Tind}}){T,NQ,NR,Tbeta,Tind}(
+            R::AbstractArray, Q::AbstractArray, beta::Real, s_indices::Vector,
+            a_indices::Vector
+        )
         # verify input integrity 1
         if NQ != 2
             throw(ArgumentError("Q must be 2-dimensional with s-a formulation"))
@@ -146,7 +151,7 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
         _a_indices = Nullable{Vector{Tind}}(_a_indices)
         a_indptr = Nullable{Vector{Tind}}(a_indptr)
 
-        new(R, full(Q), beta, _a_indices, a_indptr)
+        new{T,NQ,NR,Tbeta,Tind}(R, full(Q), beta, _a_indices, a_indptr)
     end
 end
 
@@ -199,8 +204,8 @@ end
 #-Type Aliases-#
 #--------------#
 
-typealias DDP{T,Tbeta,Tind} DiscreteDP{T,3,2,Tbeta,Tind}
-typealias DDPsa{T,Tbeta,Tind} DiscreteDP{T,2,1,Tbeta,Tind}
+@compat const DDP{T,Tbeta,Tind} =  DiscreteDP{T,3,2,Tbeta,Tind}
+@compat const DDPsa{T,Tbeta,Tind} =  DiscreteDP{T,2,1,Tbeta,Tind}
 
 #--------------------#
 #-Property Functions-#
@@ -210,7 +215,7 @@ num_states(ddp::DDP) = size(ddp.R, 1)
 num_states(ddp::DDPsa) = size(ddp.Q, 2)
 num_actions(ddp::DiscreteDP) = size(ddp.R, 2)
 
-abstract DDPAlgorithm
+@compat abstract type DDPAlgorithm end
 """
 This refers to the Value Iteration solution algorithm.
 
@@ -264,9 +269,11 @@ type DPSolveResult{Algo<:DDPAlgorithm,Tval<:Real}
     sigma::Array{Int,1}
     mc::MarkovChain
 
-    function DPSolveResult(ddp::DiscreteDP)
+    @compat function (::Type{DPSolveResult{Algo,Tval}}){Algo,Tval}(
+            ddp::DiscreteDP
+        )
         v = s_wise_max(ddp, ddp.R) # Initialise v with v_init
-        ddpr = new(v, similar(v), 0, similar(v, Int))
+        ddpr = new{Algo,Tval}(v, similar(v), 0, similar(v, Int))
 
         # fill in sigma with proper values
         compute_greedy!(ddp, ddpr)
@@ -274,8 +281,10 @@ type DPSolveResult{Algo<:DDPAlgorithm,Tval<:Real}
     end
 
     # method to pass initial value function (skip the s-wise max)
-    function DPSolveResult(ddp::DiscreteDP, v::Vector)
-        ddpr = new(v, similar(v), 0, similar(v, Int))
+    @compat function (::Type{DPSolveResult{Algo,Tval}}){Algo,Tval}(
+            ddp::DiscreteDP, v::Vector
+        )
+        ddpr = new{Algo,Tval}(v, similar(v), 0, similar(v, Int))
 
         # fill in sigma with proper values
         compute_greedy!(ddp, ddpr)
