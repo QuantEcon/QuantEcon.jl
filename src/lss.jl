@@ -41,6 +41,26 @@ end
     (f1.mu_0 == f2.mu_0) && (f1.Sigma_0 == f2.Sigma_0)
 
 Base.rand{T}(d::FakeMVTNorm{T}) = copy(d.mu_0)
+
+#=
+    This type is added for the sampling from multivariate normal with
+    positive semi-definite covariance matrix
+=#
+type MVNSampler{T<:Real}
+    mu::Array{T}
+    Sigma::Array{T}
+    Q::Array{T}     # square root of Sigma 
+end
+
+function MVNSampler(mu::AbstractVector,Sigma::AbstractArray)
+    lambdas,U = eig(Sigma)          # eigen decomposition
+    LAMBDAr = diagm(sqrt.(lambdas)) 
+    Q = U * LAMBDAr                 # square root of Sigma
+    return MVNSampler(mu,Sigma,Q)
+end
+
+Base.rand{T}(d::MVNSampler{T}) = d.mu + d.Q * randn(size(d.mu))
+
 """
 A type that describes the Gaussian Linear State Space Model
 of the form:
@@ -75,7 +95,7 @@ type LSS
     m::Int
     mu_0::Vector
     Sigma_0::Matrix
-    dist::Union{MultivariateNormal, FakeMVTNorm}
+    dist::Union{MultivariateNormal, FakeMVTNorm, MVNSampler}
 end
 
 
@@ -96,6 +116,8 @@ function LSS(A::ScalarOrArray, C::ScalarOrArray, G::ScalarOrArray,
     # define distribution
     if all(Sigma_0 .== 0.0)   # no variance -- no distribution
         dist = FakeMVTNorm(mu_0, Sigma_0)
+    elseif any(eig(Sigma_0)[1].==0.0)   # positive semi-definite covariance
+        dist = MVNSampler(mu_0,Sigma_0)
     else
         dist = MultivariateNormal(mu_0, Sigma_0)
     end
