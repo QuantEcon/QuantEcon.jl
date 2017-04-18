@@ -58,5 +58,10 @@
         end
     end
 
+    @testset "test positive semi-definite cov" begin
+        LSS = LSS(A,C,G,[0.0,0.0],[4 2;2 1])
+        rand(lss.dist)
+    end
+
 
 end  # @testset
