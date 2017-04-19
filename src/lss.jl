@@ -53,7 +53,7 @@ type MVNSampler{T<:Real}
 end
 
 function MVNSampler(mu::AbstractVector,Sigma::AbstractArray)
-    _Q = sqrtm(Sigma_0)  # complex Shcur decomposition
+    _Q = sqrtm(Sigma)  # complex Shcur decomposition
     Q =real(_Q)          # square root of Sigma
     return MVNSampler(mu,Sigma,Q)
 end
