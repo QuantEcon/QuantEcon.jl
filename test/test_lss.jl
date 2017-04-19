@@ -82,7 +82,7 @@
 
         lss_psd = LSS(A, C, G, mu_0, Sigma_0)
 
-        @test rand(lss_psd) <: Array{Float64}
+        @test typeof(rand(lss_psd.dst)) == Array{Float64}
     end
 
 end  # @testset
