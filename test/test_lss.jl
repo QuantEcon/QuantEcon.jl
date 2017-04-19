@@ -82,7 +82,8 @@
 
         lss_psd = LSS(A, C, G, mu_0, Sigma_0)
 
-        @test typeof(rand(lss_psd.dist)) == Array{Float64,1}
+        @test isapprox(lss_psd.dist.Sigma,
+                    lss_psd.dist.Q*lss_psd.dist.Q')
     end
 
 end  # @testset
