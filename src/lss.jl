@@ -54,7 +54,7 @@ end
 
 function MVNSampler(mu::AbstractVector,Sigma::AbstractArray)
     lambdas,U = eig(Sigma)          # eigen decomposition
-    LAMBDAr = diagm(sqrt.(lambdas)) 
+    LAMBDAr = diagm(broadcast(sqrt,lambdas)) 
     Q = U * LAMBDAr                 # square root of Sigma
     return MVNSampler(mu,Sigma,Q)
 end
