@@ -44,7 +44,8 @@ Base.rand{T}(d::FakeMVTNorm{T}) = copy(d.mu_0)
 
 #=
     This type is added for the sampling from multivariate normal with
-    positive semi-definite covariance matrix
+    non positive definite covariance matrix, i.e. singular covariance
+    matrix
 =#
 type MVNSampler{T<:Real}
     mu::Array{T}
@@ -54,7 +55,7 @@ end
 
 function MVNSampler(mu::AbstractVector,Sigma::AbstractArray)
     _Q = sqrtm(Sigma)  # complex Schur decomposition
-    Q =real(_Q)          # square root of Sigma
+    Q =real(_Q)        # square root of Sigma
     return MVNSampler(mu,Sigma,Q)
 end
 
@@ -115,7 +116,7 @@ function LSS(A::ScalarOrArray, C::ScalarOrArray, G::ScalarOrArray,
     # define distribution
     if all(Sigma_0 .== 0.0)   # no variance -- no distribution
         dist = FakeMVTNorm(mu_0, Sigma_0)
-    elseif any(eig(Sigma_0)[1].==0.0)   # positive semi-definite covariance
+    elseif any(eig(Sigma_0)[1].==0.0)   # non positive definite covariance
         dist = MVNSampler(mu_0,Sigma_0)
     else
         dist = MultivariateNormal(mu_0, Sigma_0)
