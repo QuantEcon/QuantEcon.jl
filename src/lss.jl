@@ -20,8 +20,8 @@ TODO: Add docstrings
 http://quant-econ.net/jl/linear_models.html
 
 =#
-import Distributions: MultivariateNormal, rand
-import Base: ==
+#import Distributions: rand
+#import Base: ==
 
 #=
     numpy allows its multivariate_normal function to have a matrix of
@@ -32,6 +32,7 @@ import Base: ==
     The behavior of `rand` is to just pass back the mean vector when
     the covariance matrix is zero.
 =#
+#=
 type FakeMVTNorm{T <: Real}
     mu_0::Array{T}
     Sigma_0::Array{T}
@@ -41,25 +42,7 @@ end
     (f1.mu_0 == f2.mu_0) && (f1.Sigma_0 == f2.Sigma_0)
 
 Base.rand{T}(d::FakeMVTNorm{T}) = copy(d.mu_0)
-
-#=
-    This type is added for the sampling from multivariate normal with
-    non positive definite covariance matrix, i.e. singular covariance
-    matrix
 =#
-type MVNSampler{T<:Real}
-    mu::Array{T}
-    Sigma::Array{T}
-    Q::Array{T}     # square root of Sigma 
-end
-
-function MVNSampler(mu::AbstractVector,Sigma::AbstractArray)
-    _Q = sqrtm(Sigma)  # complex Schur decomposition
-    Q =real(_Q)        # square root of Sigma
-    return MVNSampler(mu,Sigma,Q)
-end
-
-Base.rand{T}(d::MVNSampler{T}) = d.mu + d.Q * randn(size(d.mu))
 
 """
 A type that describes the Gaussian Linear State Space Model
@@ -95,7 +78,7 @@ type LSS
     m::Int
     mu_0::Vector
     Sigma_0::Matrix
-    dist::Union{MultivariateNormal, FakeMVTNorm, MVNSampler}
+    dist::MVNSampler
 end
 
 
@@ -113,14 +96,8 @@ function LSS(A::ScalarOrArray, C::ScalarOrArray, G::ScalarOrArray,
 
     mu_0 = reshape([mu_0;], n)
 
-    # define distribution
-    if all(Sigma_0 .== 0.0)   # no variance -- no distribution
-        dist = FakeMVTNorm(mu_0, Sigma_0)
-    elseif any(eig(Sigma_0)[1].==0.0)   # non positive definite covariance
-        dist = MVNSampler(mu_0,Sigma_0)
-    else
-        dist = MultivariateNormal(mu_0, Sigma_0)
-    end
+    # define MVNSampler
+    dist = MVNSampler(mu_0,Sigma_0)
     LSS(A, C, G, k, n, m, mu_0, Sigma_0, dist)
 end
 

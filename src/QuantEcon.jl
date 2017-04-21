@@ -120,7 +120,11 @@ export
 # interp
     interp, LinInterp
 
+# sampler
+    MVNSampler
 
+
+include("sampler.jl")
 include("util.jl")
 include("interp.jl")
 ##### includes
