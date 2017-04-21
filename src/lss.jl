@@ -20,29 +20,6 @@ TODO: Add docstrings
 http://quant-econ.net/jl/linear_models.html
 
 =#
-#import Distributions: rand
-#import Base: ==
-
-#=
-    numpy allows its multivariate_normal function to have a matrix of
-    zeros for the covariance matrix; Stats.jl doesn't. This type just
-    gives a `rand` method when we pass in a matrix of zeros for Sigma_0
-    so the rest of the api can work, unaffected
-
-    The behavior of `rand` is to just pass back the mean vector when
-    the covariance matrix is zero.
-=#
-#=
-type FakeMVTNorm{T <: Real}
-    mu_0::Array{T}
-    Sigma_0::Array{T}
-end
-
-==(f1::FakeMVTNorm, f2::FakeMVTNorm) =
-    (f1.mu_0 == f2.mu_0) && (f1.Sigma_0 == f2.Sigma_0)
-
-Base.rand{T}(d::FakeMVTNorm{T}) = copy(d.mu_0)
-=#
 
 """
 A type that describes the Gaussian Linear State Space Model
