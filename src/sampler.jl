@@ -2,6 +2,8 @@
     `MVNSampler` is used to draw from multivariate normal distribution
 =#
 
+import Base: ==
+
 immutable MVNSampler{TM<:Real,TS<:Real,TQ<:LinAlg.BlasReal}
     mu::Vector{TM}
     Sigma::Matrix{TS}
@@ -53,3 +55,6 @@ Base.rand{TM,TS,TQ}(d::MVNSampler{TM,TS,TQ}, ns::Integer...) = d.mu.+reshape(d.Q
 # methods with the optional rng argument first
 Base.rand{TM,TS,TQ}(rng::AbstractRNG, d::MVNSampler{TM,TS,TQ}) = d.mu + d.Q * randn(rng, size(d.mu))
 Base.rand{TM,TS,TQ}(rng::AbstractRNG, d::MVNSampler{TM,TS,TQ}, n::Integer...) = d.mu.+reshape(d.Q*reshape(randn(rng,tuple(vcat(length(d.mu),collect(ns))...)),length(d.mu),prod(ns)),tuple(vcat(length(d.mu),collect(ns))...))
+
+==(f1::MVNSampler, f2::MVNSampler) =
+    (f1.mu == f2.mu) && (f1.Sigma == f2.Sigma) && (f1.Q == f2.Q)
