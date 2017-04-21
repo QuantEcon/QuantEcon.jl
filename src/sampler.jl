@@ -20,7 +20,14 @@ function MVNSampler{TM<:Real,TS<:Real}(mu::Vector{TM}, Sigma::Matrix{TS})
         throw(ArgumentError("Sigma must be n x n where n is the number of elements in mu"))
     end
 
-    if issymmetric(Sigma) == false # Check Sigma is symmetric
+    Sigma_is_symmetric = nothing
+    try
+        Sigma_is_symmetric = issymmetric(Sigma) # v0.5
+    catch
+        Sigma_is_symmetric = issym(Sigma)       # v0.4
+    end
+
+    if Sigma_is_symmetric == false # Check Sigma is symmetric
         throw(ArgumentError("Sigma must be symmetric"))
     end
 
