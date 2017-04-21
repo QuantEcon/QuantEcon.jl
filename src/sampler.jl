@@ -34,7 +34,7 @@ function MVNSampler{TM<:Real,TS<:Real}(mu::Vector{TM}, Sigma::Matrix{TS})
     C = cholfact(Symmetric(Sigma, :L), Val{true})
 
     if C.rank == n  # Positive definite
-        Q = tril(C.factors)[C.piv, C.piv]
+        Q = tril(C.factors)[sortperm(C.piv), sortperm(C.piv)]
         return MVNSampler(mu, Sigma, Q)
     end
 
