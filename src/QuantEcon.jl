@@ -118,7 +118,7 @@ export
     golden_method,
 
 # interp
-    interp, LinInterp
+    interp, LinInterp,
 
 # sampler
     MVNSampler
