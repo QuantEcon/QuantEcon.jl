@@ -20,21 +20,13 @@ function MVNSampler{TM<:Real,TS<:Real}(mu::Vector{TM}, Sigma::Matrix{TS})
         throw(ArgumentError("Sigma must be n x n where n is the number of elements in mu"))
     end
 
-    Sigma_is_symmetric = nothing
-    try
-        Sigma_is_symmetric = issymmetric(Sigma) # v0.5
-    catch
-        Sigma_is_symmetric = issym(Sigma)       # v0.4
-    end
-
-    if Sigma_is_symmetric == false # Check Sigma is symmetric
-        throw(ArgumentError("Sigma must be symmetric"))
-    end
+    @compat issymmetric(Sigma) || throw(ArgumentError("Sigma must be symmetric"))
 
     C = cholfact(Symmetric(Sigma, :L), Val{true})
 
     if C.rank == n  # Positive definite
-        Q = tril(C.factors)[sortperm(C.piv), sortperm(C.piv)]
+        p = invperm(C.piv)
+        Q = tril(C.factors)[p,p]
         return MVNSampler(mu, Sigma, Q)
     end
 
@@ -46,7 +38,8 @@ function MVNSampler{TM<:Real,TS<:Real}(mu::Vector{TM}, Sigma::Matrix{TS})
         end
     end
 
-    Q = tril(C.factors)[sortperm(C.piv), sortperm(C.piv)]
+    p = invperm(C.piv)
+    Q = tril(C.factors)[p,p]
 
     if maxabs(Sigma - Q * Q') > TOL2  # Not positive semidefinite
         throw(ArgumentError(non_PSD_msg))
