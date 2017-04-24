@@ -3,7 +3,7 @@
 =#
 
 import Base: ==
-import Comopat: @compat
+import Compat: @compat
 
 immutable MVNSampler{TM<:Real,TS<:Real,TQ<:LinAlg.BlasReal}
     mu::Vector{TM}
