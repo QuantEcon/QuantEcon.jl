@@ -11,7 +11,7 @@ immutable MVNSampler{TM<:Real,TS<:Real,TQ<:LinAlg.BlasReal}
 end
 
 function MVNSampler{TM<:Real,TS<:Real}(mu::Vector{TM}, Sigma::Matrix{TS})
-    TOL1 = 1e-5  # some small value
+    TOL1 = 1e-8  # some small value
     TOL2 = 1e-10  # some small value
 
     n = length(mu)
