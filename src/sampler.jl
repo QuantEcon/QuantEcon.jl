@@ -20,7 +20,7 @@ function MVNSampler{TM<:Real,TS<:Real}(mu::Vector{TM}, Sigma::Matrix{TS})
         throw(ArgumentError("Sigma must be n x n where n is the number of elements in mu"))
     end
 
-    @compat issymmetric(Sigma) || throw(ArgumentError("Sigma must be symmetric"))
+    issymmetric(Sigma) || throw(ArgumentError("Sigma must be symmetric"))
 
     C = cholfact(Symmetric(Sigma, :L), Val{true})
 
