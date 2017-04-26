@@ -49,13 +49,13 @@ function MVNSampler{TM<:Real,TS<:Real}(mu::Vector{TM}, Sigma::Matrix{TS})
     return MVNSampler(mu, Sigma, Q)
 end
 
-# methods to draw from `MVNSampler`
-Base.rand{TM,TS,TQ}(d::MVNSampler{TM,TS,TQ}) = d.mu + d.Q * randn(size(d.mu))
-Base.rand{TM,TS,TQ}(d::MVNSampler{TM,TS,TQ}, n::Integer) = d.mu.+d.Q*randn(length(d.mu),n)
-
 # methods with the optional rng argument first
-Base.rand{TM,TS,TQ}(rng::AbstractRNG, d::MVNSampler{TM,TS,TQ}) = d.mu + d.Q * randn(rng, size(d.mu))
-Base.rand{TM,TS,TQ}(rng::AbstractRNG, d::MVNSampler{TM,TS,TQ}, n::Integer) = d.mu.+d.Q*randn(rng,(length(d.mu),n))
+Base.rand(rng::AbstractRNG, d::MVNSampler{TM,TS,TQ}) = d.mu + d.Q * randn(rng, lnegth(d.mu))
+Base.rand(rng::AbstractRNG, d::MVNSampler{TM,TS,TQ}, n::Integer) = d.mu.+d.Q*randn(rng,(length(d.mu),n))
+
+# methods to draw from `MVNSampler`
+Base.rand(d::MVNSampler) = rand(Base.GLOBAL_RNG, d)
+Base.rand(d::MVNSampler, n::Integer) = rand(Base.GLOBAL_RNG, d, n)
 
 ==(f1::MVNSampler, f2::MVNSampler) =
     (f1.mu == f2.mu) && (f1.Sigma == f2.Sigma) && (f1.Q == f2.Q)
