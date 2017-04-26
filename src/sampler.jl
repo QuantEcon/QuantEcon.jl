@@ -12,7 +12,7 @@ end
 
 function MVNSampler{TM<:Real,TS<:Real}(mu::Vector{TM}, Sigma::Matrix{TS})
     ATOL1, RTOL1 = 1e-8, 1e-8
-    ATOL2, RTOL2 = 1e-8, 1e-16
+    ATOL2, RTOL2 = 1e-8, 1e-14
 
     n = length(mu)
 
