@@ -11,13 +11,15 @@ immutable MVNSampler{TM<:Real,TS<:Real,TQ<:LinAlg.BlasReal}
 end
 
 function MVNSampler{TM<:Real,TS<:Real}(mu::Vector{TM}, Sigma::Matrix{TS})
-    TOL1 = 1e-8  # some small value
-    TOL2 = 1e-10  # some small value
+
+
+    ATOL1::TT=1e-8, RTOL1::TT=1e-8,
+    ATOL2::TT=1e-13, RTOL2::TT=1e-16)
 
     n = length(mu)
 
     if size(Sigma) != (n,n) # Check Sigma is n x n
-        throw(ArgumentError("Sigma must be n x n where n is the number of elements in mu"))
+        throw(ArgumentError("Sigma must be 2 dimensional and square matrix of same length to mu"))
     end
 
     issymmetric(Sigma) || throw(ArgumentError("Sigma must be symmetric"))
@@ -33,7 +35,7 @@ function MVNSampler{TM<:Real,TS<:Real}(mu::Vector{TM}, Sigma::Matrix{TS})
     non_PSD_msg = "Sigma must be positive semidefinite"
 
     for i in C.rank+1:n
-        if C[:L][i, i] < -TOL1  # Not positive semidefinite
+        if C[:L][i, i] < -ATOL1 || C[:L][i, i]/norm(diag(C[:L])) # Not positive semidefinite
             throw(ArgumentError(non_PSD_msg))
         end
     end
@@ -50,11 +52,11 @@ end
 
 # methods to draw from `MVNSampler`
 Base.rand{TM,TS,TQ}(d::MVNSampler{TM,TS,TQ}) = d.mu + d.Q * randn(size(d.mu))
-Base.rand{TM,TS,TQ}(d::MVNSampler{TM,TS,TQ}, ns::Integer...) = d.mu.+reshape(d.Q*reshape(randn(tuple(vcat(length(d.mu),collect(ns))...)),length(d.mu),prod(ns)),tuple(vcat(length(d.mu),collect(ns))...))
+Base.rand{TM,TS,TQ}(d::MVNSampler{TM,TS,TQ}, n::Integer) = d.mu.+d.Q*randn(length(d.mu),n)
 
 # methods with the optional rng argument first
 Base.rand{TM,TS,TQ}(rng::AbstractRNG, d::MVNSampler{TM,TS,TQ}) = d.mu + d.Q * randn(rng, size(d.mu))
-Base.rand{TM,TS,TQ}(rng::AbstractRNG, d::MVNSampler{TM,TS,TQ}, n::Integer...) = d.mu.+reshape(d.Q*reshape(randn(rng,tuple(vcat(length(d.mu),collect(ns))...)),length(d.mu),prod(ns)),tuple(vcat(length(d.mu),collect(ns))...))
+Base.rand{TM,TS,TQ}(rng::AbstractRNG, d::MVNSampler{TM,TS,TQ}, n::Integer...) = d.mu.+d.Q*randn(rng,(length(d.mu),n))
 
 ==(f1::MVNSampler, f2::MVNSampler) =
     (f1.mu == f2.mu) && (f1.Sigma == f2.Sigma) && (f1.Q == f2.Q)

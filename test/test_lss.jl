@@ -85,7 +85,7 @@
         @test isapprox(lss_psd.dist.Sigma,
                     lss_psd.dist.Q*lss_psd.dist.Q')
 
-        @test size(rand(lss_psd.dist,10000,10)) == (4,10000,10)
+        @test size(rand(lss_psd.dist,10)) == (4,10)
     end
 
 end  # @testset
