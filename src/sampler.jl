@@ -41,9 +41,10 @@ function MVNSampler{TM<:Real,TS<:Real}(mu::Vector{TM}, Sigma::Matrix{TS})
     p = invperm(C.piv)
     Q = tril(C.factors)[p,p]
 
-    if maxabs(Sigma - Q * Q') > ATOL2 && maxabs(Sigma - Q * Q')/max(norm(Sigma),norm(Q * Q')) > RTOL2 # Not positive semidefinite
-        throw(ArgumentError(non_PSD_msg))
-    end
+    for i in C.rank+1:n
+       C[:L][i, i] >= -ATOL1 - RTOL1 * C[:L][1, 1] ||
+           throw(ArgumentError(non_PSD_msg))
+   end
 
     return MVNSampler(mu, Sigma, Q)
 end
