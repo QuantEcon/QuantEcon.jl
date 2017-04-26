@@ -39,17 +39,20 @@ function MVNSampler{TM<:Real,TS<:Real}(mu::Vector{TM}, Sigma::Matrix{TS})
 
     p = invperm(C.piv)
     Q = tril(C.factors)[p,p]
-
-    if maxabs(Sigma - Q * Q') > ATOL2 && maxabs(Sigma - Q * Q')/max(norm(Sigma),norm(Q * Q')) > RTOL2 # Not positive semidefinite
-        throw(ArgumentError(non_PSD_msg))
+    Q_2 = Q * Q'
+for j in 1:n
+    for i in 1:n
+        isapprox(Q*Q', Sigma; rtol=RTOL2, atol=ATOL2) ||
+            throw(ArgumentError(non_PSD_msg))
     end
+end
 
     return MVNSampler(mu, Sigma, Q)
 end
 
 # methods with the optional rng argument first
-Base.rand(rng::AbstractRNG, d::MVNSampler{TM,TS,TQ}) = d.mu + d.Q * randn(rng, lnegth(d.mu))
-Base.rand(rng::AbstractRNG, d::MVNSampler{TM,TS,TQ}, n::Integer) = d.mu.+d.Q*randn(rng,(length(d.mu),n))
+Base.rand(rng::AbstractRNG, d::MVNSampler) = d.mu + d.Q * randn(rng, length(d.mu))
+Base.rand(rng::AbstractRNG, d::MVNSampler, n::Integer) = d.mu.+d.Q*randn(rng,(length(d.mu),n))
 
 # methods to draw from `MVNSampler`
 Base.rand(d::MVNSampler) = rand(Base.GLOBAL_RNG, d)
