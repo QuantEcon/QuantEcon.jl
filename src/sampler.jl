@@ -12,7 +12,7 @@ end
 
 function MVNSampler{TM<:Real,TS<:Real}(mu::Vector{TM}, Sigma::Matrix{TS})
     ATOL1, RTOL1 = 1e-8, 1e-8
-    ATOL2, RTOL2 = 1e-12, 1e-16
+    ATOL2, RTOL2 = 1e-8, 1e-16
 
     n = length(mu)
 
@@ -33,7 +33,7 @@ function MVNSampler{TM<:Real,TS<:Real}(mu::Vector{TM}, Sigma::Matrix{TS})
     non_PSD_msg = "Sigma must be positive semidefinite"
 
     for i in C.rank+1:n
-        if C[:L][i, i] < -ATOL1 || C[:L][i, i]/norm(diag(C[:L])) # Not positive semidefinite
+        if C[:L][i, i] < -ATOL1 || C[:L][i, i]/norm(diag(C[:L])) < -RTOL1 # Not positive semidefinite
             throw(ArgumentError(non_PSD_msg))
         end
     end
@@ -41,7 +41,7 @@ function MVNSampler{TM<:Real,TS<:Real}(mu::Vector{TM}, Sigma::Matrix{TS})
     p = invperm(C.piv)
     Q = tril(C.factors)[p,p]
 
-    if maxabs(Sigma - Q * Q') > TOL2  # Not positive semidefinite
+    if maxabs(Sigma - Q * Q') > ATOL2 || maxabs(Sigma - Q * Q')/max(norm(Sigma),norm(Q * Q')) > RTOL2 # Not positive semidefinite
         throw(ArgumentError(non_PSD_msg))
     end
 
