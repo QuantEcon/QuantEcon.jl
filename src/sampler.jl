@@ -11,10 +11,8 @@ immutable MVNSampler{TM<:Real,TS<:Real,TQ<:LinAlg.BlasReal}
 end
 
 function MVNSampler{TM<:Real,TS<:Real}(mu::Vector{TM}, Sigma::Matrix{TS})
-
-
-    ATOL1::TT=1e-8, RTOL1::TT=1e-8,
-    ATOL2::TT=1e-13, RTOL2::TT=1e-16)
+    ATOL1, RTOL1 = 1e-8, 1e-8
+    ATOL2, RTOL2 = 1e-12, 1e-16
 
     n = length(mu)
 
