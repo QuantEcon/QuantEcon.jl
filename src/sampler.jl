@@ -54,7 +54,7 @@ Base.rand{TM,TS,TQ}(d::MVNSampler{TM,TS,TQ}, n::Integer) = d.mu.+d.Q*randn(lengt
 
 # methods with the optional rng argument first
 Base.rand{TM,TS,TQ}(rng::AbstractRNG, d::MVNSampler{TM,TS,TQ}) = d.mu + d.Q * randn(rng, size(d.mu))
-Base.rand{TM,TS,TQ}(rng::AbstractRNG, d::MVNSampler{TM,TS,TQ}, n::Integer...) = d.mu.+d.Q*randn(rng,(length(d.mu),n))
+Base.rand{TM,TS,TQ}(rng::AbstractRNG, d::MVNSampler{TM,TS,TQ}, n::Integer) = d.mu.+d.Q*randn(rng,(length(d.mu),n))
 
 ==(f1::MVNSampler, f2::MVNSampler) =
     (f1.mu == f2.mu) && (f1.Sigma == f2.Sigma) && (f1.Q == f2.Q)
