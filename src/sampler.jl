@@ -22,30 +22,32 @@ function MVNSampler{TM<:Real,TS<:Real}(mu::Vector{TM}, Sigma::Matrix{TS})
 
     issymmetric(Sigma) || throw(ArgumentError("Sigma must be symmetric"))
 
-    C = cholfact(Symmetric(Sigma, :L), Val{true})
+    A = copy(Sigma)
+    C = cholfact!(Symmetric(A, :L), Val{true})
+    r = C.rank
+    p = invperm(C.piv)
 
     if C.rank == n  # Positive definite
-        p = invperm(C.piv)
-        Q = tril(C.factors)[p,p]
+        Q = tril!(A)[p,p]
         return MVNSampler(mu, Sigma, Q)
     end
 
     non_PSD_msg = "Sigma must be positive semidefinite"
 
     for i in C.rank+1:n
-    C[:L][i, i] >= -ATOL1 - RTOL1 * C[:L][1, 1] ||
-        throw(ArgumentError(non_PSD_msg))
-    end
-
-    p = invperm(C.piv)
-    Q = tril(C.factors)[p,p]
-    Q_2 = Q * Q'
-for j in 1:n
-    for i in 1:n
-        isapprox(Q*Q', Sigma; rtol=RTOL2, atol=ATOL2) ||
+        C[:L][i, i] >= -ATOL1 - RTOL1 * C[:L][1, 1] ||
             throw(ArgumentError(non_PSD_msg))
     end
-end
+
+    tril!(view(A, :, 1:r))
+    A[:, r+1:end] = 0
+    Q = A[p,p]
+    for j in 1:n
+        for i in 1:n
+            isapprox(Q*Q', Sigma; rtol=RTOL2, atol=ATOL2) ||
+                throw(ArgumentError(non_PSD_msg))
+        end
+    end
 
     return MVNSampler(mu, Sigma, Q)
 end
