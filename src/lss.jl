@@ -20,27 +20,7 @@ TODO: Add docstrings
 http://quant-econ.net/jl/linear_models.html
 
 =#
-import Distributions: MultivariateNormal, rand
-import Base: ==
 
-#=
-    numpy allows its multivariate_normal function to have a matrix of
-    zeros for the covariance matrix; Stats.jl doesn't. This type just
-    gives a `rand` method when we pass in a matrix of zeros for Sigma_0
-    so the rest of the api can work, unaffected
-
-    The behavior of `rand` is to just pass back the mean vector when
-    the covariance matrix is zero.
-=#
-type FakeMVTNorm{T <: Real}
-    mu_0::Array{T}
-    Sigma_0::Array{T}
-end
-
-==(f1::FakeMVTNorm, f2::FakeMVTNorm) =
-    (f1.mu_0 == f2.mu_0) && (f1.Sigma_0 == f2.Sigma_0)
-
-Base.rand{T}(d::FakeMVTNorm{T}) = copy(d.mu_0)
 """
 A type that describes the Gaussian Linear State Space Model
 of the form:
@@ -75,7 +55,7 @@ type LSS
     m::Int
     mu_0::Vector
     Sigma_0::Matrix
-    dist::Union{MultivariateNormal, FakeMVTNorm}
+    dist::MVNSampler
 end
 
 
@@ -93,12 +73,8 @@ function LSS(A::ScalarOrArray, C::ScalarOrArray, G::ScalarOrArray,
 
     mu_0 = reshape([mu_0;], n)
 
-    # define distribution
-    if all(Sigma_0 .== 0.0)   # no variance -- no distribution
-        dist = FakeMVTNorm(mu_0, Sigma_0)
-    else
-        dist = MultivariateNormal(mu_0, Sigma_0)
-    end
+    # define MVNSampler
+    dist = MVNSampler(mu_0,Sigma_0)
     LSS(A, C, G, k, n, m, mu_0, Sigma_0, dist)
 end
 

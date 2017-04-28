@@ -13,7 +13,7 @@
     ss1 = LSS(A, C, G, mu_0, Sigma_0)
 
     vals = stationary_distributions(ss, max_iter=1000, tol=1e-9)
-    
+
     @testset "test stationarity" begin
         vals = stationary_distributions(ss, max_iter=1000, tol=1e-9)
         ssmux, ssmuy, sssigx, sssigy = vals
@@ -58,5 +58,34 @@
         end
     end
 
+    @testset "test positive semi-dfinite covariance" begin
+
+        # set up
+        A = [1.0      0.0       0.0 0.0;
+             10.0     0.9       0.0 0.0;
+             0.0      1.0       0.0 0.0;
+             68.9655  -0.689655 0.0 1.0]
+        C = [0.0;
+             1.0;
+             0.0;
+             0.0]
+        G = [0.0     1.0       0.0  0.0;
+             65.5172 0.344828  0.0  -0.05]
+        mu_0 = [1.0;
+                99.9999;
+                99.9999;
+                0.0]
+        Sigma_0 = [0.0  0.0      0.0      0.0;
+                   0.0  5.26316  4.73684  0.0;
+                   0.0  4.73684  5.26316  0.0;
+                   0.0  0.0      0.0      0.0]
+
+        lss_psd = LSS(A, C, G, mu_0, Sigma_0)
+
+        @test isapprox(lss_psd.dist.Sigma,
+                    lss_psd.dist.Q*lss_psd.dist.Q')
+
+        @test size(rand(lss_psd.dist,10)) == (4,10)
+    end
 
 end  # @testset

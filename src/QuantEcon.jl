@@ -118,9 +118,13 @@ export
     golden_method,
 
 # interp
-    interp, LinInterp
+    interp, LinInterp,
+
+# sampler
+    MVNSampler
 
 
+include("sampler.jl")
 include("util.jl")
 include("interp.jl")
 ##### includes
