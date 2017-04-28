@@ -3,12 +3,7 @@ using DataStructures: counter
 using Distributions: LogNormal, pdf
 using Compat
 
-if VERSION >= v"0.5-"
-    using Base.Test
-else
-    using BaseTestNext
-    const Test = BaseTestNext
-end
+using Base.Test
 
 tests = [
         "arma",
@@ -32,6 +27,7 @@ tests = [
         "zeros",
         "optimization",
         "interp",
+        "sampler",
         ]
 
 

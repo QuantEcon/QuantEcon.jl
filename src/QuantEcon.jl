@@ -122,12 +122,15 @@ export
     golden_method,
 
 # interp
-    interp, LinInterp
+    interp, LinInterp,
+
+# sampler
+    MVNSampler
 
 
+include("sampler.jl")
 include("util.jl")
 include("interp.jl")
-##### includes
 include("arma.jl")
 include("compute_fp.jl")
 include("markov/markov_approx.jl")
