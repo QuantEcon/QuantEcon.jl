@@ -11,8 +11,12 @@ using DSP: TFFilter, freqz
 using Primes: primes
 using Compat: view, @compat
 
+@static if isdefined(Base, :Iterators)
+    using Base.Iterators: cycle, take
+end
+
 # useful types
-typealias ScalarOrArray{T} Union{T, Array{T}}
+@compat ScalarOrArray{T} = Union{T,Array{T}}
 
 
 export
@@ -127,7 +131,6 @@ export
 include("sampler.jl")
 include("util.jl")
 include("interp.jl")
-##### includes
 include("arma.jl")
 include("compute_fp.jl")
 include("markov/markov_approx.jl")

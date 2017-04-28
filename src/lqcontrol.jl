@@ -95,14 +95,14 @@ symmetric and nonnegative definite
 Must be symmetric and nonnegative definite
 - `A::ScalarOrArray` : n x n coefficient on state in state transition
 - `B::ScalarOrArray` : n x k coefficient on control in state transition
-- `;C::ScalarOrArray(zeros(size(R, 1)))` : n x j coefficient on random shock in
+- `;C::ScalarOrArray{zeros(size(R}(1)))` : n x j coefficient on random shock in
 state transition
-- `;N::ScalarOrArray(zeros(size(B,1), size(A, 2)))` : k x n cross product in
+- `;N::ScalarOrArray{zeros(size(B,1)}(size(A, 2)))` : k x n cross product in
 payoff equation
 - `;bet::Real(1.0)` : Discount factor in [0, 1]
 - `capT::Union{Int, Void}(Void)` : Terminal period in finite horizon
 problem
-- `rf::ScalarOrArray(fill(NaN, size(R)...))` : n x n terminal payoff in finite
+- `rf::ScalarOrArray{fill(NaN}(size(R)...))` : n x n terminal payoff in finite
 horizon problem. Must be symmetric and nonnegative definite.
 
 """
@@ -232,8 +232,8 @@ Private method implementing `compute_sequence` when state is a scalar
 function _compute_sequence{T}(lq::LQ, x0::T, policies)
     capT = length(policies)
 
-    x_path = Array(T, capT+1)
-    u_path = Array(T, capT)
+    x_path = Array{T}(capT+1)
+    u_path = Array{T}(capT)
 
     x_path[1] = x0
     u_path[1] = -(first(policies)*x0)
@@ -259,8 +259,8 @@ function _compute_sequence{T}(lq::LQ, x0::Vector{T}, policies)
 
     A, B, C = lq.A, reshape(lq.B, n, k), reshape(lq.C, n, j)
 
-    x_path = Array(T, n, capT+1)
-    u_path = Array(T, k, capT)
+    x_path = Array{T}(n, capT+1)
+    u_path = Array{T}(k, capT)
     w_path = C*randn(j, capT+1)
 
     x_path[:, 1] = x0
@@ -305,7 +305,7 @@ function compute_sequence(lq::LQ, x0::ScalarOrArray, ts_length::Integer=100)
         policies = fill(lq.F, ts_length)
     else
         capT = min(ts_length, lq.capT)
-        policies = Array(typeof(lq.F), capT)
+        policies = Array{typeof(lq.F)}(capT)
         for t = capT:-1:1
             update_values!(lq)
             policies[t] = lq.F

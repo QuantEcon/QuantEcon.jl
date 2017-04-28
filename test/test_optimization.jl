@@ -8,8 +8,8 @@
 
 	@testset "Golden Method, 1D" begin
         xstar, fstar = golden_method(f, a, b, maxit=10_000)
-        @test maxabs(0.5 - xstar) <= 1e-6
-    	@test maxabs(0.25 - fstar) <= 1e-6
+        @test maximum(abs, 0.5 - xstar) <= 1e-6
+    	@test maximum(abs, 0.25 - fstar) <= 1e-6
     end
 
 	# test multiD method
@@ -20,8 +20,8 @@
 
 	@testset "Golden Method, multiD" begin
         xstar, fstar = golden_method(g, a, b, maxit=10_000)
-        @test maxabs([0.5, 0.0] - xstar) <= 1e-6
-        @test maxabs([0.25, 0.0] - fstar) <= 1e-6
+        @test maximum(abs, [0.5, 0.0] - xstar) <= 1e-6
+        @test maximum(abs, [0.25, 0.0] - fstar) <= 1e-6
     end
 
 end

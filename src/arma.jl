@@ -119,7 +119,7 @@ function spectral_density(arma::ARMA; res=1200, two_pi::Bool=true)
     w = linspace(0, wmax, res)
     tf = TFFilter(reverse(arma.ma_poly), reverse(arma.ar_poly))
     h = freqz(tf, w)
-    spect = arma.sigma^2 * abs(h).^2
+    spect = arma.sigma.^2 .* abs.(h).^2
     return w, spect
 end
 
@@ -166,7 +166,7 @@ function impulse_response(arma::ARMA; impulse_length=30)
     # == Pad theta with zeros at the end == #
     theta = [arma.theta; zeros(impulse_length - arma.q)]
     psi_zero = 1.0
-    psi = Array(Float64, impulse_length)
+    psi = Array{Float64}(impulse_length)
     for j = 1:impulse_length
         psi[j] = theta[j]
         for i = 1:min(j, arma.p)
@@ -197,7 +197,7 @@ function simulation(arma::ARMA; ts_length=90, impulse_length=30)
     T = ts_length
     psi = impulse_response(arma, impulse_length=impulse_length)
     epsilon = arma.sigma * randn(T + J)
-    X = Array(Float64, T)
+    X = Array{Float64}(T)
     for t=1:T
         X[t] = dot(epsilon[t:J+t-1], psi)
     end

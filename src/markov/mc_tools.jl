@@ -13,7 +13,7 @@ http://quant-econ.net/jl/finite_markov.html
 import LightGraphs: DiGraph, period, attracting_components,
                     strongly_connected_components, is_strongly_connected
 
-@inline check_stochastic_matrix(P) = maxabs(sum(P, 2) - 1) < 1e-15 ? true : false
+@inline check_stochastic_matrix(P) = maximum(abs, sum(P, 2) - 1) < 1e-15 ? true : false
 
 """
 Finite-state discrete-time Markov chain.
@@ -33,7 +33,7 @@ type MarkovChain{T, TM<:AbstractMatrix, TV<:AbstractVector}
     p::TM # valid stochastic matrix
     state_values::TV
 
-    function MarkovChain(p::AbstractMatrix, state_values)
+    function (::Type{MarkovChain{T,TM,TV}}){T,TM,TV}(p::AbstractMatrix, state_values)
         n, m = size(p)
 
         eltype(p) != T &&
@@ -51,7 +51,7 @@ type MarkovChain{T, TM<:AbstractMatrix, TV<:AbstractVector}
         length(state_values) != n &&
             throw(DimensionMismatch("state_values should have $n elements"))
 
-        return new(p, state_values)
+        return new{T,TM,TV}(p, state_values)
     end
 end
 
@@ -240,7 +240,7 @@ for (S, ex_T, ex_gth) in ((Real, :(T), :(gth_solve!)),
         n = n_states(mc)
         rec_classes = recurrent_classes(mc)
         T1 = $ex_T
-        stationary_dists = Array(Vector{T1}, length(rec_classes))
+        stationary_dists = Array{Vector{T1}}(length(rec_classes))
 
         for (i, rec_class) in enumerate(rec_classes)
             dist = zeros(T1, n)
@@ -361,7 +361,7 @@ ts_length
 """
 function simulate(mc::MarkovChain, ts_length::Int;
                   init::Int=rand(1:n_states(mc)))
-    X = Array(eltype(mc), ts_length)
+    X = Array{eltype(mc)}(ts_length)
     simulate!(X, mc; init=init)
 end
 
@@ -416,7 +416,7 @@ ts_length
 """
 function simulate_indices(mc::MarkovChain, ts_length::Int;
                           init::Int=rand(1:n_states(mc)))
-    X = Array(Int, ts_length)
+    X = Array{Int}(ts_length)
     simulate_indices!(X, mc; init=init)
 end
 

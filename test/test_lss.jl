@@ -57,6 +57,16 @@
             @test getfield(ss, nm) == getfield(other_ss, nm)
         end
     end
+    
+    @testset "test moment iterator" begin
+        m = QuantEcon.LSSMoments(ss)
+
+        # never done
+        @test !done(m, 1)
+
+        # start should give us mu_0, Sigma_0
+        @test start(m) == (ss.mu_0, ss.Sigma_0)
+    end
 
     @testset "test positive semi-dfinite covariance" begin
 

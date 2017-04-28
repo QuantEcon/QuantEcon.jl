@@ -215,7 +215,7 @@ function random_probvec(k::Integer, m::Integer)
     k == 1 && return ones((k, m))
 
     # if k >= 2
-    x = Array(Float64, (k, m))
+    x = Array{Float64}((k, m))
 
     r = rand(k-1, m)
     x[1:end-1, :] = sort(r, 1)

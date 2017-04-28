@@ -60,7 +60,7 @@ function qnwlege(n::Int, a::Real, b::Real)
     weights = copy(nodes)
     i = 1:m
 
-    z = cos(pi * (i - 0.25) ./ (n + 0.5))
+    z = cos.(pi * (i - 0.25) ./ (n + 0.5))
 
     # allocate memory for loop arrays
     p3 = similar(z)
@@ -80,7 +80,7 @@ function qnwlege(n::Int, a::Real, b::Real)
         z1 = z
         z = z1 - p1./pp
 
-        err = Base.maxabs(z - z1)
+        err = Base.maximum(abs, z - z1)
         if err < 1e-14
             break
         end
@@ -116,8 +116,8 @@ $(qnw_func_notes)
 $(qnw_refs)
 """
 function qnwcheb(n::Int, a::Real, b::Real)
-    nodes = (b+a)/2 - (b-a)/2 .* cos(pi/n .* (0.5:(n-0.5)))
-    weights = ((b-a)/n) .* (cos(pi/n .* ((1:n)-0.5)*(2:2:n-1)') *
+    nodes = (b+a)/2 - (b-a)/2 .* cos.(pi/n .* (0.5:(n-0.5)))
+    weights = ((b-a)/n) .* (cos.(pi/n .* ((1:n)-0.5)*(2:2:n-1)') *
                             (-2.0 ./ ((1:2:n-2).*(3:2:n))) + 1)
     return nodes, weights
 end
@@ -521,8 +521,8 @@ for f in [:qnwlege, :qnwcheb, :qnwsimp, :qnwtrap, :qnwbeta, :qnwgamma]
                 push!(weights, _1d[2])
             end
             weights = ckron(weights[end:-1:1]...)
-            nodes = gridmake(nodes...)
-            return nodes, weights
+            nodes_out = gridmake(nodes...)::Matrix{Float64}
+            return nodes_out, weights
         end
     end  # @eval
 end
@@ -535,19 +535,20 @@ function qnwnorm(n::Vector{Int}, mu::Vector, sig2::Matrix=eye(length(n)))
         error("n and mu must have same number of elements")
     end
 
-    _nodes = Array(Vector{Float64}, n_n)
-    _weights = Array(Vector{Float64}, n_n)
+    _nodes = Array{Vector{Float64}}(n_n)
+    _weights = Array{Vector{Float64}}(n_n)
 
     for i in 1:n_n
         _nodes[i], _weights[i] = qnwnorm(n[i])
     end
 
     weights = ckron(_weights[end:-1:1]...)
-    nodes = gridmake(_nodes...)
+    nodes = gridmake(_nodes...)::Matrix{Float64}
 
     new_sig2 = chol(sig2)
 
-    nodes = nodes * new_sig2 .+ mu'
+    A_mul_B!(nodes, nodes, new_sig2)
+    broadcast!(+, nodes, nodes, mu')
 
     return nodes, weights
 end
@@ -632,12 +633,12 @@ $(qnw_refs)
 """
 function qnwlogn(n, mu, sig2)
     nodes, weights = qnwnorm(n, mu, sig2)
-    return exp(nodes), weights
+    return exp.(nodes), weights
 end
 
 
 ## qnwequi
-const equidist_pp = sqrt(primes(7920))  # good for d <= 1000
+const equidist_pp = sqrt.(primes(7920))  # good for d <= 1000
 
 
 """
