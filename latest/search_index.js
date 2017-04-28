@@ -49,6 +49,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api/QuantEcon.html#Index-1",
+    "page": "QuantEcon",
+    "title": "Index",
+    "category": "section",
+    "text": "Pages = [\"QuantEcon.md\"]"
+},
+
+{
     "location": "api/QuantEcon.html#QuantEcon.ARMA",
     "page": "QuantEcon",
     "title": "QuantEcon.ARMA",
@@ -109,7 +117,7 @@ var documenterSearchIndex = {"docs": [
     "page": "QuantEcon",
     "title": "QuantEcon.LQ",
     "category": "Type",
-    "text": "Linear quadratic optimal control of either infinite or finite horizon\n\nThe infinite horizon problem can be written\n\nmin E sum_{t=0}^{infty} beta^t r(x_t, u_t)\n\nwith\n\nr(x_t, u_t) := x_t' R x_t + u_t' Q u_t + 2 u_t' N x_t\n\nThe finite horizon form is\n\nmin E sum_{t=0}^{T-1} beta^t r(x_t, u_t) + beta^T x_T' R_f x_T\n\nBoth are minimized subject to the law of motion\n\nx_{t+1} = A x_t + B u_t + C w_{t+1}\n\nHere x is n x 1, u is k x 1, w is j x 1 and the matrices are conformable for these dimensions.  The sequence {w_t} is assumed to be white noise, with zero mean and E w_t w_t' = I, the j x j identity.\n\nFor this model, the time t value (i.e., cost-to-go) function V_t takes the form\n\nx' P_T x + d_T\n\nand the optimal policy is of the form u_T = -F_T x_T.  In the infinite horizon case, V, P, d and F are all stationary.\n\nFields\n\nQ::ScalarOrArray : k x k payoff coefficient for control variable u. Must be\n\nsymmetric and nonnegative definite\n\nR::ScalarOrArray : n x n payoff coefficient matrix for state variable x.\n\nMust be symmetric and nonnegative definite\n\nA::ScalarOrArray : n x n coefficient on state in state transition\nB::ScalarOrArray : n x k coefficient on control in state transition\nC::ScalarOrArray : n x j coefficient on random shock in state transition\nN::ScalarOrArray : k x n cross product in payoff equation\nbet::Real : Discount factor in [0, 1]\ncapT::Union{Int, Void} : Terminal period in finite horizon problem\nrf::ScalarOrArray : n x n terminal payoff in finite horizon problem. Must be\n\nsymmetric and nonnegative definite\n\nP::ScalarOrArray : n x n matrix in value function representation\n\nV(x) = x'Px + d\n\nd::Real : Constant in value function representation\nF::ScalarOrArray : Policy rule that specifies optimal control in each period\n\n\n\n"
+    "text": "Main constructor for LQ type\n\nSpecifies default argumets for all fields not part of the payoff function or transition equation.\n\nArguments\n\nQ::ScalarOrArray : k x k payoff coefficient for control variable u. Must be\n\nsymmetric and nonnegative definite\n\nR::ScalarOrArray : n x n payoff coefficient matrix for state variable x.\n\nMust be symmetric and nonnegative definite\n\nA::ScalarOrArray : n x n coefficient on state in state transition\nB::ScalarOrArray : n x k coefficient on control in state transition\n;C::ScalarOrArray{zeros(size(R}(1))) : n x j coefficient on random shock in\n\nstate transition\n\n;N::ScalarOrArray{zeros(size(B,1)}(size(A, 2))) : k x n cross product in\n\npayoff equation\n\n;bet::Real(1.0) : Discount factor in [0, 1]\ncapT::Union{Int, Void}(Void) : Terminal period in finite horizon\n\nproblem\n\nrf::ScalarOrArray{fill(NaN}(size(R)...)) : n x n terminal payoff in finite\n\nhorizon problem. Must be symmetric and nonnegative definite.\n\n\n\n"
 },
 
 {
@@ -117,7 +125,7 @@ var documenterSearchIndex = {"docs": [
     "page": "QuantEcon",
     "title": "QuantEcon.LQ",
     "category": "Type",
-    "text": "Main constructor for LQ type\n\nSpecifies default argumets for all fields not part of the payoff function or transition equation.\n\nArguments\n\nQ::ScalarOrArray : k x k payoff coefficient for control variable u. Must be\n\nsymmetric and nonnegative definite\n\nR::ScalarOrArray : n x n payoff coefficient matrix for state variable x.\n\nMust be symmetric and nonnegative definite\n\nA::ScalarOrArray : n x n coefficient on state in state transition\nB::ScalarOrArray : n x k coefficient on control in state transition\n;C::ScalarOrArray(zeros(size(R, 1))) : n x j coefficient on random shock in\n\nstate transition\n\n;N::ScalarOrArray(zeros(size(B,1), size(A, 2))) : k x n cross product in\n\npayoff equation\n\n;bet::Real(1.0) : Discount factor in [0, 1]\ncapT::Union{Int, Void}(Void) : Terminal period in finite horizon\n\nproblem\n\nrf::ScalarOrArray(fill(NaN, size(R)...)) : n x n terminal payoff in finite\n\nhorizon problem. Must be symmetric and nonnegative definite.\n\n\n\n"
+    "text": "Linear quadratic optimal control of either infinite or finite horizon\n\nThe infinite horizon problem can be written\n\nmin E sum_{t=0}^{infty} beta^t r(x_t, u_t)\n\nwith\n\nr(x_t, u_t) := x_t' R x_t + u_t' Q u_t + 2 u_t' N x_t\n\nThe finite horizon form is\n\nmin E sum_{t=0}^{T-1} beta^t r(x_t, u_t) + beta^T x_T' R_f x_T\n\nBoth are minimized subject to the law of motion\n\nx_{t+1} = A x_t + B u_t + C w_{t+1}\n\nHere x is n x 1, u is k x 1, w is j x 1 and the matrices are conformable for these dimensions.  The sequence {w_t} is assumed to be white noise, with zero mean and E w_t w_t' = I, the j x j identity.\n\nFor this model, the time t value (i.e., cost-to-go) function V_t takes the form\n\nx' P_T x + d_T\n\nand the optimal policy is of the form u_T = -F_T x_T.  In the infinite horizon case, V, P, d and F are all stationary.\n\nFields\n\nQ::ScalarOrArray : k x k payoff coefficient for control variable u. Must be\n\nsymmetric and nonnegative definite\n\nR::ScalarOrArray : n x n payoff coefficient matrix for state variable x.\n\nMust be symmetric and nonnegative definite\n\nA::ScalarOrArray : n x n coefficient on state in state transition\nB::ScalarOrArray : n x k coefficient on control in state transition\nC::ScalarOrArray : n x j coefficient on random shock in state transition\nN::ScalarOrArray : k x n cross product in payoff equation\nbet::Real : Discount factor in [0, 1]\ncapT::Union{Int, Void} : Terminal period in finite horizon problem\nrf::ScalarOrArray : n x n terminal payoff in finite horizon problem. Must be\n\nsymmetric and nonnegative definite\n\nP::ScalarOrArray : n x n matrix in value function representation\n\nV(x) = x'Px + d\n\nd::Real : Constant in value function representation\nF::ScalarOrArray : Policy rule that specifies optimal control in each period\n\n\n\n"
 },
 
 {
@@ -401,14 +409,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.ecdf",
-    "page": "QuantEcon",
-    "title": "QuantEcon.ecdf",
-    "category": "Function",
-    "text": "Evaluate the empirical cdf at one or more points\n\nArguments\n\ne::ECDF: The ECDF instance\nx::Union{Real, Array}: The point(s) at which to evaluate the ECDF\n\n\n\n"
-},
-
-{
     "location": "api/QuantEcon.html#QuantEcon.evaluate_F-Tuple{QuantEcon.RBLQ,Array{T,2}}",
     "page": "QuantEcon",
     "title": "QuantEcon.evaluate_F",
@@ -453,11 +453,11 @@ var documenterSearchIndex = {"docs": [
     "page": "QuantEcon",
     "title": "QuantEcon.gridmake",
     "category": "Function",
-    "text": "gridmake(arrays::AbstractVector...)\n\nExpand one or more vectors into a matrix where rows span the cartesian product of combinations of the input vectors. Each input array will correspond to one column of the output matrix. The first array varies the fastest (see example)\n\nExample\n\njulia> x = [1, 2, 3]; y = [10, 20]; z = [100, 200];\n\njulia> gridmake(x, y, z)\n12x3 Array{Int64,2}:\n 1  10  100\n 2  10  100\n 3  10  100\n 1  20  100\n 2  20  100\n 3  20  100\n 1  10  200\n 2  10  200\n 3  10  200\n 1  20  200\n 2  20  200\n 3  20  200\n\n\n\n"
+    "text": "gridmake(arrays::Union{AbstractVector,AbstractMatrix}...)\n\nExpand one or more vectors (or matrices) into a matrix where rows span the cartesian product of combinations of the input arrays. Each column of the input arrays will correspond to one column of the output matrix. The first array varies the fastest (see example)\n\nExample\n\njulia> x = [1, 2, 3]; y = [10, 20]; z = [100, 200];\n\njulia> gridmake(x, y, z)\n12x3 Array{Int64,2}:\n 1  10  100\n 2  10  100\n 3  10  100\n 1  20  100\n 2  20  100\n 3  20  100\n 1  10  200\n 2  10  200\n 3  10  200\n 1  20  200\n 2  20  200\n 3  20  200\n\n\n\n"
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.gridmake!-Tuple{Any,Vararg{AbstractArray{T,1},N}}",
+    "location": "api/QuantEcon.html#QuantEcon.gridmake!-Tuple{Any,Vararg{Union{AbstractArray{T,1},AbstractArray{T,2}},N}}",
     "page": "QuantEcon",
     "title": "QuantEcon.gridmake!",
     "category": "Method",
@@ -525,7 +525,7 @@ var documenterSearchIndex = {"docs": [
     "page": "QuantEcon",
     "title": "QuantEcon.moment_sequence",
     "category": "Method",
-    "text": "Create a generator to calculate the population mean and variance-convariance matrix for both x_t and y_t, starting at the initial condition (self.mu_0, self.Sigma_0).  Each iteration produces a 4-tuple of items (mu_x, mu_y, Sigma_x, Sigma_y) for the next period.\n\nArguments\n\nlss::LSS An instance of the Gaussian linear state space model\n\n\n\n"
+    "text": "Create an iterator to calculate the population mean and variance-convariance matrix for both x_t and y_t, starting at the initial condition (self.mu_0, self.Sigma_0).  Each iteration produces a 4-tuple of items (mu_x, mu_y, Sigma_x, Sigma_y) for the next period.\n\nArguments\n\nlss::LSS An instance of the Gaussian linear state space model\n\n\n\n"
 },
 
 {
@@ -889,6 +889,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api/QuantEcon.html#Base.e-Tuple{Real}",
+    "page": "QuantEcon",
+    "title": "Base.e",
+    "category": "Method",
+    "text": "Evaluate the empirical cdf at one or more points\n\nArguments\n\nx::Union{Real, Array}: The point(s) at which to evaluate the ECDF\n\n\n\n"
+},
+
+{
     "location": "api/QuantEcon.html#QuantEcon.DPSolveResult",
     "page": "QuantEcon",
     "title": "QuantEcon.DPSolveResult",
@@ -1078,14 +1086,6 @@ var documenterSearchIndex = {"docs": [
     "title": "Internal",
     "category": "section",
     "text": "Modules = [QuantEcon]\nPublic = false"
-},
-
-{
-    "location": "api/QuantEcon.html#Index-1",
-    "page": "QuantEcon",
-    "title": "Index",
-    "category": "section",
-    "text": "Pages = [\"QuantEcon.md\"]"
 },
 
 {
