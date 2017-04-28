@@ -42,12 +42,8 @@ function MVNSampler{TM<:Real,TS<:Real}(mu::Vector{TM}, Sigma::Matrix{TS})
     tril!(view(A, :, 1:r))
     A[:, r+1:end] = 0
     Q = A[p,p]
-    for j in 1:n
-        for i in 1:n
-            isapprox(Q*Q', Sigma; rtol=RTOL2, atol=ATOL2) ||
-                throw(ArgumentError(non_PSD_msg))
-        end
-    end
+    isapprox(Q*Q', Sigma; rtol=RTOL2, atol=ATOL2) ||
+        throw(ArgumentError(non_PSD_msg))
 
     return MVNSampler(mu, Sigma, Q)
 end
