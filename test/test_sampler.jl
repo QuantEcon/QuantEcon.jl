@@ -47,4 +47,14 @@
             @test typeof(MVNSampler(mu,Sigma)) <: MVNSampler
         end
     end
+
+    @testset "test covariance matrices of Int and Rational" begin
+        n = 2
+        mu = zeros(2)
+        for T in [Int, Rational{Int}]
+            Sigma = eye(T, n)
+            @test typeof(MVNSampler(mu, Sigma)) <: MVNSampler
+        end
+    end
+
 end  # @testset
