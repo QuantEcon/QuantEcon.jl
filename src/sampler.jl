@@ -22,8 +22,8 @@ function MVNSampler{TM<:Real,TS<:Real}(mu::Vector{TM}, Sigma::Matrix{TS})
 
     issymmetric(Sigma) || throw(ArgumentError("Sigma must be symmetric"))
 
-    A = copy(Sigma)
-    C = cholfact!(Symmetric(A, :L), Val{true})
+    C = cholfact(Symmetric(Sigma, :L), Val{true})
+    A = C.factors
     r = C.rank
     p = invperm(C.piv)
 
