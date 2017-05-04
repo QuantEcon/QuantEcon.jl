@@ -19,7 +19,7 @@ Tauchen's (1996) method for approximating AR(1) process with finite markov chain
 
 The process follows
 
-    y_t = μ + ρ y_{t-1} + ε_t,
+    y_t = (1-ρ)μ + ρ y_{t-1} + ε_t,
 
 where ε_t ~ N (0, σ^2)
 
@@ -73,7 +73,7 @@ function tauchen(N::Integer, ρ::Real, σ::Real, μ::Real=0.0, n_std::Integer=3)
     #       the cdf with a function that allows the distribution of input
     #       arguments to be [μ/(1 - ρ), 1] instead of [0, 1]
 
-    yy = y .+ μ / (1 - ρ) # center process around its mean (wbar / (1 - rho)) in new variable
+    yy = y .+ μ  # center process around its mean
 
     # renormalize. In some test cases the rows sum to something that is 2e-15
     # away from 1.0, which caused problems in the MarkovChain constructor
@@ -88,7 +88,7 @@ Rouwenhorst's method to approximate AR(1) processes.
 
 The process follows
 
-    y_t = μ + ρ y_{t-1} + ε_t,
+    y_t = (1-ρ)μ + ρ y_{t-1} + ε_t,
 
 where ε_t ~ N (0, σ^2)
 
@@ -109,7 +109,7 @@ function rouwenhorst(N::Integer, ρ::Real, σ::Real, μ::Real=0.0)
     p  = (1+ρ)/2
     Θ = [p 1-p; 1-p p]
     ψ = sqrt(N-1) * σ_y
-    m = μ / (1 - ρ)
+    m = μ
 
     state_values, p = _rouwenhorst(p, p, m, ψ, N)
     MarkovChain(p, state_values)
@@ -130,3 +130,4 @@ function _rouwenhorst(p::Real, q::Real, m::Real, Δ::Real, n::Integer)
         return linspace(m-Δ, m+Δ, n), θN
     end
 end
+
