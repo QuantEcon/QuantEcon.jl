@@ -114,7 +114,6 @@ _out_eltype{TV,TB}(li::LinInterp{TV,TB}) = promote_type(eltype(TV), eltype(TB))
         end
 
         if ix == li._n + 1
-            println("here!!")
             for col in cols
                 out[col] = li.vals[end, col]
             end

@@ -37,7 +37,15 @@
     for x in linspace(-3, 3, 300)
         @test abs(li(x) - exp(x)) < 1e-2
         @test all(abs.(li_mat(x) .- [exp(x), sin(x)]) .< 1e-2)
+        @test li(x) ≈ li_mat(x, 1)
     end
+
+    # test errors for col spec for li_mat being wrong
+    @test_throws BoundsError li_mat(0.5, 0)
+    @test_throws BoundsError li_mat(0.5, 3)
+    @test_throws BoundsError li_mat(0.5, [0, 1])
+    @test_throws BoundsError li_mat(0.5, [2, 3])
+
 
     # non-uniform
     breaks = cumsum(0.1 .* rand(20))
@@ -55,6 +63,7 @@
     for x in linspace(extrema(breaks)..., 30)
         @test abs(li(x) - 0.1*sin(x)) < 1e-2
         @test all(abs.(li_mat(x) - [0.1*sin(x), 0.1*sin(x)+1]) .< 1e-2)
+
     end
 
     # un-sorted works for `interp` function, but not `LinInterp`
