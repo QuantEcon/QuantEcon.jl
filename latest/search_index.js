@@ -589,7 +589,7 @@ var documenterSearchIndex = {"docs": [
     "page": "QuantEcon",
     "title": "QuantEcon.qnwgamma",
     "category": "Function",
-    "text": "Computes nodes and weights for beta distribution\n\nArguments\n\nn::Union{Int, Vector{Int}} : Number of desired nodes along each dimension\na::Union{Real, Vector{Real}} : First parameter of the gamma distribution,\n\nalong each dimension\n\nb::Union{Real, Vector{Real}} : Second parameter of the gamma distribution,\n\nalong each dimension\n\nReturns\n\nnodes::Array{Float64} : An array of quadrature nodes\nweights::Array{Float64} : An array of corresponding quadrature weights\n\nNotes\n\nIf any of the parameters to this function are scalars while others are Vectors of length n, the the scalar parameter is repeated n times.\n\nReferences\n\nMiranda, Mario J, and Paul L Fackler. Applied Computational Economics and Finance, MIT Press, 2002.\n\n\n\n"
+    "text": "Computes nodes and weights for beta distribution\n\nArguments\n\nn::Union{Int, Vector{Int}} : Number of desired nodes along each dimension\na::Union{Real, Vector{Real}} : Shape parameter of the gamma distribution,\n\nalong each dimension. Must be positive. Default is 1\n\nb::Union{Real, Vector{Real}} : Scale parameter of the gamma distribution,\n\nalong each dimension. Must be positive. Default is 1\n\nReturns\n\nnodes::Array{Float64} : An array of quadrature nodes\nweights::Array{Float64} : An array of corresponding quadrature weights\n\nNotes\n\nIf any of the parameters to this function are scalars while others are Vectors of length n, the the scalar parameter is repeated n times.\n\nReferences\n\nMiranda, Mario J, and Paul L Fackler. Applied Computational Economics and Finance, MIT Press, 2002.\n\n\n\n"
 },
 
 {

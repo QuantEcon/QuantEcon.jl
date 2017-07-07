@@ -7,17 +7,16 @@
 
 requirejs.config({
     paths: {
-        'jquery': 'https://code.jquery.com/jquery-3.1.0.js?',
+        'jquery': 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min',
         'jqueryui': 'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min',
-        'mathjax': 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML',
-        'highlight': 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.5.0/highlight.min',
-        'highlight-julia': 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.5.0/languages/julia.min',
+        'headroom': 'https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.3/headroom.min',
+        'mathjax': 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML',
+        'highlight': 'highlightjs/highlight',
     },
     shim: {
         'mathjax' : {
             exports: "MathJax"
-        },
-        'highlight-julia': ['highlight']
+        }
     }
 });
 
@@ -50,7 +49,7 @@ require(['mathjax'], function(MathJax) {
     });
 })
 
-require(['jquery', 'highlight', 'highlight-julia'], function($, hljs) {
+require(['jquery', 'highlight'], function($, hljs) {
     $(document).ready(function() {
         hljs.initHighlighting();
     })
@@ -93,4 +92,34 @@ require(['jquery'], function($) {
         }
     })
 
+})
+
+// mobile
+require(['jquery', 'headroom'], function($, Headroom) {
+    $(document).ready(function() {
+        var navtoc = $("nav.toc");
+        $("nav.toc li.current a.toctext").click(function() {
+            navtoc.toggleClass('show');
+        });
+        $("article > header div#topbar a.fa-bars").click(function(ev) {
+            ev.preventDefault();
+            navtoc.toggleClass('show');
+            if (navtoc.hasClass('show')) {
+                var title = $("article > header div#topbar span").text();
+                $("nav.toc ul li a:contains('" + title + "')").focus();
+            }
+        });
+        $("article#docs").bind('click', function(ev) {
+            if ($(ev.target).is('div#topbar a.fa-bars')) {
+                return;
+            }
+            if (navtoc.hasClass('show')) {
+                navtoc.removeClass('show');
+            }
+        });
+        if ($("article > header div#topbar").css('display') == 'block') {
+            var headroom = new Headroom(document.querySelector("article > header div#topbar"), {"tolerance": {"up": 10, "down": 10}});
+            headroom.init();
+        }
+    })
 })
