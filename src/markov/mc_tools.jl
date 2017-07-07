@@ -13,7 +13,7 @@ http://quant-econ.net/jl/finite_markov.html
 import LightGraphs: DiGraph, period, attracting_components,
                     strongly_connected_components, is_strongly_connected
 
-@inline check_stochastic_matrix(P) = maximum(abs, sum(P, 2) - 1) < 1e-15 ? true : false
+@inline check_stochastic_matrix(P) = maximum(abs, sum(P, 2) - 1) < 5e-15 ? true : false
 
 """
 Finite-state discrete-time Markov chain.
