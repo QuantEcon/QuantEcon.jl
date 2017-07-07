@@ -76,11 +76,13 @@ function qnwlege(n::Int, a::Real, b::Real)
             p1 = ((2*j-1)*z.*p2-(j-1)*p3)./j
         end
 
+        # p1 is now a vector of Legendre polynomials of degree 1..n
+        # pp will be the deriative of each p1 at the nth zero of each
         pp = n*(z.*p1-p2)./(z.*z-1)
         z1 = z
-        z = z1 - p1./pp
+        z = z1 - p1./pp  # newton's method
 
-        err = Base.maximum(abs, z - z1)
+        err = maximum(abs, z - z1)
         if err < 1e-14
             break
         end
@@ -190,9 +192,11 @@ function qnwnorm(n::Int)
                 p1 = z .* sqrt(2/j) .*p2 - sqrt((j-1)/j).*p3
             end
 
+            # p1 now contains degree n Hermite polynomial
+            # pp is derivative of p1 at the n'th zero of p1
             pp = sqrt(2n).*p2
             z1 = z
-            z = z1 - p1./pp
+            z = z1 - p1./pp  # newton step
 
             if abs(z - z1) < 1e-14
                 break
@@ -346,17 +350,18 @@ function qnwbeta(n::Int, a::Real, b::Real)
         temp = 0.0
         pp, p2 = 0.0, 0.0
         for its = 1:maxit
+            # recurrance relation for Jacboi polynomials
             temp = 2 + ab
             p1 = (a - b + temp * z) / 2
             p2 = 1
             for j=2:n
-              p3 = p2
-              p2 = p1
-              temp = 2 * j + ab
-              aa = 2 * j * (j + ab) * (temp - 2)
-              bb = (temp - 1) * (a * a - b * b + temp * (temp - 2) * z)
-              c = 2 * (j - 1 + a) * (j - 1 + b) * temp
-              p1 = (bb * p2 - c * p3) / aa
+                p3 = p2
+                p2 = p1
+                temp = 2 * j + ab
+                aa = 2 * j * (j + ab) * (temp - 2)
+                bb = (temp - 1) * (a * a - b * b + temp * (temp - 2) * z)
+                c = 2 * (j - 1 + a) * (j - 1 + b) * temp
+                p1 = (bb * p2 - c * p3) / aa
             end
             pp = (n * (a - b - temp * z) * p1 +
                   2 * (n + a) * (n + b) * p2) / (temp * (1 - z * z))
@@ -391,10 +396,10 @@ Computes nodes and weights for beta distribution
 ##### Arguments
 
 - `n::Union{Int, Vector{Int}}` : Number of desired nodes along each dimension
-- `a::Union{Real, Vector{Real}}` : First parameter of the gamma distribution,
-along each dimension
-- `b::Union{Real, Vector{Real}}` : Second parameter of the gamma distribution,
-along each dimension
+- `a::Union{Real, Vector{Real}}` : Shape parameter of the gamma distribution,
+along each dimension. Must be positive. Default is 1
+- `b::Union{Real, Vector{Real}}` : Scale parameter of the gamma distribution,
+along each dimension. Must be positive. Default is 1
 
 $(qnw_returns)
 
@@ -433,6 +438,7 @@ function qnwgamma(n::Int, a::Real=1.0, b::Real=1.0)
             p1 = 1.0
             p2 = 0.0
             for j=1:n
+                # Recurrance relation for Laguerre polynomials
                 p3 = p2
                 p2 = p1
                 p1 = ((2j - 1 + a - z) * p2 - (j - 1 + a) * p3) ./ j
