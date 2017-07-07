@@ -18,7 +18,7 @@ Notes
     c. Modified Policy Iteration
    For:
     a. Dense Matrices
-    b. State-Action Pair Formulation
+    b. State-Action Pair Formulaion
 
 =#
 
