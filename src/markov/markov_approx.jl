@@ -164,7 +164,7 @@ function estimate_MC_discrete{T}(X::Vector{T})
     state_i = findfirst(states, X[1])
     for t in 1:capT-1
         # Find next period's state
-        state_j = findfirst(states, X[t+1])
+        state_j = searchsortedfirst(states, X[t+1])
         cm[state_i, state_j] += 1.0
 
         # Tomorrow's state is j
