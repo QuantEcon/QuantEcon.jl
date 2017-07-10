@@ -130,3 +130,50 @@ function _rouwenhorst(p::Real, q::Real, m::Real, Δ::Real, n::Integer)
         return linspace(m-Δ, m+Δ, n), θN
     end
 end
+
+
+"""
+Accepts the simulation of a discrete state Markov chain and estimates
+the transition probabilities via maximum likelihood.
+
+Note: Only states that are observed in the history will be included
+in the estimation.
+
+##### Arguments
+
+- `X::Vector{T}` : Simulated history of Markov states
+
+##### Returns
+
+- `mc::MarkovChain{T}` : A Markov chain holding the state values and
+transition matrix
+
+"""
+function estimate_MC_discrete{T}(X::Vector{T})
+    # Get length of simulation
+    capT = length(X)
+
+    # Find all unique observations and sort them.
+    states = sort!(unique(X))
+    nstates = length(states)
+
+    # Counter matrix
+    cm = zeros(nstates, nstates)
+
+    # Compute conditional probabilities for each state
+    state_i = findfirst(states, X[1])
+    for t in 1:capT-1
+        # Find next period's state
+        state_j = findfirst(states, X[t+1])
+        cm[state_i, state_j] += 1.0
+
+        # Tomorrow's state is j
+        state_i = state_j
+    end
+
+    # Compute probabilities using counted elements
+    P = cm ./ sum(cm, 2)
+
+    return MarkovChain(P, states)
+end
+

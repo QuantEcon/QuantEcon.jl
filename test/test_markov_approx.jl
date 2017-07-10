@@ -16,4 +16,16 @@
             @test isapprox(sum(mc.state_values), 0.0; rough_kwargs...)
         end
     end
+
+
+    # Test discrete estimation
+    P = [0.5 0.25 0.25
+         0.25 0.5 0.25
+         0.25 0.25 0.5]
+    mc = MarkovChain(P, [0.0, 0.5, 1.0])
+    X = simulate(mc, 100_000)
+    mc2 = estimate_MC_discrete(X)
+    @test isapprox(mc.state_values, mc2.state_values, atol=1e-10)
+    @test isapprox(mc.p, mc2.p, atol=1e-2)
+
 end  # @testset
