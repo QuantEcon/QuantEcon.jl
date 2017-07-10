@@ -132,6 +132,10 @@ function _rouwenhorst(p::Real, q::Real, m::Real, Δ::Real, n::Integer)
 end
 
 
+# These are to help me order types other than vectors
+@inline _emcd_lt{T}(a::T, b::T) = isless(a, b)
+@inline _emcd_lt{T}(a::Vector{T}, b::Vector{T}) = Base.lt(Base.Order.Lexicographic, a, b)
+
 """
 Accepts the simulation of a discrete state Markov chain and estimates
 the transition probabilities
@@ -175,7 +179,7 @@ function estimate_MC_discrete{T}(X::Vector{T})
     capT = length(X)
 
     # Find all unique observations and sort them.
-    states = sort!(unique(X))
+    states = sort!(unique(X); lt=_emcd_lt)
     nstates = length(states)
 
     # Counter matrix
@@ -185,7 +189,7 @@ function estimate_MC_discrete{T}(X::Vector{T})
     state_i = findfirst(states, X[1])
     for t in 1:capT-1
         # Find next period's state
-        state_j = searchsortedfirst(states, X[t+1])
+        state_j = searchsortedfirst(states, X[t+1]; lt=_emcd_lt)
         cm[state_i, state_j] += 1.0
 
         # Tomorrow's state is j
