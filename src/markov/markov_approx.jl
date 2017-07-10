@@ -155,6 +155,11 @@ Note: Because of the estimation procedure used, only states that are observed
 in the history appear in the estimated Markov chain... It can't divine whether
 there are unobserved states in the original Markov chain.
 
+For more info, refer to:
+
+- http://www.stat.cmu.edu/~cshalizi/462/lectures/06/markov-mle.pdf
+- https://stats.stackexchange.com/questions/47685/calculating-log-likelihood-for-given-mle-markov-chains
+
 ##### Arguments
 
 - `X::Vector{T}` : Simulated history of Markov states
