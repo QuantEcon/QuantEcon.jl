@@ -18,11 +18,22 @@
     end
 
 
+    #
     # Test discrete estimation
+    #
     P = [0.5 0.25 0.25
          0.25 0.5 0.25
          0.25 0.25 0.5]
+
+    # Test with numerical inputs
     mc = MarkovChain(P, [0.0, 0.5, 1.0])
+    X = simulate(mc, 100_000)
+    mc2 = estimate_MC_discrete(X)
+    @test isapprox(mc.state_values, mc2.state_values, atol=1e-10)
+    @test isapprox(mc.p, mc2.p, atol=1e-2)
+
+    # Test with other inputs
+    mc = MarkovChain(P, ["a", "b", "c"])
     X = simulate(mc, 100_000)
     mc2 = estimate_MC_discrete(X)
     @test isapprox(mc.state_values, mc2.state_values, atol=1e-10)
