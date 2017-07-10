@@ -134,10 +134,26 @@ end
 
 """
 Accepts the simulation of a discrete state Markov chain and estimates
-the transition probabilities via maximum likelihood.
+the transition probabilities
 
-Note: Only states that are observed in the history will be included
-in the estimation.
+Let S = {s₁, s₂, ..., sₙ} with s₁ < s₂ < ... < sₙ be the discrete
+states of a Markov chain. Furthermore, let P be the corresponding
+stochastic transition matrix.
+
+Given a history of observations, {X} where xₜ ∈ S ∀ t, we would like
+to estimate the transition probabilities in P, pᵢⱼ. For xₜ=sᵢ and xₜ₋₁=sⱼ,
+let P(xₜ | xₜ₋₁) be the pᵢⱼ element of the stochastic matrix. The likelihood
+function is then given by
+
+    L({X}ₜ; P) = P(x_1) ∏_{t=2}^{T} P(xₜ | xₜ₋₁)
+
+The maximum likelihood estimate is then just given by the number of times
+a transition from sᵢ to sⱼ is observed divided by the number of times
+sᵢ was observed.
+
+Note: Because of the estimation procedure used, only states that are observed
+in the history appear in the estimated Markov chain... It can't divine whether
+there are unobserved states in the original Markov chain.
 
 ##### Arguments
 
