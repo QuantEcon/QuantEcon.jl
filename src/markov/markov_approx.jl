@@ -174,22 +174,23 @@ For more info, refer to:
 transition matrix
 
 """
-function estimate_MC_discrete{T}(X::Vector{T})
+function estimate_mc_discrete{T}(X::Vector{T})
     # Get length of simulation
     capT = length(X)
 
-    # Find all unique observations and sort them.
+    # Find all unique observations, sort them, and put into dictionary
     states = sort!(unique(X); lt=_emcd_lt)
     nstates = length(states)
+    d = Dict{T, Int}(zip(states, 1:nstates))
 
-    # Counter matrix
+    # Counter matrix and dictionary mapping i -> states
     cm = zeros(nstates, nstates)
 
     # Compute conditional probabilities for each state
-    state_i = findfirst(states, X[1])
+    state_i = d[X[1]]
     for t in 1:capT-1
         # Find next period's state
-        state_j = searchsortedfirst(states, X[t+1]; lt=_emcd_lt)
+        state_j = d[X[t]]
         cm[state_i, state_j] += 1.0
 
         # Tomorrow's state is j
