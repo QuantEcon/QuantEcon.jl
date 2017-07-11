@@ -180,7 +180,7 @@ function estimate_mc_discrete{T}(X::Vector{T}, states::Vector{T})
 
     # Make sure all of the passed in states appear in X... If not
     # throw an error
-    if any(map(x->in(x, X), states) .== false)
+    if any(!in(x, X) for x in states)
         error("One of the states does not appear in history X")
     end
 
