@@ -18,7 +18,7 @@
     end
 
 
-    # Gaussian AR(1) example from `example.m` of Tanaka and Toda
+    # Gaussian AR(1) example from `example.m` of Farmer and Toda
     
     # Parameter initialization
     rho = 0.99 # persistence
@@ -59,7 +59,7 @@
     @test isapprox(mc.state_values, D1_matlab)
     
     
-    # Gaussian 2-D VAR(1) example from `example.m` of Tanaka and Toda - example in Appendix B.1
+    # Gaussian 2-D VAR(1) example from `example.m` of Farmer and Toda - example in Appendix B.1
     
     # Set parameters
     A = [0.9809 0.0028; 0.0410 0.9648] # lag matrix
