@@ -174,12 +174,17 @@ For more info, refer to:
 transition matrix
 
 """
-function estimate_mc_discrete{T}(X::Vector{T})
+function estimate_mc_discrete{T}(X::Vector{T}, states::Vector{T})
     # Get length of simulation
     capT = length(X)
 
-    # Find all unique observations, sort them, and put into dictionary
-    states = sort!(unique(X); lt=_emcd_lt)
+    # Make sure all of the passed in states appear in X... If not
+    # throw an error
+    if any(map(x->in(x, X), states) .== false)
+        error("One of the states does not appear in history X")
+    end
+
+    # Count states and store in dictionary
     nstates = length(states)
     d = Dict{T, Int}(zip(states, 1:nstates))
 
@@ -203,3 +208,9 @@ function estimate_mc_discrete{T}(X::Vector{T})
     return MarkovChain(P, states)
 end
 
+function estimate_mc_discrete{T}(X::Vector{T})
+    # Get unique states and sort them
+    states = sort!(unique(X); lt=_emcd_lt)
+
+    return estimate_mc_discrete(X, states)
+end

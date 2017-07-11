@@ -29,7 +29,7 @@
     # Test with numerical inputs
     mc = MarkovChain(P, [0.0, 0.5, 1.0])
     X = simulate(mc, 100_000)
-    mc2 = estimate_mc_discrete(X)
+    mc2 = estimate_mc_discrete(X, mc.state_values)
     @test isequal(mc.state_values, mc2.state_values)
     @test isapprox(mc.p, mc2.p; atol=1e-2)
 
