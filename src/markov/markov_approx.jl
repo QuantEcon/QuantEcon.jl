@@ -146,17 +146,18 @@ innovations
     P, X = discreteVAR(b, B, Psi, Nm, nMoments, method, nSigmas)
     ```
 ##### Arguments
-- `b` : (M x 1) constant vector
-- `B` : (M x M) matrix of impact coefficients
-- `Psi` : (M x M) variance-covariance matrix of the innovations
-- `Nm` : Desired number of discrete points in each dimension
+- `b::ScalarOrArray` : (M x 1) constant vector
+                       (M=1 corresponds scalar case)
+- `B::ScalarOrArray` : (M x M) matrix of impact coefficients
+- `Psi::ScalarOrArray` : (M x M) variance-covariance matrix of the innovations
+- `Nm::Integer` : Desired number of discrete points in each dimension
 ##### Optional
-- `nMoments` : Desired number of moments to match. The default is 2.
-- `method` : Symbol specifying the method used to determine the grid
+- `nMoments::Integer` : Desired number of moments to match. The default is 2.
+- `method::Symbol` : Symbol specifying the method used to determine the grid
              points. Accepted inputs are `:even`. Please see the
              paper for more details.
              NOTE: `:quantile` and `:quadrature` are not supported now.
-- `nSigmas` : If the `:even` option is specified, nSigmas is used to
+- `nSigmas::Union{Void, TI}` : If the `:even` option is specified, nSigmas is used to
               determine the number of unconditional standard deviations
               used to set the endpoints of the grid. The default is
               sqrt(Nm-1).
@@ -181,7 +182,7 @@ innovations
 function discreteVAR{TI<:Integer}(b::ScalarOrArray, B::ScalarOrArray,
                      Psi::ScalarOrArray, Nm::TI,
                      nMoments::TI=2, method::Symbol=:even,
-                     nSigmas::Union{Void,TI}=nothing)
+                     nSigmas::Union{Void, TI}=nothing)
 
     if typeof(B) <: Real
         M, M_ = 1, 1
@@ -341,7 +342,7 @@ It is simiplifying `allcomb2` by using `gridmake` from QuantEcon
           3 6 8
           3 6 9]  # 27 x 3 array
 ##### Arguments
-- `A` : (N x M) Matrix
+- `A::Matrix` : (N x M) Matrix
 ##### Returns
 - `A_comb` : (N^M x M) Matrix, combination of each row of A
 """
@@ -363,19 +364,19 @@ using the maximum entropy procedure proposed in Tanaka and Toda (2013)
     p, lambdaBar, momentError = discreteApproximation(D, T, TBar, q, lambda0)
     ```
 ##### Arguments
-- `D` : (K x N) matrix of grid points. K is the dimension of the
+- `D::Vector` : (N x 1) vector of grid points. K is the dimension of the
         domain. N is the number of points at which an approximation
         is to be constructed.
-- `T` : A function handle which should accept arguments of dimension
-        (K x N) and return an (L x N) matrix of moments evaluated at
+- `T::Function` : A function handle which should accept arguments of dimension
+        (N x 1) vector and return an (L x N) matrix of moments evaluated at
         each grid point, where L is the number of moments to be
         matched.
-- `TBar` : (L x 1) vector of moments of the underlying distribution
+- `TBar::Vector` : (L x 1) vector of moments of the underlying distribution
           which should be matched
 ##### Optional
-- `q` : (1 X N) vector of prior weights for each point in D. The
+- `q::RowVector` : (1 X N) vector of prior weights for each point in D. The
         default is for each point to have an equal weight.
-- `lambda0` : (L x 1) vector of initial guesses for the dual problem
+- `lambda0::Vector` : (L x 1) vector of initial guesses for the dual problem
               variables. The default is a vector of zeros.
 
 ##### Returns
@@ -433,10 +434,10 @@ Compute the moment defining function used in discreteApproximation
     T = polynomialMoment(X,mu,scalingFactor,nMoment)
     ```
 ##### Inputs:
-- `X` : (1 x N) vector of grid points
-- `mu` : location parameter (conditional mean)
-- `scalingFactor` : scaling factor for numerical stability (typically largest grid point)
-- `nMoments` : number of polynomial moments
+- `X::Vector` : (N x 1) vector of grid points
+- `mu::Real` : location parameter (conditional mean)
+- `scalingFactor::Real` : scaling factor for numerical stability (typically largest grid point)
+- `nMoments::Integer` : number of polynomial moments
 ##### Return
 - `T` : moment defining function used in discreteApproximation
 """
@@ -454,12 +455,12 @@ Compute the maximum entropy objective function used in discreteApproximation
     obj = entropyObjective(lambda,Tx,TBar,q)
     ```
 ##### Arguments
-- `lambda` : (L x 1) vector of values of the dual problem variables
-- `Tx` : (L x N) matrix of moments evaluated at the grid points
+- `lambda::Vector` : (L x 1) vector of values of the dual problem variables
+- `Tx::Matrix` : (L x N) matrix of moments evaluated at the grid points
          specified in discreteApproximation
-- `TBar` : (L x 1) vector of moments of the underlying distribution
+- `TBar::Vector` : (L x 1) vector of moments of the underlying distribution
            which should be matched
-- `q` : (1 X N) vector of prior weights for each point in the grid.
+- `q::RowVector` : (1 X N) vector of prior weights for each point in the grid.
 
 ##### Returns
 - `obj` : scalar value of objective function evaluated at lambda
@@ -511,7 +512,7 @@ end
 find a unitary matrix `U` such that the diagonal components of `U'*AU` is as
 close to a multiple of identity matrix as possible
 ##### Arguments
-- `A` :
+- `A::Matrix` : square matrix 
 ##### Returns
 - `U` : unitary matrix
 - `fval` : minimum value
