@@ -17,7 +17,7 @@
         end
     end
 
-    
+
     # Gaussian AR(1) example from `example.m` of Tanaka and Toda
     
     # Parameter initialization
@@ -159,6 +159,7 @@
     # test transition matrix
     @test isapprox(mc.p, P2_matlab)
     # test state values
-    @test isapprox(mc.state_values, [D2_matlab[:, i] for i in 1:81])
+    @test isapprox(mc.state_values, [D2_matlab[:, i] for i in 1:81], atol = 1e-6, rtol = 1e-6)
+
 
 end  # @testset
