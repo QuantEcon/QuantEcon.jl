@@ -33,6 +33,8 @@
     @test isequal(mc.state_values, mc2.state_values)
     @test isapprox(mc.p, mc2.p; atol=1e-2)
 
+    @test_throws ErrorException estimate_mc_discrete(X, [0.0, 0.5, 1.0, 1.5])
+
     # Test with other inputs
     mc = MarkovChain(P, ["a", "b", "c"])
     X = simulate(mc, 100_000)
