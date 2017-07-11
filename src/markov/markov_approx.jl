@@ -130,3 +130,87 @@ function _rouwenhorst(p::Real, q::Real, m::Real, Δ::Real, n::Integer)
         return linspace(m-Δ, m+Δ, n), θN
     end
 end
+
+
+# These are to help me order types other than vectors
+@inline _emcd_lt{T}(a::T, b::T) = isless(a, b)
+@inline _emcd_lt{T}(a::Vector{T}, b::Vector{T}) = Base.lt(Base.Order.Lexicographic, a, b)
+
+"""
+Accepts the simulation of a discrete state Markov chain and estimates
+the transition probabilities
+
+Let S = {s₁, s₂, ..., sₙ} with s₁ < s₂ < ... < sₙ be the discrete
+states of a Markov chain. Furthermore, let P be the corresponding
+stochastic transition matrix.
+
+Given a history of observations, {X} where xₜ ∈ S ∀ t, we would like
+to estimate the transition probabilities in P, pᵢⱼ. For xₜ=sᵢ and xₜ₋₁=sⱼ,
+let P(xₜ | xₜ₋₁) be the pᵢⱼ element of the stochastic matrix. The likelihood
+function is then given by
+
+    L({X}ₜ; P) = P(x_1) ∏_{t=2}^{T} P(xₜ | xₜ₋₁)
+
+The maximum likelihood estimate is then just given by the number of times
+a transition from sᵢ to sⱼ is observed divided by the number of times
+sᵢ was observed.
+
+Note: Because of the estimation procedure used, only states that are observed
+in the history appear in the estimated Markov chain... It can't divine whether
+there are unobserved states in the original Markov chain.
+
+For more info, refer to:
+
+- http://www.stat.cmu.edu/~cshalizi/462/lectures/06/markov-mle.pdf
+- https://stats.stackexchange.com/questions/47685/calculating-log-likelihood-for-given-mle-markov-chains
+
+##### Arguments
+
+- `X::Vector{T}` : Simulated history of Markov states
+
+##### Returns
+
+- `mc::MarkovChain{T}` : A Markov chain holding the state values and
+transition matrix
+
+"""
+function estimate_mc_discrete{T}(X::Vector{T}, states::Vector{T})
+    # Get length of simulation
+    capT = length(X)
+
+    # Make sure all of the passed in states appear in X... If not
+    # throw an error
+    if any(!in(x, X) for x in states)
+        error("One of the states does not appear in history X")
+    end
+
+    # Count states and store in dictionary
+    nstates = length(states)
+    d = Dict{T, Int}(zip(states, 1:nstates))
+
+    # Counter matrix and dictionary mapping i -> states
+    cm = zeros(nstates, nstates)
+
+    # Compute conditional probabilities for each state
+    state_i = d[X[1]]
+    for t in 1:capT-1
+        # Find next period's state
+        state_j = d[X[t]]
+        cm[state_i, state_j] += 1.0
+
+        # Tomorrow's state is j
+        state_i = state_j
+    end
+
+    # Compute probabilities using counted elements
+    P = cm ./ sum(cm, 2)
+
+    return MarkovChain(P, states)
+end
+
+function estimate_mc_discrete{T}(X::Vector{T})
+    # Get unique states and sort them
+    states = sort!(unique(X); lt=_emcd_lt)
+
+    return estimate_mc_discrete(X, states)
+end

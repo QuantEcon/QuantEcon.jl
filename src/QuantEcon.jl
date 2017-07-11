@@ -58,6 +58,7 @@ export
 # markov_approx
     tauchen,
     rouwenhorst,
+    estimate_mc_discrete,
 
 # lae
     LAE,
