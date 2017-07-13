@@ -117,7 +117,7 @@ var documenterSearchIndex = {"docs": [
     "page": "QuantEcon",
     "title": "QuantEcon.LQ",
     "category": "Type",
-    "text": "Linear quadratic optimal control of either infinite or finite horizon\n\nThe infinite horizon problem can be written\n\nmin E sum_{t=0}^{infty} beta^t r(x_t, u_t)\n\nwith\n\nr(x_t, u_t) := x_t' R x_t + u_t' Q u_t + 2 u_t' N x_t\n\nThe finite horizon form is\n\nmin E sum_{t=0}^{T-1} beta^t r(x_t, u_t) + beta^T x_T' R_f x_T\n\nBoth are minimized subject to the law of motion\n\nx_{t+1} = A x_t + B u_t + C w_{t+1}\n\nHere x is n x 1, u is k x 1, w is j x 1 and the matrices are conformable for these dimensions.  The sequence {w_t} is assumed to be white noise, with zero mean and E w_t w_t' = I, the j x j identity.\n\nFor this model, the time t value (i.e., cost-to-go) function V_t takes the form\n\nx' P_T x + d_T\n\nand the optimal policy is of the form u_T = -F_T x_T.  In the infinite horizon case, V, P, d and F are all stationary.\n\nFields\n\nQ::ScalarOrArray : k x k payoff coefficient for control variable u. Must be\n\nsymmetric and nonnegative definite\n\nR::ScalarOrArray : n x n payoff coefficient matrix for state variable x.\n\nMust be symmetric and nonnegative definite\n\nA::ScalarOrArray : n x n coefficient on state in state transition\nB::ScalarOrArray : n x k coefficient on control in state transition\nC::ScalarOrArray : n x j coefficient on random shock in state transition\nN::ScalarOrArray : k x n cross product in payoff equation\nbet::Real : Discount factor in [0, 1]\ncapT::Union{Int, Void} : Terminal period in finite horizon problem\nrf::ScalarOrArray : n x n terminal payoff in finite horizon problem. Must be\n\nsymmetric and nonnegative definite\n\nP::ScalarOrArray : n x n matrix in value function representation\n\nV(x) = x'Px + d\n\nd::Real : Constant in value function representation\nF::ScalarOrArray : Policy rule that specifies optimal control in each period\n\n\n\n"
+    "text": "Main constructor for LQ type\n\nSpecifies default argumets for all fields not part of the payoff function or transition equation.\n\nArguments\n\nQ::ScalarOrArray : k x k payoff coefficient for control variable u. Must be\n\nsymmetric and nonnegative definite\n\nR::ScalarOrArray : n x n payoff coefficient matrix for state variable x.\n\nMust be symmetric and nonnegative definite\n\nA::ScalarOrArray : n x n coefficient on state in state transition\nB::ScalarOrArray : n x k coefficient on control in state transition\n;C::ScalarOrArray{zeros(size(R}(1))) : n x j coefficient on random shock in\n\nstate transition\n\n;N::ScalarOrArray{zeros(size(B,1)}(size(A, 2))) : k x n cross product in\n\npayoff equation\n\n;bet::Real(1.0) : Discount factor in [0, 1]\ncapT::Union{Int, Void}(Void) : Terminal period in finite horizon\n\nproblem\n\nrf::ScalarOrArray{fill(NaN}(size(R)...)) : n x n terminal payoff in finite\n\nhorizon problem. Must be symmetric and nonnegative definite.\n\n\n\n"
 },
 
 {
@@ -125,7 +125,7 @@ var documenterSearchIndex = {"docs": [
     "page": "QuantEcon",
     "title": "QuantEcon.LQ",
     "category": "Type",
-    "text": "Main constructor for LQ type\n\nSpecifies default argumets for all fields not part of the payoff function or transition equation.\n\nArguments\n\nQ::ScalarOrArray : k x k payoff coefficient for control variable u. Must be\n\nsymmetric and nonnegative definite\n\nR::ScalarOrArray : n x n payoff coefficient matrix for state variable x.\n\nMust be symmetric and nonnegative definite\n\nA::ScalarOrArray : n x n coefficient on state in state transition\nB::ScalarOrArray : n x k coefficient on control in state transition\n;C::ScalarOrArray{zeros(size(R}(1))) : n x j coefficient on random shock in\n\nstate transition\n\n;N::ScalarOrArray{zeros(size(B,1)}(size(A, 2))) : k x n cross product in\n\npayoff equation\n\n;bet::Real(1.0) : Discount factor in [0, 1]\ncapT::Union{Int, Void}(Void) : Terminal period in finite horizon\n\nproblem\n\nrf::ScalarOrArray{fill(NaN}(size(R)...)) : n x n terminal payoff in finite\n\nhorizon problem. Must be symmetric and nonnegative definite.\n\n\n\n"
+    "text": "Linear quadratic optimal control of either infinite or finite horizon\n\nThe infinite horizon problem can be written\n\nmin E sum_{t=0}^{infty} beta^t r(x_t, u_t)\n\nwith\n\nr(x_t, u_t) := x_t' R x_t + u_t' Q u_t + 2 u_t' N x_t\n\nThe finite horizon form is\n\nmin E sum_{t=0}^{T-1} beta^t r(x_t, u_t) + beta^T x_T' R_f x_T\n\nBoth are minimized subject to the law of motion\n\nx_{t+1} = A x_t + B u_t + C w_{t+1}\n\nHere x is n x 1, u is k x 1, w is j x 1 and the matrices are conformable for these dimensions.  The sequence {w_t} is assumed to be white noise, with zero mean and E w_t w_t' = I, the j x j identity.\n\nFor this model, the time t value (i.e., cost-to-go) function V_t takes the form\n\nx' P_T x + d_T\n\nand the optimal policy is of the form u_T = -F_T x_T.  In the infinite horizon case, V, P, d and F are all stationary.\n\nFields\n\nQ::ScalarOrArray : k x k payoff coefficient for control variable u. Must be\n\nsymmetric and nonnegative definite\n\nR::ScalarOrArray : n x n payoff coefficient matrix for state variable x.\n\nMust be symmetric and nonnegative definite\n\nA::ScalarOrArray : n x n coefficient on state in state transition\nB::ScalarOrArray : n x k coefficient on control in state transition\nC::ScalarOrArray : n x j coefficient on random shock in state transition\nN::ScalarOrArray : k x n cross product in payoff equation\nbet::Real : Discount factor in [0, 1]\ncapT::Union{Int, Void} : Terminal period in finite horizon problem\nrf::ScalarOrArray : n x n terminal payoff in finite horizon problem. Must be\n\nsymmetric and nonnegative definite\n\nP::ScalarOrArray : n x n matrix in value function representation\n\nV(x) = x'Px + d\n\nd::Real : Constant in value function representation\nF::ScalarOrArray : Policy rule that specifies optimal control in each period\n\n\n\n"
 },
 
 {
@@ -390,22 +390,6 @@ var documenterSearchIndex = {"docs": [
     "title": "QuantEcon.do_quad",
     "category": "Method",
     "text": "Approximate the integral of f, given quadrature nodes and weights\n\nArguments\n\nf::Function: A callable function that is to be approximated over the domain\n\nspanned by nodes.\n\nnodes::Array: Quadrature nodes\nweights::Array: Quadrature nodes\nargs...(Void): additional positional arguments to pass to f\n;kwargs...(Void): additional keyword arguments to pass to f\n\nReturns\n\nout::Float64 : The scalar that approximates integral of f on the hypercube\n\nformed by [a, b]\n\n\n\n"
-},
-
-{
-    "location": "api/QuantEcon.html#QuantEcon.draw-Tuple{QuantEcon.DiscreteRV,Int64}",
-    "page": "QuantEcon",
-    "title": "QuantEcon.draw",
-    "category": "Method",
-    "text": "Make multiple draws from the discrete distribution represented by a DiscreteRV instance\n\nArguments\n\nd::DiscreteRV: The DiscreteRV type representing the distribution\nk::Int:\n\nReturns\n\nout::Vector{Int}: k draws from d\n\n\n\n"
-},
-
-{
-    "location": "api/QuantEcon.html#QuantEcon.draw-Tuple{QuantEcon.DiscreteRV}",
-    "page": "QuantEcon",
-    "title": "QuantEcon.draw",
-    "category": "Method",
-    "text": "Make a single draw from the discrete distribution\n\nArguments\n\nd::DiscreteRV: The DiscreteRV type represetning the distribution\n\nReturns\n\nout::Int: One draw from the discrete distribution\n\n\n\n"
 },
 
 {
@@ -918,6 +902,22 @@ var documenterSearchIndex = {"docs": [
     "title": "Base.:*",
     "category": "Method",
     "text": "Define Matrix Multiplication between 3-dimensional matrix and a vector\n\nMatrix multiplication over the last dimension of A\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#Base.Random.rand-Tuple{QuantEcon.DiscreteRV,Int64}",
+    "page": "QuantEcon",
+    "title": "Base.Random.rand",
+    "category": "Method",
+    "text": "Make multiple draws from the discrete distribution represented by a DiscreteRV instance\n\nArguments\n\nd::DiscreteRV: The DiscreteRV type representing the distribution\nk::Int:\n\nReturns\n\nout::Vector{Int}: k draws from d\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#Base.Random.rand-Tuple{QuantEcon.DiscreteRV}",
+    "page": "QuantEcon",
+    "title": "Base.Random.rand",
+    "category": "Method",
+    "text": "Make a single draw from the discrete distribution\n\nArguments\n\nd::DiscreteRV: The DiscreteRV type represetning the distribution\n\nReturns\n\nout::Int: One draw from the discrete distribution\n\n\n\n"
 },
 
 {
