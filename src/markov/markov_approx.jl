@@ -408,6 +408,8 @@ function discreteVAR{TI<:Integer}(b::ScalarOrArray, B::ScalarOrArray,
 
     X = C*D + repmat(mu, 1, Nm^M) # map grids back to original space
 
+    M != 1 || (return MarkovChain(P, vec(X)))
+    
     return MarkovChain(P, [X[:, i] for i in 1:Nm^M])
 end
 
