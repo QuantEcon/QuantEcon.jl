@@ -1,5 +1,5 @@
 @testset "Testing discrete_rv.jl" begin
-    
+
     # set up
     n = 10
     x = rand(n)
@@ -10,7 +10,7 @@
     @test drv.Q[end] ≈ 1.0
 
     # test lln
-    draws = draw(drv, 100000)
+    draws = rand(drv, 100000)
     c = counter(draws)
     counts = Array{Float64}(n)
     for i=1:n

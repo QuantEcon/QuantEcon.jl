@@ -312,7 +312,7 @@ Base.start(mcis::MCIndSimulator) = (mcis.init, 0)
 
 function Base.next(mcis::MCIndSimulator, state::Tuple{Int,Int})
     ix, t = state
-    (ix, (draw(mcis.drvs[ix]), t+1))
+    (ix, (rand(mcis.drvs[ix]), t+1))
 end
 
 Base.done(mcis::MCIndSimulator, s::Tuple{Int,Int}) = s[2] >= mcis.len

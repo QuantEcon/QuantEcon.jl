@@ -53,7 +53,7 @@ Make a single draw from the discrete distribution
 
 - `out::Int`: One draw from the discrete distribution
 """
-draw(d::DiscreteRV) = searchsortedfirst(d.Q, rand())
+Base.rand(d::DiscreteRV) = searchsortedfirst(d.Q, rand())
 
 """
 Make multiple draws from the discrete distribution represented by a
@@ -68,4 +68,6 @@ Make multiple draws from the discrete distribution represented by a
 
 - `out::Vector{Int}`: `k` draws from `d`
 """
-draw(d::DiscreteRV, k::Int) = Int[draw(d) for i=1:k]
+Base.rand(d::DiscreteRV, k::Int) = Int[draw(d) for i=1:k]
+
+@deprecate draw Base.rand
