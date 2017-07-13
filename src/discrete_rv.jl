@@ -68,6 +68,13 @@ Make multiple draws from the discrete distribution represented by a
 
 - `out::Vector{Int}`: `k` draws from `d`
 """
-Base.rand(d::DiscreteRV, k::Int) = Int[draw(d) for i=1:k]
+Base.rand(d::DiscreteRV, k::Int) = Int[rand(d) for i=1:k]
+
+function Base.rand!{T<:Integer}(out::AbstractArray{T}, d::DiscreteRV)
+    @inbounds for I in eachindex(out)
+        out[I] = rand(d)
+    end
+    out
+end
 
 @deprecate draw Base.rand
