@@ -6,7 +6,7 @@
     A = .95
     C = .05
     G = 1.
-    H = 0.1
+    H = 0
     mu_0 = [.75;]
     Sigma_0 = fill(0.000001, 1, 1)
 
@@ -53,7 +53,7 @@
 
     @testset "test constructors" begin
         # kwarg version
-        other_ss = LSS(A, C, G, H; mu_0=[mu_0;])
+        other_ss = LSS(A, C, G; H=H, mu_0=[mu_0;])
         for nm in fieldnames(ss)
             @test getfield(ss, nm) == getfield(other_ss, nm)
         end
