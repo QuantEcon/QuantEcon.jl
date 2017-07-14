@@ -51,7 +51,7 @@ export
     simulate, simulate!, simulate_indices, simulate_indices!,
     period, is_irreducible, is_aperiodic, recurrent_classes,
     communication_classes, n_states,
-    discrete_var,
+    discrete_var, Even,
 
 # gth_solve
     gth_solve,
