@@ -130,7 +130,7 @@
     # test state values
     @test isapprox(mc.state_values, D1_matlab)
 
-    # test to match six moment but eventually 
+    # test to match six moment but sometimes fail
     nMoments = 6 # number of moments to match
     mc = discreteVAR(0, rho, sigma2, N, nMoments, :even)
 
