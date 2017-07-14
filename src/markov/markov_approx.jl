@@ -297,13 +297,12 @@ function discreteVAR{TI<:Integer}(b::ScalarOrArray, B::ScalarOrArray,
     end
 
     # Compute polynomial moments of standard normal distribution
-    gaussianMoment = Vector{TI}(nMoments)
+    gaussianMoment = zeros(nMoments)
     c = 1
     for k=1:floor(TI,nMoments/2)
         c = (2*k-1)*c
         gaussianMoment[2*k] = c
     end
-
     # Compute standardized VAR(1) representation (zero mean and diagonal covariance matrix)
     if M == 1
         C = sqrt(Psi)
@@ -383,11 +382,11 @@ function discreteVAR{TI<:Integer}(b::ScalarOrArray, B::ScalarOrArray,
                 else # solve maximum entropy problem sequentially from low order moments
                     lambdaBar[(jj-1)*2+1:jj*2, ii] = lambda
                     for mm = 4:2:nMoments
-                        lambdaGuess = vcat(lambda, 0, 0) # add zero to previous lambda
+                        lambdaGuess = vcat(lambda, 0.0, 0.0) # add zero to previous lambda
                         pnew, lambda, momentError = discreteApproximation(y1D[jj,:],
                             X -> polynomialMoment(X, condMean[jj,ii], scalingFactor[jj], mm),
-                            gaussianMoment(1:mm)./(scalingFactor[jj].^(1:mm)'), reshape(q[jj, :], 1, Nm), lambdaGuess)
-                        if norm(momentError) > 1e-5
+                            gaussianMoment[1:mm]./(scalingFactor[jj].^(1:mm)), reshape(q[jj, :], 1, Nm), lambdaGuess)
+                        if !(norm(momentError) < 1e-5)
                             warn("Failed to match first $mm moments.  Just matching $(mm-2).")
                             break
                         else
@@ -404,7 +403,6 @@ function discreteVAR{TI<:Integer}(b::ScalarOrArray, B::ScalarOrArray,
     X = C*D + repmat(mu, 1, Nm^M) # map grids back to original space
 
     M != 1 || (return MarkovChain(P, vec(X)))
-    
     return MarkovChain(P, [X[:, i] for i in 1:Nm^M])
 end
 
@@ -482,21 +480,20 @@ function discreteApproximation(D::Vector, T::Function, TBar::Vector,
     end
 
     # Compute maximum entropy discrete distribution
-    options = Optim.Options(f_tol=1e-10, x_tol=1e-10)
+    options = Optim.Options(f_tol=1e-16, x_tol=1e-16)
     obj(lambda) = entropyObjective(lambda, Tx, TBar, q)
     grad!(lambda, grad) = entropyGrad!(lambda, grad, Tx, TBar, q)
     hess!(lambda, hess) = entropyHess!(lambda, hess, Tx, TBar, q)
-    res = Optim.optimize(obj, grad!, hess!, lambda0, Optim.NewtonTrustRegion(), options)
+    res = Optim.optimize(obj, grad!, hess!, lambda0, Optim.Newton(), options)
     # Sometimes the algorithm fails to converge if the initial guess is too far
     # away from the truth. If this occurs, the program tries an initial guess
     # of all zeros.
-    if Optim.converged(res) == false && lambda0 .!= 0.0
+    if !Optim.converged(res) && all(lambda0 .!= 0.0)
         warn("Failed to find a solution from provided initial guess. Trying new initial guess.")
-        res = Optim.optimize(obj, grad!, hess!, zeros(lambda0), Optim.NewtonTrustRegion(), options)
+        res = Optim.optimize(obj, grad!, hess!, zeros(lambda0), Optim.Newton(), options)
     end
     # check convergence
     Optim.converged(res) || error("Failed to find a solution.")
-
     # Compute final probability weights and moment errors
     lambdaBar = Optim.minimizer(res)
     minimum_value = Optim.minimum(res)
@@ -557,6 +554,7 @@ function entropyObjective(lambda::Vector, Tx::Matrix, TBar::Vector, q::Matrix)
     Tdiff = Tx-repmat(TBar, 1, N)
     temp = q.*exp.(lambda'*Tdiff)
     obj = sum(temp)
+    return obj
 end
 
 """
