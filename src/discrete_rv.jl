@@ -31,9 +31,9 @@ vector of probabilities given by q.
 type DiscreteRV{TV1<:AbstractVector, TV2<:AbstractVector}
     q::TV1
     Q::TV2
-    function DiscreteRV(q, Q)
+    function (::Type{DiscreteRV{TV1,TV2}}){TV1,TV2}(q, Q)
         abs(Q[end] - 1) > 1e-10 && error("q should sum to 1")
-        new(q, Q)
+        new{TV1,TV2}(q, Q)
     end
 end
 
@@ -53,7 +53,7 @@ Make a single draw from the discrete distribution
 
 - `out::Int`: One draw from the discrete distribution
 """
-draw(d::DiscreteRV) = searchsortedfirst(d.Q, rand())
+Base.rand(d::DiscreteRV) = searchsortedfirst(d.Q, rand())
 
 """
 Make multiple draws from the discrete distribution represented by a
@@ -68,4 +68,13 @@ Make multiple draws from the discrete distribution represented by a
 
 - `out::Vector{Int}`: `k` draws from `d`
 """
-draw(d::DiscreteRV, k::Int) = Int[draw(d) for i=1:k]
+Base.rand(d::DiscreteRV, k::Int) = Int[rand(d) for i=1:k]
+
+function Base.rand!{T<:Integer}(out::AbstractArray{T}, d::DiscreteRV)
+    @inbounds for I in eachindex(out)
+        out[I] = rand(d)
+    end
+    out
+end
+
+@deprecate draw Base.rand

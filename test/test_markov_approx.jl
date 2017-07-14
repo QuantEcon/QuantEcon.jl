@@ -16,4 +16,51 @@
             @test isapprox(sum(mc.state_values), 0.0; rough_kwargs...)
         end
     end
+
+
+    #
+    # Test discrete estimation
+    #
+    srand(42)
+    P = [0.5 0.25 0.25
+         0.25 0.5 0.25
+         0.25 0.25 0.5]
+
+    # Test with numerical inputs
+    mc = MarkovChain(P, [0.0, 0.5, 1.0])
+    X = simulate(mc, 100_000)
+    mc2 = estimate_mc_discrete(X, mc.state_values)
+    @test isequal(mc.state_values, mc2.state_values)
+    @test isapprox(mc.p, mc2.p; atol=1e-2)
+
+    @test_throws ErrorException estimate_mc_discrete(X, [0.0, 0.5, 1.0, 1.5])
+
+    # Test with other inputs
+    mc = MarkovChain(P, ["a", "b", "c"])
+    X = simulate(mc, 100_000)
+    mc2 = estimate_mc_discrete(X)
+    @test isequal(mc.state_values, mc2.state_values)
+    @test isapprox(mc.p, mc2.p, atol=1e-2)
+
+    # Test with subset of states
+    P = [0.5 0.5 0.0
+         0.5 0.5 0.0
+         0.0 0.5 0.5]
+    mc = MarkovChain(P, [1, 2, 3])
+    X = simulate(mc, 100_000, init=1)
+    mc2 = estimate_mc_discrete(X)
+    @test isequal(mc.state_values[1:2], mc2.state_values)
+    @test isapprox(mc.p[1:2, 1:2], mc2.p, atol=1e-2)
+
+    # Test with vector states
+    P = [0.5 0.25 0.25
+         0.25 0.5 0.25
+         0.25 0.25 0.5]
+    mc = MarkovChain(P, [[1.0, 2.0], [1.0, 3.0], [2.0, 3.0]])
+    X = simulate(mc, 100_000)
+    mc2 = estimate_mc_discrete(X)
+    @test isequal(mc.state_values, mc2.state_values)
+    @test isapprox(mc.p, mc2.p, atol=1e-2)
+
+
 end  # @testset

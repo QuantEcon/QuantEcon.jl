@@ -24,7 +24,7 @@
     @testset "Test random_stochastic_matrix with k=1" begin
         n, k = 3, 1
         P = random_stochastic_matrix(n, k)
-        @test all((P .== 0) | (P .== 1)) == true
+        @test all((P .== 0) .| (P .== 1))
         @test all(x->isequal(sum(x), 1),
                   [P[i, :] for i in 1:size(P)[1]]) == true
     end

@@ -53,7 +53,9 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
     a_indices::Nullable{Vector{Tind}}  # Action Indices
     a_indptr::Nullable{Vector{Tind}}   # Action Index Pointers
 
-    function DiscreteDP(R::Array, Q::Array, beta::Real)
+    function (::Type{DiscreteDP{T,NQ,NR,Tbeta,Tind}}){T,NQ,NR,Tbeta,Tind}(
+            R::Array, Q::Array, beta::Real
+        )
         # verify input integrity 1
         if NQ != 3
             msg = "Q must be 3-dimensional without s-a formulation"
@@ -84,13 +86,16 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
         _a_indices = Nullable{Vector{Int}}()
         a_indptr = Nullable{Vector{Int}}()
 
-        new(R, Q, beta, _a_indices, a_indptr)
+        new{T,NQ,NR,Tbeta,Tind}(R, Q, beta, _a_indices, a_indptr)
     end
 
     # Note: We left R, Q as type Array to produce more helpful error message with regards to shape.
     # R and Q are dense Arrays
-    function DiscreteDP(R::AbstractArray, Q::AbstractArray, beta::Real,
-                        s_indices::Vector, a_indices::Vector)
+
+    function (::Type{DiscreteDP{T,NQ,NR,Tbeta,Tind}}){T,NQ,NR,Tbeta,Tind}(
+            R::AbstractArray, Q::AbstractArray, beta::Real, s_indices::Vector,
+            a_indices::Vector
+        )
         # verify input integrity 1
         if NQ != 2
             throw(ArgumentError("Q must be 2-dimensional with s-a formulation"))
@@ -115,7 +120,7 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
         end
 
         if _has_sorted_sa_indices(s_indices, a_indices)
-            a_indptr = Array(Int64, num_states+1)
+            a_indptr = Array{Int64}(num_states+1)
             _a_indices = copy(a_indices)
             _generate_a_indptr!(num_states, s_indices, a_indptr)
         else
@@ -146,7 +151,7 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
         _a_indices = Nullable{Vector{Tind}}(_a_indices)
         a_indptr = Nullable{Vector{Tind}}(a_indptr)
 
-        new(R, full(Q), beta, _a_indices, a_indptr)
+        new{T,NQ,NR,Tbeta,Tind}(R, full(Q), beta, _a_indices, a_indptr)
     end
 end
 
@@ -199,8 +204,8 @@ end
 #-Type Aliases-#
 #--------------#
 
-typealias DDP{T,Tbeta,Tind} DiscreteDP{T,3,2,Tbeta,Tind}
-typealias DDPsa{T,Tbeta,Tind} DiscreteDP{T,2,1,Tbeta,Tind}
+@compat const DDP{T,Tbeta,Tind} =  DiscreteDP{T,3,2,Tbeta,Tind}
+@compat const DDPsa{T,Tbeta,Tind} =  DiscreteDP{T,2,1,Tbeta,Tind}
 
 #--------------------#
 #-Property Functions-#
@@ -210,7 +215,7 @@ num_states(ddp::DDP) = size(ddp.R, 1)
 num_states(ddp::DDPsa) = size(ddp.Q, 2)
 num_actions(ddp::DiscreteDP) = size(ddp.R, 2)
 
-abstract DDPAlgorithm
+@compat abstract type DDPAlgorithm end
 """
 This refers to the Value Iteration solution algorithm.
 
@@ -264,9 +269,11 @@ type DPSolveResult{Algo<:DDPAlgorithm,Tval<:Real}
     sigma::Array{Int,1}
     mc::MarkovChain
 
-    function DPSolveResult(ddp::DiscreteDP)
+    function (::Type{DPSolveResult{Algo,Tval}}){Algo,Tval}(
+            ddp::DiscreteDP
+        )
         v = s_wise_max(ddp, ddp.R) # Initialise v with v_init
-        ddpr = new(v, similar(v), 0, similar(v, Int))
+        ddpr = new{Algo,Tval}(v, similar(v), 0, similar(v, Int))
 
         # fill in sigma with proper values
         compute_greedy!(ddp, ddpr)
@@ -274,8 +281,10 @@ type DPSolveResult{Algo<:DDPAlgorithm,Tval<:Real}
     end
 
     # method to pass initial value function (skip the s-wise max)
-    function DPSolveResult(ddp::DiscreteDP, v::Vector)
-        ddpr = new(v, similar(v), 0, similar(v, Int))
+    function (::Type{DPSolveResult{Algo,Tval}}){Algo,Tval}(
+            ddp::DiscreteDP, v::Vector
+        )
+        ddpr = new{Algo,Tval}(v, similar(v), 0, similar(v, Int))
 
         # fill in sigma with proper values
         compute_greedy!(ddp, ddpr)
@@ -539,7 +548,7 @@ end
 
 # TODO: express it in a similar way as above to exploit Julia's column major order
 function RQ_sigma{T<:Integer}(ddp::DDPsa, sigma::Array{T})
-    sigma_indices = Array(T, num_states(ddp))
+    sigma_indices = Array{T}(num_states(ddp))
     _find_indices!(get(ddp.a_indices), get(ddp.a_indptr), sigma, sigma_indices)
     R_sigma = ddp.R[sigma_indices]
     Q_sigma = ddp.Q[sigma_indices, :]
@@ -602,7 +611,7 @@ end
 
 function s_wise_max(ddp::DDPsa, vals::Vector)
     s_wise_max!(get(ddp.a_indices), get(ddp.a_indptr), vals,
-                 Array(Float64, num_states(ddp)))
+                 Array{Float64}(num_states(ddp)))
 end
 
 s_wise_max!(ddp::DDPsa, vals::Vector, out::Vector, out_argmax::Vector) =
@@ -751,7 +760,7 @@ function _solve!(ddp::DiscreteDP, ddpr::DPSolveResult{VFI}, max_iter::Integer,
         bellman_operator!(ddp, ddpr)
 
         # compute error and update the v inside ddpr
-        err = maxabs(ddpr.Tv .- ddpr.v)
+        err = maximum(abs, ddpr.Tv .- ddpr.v)
         copy!(ddpr.v, ddpr.Tv)
         ddpr.num_iter += 1
 

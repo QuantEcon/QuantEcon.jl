@@ -46,7 +46,7 @@ function solve_discrete_lyapunov(A::ScalarOrArray,
         alpha1 = alpha0*alpha0
         gamma1 = gamma0 + alpha0*gamma0*alpha0'
 
-        diff = maximum(abs(gamma1 - gamma0))
+        diff = maximum(abs, gamma1 - gamma0)
         alpha0 = alpha1
         gamma0 = gamma1
 
@@ -159,7 +159,7 @@ function solve_discrete_riccati(A::ScalarOrArray, B::ScalarOrArray,
         G1 = G0 + A0 * G0 * ((I + H0 * G0)\A0')
         H1 = H0 + A0' * ((I + H0*G0)\(H0*A0))
 
-        dist = Base.maxabs(H1 - H0)
+        dist = Base.maximum(abs, H1 - H0)
         A0 = A1
         G0 = G1
         H0 = H1

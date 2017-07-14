@@ -13,6 +13,12 @@ API documentation
 Pages = ["QuantEcon.md"]
 ```
 
+## Index
+
+```@index
+Pages = ["QuantEcon.md"]
+```
+
 ## Exported
 
 ```@autodocs
@@ -25,10 +31,4 @@ Private = false
 ```@autodocs
 Modules = [QuantEcon]
 Public = false
-```
-
-## Index
-
-```@index
-Pages = ["QuantEcon.md"]
 ```

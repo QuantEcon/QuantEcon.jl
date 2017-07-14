@@ -60,7 +60,7 @@ function qnwlege(n::Int, a::Real, b::Real)
     weights = copy(nodes)
     i = 1:m
 
-    z = cos(pi * (i - 0.25) ./ (n + 0.5))
+    z = cos.(pi * (i - 0.25) ./ (n + 0.5))
 
     # allocate memory for loop arrays
     p3 = similar(z)
@@ -76,11 +76,13 @@ function qnwlege(n::Int, a::Real, b::Real)
             p1 = ((2*j-1)*z.*p2-(j-1)*p3)./j
         end
 
+        # p1 is now a vector of Legendre polynomials of degree 1..n
+        # pp will be the deriative of each p1 at the nth zero of each
         pp = n*(z.*p1-p2)./(z.*z-1)
         z1 = z
-        z = z1 - p1./pp
+        z = z1 - p1./pp  # newton's method
 
-        err = Base.maxabs(z - z1)
+        err = maximum(abs, z - z1)
         if err < 1e-14
             break
         end
@@ -116,8 +118,8 @@ $(qnw_func_notes)
 $(qnw_refs)
 """
 function qnwcheb(n::Int, a::Real, b::Real)
-    nodes = (b+a)/2 - (b-a)/2 .* cos(pi/n .* (0.5:(n-0.5)))
-    weights = ((b-a)/n) .* (cos(pi/n .* ((1:n)-0.5)*(2:2:n-1)') *
+    nodes = (b+a)/2 - (b-a)/2 .* cos.(pi/n .* (0.5:(n-0.5)))
+    weights = ((b-a)/n) .* (cos.(pi/n .* ((1:n)-0.5)*(2:2:n-1)') *
                             (-2.0 ./ ((1:2:n-2).*(3:2:n))) + 1)
     return nodes, weights
 end
@@ -190,9 +192,11 @@ function qnwnorm(n::Int)
                 p1 = z .* sqrt(2/j) .*p2 - sqrt((j-1)/j).*p3
             end
 
+            # p1 now contains degree n Hermite polynomial
+            # pp is derivative of p1 at the n'th zero of p1
             pp = sqrt(2n).*p2
             z1 = z
-            z = z1 - p1./pp
+            z = z1 - p1./pp  # newton step
 
             if abs(z - z1) < 1e-14
                 break
@@ -346,17 +350,18 @@ function qnwbeta(n::Int, a::Real, b::Real)
         temp = 0.0
         pp, p2 = 0.0, 0.0
         for its = 1:maxit
+            # recurrance relation for Jacboi polynomials
             temp = 2 + ab
             p1 = (a - b + temp * z) / 2
             p2 = 1
             for j=2:n
-              p3 = p2
-              p2 = p1
-              temp = 2 * j + ab
-              aa = 2 * j * (j + ab) * (temp - 2)
-              bb = (temp - 1) * (a * a - b * b + temp * (temp - 2) * z)
-              c = 2 * (j - 1 + a) * (j - 1 + b) * temp
-              p1 = (bb * p2 - c * p3) / aa
+                p3 = p2
+                p2 = p1
+                temp = 2 * j + ab
+                aa = 2 * j * (j + ab) * (temp - 2)
+                bb = (temp - 1) * (a * a - b * b + temp * (temp - 2) * z)
+                c = 2 * (j - 1 + a) * (j - 1 + b) * temp
+                p1 = (bb * p2 - c * p3) / aa
             end
             pp = (n * (a - b - temp * z) * p1 +
                   2 * (n + a) * (n + b) * p2) / (temp * (1 - z * z))
@@ -391,10 +396,10 @@ Computes nodes and weights for beta distribution
 ##### Arguments
 
 - `n::Union{Int, Vector{Int}}` : Number of desired nodes along each dimension
-- `a::Union{Real, Vector{Real}}` : First parameter of the gamma distribution,
-along each dimension
-- `b::Union{Real, Vector{Real}}` : Second parameter of the gamma distribution,
-along each dimension
+- `a::Union{Real, Vector{Real}}` : Shape parameter of the gamma distribution,
+along each dimension. Must be positive. Default is 1
+- `b::Union{Real, Vector{Real}}` : Scale parameter of the gamma distribution,
+along each dimension. Must be positive. Default is 1
 
 $(qnw_returns)
 
@@ -433,6 +438,7 @@ function qnwgamma(n::Int, a::Real=1.0, b::Real=1.0)
             p1 = 1.0
             p2 = 0.0
             for j=1:n
+                # Recurrance relation for Laguerre polynomials
                 p3 = p2
                 p2 = p1
                 p1 = ((2j - 1 + a - z) * p2 - (j - 1 + a) * p3) ./ j
@@ -521,8 +527,8 @@ for f in [:qnwlege, :qnwcheb, :qnwsimp, :qnwtrap, :qnwbeta, :qnwgamma]
                 push!(weights, _1d[2])
             end
             weights = ckron(weights[end:-1:1]...)
-            nodes = gridmake(nodes...)
-            return nodes, weights
+            nodes_out = gridmake(nodes...)::Matrix{Float64}
+            return nodes_out, weights
         end
     end  # @eval
 end
@@ -535,19 +541,20 @@ function qnwnorm(n::Vector{Int}, mu::Vector, sig2::Matrix=eye(length(n)))
         error("n and mu must have same number of elements")
     end
 
-    _nodes = Array(Vector{Float64}, n_n)
-    _weights = Array(Vector{Float64}, n_n)
+    _nodes = Array{Vector{Float64}}(n_n)
+    _weights = Array{Vector{Float64}}(n_n)
 
     for i in 1:n_n
         _nodes[i], _weights[i] = qnwnorm(n[i])
     end
 
     weights = ckron(_weights[end:-1:1]...)
-    nodes = gridmake(_nodes...)
+    nodes = gridmake(_nodes...)::Matrix{Float64}
 
     new_sig2 = chol(sig2)
 
-    nodes = nodes * new_sig2 .+ mu'
+    A_mul_B!(nodes, nodes, new_sig2)
+    broadcast!(+, nodes, nodes, mu')
 
     return nodes, weights
 end
@@ -632,12 +639,12 @@ $(qnw_refs)
 """
 function qnwlogn(n, mu, sig2)
     nodes, weights = qnwnorm(n, mu, sig2)
-    return exp(nodes), weights
+    return exp.(nodes), weights
 end
 
 
 ## qnwequi
-const equidist_pp = sqrt(primes(7920))  # good for d <= 1000
+const equidist_pp = sqrt.(primes(7920))  # good for d <= 1000
 
 
 """

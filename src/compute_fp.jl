@@ -64,7 +64,7 @@ function compute_fixed_point{TV}(T::Function,
     while iterate < max_iter && err > err_tol
         new_v = T(v)::TV
         iterate += 1
-        err = Base.maxabs(new_v - v)
+        err = Base.maximum(abs, new_v - v)
         if verbose == 2
             if iterate % print_skip == 0
                 println("Compute iterate $iterate with error $err")
