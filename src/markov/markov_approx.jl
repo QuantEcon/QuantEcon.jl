@@ -224,7 +224,7 @@ end
 types specifying the method for `discrete_var`
 
 """
-abstract type AbstractMethod end
+@compat abstract type AbstractMethod end
 immutable Even <: AbstractMethod end
 # immutable type Quantile <: AbstractMethod end
 # immutable type Quadrature <: AbstractMethod end
