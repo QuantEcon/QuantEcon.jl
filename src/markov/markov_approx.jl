@@ -195,7 +195,7 @@ function estimate_mc_discrete{T}(X::Vector{T}, states::Vector{T})
     state_i = d[X[1]]
     for t in 1:capT-1
         # Find next period's state
-        state_j = d[X[t]]
+        state_j = d[X[t+1]]
         cm[state_i, state_j] += 1.0
 
         # Tomorrow's state is j
