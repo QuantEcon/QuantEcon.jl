@@ -15,3 +15,10 @@ pages:
 - Overview: 'api/index.md'
 - API Docs:
   - QuantEcon: 'api/QuantEcon.md'
+
+markdown_extensions:
+  - mdx_math
+  
+extra_javascript:
+- https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML
+- assets/mathjaxhelper.js
