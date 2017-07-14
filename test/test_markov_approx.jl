@@ -203,6 +203,6 @@
     # test transition matrix
     @test isapprox(mc.p, P2_matlab, atol = 1e-6, rtol = 1e-6)
     # test state values
-    @test isapprox.(mc.state_values, [D2_matlab[:, i] for i in 1:81], atol = 1e-6, rtol = 1e-6)
+    @test all(isapprox.(mc.state_values, [D2_matlab[:, i] for i in 1:81], atol = 1e-6, rtol = 1e-6))
 
 end  # @testset
