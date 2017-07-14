@@ -460,7 +460,7 @@ using the maximum entropy procedure proposed in Tanaka and Toda (2013)
 - `TBar::Vector` : (L x 1) vector of moments of the underlying distribution
           which should be matched
 ##### Optional
-- `q::RowVector` : (1 X N) vector of prior weights for each point in D. The
+- `q::Matrix` : (1 X N) vector of prior weights for each point in D. The
         default is for each point to have an equal weight.
 - `lambda0::Vector` : (L x 1) vector of initial guesses for the dual problem
               variables. The default is a vector of zeros.
@@ -473,7 +473,7 @@ using the maximum entropy procedure proposed in Tanaka and Toda (2013)
                   discretization minus actual moments)
 """
 function discreteApproximation(D::Vector, T::Function, TBar::Vector,
-                                  q::RowVector=ones(N)'/N, # Default prior weights
+                                  q::Matrix=ones(N)'/N, # Default prior weights
                                   lambda0::Vector=zeros(Tbar))
 
     # Input error checking
@@ -546,12 +546,12 @@ Compute the maximum entropy objective function used in discreteApproximation
          specified in discreteApproximation
 - `TBar::Vector` : (L x 1) vector of moments of the underlying distribution
            which should be matched
-- `q::RowVector` : (1 X N) vector of prior weights for each point in the grid.
+- `q::Matrix` : (1 X N) vector of prior weights for each point in the grid.
 
 ##### Returns
 - `obj` : scalar value of objective function evaluated at lambda
 """
-function entropyObjective(lambda::Vector, Tx::Matrix, TBar::Vector, q::RowVector)
+function entropyObjective(lambda::Vector, Tx::Matrix, TBar::Vector, q::Matrix)
 
     # Some error checking
     L, N = size(Tx)
@@ -570,7 +570,7 @@ Compute gradient of objective function
 - `grad` : (L x 1) gradient vector of the objective function evaluated
            at lambda
 """
-function entropyGrad!(lambda::Vector, grad::Vector, Tx::Matrix, TBar::Vector, q::RowVector)
+function entropyGrad!(lambda::Vector, grad::Vector, Tx::Matrix, TBar::Vector, q::Matrix)
     L, N = size(Tx)
     !(length(lambda) != L || length(TBar) != L || length(q) != N) || error("Dimensions of inputs are not compatible.")
     Tdiff = Tx-repmat(TBar, 1, N)
@@ -585,7 +585,7 @@ Compute hessian of objective function
 ##### Returns
 - `hess` : (L x L) hessian matrix of the objective function evaluated at `lambda`
 """
-function entropyHess!(lambda::Vector, hess::Matrix, Tx::Matrix, TBar::Vector, q::RowVector)
+function entropyHess!(lambda::Vector, hess::Matrix, Tx::Matrix, TBar::Vector, q::Matrix)
     L, N = size(Tx)
     !(length(lambda) != L || length(TBar) != L || length(q) != N) || error("Dimensions of inputs are not compatible.")
     Tdiff = Tx-repmat(TBar,1,N)
