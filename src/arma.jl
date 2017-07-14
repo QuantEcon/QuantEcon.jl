@@ -11,40 +11,42 @@ Jerry Choi, Thomas Sargent and John Stachurski
 References
 ----------
 
-http://quant-econ.net/jl/arma.html
+https://lectures.quantecon.org/jl/arma.html
 
 =#
 
-"""
+doc"""
 Represents a scalar ARMA(p, q) process
 
-If phi and theta are scalars, then the model is
+If ``\phi`` and ``\theta`` are scalars, then the model is
 understood to be
 
 ```math
 X_t = \phi X_{t-1} + \epsilon_t + \theta \epsilon_{t-1}
 ```
 
-where epsilon_t is a white noise process with standard
+where ``\epsilon_t`` is a white noise process with standard
 deviation sigma.
 
-If phi and theta are arrays or sequences,
+If ``\phi`` and ``\theta`` are arrays or sequences,
 then the interpretation is the ARMA(p, q) model
 
-    X_t = phi_1 X_{t-1} + ... + phi_p X_{t-p} +
-    epsilon_t + theta_1 epsilon_{t-1} + ...  +
-    theta_q epsilon_{t-q}
+```math
+X_t = \phi_1 X_{t-1} + ... + \phi_p X_{t-p} +
+\epsilon_t + \theta_1 \epsilon_{t-1} + \ldots  +
+\theta_q \epsilon_{t-q}
+```
 
 where
 
-* phi = (phi_1, phi_2,..., phi_p)
-* theta = (theta_1, theta_2,..., theta_q)
-* sigma is a scalar, the standard deviation of the white noise
+* ``\phi = (\phi_1, \phi_2, \ldots , \phi_p)``
+* ``\theta = (\theta_1, \theta_2, \ldots , \theta_q)``
+* ``\sigma`` is a scalar, the standard deviation of the white noise
 
 ##### Fields
 
- - `phi::Vector` : AR parameters phi_1, ..., phi_p
- - `theta::Vector` : MA parameters theta_1, ..., theta_q
+ - `phi::Vector` : AR parameters ``\phi_1, \ldots, \phi_p``
+ - `theta::Vector` : MA parameters ``\theta_1, \ldots, \theta_q``
  - `p::Integer` : Number of AR coefficients
  - `q::Integer` : Number of MA coefficients
  - `sigma::Real` : Standard deviation of white noise
@@ -89,22 +91,24 @@ function ARMA(phi::AbstractVector, theta::AbstractVector=[0.0], sigma::Real=1.0)
     return ARMA(phi, theta, p, q, sigma, ma_poly, ar_poly)
 end
 
-"""
+doc"""
 Compute the spectral density function.
 
 The spectral density is the discrete time Fourier transform of the
 autocovariance function. In particular,
 
-    f(w) = sum_k gamma(k) exp(-ikw)
+```math
+f(w) = \sum_k \gamma(k) \exp(-ikw)
+```
 
-where gamma is the autocovariance function and the sum is over
+where ``\gamma`` is the autocovariance function and the sum is over
 the set of all integers.
 
 ##### Arguments
 
 - `arma::ARMA`: Instance of `ARMA` type
-- `;two_pi::Bool(true)`: Compute the spectral density function over [0, pi] if
-  false and [0, 2 pi] otherwise.
+- `;two_pi::Bool(true)`: Compute the spectral density function over ``[0, \pi]``
+if false and ``[0, 2 \pi]`` otherwise.
 - `;res(1200)` : If `res` is a scalar then the spectral density is computed at
 `res` frequencies evenly spaced around the unit circle, but if `res` is an array
 then the function computes the response at the frequencies given by the array
@@ -145,7 +149,7 @@ function autocovariance(arma::ARMA; num_autocov::Integer=16)
     return acov[1:num_autocov]
 end
 
-"""
+doc"""
 Get the impulse response corresponding to our model.
 
 ##### Arguments
@@ -158,7 +162,7 @@ reponse. Must be at least as long as the `p` fields of `arma`
 ##### Returns
 
 - `psi::Vector{Float64}`: `psi[j]` is the response at lag j of the impulse
-response. We take psi[1] as unity.
+response. We take `psi[1]` as unity.
 
 """
 function impulse_response(arma::ARMA; impulse_length=30)
