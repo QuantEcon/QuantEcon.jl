@@ -45,8 +45,8 @@ where
 
 ##### Fields
 
- - `phi::Vector` : AR parameters phi_1, ..., phi_p
- - `theta::Vector` : MA parameters theta_1, ..., theta_q
+ - `phi::Vector` : AR parameters ``\phi_1, \ldots, \phi_p``
+ - `theta::Vector` : MA parameters ``\theta_1, \ldots, \theta_q``
  - `p::Integer` : Number of AR coefficients
  - `q::Integer` : Number of MA coefficients
  - `sigma::Real` : Standard deviation of white noise
@@ -107,8 +107,8 @@ the set of all integers.
 ##### Arguments
 
 - `arma::ARMA`: Instance of `ARMA` type
-- `;two_pi::Bool(true)`: Compute the spectral density function over [0, pi] if
-  false and [0, 2 pi] otherwise.
+- `;two_pi::Bool(true)`: Compute the spectral density function over ``[0, \pi]``
+if false and ``[0, 2 \pi]`` otherwise.
 - `;res(1200)` : If `res` is a scalar then the spectral density is computed at
 `res` frequencies evenly spaced around the unit circle, but if `res` is an array
 then the function computes the response at the frequencies given by the array
