@@ -227,7 +227,7 @@ Compute a finite-state Markov chain approximation to a VAR(1) process of the for
 where `\epsilon_{t+1}` is an (M x 1) vector of independent standard normal
 innovations
     ```julia
-    P, X = discreteVAR(b, B, Psi, Nm, nMoments, method, nSigmas)
+    P, X = discrete_var(b, B, Psi, Nm, nMoments, method, nSigmas)
     ```
 ##### Arguments
 - `b::ScalarOrArray` : (M x 1) constant vector
@@ -255,15 +255,15 @@ innovations
         with each row of P
 
 ##### NOTES
-- discreteVAR only accepts non-singular variance-covariance matrices.
-- discreteVAR only constructs tensor product grids where each dimension
+- discrete_var only accepts non-singular variance-covariance matrices.
+- discrete_var only constructs tensor product grids where each dimension
   contains the same number of points. For this reason it is recommended
   that this code not be used for problems of more than about 4 or 5
   dimensions due to curse of dimensionality issues.
 - Future updates will allow for singular variance-covariance matrices and
   sparse grid specifications.
 """
-function discreteVAR{TI<:Integer}(b::ScalarOrArray, B::ScalarOrArray,
+function discrete_var{TI<:Integer}(b::ScalarOrArray, B::ScalarOrArray,
                      Psi::ScalarOrArray, Nm::TI,
                      nMoments::TI=2, method::Symbol=:even,
                      nSigmas::Union{Void, TI}=nothing)
@@ -314,7 +314,7 @@ function discreteVAR{TI<:Integer}(b::ScalarOrArray, B::ScalarOrArray,
         mu = ((eye(M)-B)\eye(M))*b
         A1 = C1\(B*C1)
         Sigma1 = reshape(((eye(M^2)-kron(A1,A1))\eye(M^2))*vec(eye(M)),M,M) # unconditional variance
-        U, _ = minVarTrace(Sigma1)
+        U, _ = min_var_trace(Sigma1)
         A = U'*A1*U
         Sigma = U'*Sigma1*U
         C = C1*U
@@ -365,15 +365,15 @@ function discreteVAR{TI<:Integer}(b::ScalarOrArray, B::ScalarOrArray,
 
             # Maximum entropy optimization
             if nMoments == 1 # match only 1 moment
-                temp[jj, :], _, _ = discreteApproximation(y1D[jj, :],
+                temp[jj, :], _, _ = discrete_approximation(y1D[jj, :],
                     X -> (reshape(X, 1, Nm)-condMean[jj, ii])/scalingFactor[jj], [0.0], reshape(q[jj, :], 1, Nm), [0.0])
             else # match 2 moments first
-                p, lambda, momentError = discreteApproximation(y1D[jj, :],
-                    X -> polynomialMoment(X, condMean[jj, ii], scalingFactor[jj], 2),
+                p, lambda, momentError = discrete_approximation(y1D[jj, :],
+                    X -> polynomial_moment(X, condMean[jj, ii], scalingFactor[jj], 2),
                     [0; 1]./(scalingFactor[jj].^(1:2)), reshape(q[jj, :], 1, Nm), lambdaGuess)
                 if norm(momentError) > 1e-5 # if 2 moments fail, then just match 1 moment
                     warn("Failed to match first 2 moments. Just matching 1.")
-                    temp[jj, :], _, _ = discreteApproximation(y1D[jj, :],
+                    temp[jj, :], _, _ = discrete_approximation(y1D[jj, :],
                         X -> (X-condMean[jj,ii])/scalingFactor[jj], 0, reshape(q[jj, :], 1, Nm), 0)
                     lambdaBar[(jj-1)*2+1:jj*2, ii] = zeros(2,1)
                 elseif nMoments == 2
@@ -383,8 +383,8 @@ function discreteVAR{TI<:Integer}(b::ScalarOrArray, B::ScalarOrArray,
                     lambdaBar[(jj-1)*2+1:jj*2, ii] = lambda
                     for mm = 4:2:nMoments
                         lambdaGuess = vcat(lambda, 0.0, 0.0) # add zero to previous lambda
-                        pnew, lambda, momentError = discreteApproximation(y1D[jj,:],
-                            X -> polynomialMoment(X, condMean[jj,ii], scalingFactor[jj], mm),
+                        pnew, lambda, momentError = discrete_approximation(y1D[jj,:],
+                            X -> polynomial_moment(X, condMean[jj,ii], scalingFactor[jj], mm),
                             gaussianMoment[1:mm]./(scalingFactor[jj].^(1:mm)), reshape(q[jj, :], 1, Nm), lambdaGuess)
                         if !(norm(momentError) < 1e-5)
                             warn("Failed to match first $mm moments.  Just matching $(mm-2).")
@@ -440,7 +440,7 @@ end
 Compute a discrete state approximation to a distribution with known moments,
 using the maximum entropy procedure proposed in Tanaka and Toda (2013)
     ```julia
-    p, lambdaBar, momentError = discreteApproximation(D, T, TBar, q, lambda0)
+    p, lambdaBar, momentError = discrete_approximation(D, T, TBar, q, lambda0)
     ```
 ##### Arguments
 - `D::Vector` : (N x 1) vector of grid points. K is the dimension of the
@@ -465,7 +465,7 @@ using the maximum entropy procedure proposed in Tanaka and Toda (2013)
 - `momentError` : (L x 1) vector of errors in moments (defined by moments of
                   discretization minus actual moments)
 """
-function discreteApproximation(D::Vector, T::Function, TBar::Vector,
+function discrete_approximation(D::Vector, T::Function, TBar::Vector,
                                   q::Matrix=ones(N)'/N, # Default prior weights
                                   lambda0::Vector=zeros(Tbar))
 
@@ -481,9 +481,9 @@ function discreteApproximation(D::Vector, T::Function, TBar::Vector,
 
     # Compute maximum entropy discrete distribution
     options = Optim.Options(f_tol=1e-16, x_tol=1e-16)
-    obj(lambda) = entropyObjective(lambda, Tx, TBar, q)
-    grad!(lambda, grad) = entropyGrad!(lambda, grad, Tx, TBar, q)
-    hess!(lambda, hess) = entropyHess!(lambda, hess, Tx, TBar, q)
+    obj(lambda) = entropy_obj(lambda, Tx, TBar, q)
+    grad!(lambda, grad) = entropy_grad!(lambda, grad, Tx, TBar, q)
+    hess!(lambda, hess) = entropy_hess!(lambda, hess, Tx, TBar, q)
     res = Optim.optimize(obj, grad!, hess!, lambda0, Optim.Newton(), options)
     # Sometimes the algorithm fails to converge if the initial guess is too far
     # away from the truth. If this occurs, the program tries an initial guess
@@ -507,9 +507,9 @@ function discreteApproximation(D::Vector, T::Function, TBar::Vector,
 end
 
 """
-Compute the moment defining function used in discreteApproximation
+Compute the moment defining function used in discrete_approximation
     ```julia
-    T = polynomialMoment(X,mu,scalingFactor,nMoment)
+    T = polynomial_moment(X,mu,scalingFactor,nMoment)
     ```
 ##### Inputs:
 - `X::Vector` : (N x 1) vector of grid points
@@ -517,9 +517,9 @@ Compute the moment defining function used in discreteApproximation
 - `scalingFactor::Real` : scaling factor for numerical stability (typically largest grid point)
 - `nMoments::Integer` : number of polynomial moments
 ##### Return
-- `T` : moment defining function used in discreteApproximation
+- `T` : moment defining function used in discrete_approximation
 """
-function polynomialMoment(X::Vector, mu::Real, scalingFactor::Real, nMoments::Integer)
+function polynomial_moment(X::Vector, mu::Real, scalingFactor::Real, nMoments::Integer)
     # Check that scaling factor is positive
     scalingFactor>0 || error("scalingFactor must be a positive number")
 
@@ -528,14 +528,14 @@ function polynomialMoment(X::Vector, mu::Real, scalingFactor::Real, nMoments::In
 end
 
 """
-Compute the maximum entropy objective function used in discreteApproximation
+Compute the maximum entropy objective function used in discrete_approximation
     ```julia
-    obj = entropyObjective(lambda,Tx,TBar,q)
+    obj = entropy_obj(lambda,Tx,TBar,q)
     ```
 ##### Arguments
 - `lambda::Vector` : (L x 1) vector of values of the dual problem variables
 - `Tx::Matrix` : (L x N) matrix of moments evaluated at the grid points
-         specified in discreteApproximation
+         specified in discrete_approximation
 - `TBar::Vector` : (L x 1) vector of moments of the underlying distribution
            which should be matched
 - `q::Matrix` : (1 X N) vector of prior weights for each point in the grid.
@@ -543,7 +543,7 @@ Compute the maximum entropy objective function used in discreteApproximation
 ##### Returns
 - `obj` : scalar value of objective function evaluated at lambda
 """
-function entropyObjective(lambda::Vector, Tx::Matrix, TBar::Vector, q::Matrix)
+function entropy_obj(lambda::Vector, Tx::Matrix, TBar::Vector, q::Matrix)
 
     # Some error checking
     L, N = size(Tx)
@@ -563,7 +563,7 @@ Compute gradient of objective function
 - `grad` : (L x 1) gradient vector of the objective function evaluated
            at lambda
 """
-function entropyGrad!(lambda::Vector, grad::Vector, Tx::Matrix, TBar::Vector, q::Matrix)
+function entropy_grad!(lambda::Vector, grad::Vector, Tx::Matrix, TBar::Vector, q::Matrix)
     L, N = size(Tx)
     !(length(lambda) != L || length(TBar) != L || length(q) != N) || error("Dimensions of inputs are not compatible.")
     Tdiff = Tx-repmat(TBar, 1, N)
@@ -578,7 +578,7 @@ Compute hessian of objective function
 ##### Returns
 - `hess` : (L x L) hessian matrix of the objective function evaluated at `lambda`
 """
-function entropyHess!(lambda::Vector, hess::Matrix, Tx::Matrix, TBar::Vector, q::Matrix)
+function entropy_hess!(lambda::Vector, hess::Matrix, Tx::Matrix, TBar::Vector, q::Matrix)
     L, N = size(Tx)
     !(length(lambda) != L || length(TBar) != L || length(q) != N) || error("Dimensions of inputs are not compatible.")
     Tdiff = Tx-repmat(TBar,1,N)
@@ -596,7 +596,7 @@ close to a multiple of identity matrix as possible
 - `U` : unitary matrix
 - `fval` : minimum value
 """
-function  minVarTrace(A::Matrix)
+function  min_var_trace(A::Matrix)
     ==(size(A)...) || throw(ArgumentError("input matrix must be square"))
 
     K = size(A, 1) # size of A
