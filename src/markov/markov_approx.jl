@@ -366,7 +366,7 @@ function discreteVAR{TI<:Integer}(b::ScalarOrArray, B::ScalarOrArray,
 
             # Maximum entropy optimization
             if nMoments == 1 # match only 1 moment
-                temp[jj, :] = discreteApproximation(y1D[jj, :],
+                temp[jj, :], _, _ = discreteApproximation(y1D[jj, :],
                     X -> (X-condMean[jj, ii])/scalingFactor[jj], 0, reshape(q[jj, :], 1, Nm), 0)
             else # match 2 moments first
                 p, lambda, momentError = discreteApproximation(y1D[jj, :],
