@@ -357,7 +357,7 @@ function discreteVAR{TI<:Integer}(b::ScalarOrArray, B::ScalarOrArray,
         if method == :even
             q = pdf.(Normal.(repmat(condMean[:,ii], 1, Nm), 1), y1D)
         end
-
+        
         # Make sure all elements of the prior are stricly positive
         q[q.<kappa] = kappa
 
@@ -372,15 +372,15 @@ function discreteVAR{TI<:Integer}(b::ScalarOrArray, B::ScalarOrArray,
             # Maximum entropy optimization
             if nMoments == 1 # match only 1 moment
                 temp[jj, :] = discreteApproximation(y1D[jj, :],
-                    X -> (X-condMean[jj, ii])/scalingFactor[jj], 0, q[jj, :]', 0)
+                    X -> (X-condMean[jj, ii])/scalingFactor[jj], 0, reshape(q[jj, :], 1, Nm), 0)
             else # match 2 moments first
                 p, lambda, momentError = discreteApproximation(y1D[jj, :],
                     X -> polynomialMoment(X, condMean[jj, ii], scalingFactor[jj], 2),
-                    [0; 1]./(scalingFactor[jj].^(1:2)), q[jj, :]', lambdaGuess)
+                    [0; 1]./(scalingFactor[jj].^(1:2)), reshape(q[jj, :], 1, Nm), lambdaGuess)
                 if norm(momentError) > 1e-5 # if 2 moments fail, then just match 1 moment
                     warn("Failed to match first 2 moments. Just matching 1.")
                     temp[jj, :], _, _ = discreteApproximation(y1D[jj, :],
-                        X -> (X-condMean[jj,ii])/scalingFactor[jj], 0, q[jj, :]', 0)
+                        X -> (X-condMean[jj,ii])/scalingFactor[jj], 0, reshape(q[jj, :], 1, Nm), 0)
                     lambdaBar[(jj-1)*2+1:jj*2, ii] = zeros(2,1)
                 elseif nMoments == 2
                     lambdaBar[(jj-1)*2+1:jj*2, ii] = lambda
@@ -391,7 +391,7 @@ function discreteVAR{TI<:Integer}(b::ScalarOrArray, B::ScalarOrArray,
                         lambdaGuess = vcat(lambda, 0, 0) # add zero to previous lambda
                         pnew, lambda, momentError = discreteApproximation(y1D[jj,:],
                             X -> polynomialMoment(X, condMean[jj,ii], scalingFactor[jj], mm),
-                            gaussianMoment(1:mm)./(scalingFactor[jj].^(1:mm)'), q[jj, :]', lambdaGuess)
+                            gaussianMoment(1:mm)./(scalingFactor[jj].^(1:mm)'), reshape(q[jj, :], 1, Nm), lambdaGuess)
                         if norm(momentError) > 1e-5
                             warn("Failed to match first $mm moments.  Just matching $(mm-2).")
                             break
