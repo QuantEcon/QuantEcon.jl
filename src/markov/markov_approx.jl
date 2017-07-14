@@ -296,11 +296,6 @@ function discreteVAR{TI<:Integer}(b::ScalarOrArray, B::ScalarOrArray,
         error("nMoments must be either 1 or a positive even integer")
     end
 
-    # Warning about persistence for quadrature method
-    if method == :quadrature && any(eig(B) .> 0.9)
-        warn("The quadrature method may perform poorly for highly persistent processes.")
-    end
-
     # Compute polynomial moments of standard normal distribution
     gaussianMoment = Vector{TI}(nMoments)
     c = 1
@@ -357,7 +352,7 @@ function discreteVAR{TI<:Integer}(b::ScalarOrArray, B::ScalarOrArray,
         if method == :even
             q = pdf.(Normal.(repmat(condMean[:,ii], 1, Nm), 1), y1D)
         end
-        
+
         # Make sure all elements of the prior are stricly positive
         q[q.<kappa] = kappa
 
