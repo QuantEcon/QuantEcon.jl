@@ -25,7 +25,7 @@ understood to be
 X_t = \phi X_{t-1} + \epsilon_t + \theta \epsilon_{t-1}
 ```
 
-where epsilon_t is a white noise process with standard
+where ``\epsilon_t`` is a white noise process with standard
 deviation sigma.
 
 If ``\phi`` and ``\theta`` are arrays or sequences,
