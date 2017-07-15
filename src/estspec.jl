@@ -8,7 +8,7 @@ Functions for working with periodograms of scalar data.
 References
 ----------
 
-http://quant-econ.net/jl/estspec.html
+https://lectures.quantecon.org/jl/estspec.html
 
 =#
 import DSP
@@ -90,14 +90,16 @@ function periodogram(x::Vector, window::AbstractString, window_len::Int=7)
     return w, I_w
 end
 
-"""
+doc"""
 Computes the periodogram
 
-    I(w) = (1 / n) | sum_{t=0}^{n-1} x_t e^{itw} |^2
+```math
+I(w) = (1 / n) | \sum_{t=0}^{n-1} x_t e^{itw} |^2
+```
 
-at the Fourier frequences w_j := 2 pi j / n, j = 0, ..., n - 1, using the fast
-Fourier transform.  Only the frequences w_j in [0, pi] and corresponding values
-I(w_j) are returned.  If a window type is given then smoothing is performed.
+at the Fourier frequences ``w_j := 2 pi j / n, j = 0, \ldots, n - 1``, using the fast
+Fourier transform.  Only the frequences ``w_j`` in ``[0, \pi]`` and corresponding values
+``I(w_j)`` are returned.  If a window type is given then smoothing is performed.
 
 ##### Arguments
 
