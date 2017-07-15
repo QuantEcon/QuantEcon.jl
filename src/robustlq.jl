@@ -29,20 +29,14 @@ and with model misspecification parameter ``\theta``.
 
 ##### Fields
 
-- `Q::Matrix{Float64}` :  The cost(payoff) matrix for the controls. See above
-for more. ``Q`` should be `k x k` and symmetric and positive definite
-- `R::Matrix{Float64}` :  The cost(payoff) matrix for the state. See above for
-more. ``R`` should be `n x n` and symmetric and non-negative definite
-- `A::Matrix{Float64}` :  The matrix that corresponds with the state in the
-state space system. ``A`` should be `n x n`
-- `B::Matrix{Float64}` :  The matrix that corresponds with the control in the
-state space system.  ``B`` should be `n x k`
-- `C::Matrix{Float64}` :  The matrix that corresponds with the random process in
-the state space system. ``C`` should be `n x j`
+- `Q::Matrix{Float64}` :  The cost(payoff) matrix for the controls. See above for more. ``Q`` should be `k x k` and symmetric and positive definite
+- `R::Matrix{Float64}` :  The cost(payoff) matrix for the state. See above for more. ``R`` should be `n x n` and symmetric and non-negative definite
+- `A::Matrix{Float64}` :  The matrix that corresponds with the state in the state space system. ``A`` should be `n x n`
+- `B::Matrix{Float64}` :  The matrix that corresponds with the control in the state space system.  ``B`` should be `n x k`
+- `C::Matrix{Float64}` :  The matrix that corresponds with the random process in the state space system. ``C`` should be `n x j`
 - `beta::Real` : The discount factor in the robust control problem
 - `theta::Real` The robustness factor in the robust control problem
 - `k, n, j::Int` : Dimensions of input matrices
-
 
 """
 type RBLQ
