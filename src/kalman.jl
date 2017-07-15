@@ -48,10 +48,10 @@ time ``t` filtering distribution, using current measurement ``y_t``.
 The updates are according to
 
 ```math
-\hat{x}^F = \hat{x} + \Sigma G' (G \Sigma G' + R)^{-1}
-                (y - G \hat{x})
-\Sigma^F = \Sigma - \Sigma G' (G \Sigma G' + R)^{-1} G
-           \Sigma
+    \hat{x}^F = \hat{x} + \Sigma G' (G \Sigma G' + R)^{-1}
+                    (y - G \hat{x})
+    \Sigma^F = \Sigma - \Sigma G' (G \Sigma G' + R)^{-1} G
+               \Sigma
 ```
 
 #### Arguments
@@ -78,9 +78,9 @@ function prior_to_filtered!(k::Kalman, y)
 end
 
 """
-Updates the moments of the time t filtering distribution to the
+Updates the moments of the time ``t`` filtering distribution to the
 moments of the predictive distribution, which becomes the time
-t+1 prior
+``t+1`` prior
 
 #### Arguments
 - `k::Kalman` An instance of the Kalman filter
