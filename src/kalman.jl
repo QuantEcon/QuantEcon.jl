@@ -8,7 +8,7 @@ Implements the Kalman filter for a linear Gaussian state space model.
 References
 ----------
 
-http://quant-econ.net/jl/kalman.html
+https://lectures.quantecon.org/jl/kalman.html
 
 
 TODO: Do docstrings here after implementing LinerStateSpace
@@ -42,14 +42,17 @@ function set_state!(k::Kalman, x_hat, Sigma)
     Void
 end
 
-"""
-Updates the moments (cur_x_hat, cur_sigma) of the time t prior to the
-time t filtering distribution, using current measurement y_t.
+doc"""
+Updates the moments (`cur_x_hat`, `cur_sigma`) of the time ``t`` prior to the
+time ``t` filtering distribution, using current measurement ``y_t``.
 The updates are according to
-    x_{hat}^F = x_{hat} + Sigma G' (G Sigma G' + R)^{-1}
-                    (y - G x_{hat})
-    Sigma^F = Sigma - Sigma G' (G Sigma G' + R)^{-1} G
-                Sigma
+
+```math
+\hat{x}^F = \hat{x} + \Sigma G' (G \Sigma G' + R)^{-1}
+                (y - G \hat{x})
+\Sigma^F = \Sigma - \Sigma G' (G \Sigma G' + R)^{-1} G
+           \Sigma
+```
 
 #### Arguments
 
@@ -95,7 +98,7 @@ function filtered_to_forecast!(k::Kalman)
 end
 
 """
-Updates cur_x_hat and cur_sigma given array `y` of length `k`.  The full
+Updates `cur_x_hat` and `cur_sigma` given array `y` of length `k`.  The full
 update, from one period to the next
 
 #### Arguments
