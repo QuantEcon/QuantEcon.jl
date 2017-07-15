@@ -222,7 +222,7 @@ This refers to the Value Iteration solution algorithm.
 References
 ----------
 
-http://quant-econ.net/jl/ddp.html
+https://lectures.quantecon.org/py/discrete_dp.html
 
 """
 immutable VFI <: DDPAlgorithm end
@@ -233,7 +233,7 @@ This refers to the Policy Iteration solution algorithm.
 References
 ----------
 
-http://quant-econ.net/jl/ddp.html
+https://lectures.quantecon.org/py/discrete_dp.html
 
 """
 immutable PFI <: DDPAlgorithm end
@@ -244,7 +244,7 @@ This refers to the Modified Policy Iteration solution algorithm.
 References
 ----------
 
-http://quant-econ.net/jl/ddp.html
+https://lectures.quantecon.org/py/discrete_dp.html
 
 """
 immutable MPFI <: DDPAlgorithm end
