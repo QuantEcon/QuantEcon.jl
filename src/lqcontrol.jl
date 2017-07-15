@@ -56,19 +56,19 @@ case, ``V, P, d`` and ``F`` are all stationary.
 
 ##### Fields
 
-- `Q::ScalarOrArray` : k x k payoff coefficient for control variable u. Must be
+- `Q::ScalarOrArray` : `k x k` payoff coefficient for control variable u. Must be
 symmetric and nonnegative definite
-- `R::ScalarOrArray` : n x n payoff coefficient matrix for state variable x.
+- `R::ScalarOrArray` : `n x n` payoff coefficient matrix for state variable x.
 Must be symmetric and nonnegative definite
-- `A::ScalarOrArray` : n x n coefficient on state in state transition
-- `B::ScalarOrArray` : n x k coefficient on control in state transition
-- `C::ScalarOrArray` : n x j coefficient on random shock in state transition
-- `N::ScalarOrArray` : k x n cross product in payoff equation
-- `bet::Real` : Discount factor in [0, 1]
+- `A::ScalarOrArray` : `n x n` coefficient on state in state transition
+- `B::ScalarOrArray` : `n x k` coefficient on control in state transition
+- `C::ScalarOrArray` : `n x j` coefficient on random shock in state transition
+- `N::ScalarOrArray` : `k x n` cross product in payoff equation
+- `bet::Real` : Discount factor in `[0, 1]`
 - `capT::Union{Int, Void}` : Terminal period in finite horizon problem
 - `rf::ScalarOrArray` : n x n terminal payoff in finite horizon problem. Must be
 symmetric and nonnegative definite
-- `P::ScalarOrArray` : n x n matrix in value function representation
+- `P::ScalarOrArray` : `n x n` matrix in value function representation
 V(x) = x'Px + d
 - `d::Real` : Constant in value function representation
 - `F::ScalarOrArray` : Policy rule that specifies optimal control in each period
@@ -99,20 +99,20 @@ transition equation.
 
 ##### Arguments
 
-- `Q::ScalarOrArray` : k x k payoff coefficient for control variable u. Must be
+- `Q::ScalarOrArray` : `k x k` payoff coefficient for control variable u. Must be
 symmetric and nonnegative definite
-- `R::ScalarOrArray` : n x n payoff coefficient matrix for state variable x.
+- `R::ScalarOrArray` : `n x n` payoff coefficient matrix for state variable x.
 Must be symmetric and nonnegative definite
-- `A::ScalarOrArray` : n x n coefficient on state in state transition
-- `B::ScalarOrArray` : n x k coefficient on control in state transition
-- `;C::ScalarOrArray{zeros(size(R}(1)))` : n x j coefficient on random shock in
+- `A::ScalarOrArray` : `n x n` coefficient on state in state transition
+- `B::ScalarOrArray` : `n x k` coefficient on control in state transition
+- `;C::ScalarOrArray{zeros(size(R}(1)))` : `n x j` coefficient on random shock in
 state transition
-- `;N::ScalarOrArray{zeros(size(B,1)}(size(A, 2)))` : k x n cross product in
+- `;N::ScalarOrArray{zeros(size(B,1)}(size(A, 2)))` : `k x n` cross product in
 payoff equation
-- `;bet::Real(1.0)` : Discount factor in [0, 1]
+- `;bet::Real(1.0)` : Discount factor in `[0, 1]`
 - `capT::Union{Int, Void}(Void)` : Terminal period in finite horizon
 problem
-- `rf::ScalarOrArray{fill(NaN}(size(R)...))` : n x n terminal payoff in finite
+- `rf::ScalarOrArray{fill(NaN}(size(R)...))` : `n x n` terminal payoff in finite
 horizon problem. Must be symmetric and nonnegative definite.
 
 """
@@ -144,7 +144,7 @@ Update `P` and `d` from the value function representation in finite horizon case
 
 ##### Returns
 
-- `P::ScalarOrArray` : n x n matrix in value function representation
+- `P::ScalarOrArray` : `n x n` matrix in value function representation
 V(x) = x'Px + d
 - `d::Real` : Constant in value function representation
 
@@ -296,9 +296,9 @@ Compute and return the optimal state and control sequence, assuming innovation `
 
 ##### Returns
 
-- `x_path::Matrix{Float64}` : An n x T+1 matrix, where the t-th column represents `x_t`
-- `u_path::Matrix{Float64}` : A k x T matrix, where the t-th column represents `u_t`
-- `w_path::Matrix{Float64}` : A n x T+1 matrix, where the t-th column represents `lq.C*N(0,1)`
+- `x_path::Matrix{Float64}` : An `n x T+1` matrix, where the t-th column represents ``x_t``
+- `u_path::Matrix{Float64}` : A `k x T` matrix, where the t-th column represents ``u_t``
+- `w_path::Matrix{Float64}` : A `n x T+1` matrix, where the t-th column represents `lq.C*N(0,1)`
 
 """
 function compute_sequence(lq::LQ, x0::ScalarOrArray, ts_length::Integer=100)
