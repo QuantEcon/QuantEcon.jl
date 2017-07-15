@@ -32,7 +32,7 @@ where ``\epsilon_t \sim N (0, \sigma^2)``
 - `σ::Real` : Standard deviation of random component of AR(1) process
 - `μ::Real(0.0)` : Mean of AR(1) process
 - `n_std::Integer(3)` : The number of standard deviations to each side the process
-should span
+  should span
 
 ##### Returns
 
@@ -175,7 +175,7 @@ For more info, refer to:
 ##### Returns
 
 - `mc::MarkovChain{T}` : A Markov chain holding the state values and
-transition matrix
+  transition matrix
 
 """
 function estimate_mc_discrete{T}(X::Vector{T}, states::Vector{T})

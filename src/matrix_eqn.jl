@@ -22,9 +22,9 @@ starting from ``X_0 = B, a_0 = A``:
 ##### Arguments
 
 - `A::Matrix{Float64}` : An `n x n` matrix as described above.  We assume in order
-for  convergence that the eigenvalues of ``A`` have moduli bounded by unity
+  for  convergence that the eigenvalues of ``A`` have moduli bounded by unity
 - `B::Matrix{Float64}` :  An `n x n` matrix as described above.  We assume in order
-for convergence that the eigenvalues of ``B`` have moduli bounded by unity
+  for convergence that the eigenvalues of ``B`` have moduli bounded by unity
 - `max_it::Int(50)` :  Maximum number of iterations
 
 ##### Returns
@@ -91,7 +91,7 @@ Note that `A, B, R, Q` can either be real (i.e. `k, n = 1`) or matrices.
 
 ##### Returns
 - `X::Matrix{Float64}` The fixed point of the Riccati equation; a `k x k` array
-representing the approximate solution
+  representing the approximate solution
 
 ##### References
 

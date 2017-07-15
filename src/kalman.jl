@@ -44,12 +44,13 @@ end
 
 doc"""
 Updates the moments (`cur_x_hat`, `cur_sigma`) of the time ``t`` prior to the
-time ``t` filtering distribution, using current measurement ``y_t``.
+time ``t`` filtering distribution, using current measurement ``y_t``.
 The updates are according to
 
 ```math
     \hat{x}^F = \hat{x} + \Sigma G' (G \Sigma G' + R)^{-1}
-                    (y - G \hat{x})
+                    (y - G \hat{x}) \\
+                    
     \Sigma^F = \Sigma - \Sigma G' (G \Sigma G' + R)^{-1} G
                \Sigma
 ```

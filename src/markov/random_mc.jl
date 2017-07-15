@@ -88,7 +88,7 @@ each row.
 
 - `n::Integer` : Number of states.
 - `k::Union{Integer, Void}(nothing)` : Number of nonzero entries in each
-column of the matrix. Set to `n` if note specified.
+  column of the matrix. Set to `n` if none specified.
 
 ##### Returns
 
@@ -118,12 +118,12 @@ as columns `m` probability vectors of length `n` with `k` nonzero entries.
 - `n::Integer` : Number of states.
 - `m::Integer` : Number of probability vectors.
 - `;k::Union{Integer, Void}(nothing)` : Number of nonzero entries in each
-column of the matrix. Set to `n` if note specified.
+  column of the matrix. Set to `n` if none specified.
 
 ##### Returns
 
 - `p::Array` : Array of shape `(n, m)` containing `m` probability vectors of length
-`n` as columns.
+  `n` as columns.
 
 """
 function _random_stochastic_matrix(n::Integer, m::Integer;
@@ -164,11 +164,11 @@ distribution with mean 0 and standard deviation `scale`.
 - `num_states::Integer` : Number of states.
 - `num_actions::Integer` : Number of actions.
 - `beta::Union{Float64, Void}(nothing)` : Discount factor. Randomly chosen from
-[0, 1) if not specified.
+  `[0, 1)` if not specified.
 - `;k::Union{Integer, Void}(nothing)` : Number of possible next states for each
-state-action pair. Equal to `num_states` if not specified.
+  state-action pair. Equal to `num_states` if not specified.
 - `scale::Real(1)` : Standard deviation of the normal distribution for the
-reward values.
+  reward values.
 
 ##### Returns
 

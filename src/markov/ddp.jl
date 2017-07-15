@@ -250,7 +250,7 @@ https://lectures.quantecon.org/py/discrete_dp.html
 immutable MPFI <: DDPAlgorithm end
 
 """
-DPSolveResult is an object for retaining results and associated metadata after
+`DPSolveResult` is an object for retaining results and associated metadata after
 solving the model
 
 ##### Parameters
@@ -259,7 +259,7 @@ solving the model
 
 ##### Returns
 
-- `ddpr::DPSolveResult` : DiscreteDP Results object
+- `ddpr::DPSolveResult` : DiscreteDP results object
 
 """
 type DPSolveResult{Algo<:DDPAlgorithm,Tval<:Real}
@@ -336,7 +336,7 @@ The Bellman operator, which computes and returns the updated value function ``Tv
 for a given value function ``v``.
 
 This function will fill the input `v` with `Tv` and the input `sigma` with the
-corresponding policy rule
+corresponding policy rule.
 
 ##### Parameters
 
@@ -382,8 +382,8 @@ bellman_operator(ddp::DiscreteDP, v::Vector) =
 # Compute greedy methods #
 # ---------------------- #
 
-"""
-Compute the v-greedy policy
+doc"""
+Compute the ``v``-greedy policy
 
 ##### Parameters
 
@@ -465,18 +465,18 @@ Solve the dynamic programming problem.
 
 - `ddp::DiscreteDP` : Object that contains the Model Parameters
 - `method::Type{T<Algo}(VFI)`: Type name specifying solution method. Acceptable
-arguments are `VFI` for value function iteration or `PFI` for policy function
-iteration or `MPFI` for modified policy function iteration
+  arguments are `VFI` for value function iteration or `PFI` for policy function
+  iteration or `MPFI` for modified policy function iteration
 - `;max_iter::Int(250)` : Maximum number of iterations
 - `;epsilon::Float64(1e-3)` : Value for epsilon-optimality. Only used if
-`method` is `VFI`
+  `method` is `VFI`
 - `;k::Int(20)` : Number of iterations for partial policy evaluation in modified
-policy iteration (irrelevant for other methods).
+  policy iteration (irrelevant for other methods).
 
 ##### Returns
 
 - `ddpr::DPSolveResult{Algo}` : Optimization result represented as a
-DPSolveResult. See `DPSolveResult` for details.
+  `DPSolveResult`. See `DPSolveResult` for details.
 """
 function solve{Algo<:DDPAlgorithm,T}(ddp::DiscreteDP{T}, method::Type{Algo}=VFI;
                                      max_iter::Integer=250, epsilon::Real=1e-3,
@@ -534,10 +534,10 @@ the transition probability matrix `Q_sigma`.
 
 ##### Returns
 
-- `R_sigma::Array{Float64}`: Reward vector for `sigma`, of length n.
+- `R_sigma::Array{Float64}`: Reward vector for `sigma`, of length `n`.
 
 - `Q_sigma::Array{Float64}`: Transition probability matrix for `sigma`,
-  of shape (n, n).
+  of shape `(n, n)`.
 
 """
 function RQ_sigma{T<:Integer}(ddp::DDP, sigma::Array{T})
@@ -582,7 +582,7 @@ s_wise_max!(vals::AbstractMatrix, out::Vector) = (println("calling this one! ");
 Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
 `AbstractMatrix` of size `(num_states, num_actions)`.
 
-Also fills `out_argmax` with the column number associated with the indmax in
+Also fills `out_argmax` with the column number associated with the `indmax` in
 each row
 """
 function s_wise_max!(vals::AbstractMatrix, out::Vector, out_argmax::Vector)
@@ -642,7 +642,7 @@ end
 Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
 `Vector` of size `(num_sa_pairs,)`.
 
-Also fills `out_argmax` with the cartesiean index associated with the indmax in
+Also fills `out_argmax` with the cartesiean index associated with the `indmax` in
 each row
 """
 function s_wise_max!(a_indices::Vector, a_indptr::Vector, vals::Vector,
@@ -669,7 +669,7 @@ Check whether `s_indices` and `a_indices` are sorted in lexicographic order.
 
 Parameters
 ----------
-s_indices, a_indices : Vectors
+`s_indices`, `a_indices` : Vectors
 
 Returns
 -------
@@ -696,11 +696,10 @@ in sorted order.
 
 Parameters
 ----------
-num_states : Int
+- `num_states::Integer`
+- `s_indices::Vector{T}`
+- `out::Vector{T}` :  with length = `num_states` + 1
 
-s_indices : Vector{Int}
-
-out : Vector{Int} with length = num_states+1
 """
 function _generate_a_indptr!(num_states::Int, s_indices::Vector, out::Vector)
     idx = 1
@@ -727,10 +726,10 @@ function _find_indices!(a_indices::Vector, a_indptr::Vector, sigma::Vector,
     end
 end
 
-"""
+doc"""
 Define Matrix Multiplication between 3-dimensional matrix and a vector
 
-Matrix multiplication over the last dimension of A
+Matrix multiplication over the last dimension of ``A``
 
 """
 function *{T}(A::Array{T,3}, v::Vector)

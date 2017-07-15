@@ -19,14 +19,14 @@ standard normal and ``x_0`` the initial condition.
 
 ##### Arguments
 - `A::Union{Float64, Matrix{Float64}}` The `n x n` matrix described above (scalar)
-if n = 1
+  if `n = 1`
 - `C::Union{Float64, Matrix{Float64}}` The `n x n` matrix described above (scalar)
-if n = 1
+  if `n = 1`
 - `H::Union{Float64, Matrix{Float64}}` The `n x n` matrix described above (scalar)
-if n = 1
-- `beta::Float64`: Discount factor in (0, 1)
+  if `n = 1`
+- `beta::Float64`: Discount factor in `(0, 1)`
 - `x_0::Union{Float64, Vector{Float64}}` The initial condtion. A conformable
-array (of length `n`) or a scalar if `n=1`
+  array (of length `n`) or a scalar if `n = 1`
 
 ##### Returns
 
@@ -37,7 +37,7 @@ array (of length `n`) or a scalar if `n=1`
 The formula for computing ``q(x_0)`` is ``q(x_0) = x_0' Q x_0 + v`` where
 
 - ``Q`` is the solution to ``Q = H + \beta A' Q A`` and
-- ``v = trace(C' Q C) \beta / (1 - \beta)``
+- ``v = \frac{trace(C' Q C) \beta}{1 - \beta}``
 
 """
 function var_quadratic_sum(A::ScalarOrArray, C::ScalarOrArray, H::ScalarOrArray,
@@ -72,9 +72,9 @@ more information.
 ##### Arguments
 
 - `A::Matrix{Float64}` : An `n x n` matrix as described above.  We assume in order
-for convergence that the eigenvalues of ``A`` have moduli bounded by unity
+  for convergence that the eigenvalues of ``A`` have moduli bounded by unity
 - `B::Matrix{Float64}` : An `n x n` matrix as described above.  We assume in order
-for convergence that the eigenvalues of ``B`` have moduli bounded by unity
+  for convergence that the eigenvalues of ``B`` have moduli bounded by unity
 - `max_it::Int(50)` : Maximum number of iterations
 
 ##### Returns

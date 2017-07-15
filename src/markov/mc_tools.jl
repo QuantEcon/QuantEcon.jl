@@ -82,7 +82,7 @@ one, up to normalization) nonzero solution exists corresponding to each
 reccurent class of ``A``, and in particular, if ``A`` is irreducible, there is a
 unique solution; when there are more than one solution, the routine returns the
 solution that contains in its support the first index ``i`` such that no path
-connects `i` to any index larger than ``i``. The solution is normalized so that
+connects ``i`` to any index larger than ``i``. The solution is normalized so that
 its 1-norm equals one. This routine implements the Grassmann-Taksar-Heyman
 (GTH) algorithm (Grassmann, Taksar, and Heyman 1985), a numerically stable
 variant of Gaussian elimination, where only the off-diagonal entries of ``A`` are
@@ -101,10 +101,10 @@ used as the input data. For a nice exposition of the algorithm, see Stewart
 ##### References
 
 - W. K. Grassmann, M. I. Taksar and D. P. Heyman, "Regenerative Analysis and
-Steady State Distributions for Markov Chains, " Operations Research (1985),
-1107-1116.
+  Steady State Distributions for Markov Chains, " Operations Research (1985),
+  1107-1116.
 - W. J. Stewart, Probability, Markov Chains, Queues, and Simulation, Princeton
-University Press, 2009.
+  University Press, 2009.
 
 """
 gth_solve{T<:Real}(A::Matrix{T}) = gth_solve!(copy(A))
@@ -159,7 +159,7 @@ Find the recurrent classes of the Markov chain `mc`.
 ##### Returns
 
 - `::Vector{Vector{Int}}` : Vector of vectors that describe the recurrent
-classes of `mc`.
+  classes of `mc`.
 
 """
 recurrent_classes(mc::MarkovChain) = attracting_components(DiGraph(mc.p))
@@ -174,7 +174,7 @@ Find the communication classes of the Markov chain `mc`.
 ### Returns
 
 - `::Vector{Vector{Int}}` : Vector of vectors that describe the communication
-classes of `mc`.
+  classes of `mc`.
 
 """
 communication_classes(mc::MarkovChain) = strongly_connected_components(DiGraph(mc.p))
@@ -273,7 +273,7 @@ recurrent class.
 """ stationary_distributions
 
 
-"""Custom version of `full`, which allows convertion to type T"""
+"""Custom version of `full`, which allows convertion to type `T`"""
 # From base/sparse/sparsematrix.jl
 function todense(T::Type, S::SparseMatrixCSC)
     A = zeros(T, S.m, S.n)
@@ -287,7 +287,7 @@ function todense(T::Type, S::SparseMatrixCSC)
     return A
 end
 
-"""If A is already dense, return A as is"""
+"""If `A` is already dense, return `A` as is"""
 todense(::Type, A::Array) = A
 
 
@@ -356,7 +356,7 @@ The resulting vector has the state values of `mc` as elements.
 ### Returns
 
 - `X::Vector` : Vector containing the sample path, with length
-ts_length
+  ts_length
 """
 function simulate(mc::MarkovChain, ts_length::Int;
                   init::Int=rand(1:n_states(mc)))
@@ -411,7 +411,7 @@ The resulting vector has the indices of the state values of `mc` as elements.
 ### Returns
 
 - `X::Vector{Int}` : Vector containing the sample path, with length
-ts_length
+  ts_length
 """
 function simulate_indices(mc::MarkovChain, ts_length::Int;
                           init::Int=rand(1:n_states(mc)))

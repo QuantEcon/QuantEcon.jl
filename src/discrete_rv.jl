@@ -43,7 +43,7 @@ function DiscreteRV{TV<:AbstractVector}(q::TV)
 end
 
 """
-Make a single draw from the discrete distribution
+Make a single draw from the discrete distribution.
 
 ##### Arguments
 
@@ -62,7 +62,7 @@ Make multiple draws from the discrete distribution represented by a
 ##### Arguments
 
 - `d::DiscreteRV`: The `DiscreteRV` type representing the distribution
-- `k::Int`:
+- `k::Int`
 
 ##### Returns
 

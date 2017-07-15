@@ -238,7 +238,7 @@ Compute agent 2's best cost-minimizing response ``K``, given ``F``.
 
 ##### Returns
 
-- `K::Matrix{Float64}` : Agent's best cost minimizing response corresponding to `F`
+- `K::Matrix{Float64}` : Agent's best cost minimizing response corresponding to ``F``
 - `P::Matrix{Float64}` : The value function corresponding to ``F``
 
 """
