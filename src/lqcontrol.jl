@@ -66,10 +66,8 @@ Must be symmetric and nonnegative definite
 - `N::ScalarOrArray` : `k x n` cross product in payoff equation
 - `bet::Real` : Discount factor in `[0, 1]`
 - `capT::Union{Int, Void}` : Terminal period in finite horizon problem
-- `rf::ScalarOrArray` : n x n terminal payoff in finite horizon problem. Must be
-symmetric and nonnegative definite
-- `P::ScalarOrArray` : `n x n` matrix in value function representation
-V(x) = x'Px + d
+- `rf::ScalarOrArray` : n x n terminal payoff in finite horizon problem. Must be symmetric and nonnegative definite
+- `P::ScalarOrArray` : `n x n` matrix in value function representation ``V(x) = x'Px + d``
 - `d::Real` : Constant in value function representation
 - `F::ScalarOrArray` : Policy rule that specifies optimal control in each period
 
