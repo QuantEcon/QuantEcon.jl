@@ -33,29 +33,29 @@ double optimal linear regulator problem.
 
 ##### Arguments
 
-- `A` : Corresponds to the above equation, should be of size (n, n)
-- `B1` : As above, size (n, k_1)
-- `B2` : As above, size (n, k_2)
-- `R1` : As above, size (n, n)
-- `R2` : As above, size (n, n)
-- `Q1` : As above, size (k_1, k_1)
-- `Q2` : As above, size (k_2, k_2)
-- `S1` : As above, size (k_1, k_1)
-- `S2` : As above, size (k_2, k_2)
-- `W1` : As above, size (n, k_1)
-- `W2` : As above, size (n, k_2)
-- `M1` : As above, size (k_2, k_1)
-- `M2` : As above, size (k_1, k_2)
+- `A` : Corresponds to the above equation, should be of size `(n, n)`
+- `B1` : As above, size `(n, k_1)`
+- `B2` : As above, size `(n, k_2)`
+- `R1` : As above, size `(n, n)`
+- `R2` : As above, size `(n, n)`
+- `Q1` : As above, size `(k_1, k_1)`
+- `Q2` : As above, size `(k_2, k_2)`
+- `S1` : As above, size `(k_1, k_1)`
+- `S2` : As above, size `(k_2, k_2)`
+- `W1` : As above, size `(n, k_1)`
+- `W2` : As above, size `(n, k_2)`
+- `M1` : As above, size `(k_2, k_1)`
+- `M2` : As above, size `(k_1, k_2)`
 - `;beta::Float64(1.0)` Discount rate
 - `;tol::Float64(1e-8)` : Tolerance level for convergence
 - `;max_iter::Int(1000)` : Maximum number of iterations allowed
 
 ##### Returns
 
-- `F1::Matrix{Float64}`: (k_1, n) matrix representing feedback law for agent 1
-- `F2::Matrix{Float64}`: (k_2, n) matrix representing feedback law for agent 2
-- `P1::Matrix{Float64}`: (n, n) matrix representing the steady-state solution to the associated discrete matrix ticcati equation for agent 1
-- `P2::Matrix{Float64}`: (n, n) matrix representing the steady-state solution to the associated discrete matrix riccati equation for agent 2
+- `F1::Matrix{Float64}`: `(k_1, n)` matrix representing feedback law for agent 1
+- `F2::Matrix{Float64}`: `(k_2, n)` matrix representing feedback law for agent 2
+- `P1::Matrix{Float64}`: `(n, n)` matrix representing the steady-state solution to the associated discrete matrix ticcati equation for agent 1
+- `P2::Matrix{Float64}`: `(n, n)` matrix representing the steady-state solution to the associated discrete matrix riccati equation for agent 2
 
 """
 function nnash(a, b1, b2, r1, r2, q1, q2, s1, s2, w1, w2, m1, m2;
