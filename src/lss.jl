@@ -187,7 +187,7 @@ initial conditions `lss.mu_0` and `lss.Sigma_0`
 #### Returns
 
 - `mu_x::Vector` Represents the stationary mean of ``x_t``
-- `mu_y::Vector`Represents the stationary mean of ``y_t``
+- `mu_y::Vector` Represents the stationary mean of ``y_t``
 - `Sigma_x::Matrix` Represents the var-cov matrix
 - `Sigma_y::Matrix` Represents the var-cov matrix
 
