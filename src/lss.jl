@@ -26,9 +26,8 @@ A type that describes the Gaussian Linear State Space Model
 of the form:
 
 ```math
-    x_{t+1} = A x_t + C w_{t+1}
-```
-```math
+    x_{t+1} = A x_t + C w_{t+1} \\
+    
     y_t = G x_t + H v_t
 ```
 
@@ -119,9 +118,9 @@ Simulate `num_reps` observations of ``x_T`` and ``y_T`` given ``x_0 \sim N(\mu_0
 
 #### Returns
 
-- `x::Matrix` An n x num_reps matrix, where the j-th column is the j_th
+- `x::Matrix` An `n x num_reps` matrix, where the j-th column is the j_th
               observation of ``x_T``
-- `y::Matrix` An k x num_reps matrix, where the j-th column is the j_th
+- `y::Matrix` An `k x num_reps` matrix, where the j-th column is the j_th
               observation of ``y_T``
 
 """
