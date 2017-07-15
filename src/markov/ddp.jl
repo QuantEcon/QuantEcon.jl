@@ -8,7 +8,7 @@ Discrete Decision Processes
 References
 ----------
 
-http://quant-econ.net/jl/ddp.html
+https://lectures.quantecon.org/py/discrete_dp.html
 
 Notes
 -----
