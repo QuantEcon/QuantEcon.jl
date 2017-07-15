@@ -21,12 +21,12 @@ TODO: as of 07/10/2014 it is not possible to define the property
 
 """
 Generates an array of draws from a discrete random variable with
-vector of probabilities given by q.
+vector of probabilities given by `q`.
 
 ##### Fields
 
 - `q::AbstractVector`: A vector of non-negative probabilities that sum to 1
-- `Q::AbstractVector`: The cumulative sum of q
+- `Q::AbstractVector`: The cumulative sum of `q`
 """
 type DiscreteRV{TV1<:AbstractVector, TV2<:AbstractVector}
     q::TV1
