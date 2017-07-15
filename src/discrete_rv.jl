@@ -10,7 +10,7 @@ specified vector of probabilities.
 References
 ----------
 
-http://quant-econ.net/jl/finite_markov.html?highlight=discrete_rv
+https://lectures.quantecon.org/jl/finite_markov.html
 
 
 TODO: as of 07/10/2014 it is not possible to define the property
