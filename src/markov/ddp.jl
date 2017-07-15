@@ -296,9 +296,9 @@ end
 # Bellman operator methods #
 # ------------------------ #
 
-"""
-The Bellman operator, which computes and returns the updated value function Tv
-for a value function v.
+doc"""
+The Bellman operator, which computes and returns the updated value function ``Tv``
+for a value function ``v``.
 
 ##### Parameters
 
@@ -320,7 +320,7 @@ function bellman_operator!(ddp::DiscreteDP, v::Vector, Tv::Vector, sigma::Vector
     Tv, sigma
 end
 
-"""
+doc"""
 Apply the Bellman operator using `v=ddpr.v`, `Tv=ddpr.Tv`, and `sigma=ddpr.sigma`
 
 ##### Notes
@@ -332,8 +332,8 @@ bellman_operator!(ddp::DiscreteDP, ddpr::DPSolveResult) =
     bellman_operator!(ddp, ddpr.v, ddpr.Tv, ddpr.sigma)
 
 """
-The Bellman operator, which computes and returns the updated value function Tv
-for a given value function v.
+The Bellman operator, which computes and returns the updated value function ``Tv``
+for a given value function ``v``.
 
 This function will fill the input `v` with `Tv` and the input `sigma` with the
 corresponding policy rule
@@ -362,9 +362,9 @@ function bellman_operator!{T1<:Rational,T2<:Rational,NR,NQ,T3<:Rational}(ddp::Di
     bellman_operator!(ddp, v, v, sigma)
 end
 
-"""
-The Bellman operator, which computes and returns the updated value function Tv
-for a given value function v.
+doc"""
+The Bellman operator, which computes and returns the updated value function ``Tv``
+for a given value function ``v``.
 
 ##### Parameters
 
@@ -402,8 +402,8 @@ modifies ddpr.sigma and ddpr.Tv in place
 compute_greedy!(ddp::DiscreteDP, ddpr::DPSolveResult) =
     (bellman_operator!(ddp, ddpr); ddpr.sigma)
 
-"""
-Compute the v-greedy policy.
+doc"""
+Compute the ``v``-greedy policy.
 
 #### Arguments
 
@@ -444,7 +444,7 @@ Compute the value of a policy.
 
 ##### Returns
 
-- `v_sigma::Array{Float64}` : Value vector of `sigma`, of length n.
+- `v_sigma::Array{Float64}` : Value vector of `sigma`, of length `n`.
 
 """
 function evaluate_policy{T<:Integer}(ddp::DiscreteDP, sigma::Vector{T})
