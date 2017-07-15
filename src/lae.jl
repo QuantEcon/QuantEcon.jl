@@ -15,13 +15,13 @@ This is a density in y.
 References
 ----------
 
-http://quant-econ.net/jl/stationary_densities.html
+https://lectures.quantecon.org/jl/stationary_densities.html
 =#
 
 
 """
-A look ahead estimator associated with a given stochastic kernel p and a vector
-of observations X.
+A look ahead estimator associated with a given stochastic kernel `p` and a vector
+of observations `X`.
 
 ##### Fields
 
@@ -43,7 +43,7 @@ end
 
 """
 A vectorized function that returns the value of the look ahead estimate at the
-values in the array y.
+values in the array `y`.
 
 ##### Arguments
 
