@@ -25,10 +25,8 @@ state transitions.
 
 ##### Fields
 
-- `p::AbstractMatrix` : The transition matrix. Must be square, all elements
-must be nonnegative, and all rows must sum to unity.
-- `state_values::AbstractVector` : Vector containing the values associated with
-the states.
+- `p::AbstractMatrix` : The transition matrix. Must be square, all elements must be nonnegative, and all rows must sum to unity.
+- `state_values::AbstractVector` : Vector containing the values associated with the states.
 """
 type MarkovChain{T, TM<:AbstractMatrix, TV<:AbstractVector}
     p::TM # valid stochastic matrix
