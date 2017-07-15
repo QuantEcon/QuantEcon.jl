@@ -8,20 +8,22 @@ Various routines to discretize AR(1) processes
 References
 ----------
 
-http://quant-econ.net/jl/finite_markov.html
+https://lectures.quantecon.org/jl/finite_markov.html
 =#
 
 std_norm_cdf{T <: Real}(x::T) = 0.5 * erfc(-x/sqrt(2))
 std_norm_cdf{T <: Real}(x::Array{T}) = 0.5 .* erfc(-x./sqrt(2))
 
-"""
+doc"""
 Tauchen's (1996) method for approximating AR(1) process with finite markov chain
 
 The process follows
 
-    y_t = μ + ρ y_{t-1} + ε_t,
+```math
+    y_t = \mu + \rho y_{t-1} + \epsilon_t
+```
 
-where ε_t ~ N (0, σ^2)
+where ``\epsilon_t \sim N (0, \sigma^2)``
 
 ##### Arguments
 
@@ -34,8 +36,7 @@ should span
 
 ##### Returns
 
-- `mc::MarkovChain{Float64}` : Markov chain holding the state values and
-transition matrix
+- `mc::MarkovChain{Float64}` : Markov chain holding the state values and transition matrix
 
 """
 function tauchen(N::Integer, ρ::Real, σ::Real, μ::Real=0.0, n_std::Integer=3)
@@ -83,14 +84,16 @@ function tauchen(N::Integer, ρ::Real, σ::Real, μ::Real=0.0, n_std::Integer=3)
 end
 
 
-"""
+doc"""
 Rouwenhorst's method to approximate AR(1) processes.
 
 The process follows
 
-    y_t = μ + ρ y_{t-1} + ε_t,
+```math
+    y_t = \mu + \rho y_{t-1} + \epsilon_t
+```
 
-where ε_t ~ N (0, σ^2)
+where ``\epsilon_t \sim N (0, \sigma^2)``
 
 ##### Arguments
 - `N::Integer` : Number of points in markov process
@@ -100,8 +103,7 @@ where ε_t ~ N (0, σ^2)
 
 ##### Returns
 
-- `mc::MarkovChain{Float64}` : Markov chain holding the state values and
-transition matrix
+- `mc::MarkovChain{Float64}` : Markov chain holding the state values and transition matrix
 
 """
 function rouwenhorst(N::Integer, ρ::Real, σ::Real, μ::Real=0.0)
@@ -136,24 +138,26 @@ end
 @inline _emcd_lt{T}(a::T, b::T) = isless(a, b)
 @inline _emcd_lt{T}(a::Vector{T}, b::Vector{T}) = Base.lt(Base.Order.Lexicographic, a, b)
 
-"""
+doc"""
 Accepts the simulation of a discrete state Markov chain and estimates
 the transition probabilities
 
-Let S = {s₁, s₂, ..., sₙ} with s₁ < s₂ < ... < sₙ be the discrete
-states of a Markov chain. Furthermore, let P be the corresponding
+Let ``S = s_1, s_2, \ldots, s_i`` with ``s_1 < s_2 < \ldots < s_i`` be the discrete
+states of a Markov chain. Furthermore, let ``P`` be the corresponding
 stochastic transition matrix.
 
-Given a history of observations, {X} where xₜ ∈ S ∀ t, we would like
-to estimate the transition probabilities in P, pᵢⱼ. For xₜ=sᵢ and xₜ₋₁=sⱼ,
-let P(xₜ | xₜ₋₁) be the pᵢⱼ element of the stochastic matrix. The likelihood
+Given a history of observations, ``{X}`` where ``x_t \in S \forall t``, we would like
+to estimate the transition probabilities in ``P``, ``p_{i,j}``. For ``x_t=s_i`` and ``x_{t-1}=s_j``,
+let ``P(x_t | x_{t-1})`` be the ``p_{i,j}`` element of the stochastic matrix. The likelihood
 function is then given by
 
-    L({X}ₜ; P) = P(x_1) ∏_{t=2}^{T} P(xₜ | xₜ₋₁)
+```math
+    L({X}_t; P) = P(x_1) \prod_{t=2}^{T} P(x_t | x_{t-1})
+```
 
 The maximum likelihood estimate is then just given by the number of times
-a transition from sᵢ to sⱼ is observed divided by the number of times
-sᵢ was observed.
+a transition from ``s_i`` to ``s_j`` is observed divided by the number of times
+``s_i`` was observed.
 
 Note: Because of the estimation procedure used, only states that are observed
 in the history appear in the estimated Markov chain... It can't divine whether
