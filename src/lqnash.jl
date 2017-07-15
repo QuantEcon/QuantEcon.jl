@@ -9,22 +9,26 @@ problems.
 
 =#
 
-"""
+doc"""
 Compute the limit of a Nash linear quadratic dynamic game.
 
 Player `i` minimizes
 
-    sum_{t=1}^{inf}(x_t' r_i x_t + 2 x_t' w_i
+```math
+    \sum_{t=1}^{\infty}(x_t' r_i x_t + 2 x_t' w_i
     u_{it} +u_{it}' q_i u_{it} + u_{jt}' s_i u_{jt} + 2 u_{jt}'
     m_i u_{it})
+```
 
 subject to the law of motion
 
+```math
     x_{t+1} = A x_t + b_1 u_{1t} + b_2 u_{2t}
+```
 
-and a perceived control law :math:`u_j(t) = - f_j x_t` for the other player.
+and a perceived control law ``u_j(t) = - f_j x_t`` for the other player.
 
-The solution computed in this routine is the `f_i` and `p_i` of the associated
+The solution computed in this routine is the ``f_i`` and ``p_i`` of the associated
 double optimal linear regulator problem.
 
 ##### Arguments
