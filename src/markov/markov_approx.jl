@@ -142,17 +142,18 @@ doc"""
 Accepts the simulation of a discrete state Markov chain and estimates
 the transition probabilities
 
-Let ``S = s_1, s_2, \ldots, s_i`` with ``s_1 < s_2 < \ldots < s_i`` be the discrete
+Let ``S = s_1, s_2, \ldots, s_N`` with ``s_1 < s_2 < \ldots < s_N`` be the discrete
 states of a Markov chain. Furthermore, let ``P`` be the corresponding
 stochastic transition matrix.
 
-Given a history of observations, ``{X}`` where ``x_t \in S \forall t``, we would like
-to estimate the transition probabilities in ``P``, ``p_{i,j}``. For ``x_t=s_i`` and ``x_{t-1}=s_j``,
-let ``P(x_t | x_{t-1})`` be the ``p_{i,j}`` element of the stochastic matrix. The likelihood
-function is then given by
+Given a history of observations, ``\{X\}_{t=0}^{T}`` with ``x_t \in S \forall t``,
+we would like to estimate the transition probabilities in ``P`` with ``p_{ij}``
+as the ith row and jth column of ``P``. For ``x_t = s_i`` and ``x_{t-1} = s_j``,
+let ``P(x_t | x_{t-1})`` be defined as ``p_{i,j}`` element of the stochastic
+matrix. The likelihood function is then given by
 
 ```math
-    L({X}_t; P) = P(x_1) \prod_{t=2}^{T} P(x_t | x_{t-1})
+  L(\{X\}^t; P) = \text{Prob}(x_1) \prod_{t=2}^{T} P(x_t | x_{t-1})
 ```
 
 The maximum likelihood estimate is then just given by the number of times
