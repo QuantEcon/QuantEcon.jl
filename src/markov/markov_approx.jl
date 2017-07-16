@@ -323,7 +323,7 @@ function discrete_var{TI<:Integer}(b::ScalarOrArray, B::ScalarOrArray,
         c = (2*k-1)*c
         gaussianMoment[2*k] = c
     end
-    # Compute standardized VAR(1) representation 
+    # Compute standardized VAR(1) representation
     # (zero mean and diagonal covariance matrix)
     if M == 1
         C = sqrt(Psi)
@@ -335,7 +335,7 @@ function discrete_var{TI<:Integer}(b::ScalarOrArray, B::ScalarOrArray,
         mu = ((eye(M)-B)\eye(M))*b
         A1 = C1\(B*C1)
         # unconditional variance
-        Sigma1 = reshape(((eye(M^2)-kron(A1,A1))\eye(M^2))*vec(eye(M)),M,M) 
+        Sigma1 = reshape(((eye(M^2)-kron(A1,A1))\eye(M^2))*vec(eye(M)),M,M)
         U, _ = min_var_trace(Sigma1)
         A = U'*A1*U
         Sigma = U'*Sigma1*U
@@ -365,35 +365,29 @@ function discrete_var{TI<:Integer}(b::ScalarOrArray, B::ScalarOrArray,
     for ii = 1:(Nm^M)
 
         # Construct prior guesses for maximum entropy optimizations
-        if typeof(method) == Even
-            q = pdf.(Normal.(repmat(condMean[:,ii], 1, Nm), 1), y1D)
-        end
+        q = construct_prior_guess(condMean[:, ii], Nm, y1D, method)
 
         # Make sure all elements of the prior are stricly positive
         q[q.<kappa] = kappa
 
         for jj = 1:M
             # Try to use intelligent initial guesses
-            if ii == 1
-                lambdaGuess = zeros(2)
-            else
-                lambdaGuess = lambdaBar[(jj-1)*2+1:jj*2, ii-1]
-            end
+            lambdaGuess = ifelse(ii == 1, zeros(2), lambdaBar[(jj-1)*2+1:jj*2, ii-1])
 
             # Maximum entropy optimization
             if nMoments == 1 # match only 1 moment
                 temp[jj, :], _, _ = discrete_approximation(y1D[jj, :],
-                    X -> (reshape(X, 1, Nm)-condMean[jj, ii])/scalingFactor[jj], 
+                    X -> (reshape(X, 1, Nm)-condMean[jj, ii])/scalingFactor[jj],
                     [0.0], reshape(q[jj, :], 1, Nm), [0.0])
             else # match 2 moments first
                 p, lambda, momentError = discrete_approximation(y1D[jj, :],
                     X -> polynomial_moment(X, condMean[jj, ii], scalingFactor[jj], 2),
-                    [0; 1]./(scalingFactor[jj].^(1:2)), 
+                    [0; 1]./(scalingFactor[jj].^(1:2)),
                     reshape(q[jj, :], 1, Nm), lambdaGuess)
                 if norm(momentError) > 1e-5 # if 2 moments fail, then just match 1 moment
                     warn("Failed to match first 2 moments. Just matching 1.")
                     temp[jj, :], _, _ = discrete_approximation(y1D[jj, :],
-                        X -> (X-condMean[jj,ii])/scalingFactor[jj], 
+                        X -> (X-condMean[jj,ii])/scalingFactor[jj],
                         0, reshape(q[jj, :], 1, Nm), 0)
                     lambdaBar[(jj-1)*2+1:jj*2, ii] = zeros(2,1)
                 elseif nMoments == 2
@@ -405,7 +399,7 @@ function discrete_var{TI<:Integer}(b::ScalarOrArray, B::ScalarOrArray,
                         lambdaGuess = vcat(lambda, 0.0, 0.0) # add zero to previous lambda
                         pnew, lambda, momentError = discrete_approximation(y1D[jj,:],
                             X -> polynomial_moment(X, condMean[jj,ii], scalingFactor[jj], mm),
-                            gaussianMoment[1:mm]./(scalingFactor[jj].^(1:mm)), 
+                            gaussianMoment[1:mm]./(scalingFactor[jj].^(1:mm)),
                             reshape(q[jj, :], 1, Nm), lambdaGuess)
                         if !(norm(momentError) < 1e-5)
                             warn("Failed to match first $mm moments.  Just matching $(mm-2).")
@@ -428,23 +422,37 @@ function discrete_var{TI<:Integer}(b::ScalarOrArray, B::ScalarOrArray,
 end
 
 """
+construct guess for prior for evenly spaced grid method
+
+##### Arguments
+
+- `method::Even` : method for grid making
+- `condMean::Vector` : conditional Mean of each variable
+- `Nm::Integer` : number of grid points
+- `y1D::Matrix` : grid of variable
+
+"""
+construct_prior_guess(method::Even, condMean::Vector, Nm::Integer, y1D::Matrix) =
+    pdf.(Normal.(repmat(condMean, 1, Nm), 1), y1D)
+
+"""
 
 construct one-dimensional grid of states
 
 ##### Argument
 
 - `method::Even` : method for grid making
-- `Sigma::ScalarOrArray` : 
+- `Sigma::ScalarOrArray` :
 - `Nm::Integer` : number of grid points
 - `M::Integer` : number of variables (M=1 corresponds to AR(1))
 - `nSigmas::Real` : number of standard error determining end points of grid
 
 ##### Return
 
-- `y1D` : (M x Nm) matrix of 
+- `y1D` : (M x Nm) matrix of variable grid
 
 """
-function construct_1D_grid(method::Even, Sigma::ScalarOrArray, 
+function construct_1D_grid(method::Even, Sigma::ScalarOrArray,
                            Nm::Integer, M::Integer, nSigmas::Real)
     if M == 1
         minSigmas = sqrt(Sigma)
@@ -482,7 +490,7 @@ It is simiplifying `allcomb2` by using `gridmake` from QuantEcon
 - (N^M x M) Matrix, combination of each row of A
 
 """
-allcomb3(A::Matrix) = 
+allcomb3(A::Matrix) =
     flipdim(gridmake(flipdim([A[:, i] for i in 1:size(A, 2)], 1)...) ,2)
 
 """
@@ -574,7 +582,7 @@ Compute the moment defining function used in discrete_approximation
 
 - `X::Vector` : (N x 1) vector of grid points
 - `mu::Real` : location parameter (conditional mean)
-- `scalingFactor::Real` : scaling factor for numerical stability 
+- `scalingFactor::Real` : scaling factor for numerical stability
                           (typically largest grid point)
 - `nMoments::Integer` : number of polynomial moments
 
@@ -618,7 +626,7 @@ function entropy_obj(lambda::Vector, Tx::Matrix, TBar::Vector, q::Matrix)
     # Some error checking
     L, N = size(Tx)
 
-    !(length(lambda) != L || length(TBar) != L || length(q) != N) || 
+    !(length(lambda) != L || length(TBar) != L || length(q) != N) ||
         error("Dimensions of inputs are not compatible.")
 
     # Compute objective function
@@ -639,7 +647,7 @@ Compute gradient of objective function
 """
 function entropy_grad!(grad::Vector, lambda::Vector, Tx::Matrix, TBar::Vector, q::Matrix)
     L, N = size(Tx)
-    !(length(lambda) != L || length(TBar) != L || length(q) != N) || 
+    !(length(lambda) != L || length(TBar) != L || length(q) != N) ||
         error("Dimensions of inputs are not compatible.")
     Tdiff = Tx-repmat(TBar, 1, N)
     temp = q.*exp.(lambda'*Tdiff)
@@ -658,7 +666,7 @@ Compute hessian of objective function
 """
 function entropy_hess!(hess::Matrix, lambda::Vector, Tx::Matrix, TBar::Vector, q::Matrix)
     L, N = size(Tx)
-    !(length(lambda) != L || length(TBar) != L || length(q) != N) || 
+    !(length(lambda) != L || length(TBar) != L || length(q) != N) ||
         error("Dimensions of inputs are not compatible.")
     Tdiff = Tx-repmat(TBar,1,N)
     temp = q.*exp.(lambda'*Tdiff)
@@ -673,7 +681,7 @@ close to a multiple of identity matrix as possible
 
 ##### Arguments
 
-- `A::Matrix` : square matrix 
+- `A::Matrix` : square matrix
 
 ##### Returns
 
