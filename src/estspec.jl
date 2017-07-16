@@ -8,7 +8,7 @@ Functions for working with periodograms of scalar data.
 References
 ----------
 
-http://quant-econ.net/jl/estspec.html
+https://lectures.quantecon.org/jl/estspec.html
 
 =#
 import DSP
@@ -20,8 +20,8 @@ Smooth the data in x using convolution with a window of requested size and type.
 
 - `x::Array`: An array containing the data to smooth
 - `window_len::Int(7)`: An odd integer giving the length of the window
-- `window::AbstractString("hanning")`: A string giving the window type. Possible values
-are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`
+- `window::AbstractString("hanning")`: A string giving the window type. 
+  Possible values are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`
 
 ##### Returns
 
@@ -90,21 +90,23 @@ function periodogram(x::Vector, window::AbstractString, window_len::Int=7)
     return w, I_w
 end
 
-"""
+doc"""
 Computes the periodogram
 
-    I(w) = (1 / n) | sum_{t=0}^{n-1} x_t e^{itw} |^2
+```math
+I(w) = \frac{1}{n} | \sum_{t=0}^{n-1} x_t e^{itw} |^2
+```
 
-at the Fourier frequences w_j := 2 pi j / n, j = 0, ..., n - 1, using the fast
-Fourier transform.  Only the frequences w_j in [0, pi] and corresponding values
-I(w_j) are returned.  If a window type is given then smoothing is performed.
+at the Fourier frequences ``w_j := 2 \frac{\pi j}{n}, j = 0, \ldots, n - 1``, using the fast
+Fourier transform.  Only the frequences ``w_j`` in ``[0, \pi]`` and corresponding values
+``I(w_j)`` are returned.  If a window type is given then smoothing is performed.
 
 ##### Arguments
 
 - `x::Array`: An array containing the data to smooth
 - `window_len::Int(7)`: An odd integer giving the length of the window
 - `window::AbstractString("hanning")`: A string giving the window type. Possible values
-are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`
+  are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`
 
 ##### Returns
 
@@ -125,7 +127,7 @@ coefficients are then used for recoloring.
 - `x::Array`: An array containing the data to smooth
 - `window_len::Int(7)`: An odd integer giving the length of the window
 - `window::AbstractString("hanning")`: A string giving the window type. Possible values
-are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`
+  are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`
 
 ##### Returns
 

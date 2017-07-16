@@ -19,6 +19,6 @@ deploydocs(
     branch = "gh-pages",
     target = "build",
     julia  = "0.5",
-    deps = nothing,
+    deps = Deps.pip("pygments", "mkdocs", "python-markdown-math"),
     make = nothing,
 )

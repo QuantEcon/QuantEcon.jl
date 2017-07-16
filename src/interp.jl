@@ -3,10 +3,9 @@ Linear interpolation in one dimension
 
 ##### Fields
 
-- `breaks::AbstractVector` : A sorted array of grid points on which to
-interpolate
-- `vals::AbstractVector` : The function values associated with each of the grid
-points
+- `breaks::AbstractVector` : A sorted array of grid points on which to interpolate
+
+- `vals::AbstractVector` : The function values associated with each of the grid points
 
 ##### Examples
 

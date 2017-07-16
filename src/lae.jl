@@ -15,20 +15,20 @@ This is a density in y.
 References
 ----------
 
-http://quant-econ.net/jl/stationary_densities.html
+https://lectures.quantecon.org/jl/stationary_densities.html
 =#
 
 
 """
-A look ahead estimator associated with a given stochastic kernel p and a vector
-of observations X.
+A look ahead estimator associated with a given stochastic kernel `p` and a vector
+of observations `X`.
 
 ##### Fields
 
 - `p::Function`: The stochastic kernel. Signature is `p(x, y)` and it should be
-vectorized in both inputs
+  vectorized in both inputs
 - `X::Matrix`: A vector containing observations. Note that this can be passed as
-any kind of `AbstractArray` and will be coerced into an `n x 1` vector.
+  any kind of `AbstractArray` and will be coerced into an `n x 1` vector.
 
 """
 type LAE
@@ -43,7 +43,7 @@ end
 
 """
 A vectorized function that returns the value of the look ahead estimate at the
-values in the array y.
+values in the array `y`.
 
 ##### Arguments
 
