@@ -412,7 +412,7 @@ function qnwgamma(n::Int, a::Real=1.0, b::Real=1.0)
     b < 0 && error("scale parameter must be positive")
 
     a -= 1
-    maxit = 10
+    maxit = 25
     fact = -exp(lgamma(a+n)-lgamma(n)-lgamma(a+1))
     nodes = zeros(n)
     weights = zeros(n)
