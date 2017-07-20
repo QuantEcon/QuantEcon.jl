@@ -10,7 +10,7 @@ import QuantEcon: MarkovChain, DiscreteDP
 # random_markov_chain
 
 """
-Return a randomly sampled MarkovChain instance with n states.
+Return a randomly sampled MarkovChain instance with `n` states.
 
 ##### Arguments
 
@@ -44,8 +44,8 @@ end
 
 
 """
-Return a randomly sampled MarkovChain instance with n states, where each state
-has k states with positive transition probability.
+Return a randomly sampled MarkovChain instance with `n` states, where each state
+has `k` states with positive transition probability.
 
 ##### Arguments
 
@@ -81,14 +81,14 @@ end
 # random_stochastic_matrix
 
 """
-Return a randomly sampled n x n stochastic matrix with k nonzero entries for
+Return a randomly sampled `n x n` stochastic matrix with `k` nonzero entries for
 each row.
 
 ##### Arguments
 
 - `n::Integer` : Number of states.
 - `k::Union{Integer, Void}(nothing)` : Number of nonzero entries in each
-column of the matrix. Set to n if note specified.
+  column of the matrix. Set to `n` if none specified.
 
 ##### Returns
 
@@ -110,20 +110,20 @@ end
 
 
 """
-Generate a "non-square column stochstic matrix" of shape (n, m), which contains
-as columns m probability vectors of length n with k nonzero entries.
+Generate a "non-square column stochstic matrix" of shape `(n, m)`, which contains
+as columns `m` probability vectors of length `n` with `k` nonzero entries.
 
 ##### Arguments
 
 - `n::Integer` : Number of states.
 - `m::Integer` : Number of probability vectors.
 - `;k::Union{Integer, Void}(nothing)` : Number of nonzero entries in each
-column of the matrix. Set to n if note specified.
+  column of the matrix. Set to `n` if none specified.
 
 ##### Returns
 
-- `p::Array` : Array of shape (n, m) containing m probability vectors of length
-n as columns.
+- `p::Array` : Array of shape `(n, m)` containing `m` probability vectors of length
+  `n` as columns.
 
 """
 function _random_stochastic_matrix(n::Integer, m::Integer;
@@ -164,12 +164,11 @@ distribution with mean 0 and standard deviation `scale`.
 - `num_states::Integer` : Number of states.
 - `num_actions::Integer` : Number of actions.
 - `beta::Union{Float64, Void}(nothing)` : Discount factor. Randomly chosen from
-[0, 1) if not specified.
+  `[0, 1)` if not specified.
 - `;k::Union{Integer, Void}(nothing)` : Number of possible next states for each
-state-action pair. Equal to `num_states` if not specified.
-
+  state-action pair. Equal to `num_states` if not specified.
 - `scale::Real(1)` : Standard deviation of the normal distribution for the
-reward values.
+  reward values.
 
 ##### Returns
 
@@ -199,7 +198,7 @@ end
 # random_probvec
 
 """
-Return m randomly sampled probability vectors of size k.
+Return `m` randomly sampled probability vectors of size `k`.
 
 ##### Arguments
 
@@ -208,7 +207,7 @@ Return m randomly sampled probability vectors of size k.
 
 ##### Returns
 
-- `a::Array` : Array of shape (k, m) containing probability vectors as colums.
+- `a::Array` : Array of shape `(k, m)` containing probability vectors as columns.
 
 """
 function random_probvec(k::Integer, m::Integer)

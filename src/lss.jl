@@ -17,21 +17,23 @@ References
 TODO: Come back and update to match `LinearStateSpace` type from py side
 TODO: Add docstrings
 
-http://quant-econ.net/jl/linear_models.html
+https://lectures.quantecon.org/jl/kalman.html
 
 =#
 
-"""
+doc"""
 A type that describes the Gaussian Linear State Space Model
 of the form:
 
-    x_{t+1} = A x_t + C w_{t+1}
+```math
+    x_{t+1} = A x_t + C w_{t+1} \\
+    
+    y_t = G x_t + H v_t
+```
 
-        y_t = G x_t + H v_t
-
-where {w_t} and {v_t} are independent and standard normal with dimensions
-k and l respectively.  The initial conditions are mu_0 and Sigma_0 for x_0
-~ N(mu_0, Sigma_0).  When Sigma_0=0, the draw of x_0 is exactly mu_0.
+where ``{w_t}`` and ``{v_t}`` are independent and standard normal with dimensions
+`k` and `l` respectively.  The initial conditions are ``\mu_0`` and ``\Sigma_0`` for ``x_0
+\sim N(\mu_0, \Sigma_0)``. When ``\Sigma_0=0``, the draw of ``x_0`` is exactly ``\mu_0``.
 
 #### Fields
 
@@ -105,8 +107,8 @@ function simulate(lss::LSS, ts_length=100)
     return x, y
 end
 
-"""
-Simulate num_reps observations of x_T and y_T given x_0 ~ N(mu_0, Sigma_0).
+doc"""
+Simulate `num_reps` observations of ``x_T`` and ``y_T`` given ``x_0 \sim N(\mu_0, \Sigma_0)``.
 
 #### Arguments
 
@@ -116,10 +118,10 @@ Simulate num_reps observations of x_T and y_T given x_0 ~ N(mu_0, Sigma_0).
 
 #### Returns
 
-- `x::Matrix` An n x num_reps matrix, where the j-th column is the j_th
-              observation of x_T
-- `y::Matrix` An k x num_reps matrix, where the j-th column is the j_th
-              observation of y_T
+- `x::Matrix` An `n x num_reps` matrix, where the j-th column is the j_th
+              observation of ``x_T``
+- `y::Matrix` An `k x num_reps` matrix, where the j-th column is the j_th
+              observation of ``y_T``
 
 """
 function replicate(lss::LSS, t::Integer, num_reps::Integer=100)
@@ -156,11 +158,11 @@ function Base.next(L::LSSMoments, moms)
     (mu_x, mu_y, Sigma_x, Sigma_y), (mu_x2, Sigma_x2)
 end
 
-"""
+doc"""
 Create an iterator to calculate the population mean and
-variance-convariance matrix for both x_t and y_t, starting at
-the initial condition (self.mu_0, self.Sigma_0).  Each iteration
-produces a 4-tuple of items (mu_x, mu_y, Sigma_x, Sigma_y) for
+variance-convariance matrix for both ``x_t`` and ``y_t``, starting at
+the initial condition `(self.mu_0, self.Sigma_0)`.  Each iteration
+produces a 4-tuple of items `(mu_x, mu_y, Sigma_x, Sigma_y)` for
 the next period.
 
 #### Arguments
@@ -171,10 +173,10 @@ the next period.
 moment_sequence(lss::LSS) = LSSMoments(lss)
 
 
-"""
-Compute the moments of the stationary distributions of x_t and
-y_t if possible.  Computation is by iteration, starting from the
-initial conditions lss.mu_0 and lss.Sigma_0
+doc"""
+Compute the moments of the stationary distributions of ``x_t`` and
+``y_t`` if possible.  Computation is by iteration, starting from the
+initial conditions `lss.mu_0` and `lss.Sigma_0`
 
 #### Arguments
 
@@ -184,8 +186,8 @@ initial conditions lss.mu_0 and lss.Sigma_0
 
 #### Returns
 
-- `mu_x::Vector` Represents the stationary mean of x_t
-- `mu_y::Vector`Represents the stationary mean of y_t
+- `mu_x::Vector` Represents the stationary mean of ``x_t``
+- `mu_y::Vector` Represents the stationary mean of ``y_t``
 - `Sigma_x::Matrix` Represents the var-cov matrix
 - `Sigma_y::Matrix` Represents the var-cov matrix
 

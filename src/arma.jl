@@ -22,7 +22,7 @@ If ``\phi`` and ``\theta`` are scalars, then the model is
 understood to be
 
 ```math
-X_t = \phi X_{t-1} + \epsilon_t + \theta \epsilon_{t-1}
+    X_t = \phi X_{t-1} + \epsilon_t + \theta \epsilon_{t-1}
 ```
 
 where ``\epsilon_t`` is a white noise process with standard
@@ -32,9 +32,9 @@ If ``\phi`` and ``\theta`` are arrays or sequences,
 then the interpretation is the ARMA(p, q) model
 
 ```math
-X_t = \phi_1 X_{t-1} + ... + \phi_p X_{t-p} +
-\epsilon_t + \theta_1 \epsilon_{t-1} + \ldots  +
-\theta_q \epsilon_{t-q}
+    X_t = \phi_1 X_{t-1} + ... + \phi_p X_{t-p} +
+    \epsilon_t + \theta_1 \epsilon_{t-1} + \ldots  +
+    \theta_q \epsilon_{t-q}
 ```
 
 where
@@ -98,7 +98,7 @@ The spectral density is the discrete time Fourier transform of the
 autocovariance function. In particular,
 
 ```math
-f(w) = \sum_k \gamma(k) \exp(-ikw)
+    f(w) = \sum_k \gamma(k) \exp(-ikw)
 ```
 
 where ``\gamma`` is the autocovariance function and the sum is over
@@ -108,10 +108,10 @@ the set of all integers.
 
 - `arma::ARMA`: Instance of `ARMA` type
 - `;two_pi::Bool(true)`: Compute the spectral density function over ``[0, \pi]``
-if false and ``[0, 2 \pi]`` otherwise.
+  if false and ``[0, 2 \pi]`` otherwise.
 - `;res(1200)` : If `res` is a scalar then the spectral density is computed at
-`res` frequencies evenly spaced around the unit circle, but if `res` is an array
-then the function computes the response at the frequencies given by the array
+  `res` frequencies evenly spaced around the unit circle, but if `res` is an array
+  then the function computes the response at the frequencies given by the array
 
 
 ##### Returns
@@ -131,7 +131,7 @@ end
 
 """
 Compute the autocovariance function from the ARMA parameters
-over the integers range(num_autocov) using the spectral density
+over the integers range(`num_autocov`) using the spectral density
 and the inverse Fourier transform.
 
 ##### Arguments
@@ -155,14 +155,13 @@ Get the impulse response corresponding to our model.
 ##### Arguments
 
 - `arma::ARMA`: Instance of `ARMA` type
-- `;impulse_length::Integer(30)`: Length of horizon for calucluating impulse
-reponse. Must be at least as long as the `p` fields of `arma`
+- `;impulse_length::Integer(30)`: Length of horizon for calcluating impulse reponse. Must be at least as long as the `p` fields of `arma`
 
 
 ##### Returns
 
 - `psi::Vector{Float64}`: `psi[j]` is the response at lag j of the impulse
-response. We take `psi[1]` as unity.
+  response. We take `psi[1]` as unity.
 
 """
 function impulse_response(arma::ARMA; impulse_length=30)
@@ -190,7 +189,7 @@ Compute a simulated sample path assuming Gaussian shocks.
 - `arma::ARMA`: Instance of `ARMA` type
 - `;ts_length::Integer(90)`: Length of simulation
 - `;impulse_length::Integer(30)`: Horizon for calculating impulse response
-(see also docstring for `impulse_response`)
+  (see also docstring for `impulse_response`)
 
 ##### Returns
 

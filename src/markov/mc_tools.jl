@@ -8,7 +8,8 @@ Tools for working with Markov Chains
 References
 ----------
 
-http://quant-econ.net/jl/finite_markov.html
+https://lectures.quantecon.org/jl/finite_markov.html
+
 =#
 import LightGraphs: DiGraph, period, attracting_components,
                     strongly_connected_components, is_strongly_connected
@@ -24,10 +25,8 @@ state transitions.
 
 ##### Fields
 
-- `p::AbstractMatrix` : The transition matrix. Must be square, all elements
-must be nonnegative, and all rows must sum to unity.
-- `state_values::AbstractVector` : Vector containing the values associated with
-the states.
+- `p::AbstractMatrix` : The transition matrix. Must be square, all elements must be nonnegative, and all rows must sum to unity.
+- `state_values::AbstractVector` : Vector containing the values associated with the states.
 """
 type MarkovChain{T, TM<:AbstractMatrix, TV<:AbstractVector}
     p::TM # valid stochastic matrix
@@ -70,23 +69,23 @@ function Base.show{T,TM}(io::IO, mc::MarkovChain{T,TM})
     print(io, mc.p)
 end
 
-"""
+doc"""
 This routine computes the stationary distribution of an irreducible Markov
 transition matrix (stochastic matrix) or transition rate matrix (generator
-matrix) `A`.
+matrix) ``A``.
 
 More generally, given a Metzler matrix (square matrix whose off-diagonal
-entries are all nonnegative) `A`, this routine solves for a nonzero solution
-`x` to `x (A - D) = 0`, where `D` is the diagonal matrix for which the rows of
-`A - D` sum to zero (i.e., `D_{ii} = \sum_j A_{ij}` for all `i`). One (and only
+entries are all nonnegative) ``A``, this routine solves for a nonzero solution
+``x`` to ``x (A - D) = 0``, where ``D`` is the diagonal matrix for which the rows of
+``A - D`` sum to zero (i.e., ``D_{ii} = \sum_j A_{ij}`` for all ``i``). One (and only
 one, up to normalization) nonzero solution exists corresponding to each
-reccurent class of `A`, and in particular, if `A` is irreducible, there is a
+reccurent class of ``A``, and in particular, if ``A`` is irreducible, there is a
 unique solution; when there are more than one solution, the routine returns the
-solution that contains in its support the first index `i` such that no path
-connects `i` to any index larger than `i`. The solution is normalized so that
+solution that contains in its support the first index ``i`` such that no path
+connects ``i`` to any index larger than ``i``. The solution is normalized so that
 its 1-norm equals one. This routine implements the Grassmann-Taksar-Heyman
 (GTH) algorithm (Grassmann, Taksar, and Heyman 1985), a numerically stable
-variant of Gaussian elimination, where only the off-diagonal entries of `A` are
+variant of Gaussian elimination, where only the off-diagonal entries of ``A`` are
 used as the input data. For a nice exposition of the algorithm, see Stewart
 (2009), Chapter 10.
 
@@ -97,15 +96,15 @@ used as the input data. For a nice exposition of the algorithm, see Stewart
 
 ##### Returns
 
-- `x::Vector{T}` : Stationary distribution of `A`.
+- `x::Vector{T}` : Stationary distribution of ``A``.
 
 ##### References
 
 - W. K. Grassmann, M. I. Taksar and D. P. Heyman, "Regenerative Analysis and
-Steady State Distributions for Markov Chains, " Operations Research (1985),
-1107-1116.
+  Steady State Distributions for Markov Chains, " Operations Research (1985),
+  1107-1116.
 - W. J. Stewart, Probability, Markov Chains, Queues, and Simulation, Princeton
-University Press, 2009.
+  University Press, 2009.
 
 """
 gth_solve{T<:Real}(A::Matrix{T}) = gth_solve!(copy(A))
@@ -160,7 +159,7 @@ Find the recurrent classes of the Markov chain `mc`.
 ##### Returns
 
 - `::Vector{Vector{Int}}` : Vector of vectors that describe the recurrent
-classes of `mc`.
+  classes of `mc`.
 
 """
 recurrent_classes(mc::MarkovChain) = attracting_components(DiGraph(mc.p))
@@ -175,7 +174,7 @@ Find the communication classes of the Markov chain `mc`.
 ### Returns
 
 - `::Vector{Vector{Int}}` : Vector of vectors that describe the communication
-classes of `mc`.
+  classes of `mc`.
 
 """
 communication_classes(mc::MarkovChain) = strongly_connected_components(DiGraph(mc.p))
@@ -274,7 +273,7 @@ recurrent class.
 """ stationary_distributions
 
 
-"""Custom version of `full`, which allows convertion to type T"""
+"""Custom version of `full`, which allows convertion to type `T`"""
 # From base/sparse/sparsematrix.jl
 function todense(T::Type, S::SparseMatrixCSC)
     A = zeros(T, S.m, S.n)
@@ -288,7 +287,7 @@ function todense(T::Type, S::SparseMatrixCSC)
     return A
 end
 
-"""If A is already dense, return A as is"""
+"""If `A` is already dense, return `A` as is"""
 todense(::Type, A::Array) = A
 
 
@@ -357,7 +356,7 @@ The resulting vector has the state values of `mc` as elements.
 ### Returns
 
 - `X::Vector` : Vector containing the sample path, with length
-ts_length
+  ts_length
 """
 function simulate(mc::MarkovChain, ts_length::Int;
                   init::Int=rand(1:n_states(mc)))
@@ -412,7 +411,7 @@ The resulting vector has the indices of the state values of `mc` as elements.
 ### Returns
 
 - `X::Vector{Int}` : Vector containing the sample path, with length
-ts_length
+  ts_length
 """
 function simulate_indices(mc::MarkovChain, ts_length::Int;
                           init::Int=rand(1:n_states(mc)))

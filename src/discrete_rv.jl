@@ -10,7 +10,7 @@ specified vector of probabilities.
 References
 ----------
 
-http://quant-econ.net/jl/finite_markov.html?highlight=discrete_rv
+https://lectures.quantecon.org/jl/finite_markov.html
 
 
 TODO: as of 07/10/2014 it is not possible to define the property
@@ -21,12 +21,12 @@ TODO: as of 07/10/2014 it is not possible to define the property
 
 """
 Generates an array of draws from a discrete random variable with
-vector of probabilities given by q.
+vector of probabilities given by `q`.
 
 ##### Fields
 
 - `q::AbstractVector`: A vector of non-negative probabilities that sum to 1
-- `Q::AbstractVector`: The cumulative sum of q
+- `Q::AbstractVector`: The cumulative sum of `q`
 """
 type DiscreteRV{TV1<:AbstractVector, TV2<:AbstractVector}
     q::TV1
@@ -43,7 +43,7 @@ function DiscreteRV{TV<:AbstractVector}(q::TV)
 end
 
 """
-Make a single draw from the discrete distribution
+Make a single draw from the discrete distribution.
 
 ##### Arguments
 
@@ -62,7 +62,7 @@ Make multiple draws from the discrete distribution represented by a
 ##### Arguments
 
 - `d::DiscreteRV`: The `DiscreteRV` type representing the distribution
-- `k::Int`:
+- `k::Int`
 
 ##### Returns
 
