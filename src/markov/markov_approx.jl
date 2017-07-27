@@ -229,10 +229,10 @@ end
 types specifying the method for `discrete_var`
 
 """
-@compat abstract type AbstractMethod end
-immutable Even <: AbstractMethod end
-# immutable type Quantile <: AbstractMethod end
-# immutable type Quadrature <: AbstractMethod end
+@compat abstract type VAREstimationMethod end
+immutable Even <: VAREstimationMethod end
+# immutable type Quantile <: VAREstimationMethod end
+# immutable type Quadrature <: VAREstimationMethod end
 
 doc"""
 
@@ -242,45 +242,46 @@ Compute a finite-state Markov chain approximation to a VAR(1) process of the for
     y_{t+1} = b + By_{t} + \Psi^{\frac{1}{2}}\epsilon_{t+1}
 ```
 
-where ``\epsilon_{t+1}`` is an (M x 1) vector of independent standard normal
-innovations
+where ``\epsilon_{t+1}`` is an vector of independent standard normal
+innovations of length `M`
 
 ```julia
-P, X = discrete_var(b, B, Psi, Nm, nMoments, method, nSigmas)
+P, X = discrete_var(b, B, Psi, Nm, n_moments, method, n_sigmas)
 ```
 
 ##### Arguments
 
-- `b::ScalarOrArray` : (M x 1) constant vector
-                       (M=1 corresponds scalar case)
-- `B::ScalarOrArray` : (M x M) matrix of impact coefficients
-- `Psi::ScalarOrArray` : (M x M) variance-covariance matrix of the innovations
+- `b::ScalarOrArray` : constant vector of length `M`
+                       `M=1` corresponds scalar case
+- `B::ScalarOrArray` : `M x M` matrix of impact coefficients
+- `Psi::ScalarOrArray` : `M x M` variance-covariance matrix of the innovations
+    - `discrete_var` only accepts non-singular variance-covariance matrices, `Psi`.
 - `Nm::Integer > 3` : Desired number of discrete points in each dimension
 
 ##### Optional
 
-- `nMoments::Integer` : Desired number of moments to match. The default is 2.
-- `method::AbstractMethod` : AbstractMethod specifying the method used to determine
-              the grid points. Accepted inputs are `Even()`. Please see the
-             paper for more details.
-             NOTE: `Quantile()` and `Quadrature()` are not supported now.
-- `nSigmas::Real` : If the `Even()` option is specified, nSigmas is used to
-              determine the number of unconditional standard deviations
-              used to set the endpoints of the grid. The default is
-              sqrt(Nm-1).
+- `n_moments::Integer` : Desired number of moments to match. The default is 2.
+- `method::VAREstimationMethod` : Specify the method used to determine the grid
+                                  points. Accepted inputs are `Even()`.
+                                  Please see the paper for more details.
+                                  NOTE: `Quantile()` and `Quadrature()` are
+                                        not supported now.
+- `n_sigmas::Real` : If the `Even()` option is specified, `n_sigmas` is used to
+                     determine the number of unconditional standard deviations
+                     used to set the endpoints of the grid. The default is
+                     `sqrt(Nm-1)`.
 
 ##### Returns
 
-- `P` : (Nm^M x Nm^M) probability transition matrix. Each row
+- `P` : `Nm^M x Nm^M` probability transition matrix. Each row
         corresponds to a discrete conditional probability
-        distribution over the state M-tuples in X
-- `X` : (M x Nm^M) matrix of states. Each column corresponds to an
+        distribution over the state M-tuples in `X`
+- `X` : `M x Nm^M` matrix of states. Each column corresponds to an
         M-tuple of values which correspond to the state associated
-        with each row of P
+        with each row of `P`
 
 ##### NOTES
 
-- discrete_var only accepts non-singular variance-covariance matrices.
 - discrete_var only constructs tensor product grids where each dimension
   contains the same number of points. For this reason it is recommended
   that this code not be used for problems of more than about 4 or 5
@@ -289,10 +290,10 @@ P, X = discrete_var(b, B, Psi, Nm, nMoments, method, nSigmas)
   sparse grid specifications.
 
 """
-function discrete_var{TI<:Integer}(b::ScalarOrArray, B::ScalarOrArray,
-                     Psi::ScalarOrArray, Nm::TI,
-                     nMoments::TI=2, method::AbstractMethod=Even(),
-                     nSigmas::Real=sqrt(Nm-1))
+function discrete_var(b::ScalarOrArray, B::ScalarOrArray,
+                     Psi::ScalarOrArray, Nm::Integer,
+                     n_moments::Integer=2, method::VAREstimationMethod=Even(),
+                     n_sigmas::Real=sqrt(Nm-1))
 
     M, M_ = size(B)
 
@@ -305,17 +306,17 @@ function discrete_var{TI<:Integer}(b::ScalarOrArray, B::ScalarOrArray,
     isposdef(Psi) || throw(ArgumentError("Psi must be a positive definite matrix"))
 
     # Check that Nm is a valid number of grid points
-    Nm>=3 || throw(ArgumentError("Nm must be a positive interger greater than 3"))
+    Nm >= 3 || throw(ArgumentError("Nm must be a positive interger greater than 3"))
 
-    # Check that nMoments is a valid number
-    if nMoments < 1 || !(nMoments%2 == 0 || nMoments == 1)
-        error("nMoments must be either 1 or a positive even integer")
+    # Check that n_moments is a valid number
+    if n_moments < 1 || !(n_moments % 2 == 0 || n_moments == 1)
+        error("n_moments must be either 1 or a positive even integer")
     end
 
     # Compute polynomial moments of standard normal distribution
-    gaussianMoment = zeros(nMoments)
+    gaussianMoment = zeros(n_moments)
     c = 1
-    for k=1:floor(TI, nMoments/2)
+    for k=1:floor(Int, n_moments/2)
         c = (2*k-1)*c
         gaussianMoment[2*k] = c
     end
@@ -324,7 +325,7 @@ function discrete_var{TI<:Integer}(b::ScalarOrArray, B::ScalarOrArray,
     A, C, mu, Sigma = standardize_var(b, B, Psi, M)
 
     # Construct 1-D grids
-    y1D = construct_1D_grid(Sigma, Nm, M, nSigmas, method)
+    y1D = construct_1D_grid(Sigma, Nm, M, n_sigmas, method)
 
     # Construct all possible combinations of elements of the 1-D grids
     D = allcomb3(y1D')'
@@ -360,33 +361,32 @@ function discrete_var{TI<:Integer}(b::ScalarOrArray, B::ScalarOrArray,
             end
 
             # Maximum entropy optimization
-            if nMoments == 1 # match only 1 moment
+            if n_moments == 1 # match only 1 moment
                 temp[jj, :], _, _ = discrete_approximation(y1D[jj, :],
                     X -> (reshape(X, 1, Nm)-condMean[jj, ii])/scalingFactor[jj],
-                    [0.0], reshape(q[jj, :], 1, Nm), [0.0])
+                    [0.0], q[jj, :], [0.0])
             else # match 2 moments first
                 p, lambda, momentError = discrete_approximation(y1D[jj, :],
                     X -> polynomial_moment(X, condMean[jj, ii], scalingFactor[jj], 2),
-                    [0; 1]./(scalingFactor[jj].^(1:2)),
-                    reshape(q[jj, :], 1, Nm), lambdaGuess)
+                    [0; 1]./(scalingFactor[jj].^(1:2)), q[jj, :], lambdaGuess)
                 if norm(momentError) > 1e-5 # if 2 moments fail, just match 1 moment
                     warn("Failed to match first 2 moments. Just matching 1.")
                     temp[jj, :], _, _ = discrete_approximation(y1D[jj, :],
                         X -> (X-condMean[jj,ii])/scalingFactor[jj],
-                        0, reshape(q[jj, :], 1, Nm), 0)
+                        0, q[jj, :], 0)
                     lambdaBar[(jj-1)*2+1:jj*2, ii] = zeros(2,1)
-                elseif nMoments == 2
+                elseif n_moments == 2
                     lambdaBar[(jj-1)*2+1:jj*2, ii] = lambda
                     temp[jj, :] = p
                 else # solve maximum entropy problem sequentially from low order moments
                     lambdaBar[(jj-1)*2+1:jj*2, ii] = lambda
-                    for mm = 4:2:nMoments
+                    for mm = 4:2:n_moments
                         lambdaGuess = vcat(lambda, 0.0, 0.0) # add 0 to previous lambda
                         pnew, lambda, momentError = discrete_approximation(y1D[jj,:],
                             X -> polynomial_moment(X, condMean[jj,ii],
                                                     scalingFactor[jj], mm),
                             gaussianMoment[1:mm]./(scalingFactor[jj].^(1:mm)),
-                            reshape(q[jj, :], 1, Nm), lambdaGuess)
+                            q[jj, :], lambdaGuess)
                         if !(norm(momentError) < 1e-5)
                             warn(
                             "Failed to match first $mm moments.  Just matching $(mm-2).")
@@ -402,7 +402,7 @@ function discrete_var{TI<:Integer}(b::ScalarOrArray, B::ScalarOrArray,
         P[ii, :] .= vec(prod(allcomb3(temp'), 2))
     end
 
-    X = C*D + repmat(mu, 1, Nm^M) # map grids back to original space
+    X = C*D .+ mu # map grids back to original space
 
     M != 1 || (return MarkovChain(P, vec(X)))
     return MarkovChain(P, [X[:, i] for i in 1:Nm^M])
@@ -456,20 +456,21 @@ return standerdized VAR(1) representation
 
 ##### Arguments
 
-- `b::Vector` : (M x 1) constant term vector
-- `B::Matrix` : (M x M) matrix of impact coefficients
-- `Psi::Matrix` : (M x M) variance-covariance matrix of innovations
+- `b::AbstractVector` : `M x 1` constant term vector
+- `B::AbstractMatrix` : `M x M` matrix of impact coefficients
+- `Psi::AbstractMatrix` : `M x M` variance-covariance matrix of innovations
 - `M::Intger` : number of variables of the VAR(1) model
 
 ##### Returns
 
 - `A::Matirx` : impact coefficients of standardized VAR(1) process
-- `C::Matrix` : variance-covariance matrix of standardized model innovations
-- `mu::Vector` : mean of the standardized VAR(1) process
-- `Sigma::Matrix` : variance-covariance matrix of the standardized VAR(1) process
+- `C::AbstractMatrix` : variance-covariance matrix of standardized model innovations
+- `mu::AbstractVector` : mean of the standardized VAR(1) process
+- `Sigma::AbstractMatrix` : variance-covariance matrix of the standardized VAR(1) process
 
 """
-function standardize_var(b::Vector, B::Matrix, Psi::Matrix, M::Integer)
+function standardize_var(b::AbstractVector, B::AbstractMatrix,
+                         Psi::AbstractMatrix, M::Integer)
     C1 = cholfact(Psi)[:L]
     mu = ((eye(M)-B)\eye(M))*b
     A1 = C1\(B*C1)
@@ -487,13 +488,14 @@ construct prior guess for evenly spaced grid method
 
 ##### Arguments
 
-- `condMean::Vector` : conditional Mean of each variable
+- `condMean::AbstractVector` : conditional Mean of each variable
 - `Nm::Integer` : number of grid points
-- `y1D::Matrix` : grid of variable
+- `y1D::AbstractMatrix` : grid of variable
 - `method::Even` : method for grid making
 
 """
-construct_prior_guess(condMean::Vector, Nm::Integer, y1D::Matrix, method::Even) =
+construct_prior_guess(condMean::AbstractVector, Nm::Integer,
+                      y1D::AbstractMatrix, method::Even) =
     pdf.(Normal.(repmat(condMean, 1, Nm), 1), y1D)
 
 """
@@ -502,25 +504,21 @@ construct one-dimensional grid of states
 
 ##### Argument
 
-- `Sigma::ScalarOrArray` :
+- `Sigma::ScalarOrArray` : variance-covariance matrix of the standardized process
 - `Nm::Integer` : number of grid points
-- `M::Integer` : number of variables (M=1 corresponds to AR(1))
-- `nSigmas::Real` : number of standard error determining end points of grid
+- `M::Integer` : number of variables (`M=1` corresponds to AR(1))
+- `n_sigmas::Real` : number of standard error determining end points of grid
 - `method::Even` : method for grid making
 
 ##### Return
 
-- `y1D` : (M x Nm) matrix of variable grid
+- `y1D` : `M x Nm` matrix of variable grid
 
 """
 function construct_1D_grid(Sigma::ScalarOrArray, Nm::Integer,
-                           M::Integer, nSigmas::Real, method::Even)
-    if M == 1
-        minSigmas = sqrt(Sigma)
-    else
-        minSigmas = sqrt(minimum(eig(Sigma)[1]))
-    end
-    y1Drow = collect(linspace(-minSigmas*nSigmas, minSigmas*nSigmas, Nm))'
+                           M::Integer, n_sigmas::Real, method::Even)
+    minSigmas = sqrt(minimum(eigfact(Sigma).values))
+    y1Drow = collect(linspace(-minSigmas*n_sigmas, minSigmas*n_sigmas, Nm))'
     y1D = repmat(y1Drow, M, 1)
     return y1D
 end
@@ -532,17 +530,17 @@ It is simiplifying `allcomb2` by using `gridmake` from QuantEcon
 
 ##### Arguments
 
-- `A::Matrix` : (N x M) Matrix
+- `A::AbstractMatrix` : `N x M` Matrix
 
 ##### Returns
 
-- (N^M x M) Matrix, combination of each row of `A`.
+- `N^M x M` Matrix, combination of each row of `A`.
 
 ###### Example
-```jldoctest
-julia>allcomb3([1 4 7;
-                2 5 8;
-                3 6 9]) # numerical input
+```julia-repl
+julia> allcomb3([1 4 7;
+                 2 5 8;
+                 3 6 9]) # numerical input
 27×3 Array{Int64,2}:
  1  4  7
  1  4  8
@@ -581,35 +579,35 @@ p, lambdaBar, momentError = discrete_approximation(D, T, TBar, q, lambda0)
 
 ##### Arguments
 
-- `D::Vector` : (N x 1) vector of grid points. K is the dimension of the
-        domain. N is the number of points at which an approximation
-        is to be constructed.
-- `T::Function` : A function handle which should accept arguments of dimension
-        (N x 1) vector and return an (L x N) matrix of moments evaluated at
-        each grid point, where L is the number of moments to be
-        matched.
-- `TBar::Vector` : (L x 1) vector of moments of the underlying distribution
-          which should be matched
+- `D::AbstractVector` : vector of grid points of length `N`.
+                        N is the number of points at which an approximation
+                        is to be constructed.
+- `T::Function` : A function that accepts a single `AbstractVector` of length `N`
+                  and returns an `L x N` matrix of moments evaluated
+                  at each grid point, where L is the number of moments to be
+                  matched.
+- `TBar::AbstractVector` : length `L` vector of moments of the underlying distribution
+                           which should be matched
 
 ##### Optional
 
-- `q::Matrix` : (1 X N) vector of prior weights for each point in D. The
-        default is for each point to have an equal weight.
-- `lambda0::Vector` : (L x 1) vector of initial guesses for the dual problem
-              variables. The default is a vector of zeros.
+- `q::AbstractVector` : length `N` vector of prior weights for each point in D. The
+                        default is for each point to have an equal weight.
+- `lambda0::AbstractVector` : length `L` vector of initial guesses for the dual problem
+                              variables. The default is a vector of zeros.
 
 ##### Returns
 
 - `p` : (1 x N) vector of probabilties assigned to each grid point in `D`.
-- `lambdaBar` : (L x 1) vector of dual problem variables which solve the
+- `lambdaBar` : length `L` vector of dual problem variables which solve the
                 maximum entropy problem
-- `momentError` : (L x 1) vector of errors in moments (defined by moments of
-                  discretization minus actual moments)
+- `momentError` : vector of errors in moments (defined by moments of
+                  discretization minus actual moments) of length `L`
 
 """
-function discrete_approximation(D::Vector, T::Function, TBar::Vector,
-                                  q::Matrix=ones(N)'/N, # Default prior weights
-                                  lambda0::Vector=zeros(Tbar))
+function discrete_approximation(D::AbstractVector, T::Function, TBar::AbstractVector,
+                                  q::AbstractVector=ones(N)/N, # Default prior weights
+                                  lambda0::AbstractVector=zeros(Tbar))
 
     # Input error checking
     N = length(D)
@@ -617,7 +615,7 @@ function discrete_approximation(D::Vector, T::Function, TBar::Vector,
     Tx = T(D)
     L, N2 = size(Tx)
 
-    if N2 != N || length(TBar) != L
+    if N2 != N || length(TBar) != L || length(lambda0) != L || length(q) != N2
         error("Dimension mismatch")
     end
 
@@ -640,8 +638,8 @@ function discrete_approximation(D::Vector, T::Function, TBar::Vector,
     lambdaBar = Optim.minimizer(res)
     minimum_value = Optim.minimum(res)
 
-    Tdiff = Tx-repmat(TBar, 1, N)
-    p = (q.*exp.(lambdaBar'*Tdiff))/minimum_value
+    Tdiff = Tx .- TBar
+    p = (q'.*exp.(lambdaBar'*Tdiff))/minimum_value
     grad = similar(lambda0)
     grad!(Optim.minimizer(res), grad)
     momentError = grad/minimum_value
@@ -658,27 +656,28 @@ T = polynomial_moment(X, mu, scalingFactor, mMoments)
 
 ##### Argumentss:
 
-- `X::Vector` : (N x 1) vector of grid points
+- `X::AbstractVector` : length `N` vector of grid points
 - `mu::Real` : location parameter (conditional mean)
 - `scalingFactor::Real` : scaling factor for numerical stability
                           (typically largest grid point)
-- `nMoments::Integer` : number of polynomial moments
+- `n_moments::Integer` : number of polynomial moments
 
 ##### Return
 
-- `T` : moment defining function used in discrete_approximation
+- `T` : moment defining function used in `discrete_approximation`
 
 """
-function polynomial_moment(X::Vector, mu::Real, scalingFactor::Real, nMoments::Integer)
+function polynomial_moment(X::AbstractVector, mu::Real,
+                           scalingFactor::Real, n_moments::Integer)
     # Check that scaling factor is positive
     scalingFactor>0 || error("scalingFactor must be a positive number")
     Y = (X-mu)/scalingFactor # standardized grid
-    T = Y'.^collect(1:nMoments)
+    T = Y'.^collect(1:n_moments)
 end
 
 """
 
-Compute the maximum entropy objective function used in discrete_approximation
+Compute the maximum entropy objective function used in `discrete_approximation`
 
 ```julia
 obj = entropy_obj(lambda, Tx, TBar, q)
@@ -686,29 +685,23 @@ obj = entropy_obj(lambda, Tx, TBar, q)
 
 ##### Arguments
 
-- `lambda::Vector` : (L x 1) vector of values of the dual problem variables
-- `Tx::Matrix` : (L x N) matrix of moments evaluated at the grid points
-         specified in discrete_approximation
-- `TBar::Vector` : (L x 1) vector of moments of the underlying distribution
-           which should be matched
-- `q::Matrix` : (1 X N) vector of prior weights for each point in the grid.
+- `lambda::AbstractVector` : length `L` vector of values of the dual problem variables
+- `Tx::AbstractMatrix` : `L x N` matrix of moments evaluated at the grid points
+                         specified in discrete_approximation
+- `TBar::AbstractVector` : length `L` vector of moments of the underlying distribution
+                           which should be matched
+- `q::AbstractVector` : length `N` vector of prior weights for each point in the grid.
 
 ##### Returns
 
-- `obj` : scalar value of objective function evaluated at lambda
+- `obj` : scalar value of objective function evaluated at `lambda`
 
 """
-function entropy_obj(lambda::Vector, Tx::Matrix, TBar::Vector, q::Matrix)
-
-    # Some error checking
-    L, N = size(Tx)
-
-    !(length(lambda) != L || length(TBar) != L || length(q) != N) ||
-        error("Dimensions of inputs are not compatible.")
-
+function entropy_obj(lambda::AbstractVector, Tx::AbstractMatrix,
+                     TBar::AbstractVector, q::AbstractVector)
     # Compute objective function
-    Tdiff = Tx-repmat(TBar, 1, N)
-    temp = q.*exp.(lambda'*Tdiff)
+    Tdiff = Tx .- TBar
+    temp = q' .* exp.(lambda'*Tdiff)
     obj = sum(temp)
     return obj
 end
@@ -718,17 +711,14 @@ Compute gradient of objective function
 
 ##### Returns
 
-- `grad` : (L x 1) gradient vector of the objective function evaluated
-           at lambda
+- `grad` : gradient vector of the objective function evaluated
+           at `lambda` of length `L`
 
 """
-function entropy_grad!(grad::Vector, lambda::Vector, Tx::Matrix, TBar::Vector, q::Matrix)
-    L, N = size(Tx)
-    !(length(lambda) != L || length(TBar) != L || length(q) != N) ||
-        error("Dimensions of inputs are not compatible.")
-    Tdiff = Tx-repmat(TBar, 1, N)
-    temp = q.*exp.(lambda'*Tdiff)
-    obj = sum(temp)
+function entropy_grad!(grad::AbstractVector, lambda::AbstractVector,
+                       Tx::AbstractMatrix, TBar::AbstractVector, q::AbstractVector)
+    Tdiff = Tx .- TBar
+    temp = q'.*exp.(lambda'*Tdiff)
     temp2 = temp.*Tdiff
     grad .= vec(sum(temp2, 2))
 end
@@ -738,27 +728,25 @@ Compute hessian of objective function
 
 ##### Returns
 
-- `hess` : (L x L) hessian matrix of the objective function evaluated at `lambda`
+- `hess` : `L x L` hessian matrix of the objective function evaluated at `lambda`
 
 """
-function entropy_hess!(hess::Matrix, lambda::Vector, Tx::Matrix, TBar::Vector, q::Matrix)
-    L, N = size(Tx)
-    !(length(lambda) != L || length(TBar) != L || length(q) != N) ||
-        error("Dimensions of inputs are not compatible.")
-    Tdiff = Tx-repmat(TBar,1,N)
-    temp = q.*exp.(lambda'*Tdiff)
+function entropy_hess!(hess::AbstractMatrix, lambda::AbstractVector,
+                       Tx::AbstractMatrix, TBar::AbstractVector, q::AbstractVector)
+    Tdiff = Tx .- TBar
+    temp = q'.*exp.(lambda'*Tdiff)
     temp2 = temp.*Tdiff
     hess .= temp2*Tdiff'
 end
 
 doc"""
 
-find a unitary matrix ``U`` such that the diagonal components of ``U'AU`` is as
+find a unitary matrix `U` such that the diagonal components of `U'AU` is as
 close to a multiple of identity matrix as possible
 
 ##### Arguments
 
-- `A::Matrix` : square matrix
+- `A::AbstractMatrix` : square matrix
 
 ##### Returns
 
@@ -766,7 +754,7 @@ close to a multiple of identity matrix as possible
 - `fval` : minimum value
 
 """
-function min_var_trace(A::Matrix)
+function min_var_trace(A::AbstractMatrix)
     ==(size(A)...) || throw(ArgumentError("input matrix must be square"))
 
     K = size(A, 1) # size of A
