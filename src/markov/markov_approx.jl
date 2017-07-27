@@ -299,7 +299,7 @@ function discrete_var(b::Union{Real, AbstractVector},
                       method::VAREstimationMethod=Even(),
                       n_sigmas::Real=sqrt(Nm-1))
 
-    M, M_ = size(B)
+    M, M_ = size(B, 1), size(B, 2)
 
     # Check size restrictions on matrices
     M == M_ || throw(ArgumentError("B must be a scalar or square matrix"))
@@ -411,21 +411,6 @@ function discrete_var(b::Union{Real, AbstractVector},
     M != 1 || (return MarkovChain(P, vec(X)))
     return MarkovChain(P, [X[:, i] for i in 1:Nm^M])
 end
-
-"""
-
-return the size of scalar as (1, 1)
-
-##### Arguments
-
-- `x::Real` : Scalar value
-
-##### Return
-
-- `(1, 1)`
-
-"""
-Base.size(x::Real) = (1, 1)
 
 """
 
