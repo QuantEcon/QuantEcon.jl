@@ -251,10 +251,11 @@ P, X = discrete_var(b, B, Psi, Nm, n_moments, method, n_sigmas)
 
 ##### Arguments
 
-- `b::ScalarOrArray` : constant vector of length `M`
-                       `M=1` corresponds scalar case
-- `B::ScalarOrArray` : `M x M` matrix of impact coefficients
-- `Psi::ScalarOrArray` : `M x M` variance-covariance matrix of the innovations
+- `b::Union{Real, AbstractVector}` : constant vector of length `M`.
+                                     `M=1` corresponds scalar case
+- `B::Union{Real, AbstractMatrix}` : `M x M` matrix of impact coefficients
+- `Psi::Union{Real, AbstractMatrix}` : `M x M` variance-covariance matrix of
+                                       the innovations
     - `discrete_var` only accepts non-singular variance-covariance matrices, `Psi`.
 - `Nm::Integer > 3` : Desired number of discrete points in each dimension
 
@@ -290,7 +291,7 @@ P, X = discrete_var(b, B, Psi, Nm, n_moments, method, n_sigmas)
   sparse grid specifications.
 
 """
-function discrete_var(b::Union{Real, AbstractMatrix},
+function discrete_var(b::Union{Real, AbstractVector},
                       B::Union{Real, AbstractMatrix},
                       Psi::Union{Real, AbstractMatrix},
                       Nm::Integer,
@@ -594,8 +595,8 @@ p, lambdaBar, momentError = discrete_approximation(D, T, TBar, q, lambda0)
 
 ##### Optional
 
-- `q::AbstractVector` : length `N` vector of prior weights for each point in D. The
-                        default is for each point to have an equal weight.
+- `q::AbstractVector` : length `N` vector of prior weights for each point in D.
+                        The default is for each point to have an equal weight.
 - `lambda0::AbstractVector` : length `L` vector of initial guesses for the dual problem
                               variables. The default is a vector of zeros.
 
@@ -661,7 +662,7 @@ T = polynomial_moment(X, mu, scalingFactor, mMoments)
 
 - `X::AbstractVector` : length `N` vector of grid points
 - `mu::Real` : location parameter (conditional mean)
-- `scalingFactor::Real` : scaling factor for numerical stability
+- `scalingFactor::Real` : scaling factor for numerical stability.
                           (typically largest grid point)
 - `n_moments::Integer` : number of polynomial moments
 
@@ -714,8 +715,7 @@ Compute gradient of objective function
 
 ##### Returns
 
-- `grad` : gradient vector of the objective function evaluated
-           at `lambda` of length `L`
+- `grad` : length `L` gradient vector of the objective function evaluated at `lambda`
 
 """
 function entropy_grad!(grad::AbstractVector, lambda::AbstractVector,
