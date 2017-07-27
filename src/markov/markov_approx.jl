@@ -290,10 +290,13 @@ P, X = discrete_var(b, B, Psi, Nm, n_moments, method, n_sigmas)
   sparse grid specifications.
 
 """
-function discrete_var(b::ScalarOrArray, B::ScalarOrArray,
-                     Psi::ScalarOrArray, Nm::Integer,
-                     n_moments::Integer=2, method::VAREstimationMethod=Even(),
-                     n_sigmas::Real=sqrt(Nm-1))
+function discrete_var(b::Union{Real, AbstractMatrix},
+                      B::Union{Real, AbstractMatrix},
+                      Psi::Union{Real, AbstractMatrix},
+                      Nm::Integer,
+                      n_moments::Integer=2,
+                      method::VAREstimationMethod=Even(),
+                      n_sigmas::Real=sqrt(Nm-1))
 
     M, M_ = size(B)
 
