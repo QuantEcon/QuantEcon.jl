@@ -224,7 +224,7 @@ function estimate_mc_discrete{T}(X::Vector{T})
     return estimate_mc_discrete(X, states)
 end
 
-"""
+doc"""
 
 types specifying the method for `discrete_var`
 
@@ -303,7 +303,6 @@ function discrete_var(b::Union{Real, AbstractVector},
 
     # Check size restrictions on matrices
     M == M_ || throw(ArgumentError("B must be a scalar or square matrix"))
-    size(b, 2) == 1 || throw(ArgumentError("b must be a column vector"))
     M == length(b) || throw(ArgumentError("b must have the same number of rows as B"))
 
     #% Check that Psi is a valid covariance matrix
@@ -318,11 +317,11 @@ function discrete_var(b::Union{Real, AbstractVector},
     end
 
     # Compute polynomial moments of standard normal distribution
-    gaussianMoment = zeros(n_moments)
+    gaussian_moment = zeros(n_moments)
     c = 1
     for k=1:floor(Int, n_moments/2)
         c = (2*k-1)*c
-        gaussianMoment[2*k] = c
+        gaussian_moment[2*k] = c
     end
     # Compute standardized VAR(1) representation
     # (zero mean and diagonal covariance matrix)
@@ -336,22 +335,22 @@ function discrete_var(b::Union{Real, AbstractVector},
 
     # Construct finite-state Markov chain approximation
     # conditional mean of the VAR process at each grid point
-    condMean = A*D
+    cond_mean = A*D
     # probability transition matrix
     P = ones(Nm^M, Nm^M)
     # normalizing constant for maximum entropy computations
-    scalingFactor = y1D[:, end]
+    scaling_factor = y1D[:, end]
     # used to store some intermediate calculations
     temp = Array{Float64}(M, Nm)
     # store optimized values of lambda (2 moments) to improve initial guesses
-    lambdaBar = zeros(2*M, Nm^M)
+    lambda_bar = zeros(2*M, Nm^M)
     # small positive constant for numerical stability
     kappa = 1e-8
 
     for ii = 1:(Nm^M)
 
         # Construct prior guesses for maximum entropy optimizations
-        q = construct_prior_guess(condMean[:, ii], Nm, y1D, method)
+        q = construct_prior_guess(cond_mean[:, ii], Nm, y1D, method)
 
         # Make sure all elements of the prior are stricly positive
         q[q.<kappa] = kappa
@@ -359,39 +358,39 @@ function discrete_var(b::Union{Real, AbstractVector},
         for jj = 1:M
             # Try to use intelligent initial guesses
             if ii == 1
-                lambdaGuess = zeros(2)
+                lambda_guess = zeros(2)
             else
-                lambdaGuess = lambdaBar[(jj-1)*2+1:jj*2, ii-1]
+                lambda_guess = lambda_bar[(jj-1)*2+1:jj*2, ii-1]
             end
 
             # Maximum entropy optimization
             if n_moments == 1 # match only 1 moment
                 temp[jj, :], _, _ = discrete_approximation(y1D[jj, :],
-                    X -> (reshape(X, 1, Nm)-condMean[jj, ii])/scalingFactor[jj],
+                    X -> (reshape(X, 1, Nm)-cond_mean[jj, ii])/scaling_factor[jj],
                     [0.0], q[jj, :], [0.0])
             else # match 2 moments first
-                p, lambda, momentError = discrete_approximation(y1D[jj, :],
-                    X -> polynomial_moment(X, condMean[jj, ii], scalingFactor[jj], 2),
-                    [0; 1]./(scalingFactor[jj].^(1:2)), q[jj, :], lambdaGuess)
-                if norm(momentError) > 1e-5 # if 2 moments fail, just match 1 moment
+                p, lambda, moment_error = discrete_approximation(y1D[jj, :],
+                    X -> polynomial_moment(X, cond_mean[jj, ii], scaling_factor[jj], 2),
+                    [0; 1]./(scaling_factor[jj].^(1:2)), q[jj, :], lambda_guess)
+                if norm(moment_error) > 1e-5 # if 2 moments fail, just match 1 moment
                     warn("Failed to match first 2 moments. Just matching 1.")
                     temp[jj, :], _, _ = discrete_approximation(y1D[jj, :],
-                        X -> (X-condMean[jj,ii])/scalingFactor[jj],
+                        X -> (X-cond_mean[jj,ii])/scaling_factor[jj],
                         0, q[jj, :], 0)
-                    lambdaBar[(jj-1)*2+1:jj*2, ii] = zeros(2,1)
+                    lambda_bar[(jj-1)*2+1:jj*2, ii] = zeros(2,1)
                 elseif n_moments == 2
-                    lambdaBar[(jj-1)*2+1:jj*2, ii] = lambda
+                    lambda_bar[(jj-1)*2+1:jj*2, ii] = lambda
                     temp[jj, :] = p
                 else # solve maximum entropy problem sequentially from low order moments
-                    lambdaBar[(jj-1)*2+1:jj*2, ii] = lambda
+                    lambda_bar[(jj-1)*2+1:jj*2, ii] = lambda
                     for mm = 4:2:n_moments
-                        lambdaGuess = vcat(lambda, 0.0, 0.0) # add 0 to previous lambda
-                        pnew, lambda, momentError = discrete_approximation(y1D[jj,:],
-                            X -> polynomial_moment(X, condMean[jj,ii],
-                                                    scalingFactor[jj], mm),
-                            gaussianMoment[1:mm]./(scalingFactor[jj].^(1:mm)),
-                            q[jj, :], lambdaGuess)
-                        if !(norm(momentError) < 1e-5)
+                        lambda_guess = vcat(lambda, 0.0, 0.0) # add 0 to previous lambda
+                        pnew, lambda, moment_error = discrete_approximation(y1D[jj,:],
+                            X -> polynomial_moment(X, cond_mean[jj,ii],
+                                                    scaling_factor[jj], mm),
+                            gaussian_moment[1:mm]./(scaling_factor[jj].^(1:mm)),
+                            q[jj, :], lambda_guess)
+                        if !(norm(moment_error) < 1e-5)
                             warn(
                             "Failed to match first $mm moments.  Just matching $(mm-2).")
                             break
@@ -477,15 +476,15 @@ construct prior guess for evenly spaced grid method
 
 ##### Arguments
 
-- `condMean::AbstractVector` : conditional Mean of each variable
+- `cond_mean::AbstractVector` : conditional Mean of each variable
 - `Nm::Integer` : number of grid points
 - `y1D::AbstractMatrix` : grid of variable
 - `method::Even` : method for grid making
 
 """
-construct_prior_guess(condMean::AbstractVector, Nm::Integer,
+construct_prior_guess(cond_mean::AbstractVector, Nm::Integer,
                       y1D::AbstractMatrix, method::Even) =
-    pdf.(Normal.(repmat(condMean, 1, Nm), 1), y1D)
+    pdf.(Normal.(repmat(cond_mean, 1, Nm), 1), y1D)
 
 """
 
@@ -506,8 +505,8 @@ construct one-dimensional grid of states
 """
 function construct_1D_grid(Sigma::ScalarOrArray, Nm::Integer,
                            M::Integer, n_sigmas::Real, method::Even)
-    minSigmas = sqrt(minimum(eigfact(Sigma).values))
-    y1Drow = collect(linspace(-minSigmas*n_sigmas, minSigmas*n_sigmas, Nm))'
+    min_sigmas = sqrt(minimum(eigfact(Sigma).values))
+    y1Drow = collect(linspace(-min_sigmas*n_sigmas, min_sigmas*n_sigmas, Nm))'
     y1D = repmat(y1Drow, M, 1)
     return y1D
 end
@@ -563,7 +562,7 @@ Compute a discrete state approximation to a distribution with known moments,
 using the maximum entropy procedure proposed in Tanaka and Toda (2013)
 
 ```julia
-p, lambdaBar, momentError = discrete_approximation(D, T, TBar, q, lambda0)
+p, lambda_bar, moment_error = discrete_approximation(D, T, TBar, q, lambda0)
 ```
 
 ##### Arguments
@@ -588,9 +587,9 @@ p, lambdaBar, momentError = discrete_approximation(D, T, TBar, q, lambda0)
 ##### Returns
 
 - `p` : (1 x N) vector of probabilties assigned to each grid point in `D`.
-- `lambdaBar` : length `L` vector of dual problem variables which solve the
+- `lambda_bar` : length `L` vector of dual problem variables which solve the
                 maximum entropy problem
-- `momentError` : vector of errors in moments (defined by moments of
+- `moment_error` : vector of errors in moments (defined by moments of
                   discretization minus actual moments) of length `L`
 
 """
@@ -624,15 +623,15 @@ function discrete_approximation(D::AbstractVector, T::Function, TBar::AbstractVe
         Optim.converged(res) || error("Failed to find a solution.")
     end
     # Compute final probability weights and moment errors
-    lambdaBar = Optim.minimizer(res)
+    lambda_bar = Optim.minimizer(res)
     minimum_value = Optim.minimum(res)
 
     Tdiff = Tx .- TBar
-    p = (q'.*exp.(lambdaBar'*Tdiff))/minimum_value
+    p = (q'.*exp.(lambda_bar'*Tdiff))/minimum_value
     grad = similar(lambda0)
     grad!(Optim.minimizer(res), grad)
-    momentError = grad/minimum_value
-    return p, lambdaBar, momentError
+    moment_error = grad/minimum_value
+    return p, lambda_bar, moment_error
 end
 
 """
@@ -640,14 +639,14 @@ end
 Compute the moment defining function used in discrete_approximation
 
 ```julia
-T = polynomial_moment(X, mu, scalingFactor, mMoments)
+T = polynomial_moment(X, mu, scaling_factor, mMoments)
 ```
 
 ##### Argumentss:
 
 - `X::AbstractVector` : length `N` vector of grid points
 - `mu::Real` : location parameter (conditional mean)
-- `scalingFactor::Real` : scaling factor for numerical stability.
+- `scaling_factor::Real` : scaling factor for numerical stability.
                           (typically largest grid point)
 - `n_moments::Integer` : number of polynomial moments
 
@@ -657,10 +656,10 @@ T = polynomial_moment(X, mu, scalingFactor, mMoments)
 
 """
 function polynomial_moment(X::AbstractVector, mu::Real,
-                           scalingFactor::Real, n_moments::Integer)
+                           scaling_factor::Real, n_moments::Integer)
     # Check that scaling factor is positive
-    scalingFactor>0 || error("scalingFactor must be a positive number")
-    Y = (X-mu)/scalingFactor # standardized grid
+    scaling_factor>0 || error("scaling_factor must be a positive number")
+    Y = (X-mu)/scaling_factor # standardized grid
     T = Y'.^collect(1:n_moments)
 end
 
