@@ -292,9 +292,10 @@ P, X = discrete_var(b, B, Psi, Nm, n_moments, method, n_sigmas)
 
 ##### Reference
 
-Farmer and Toda (2017, Quantitative Economics)
+- Farmer, L. E., & Toda, A. A. (2017).
+  "Discretizing nonlinear, non‐Gaussian Markov processes with exact conditional moments,"
+  Quantitative Economics, 8(2), 651-683.
 
-http://onlinelibrary.wiley.com/doi/10.3982/QE737/abstract;jsessionid=A4CAE433DB2DBBA3314CFA9C27CA501E.f03t01
 """
 function discrete_var(b::Union{Real, AbstractVector},
                       B::Union{Real, AbstractMatrix},
