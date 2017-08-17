@@ -347,7 +347,7 @@ function discrete_var(b::Union{Real, AbstractVector},
     # normalizing constant for maximum entropy computations
     scaling_factor = y1D[:, end]
     # used to store some intermediate calculations
-    temp = Array{Float64}(M, Nm)
+    temp = Array{Float64}(Nm, M)
     # store optimized values of lambda (2 moments) to improve initial guesses
     lambda_bar = zeros(2*M, Nm^M)
     # small positive constant for numerical stability
@@ -371,7 +371,7 @@ function discrete_var(b::Union{Real, AbstractVector},
 
             # Maximum entropy optimization
             if n_moments == 1 # match only 1 moment
-                temp[jj, :], _, _ = discrete_approximation(y1D[jj, :],
+                temp[:, jj], _, _ = discrete_approximation(y1D[jj, :],
                     X -> (reshape(X, 1, Nm)-cond_mean[jj, ii])/scaling_factor[jj],
                     [0.0], q[jj, :], [0.0])
             else # match 2 moments first
@@ -380,13 +380,13 @@ function discrete_var(b::Union{Real, AbstractVector},
                     [0; 1]./(scaling_factor[jj].^(1:2)), q[jj, :], lambda_guess)
                 if norm(moment_error) > 1e-5 # if 2 moments fail, just match 1 moment
                     warn("Failed to match first 2 moments. Just matching 1.")
-                    temp[jj, :], _, _ = discrete_approximation(y1D[jj, :],
+                    temp[:, jj], _, _ = discrete_approximation(y1D[jj, :],
                         X -> (X-cond_mean[jj,ii])/scaling_factor[jj],
                         0, q[jj, :], 0)
                     lambda_bar[(jj-1)*2+1:jj*2, ii] = zeros(2,1)
                 elseif n_moments == 2
                     lambda_bar[(jj-1)*2+1:jj*2, ii] = lambda
-                    temp[jj, :] = p
+                    temp[:, jj] = p
                 else # solve maximum entropy problem sequentially from low order moments
                     lambda_bar[(jj-1)*2+1:jj*2, ii] = lambda
                     for mm = 4:2:n_moments
@@ -404,11 +404,11 @@ function discrete_var(b::Union{Real, AbstractVector},
                             p = pnew
                         end
                     end
-                    temp[jj, :] = p
+                    temp[:, jj] = p
                 end
             end
         end
-        P[ii, :] .= vec(prod(allcomb3(temp'), 2))
+        P[ii, :] .= vec(prod(allcomb3(temp), 2))
     end
 
     X = C*D .+ mu # map grids back to original space
@@ -648,7 +648,7 @@ Compute the moment defining function used in discrete_approximation
 T = polynomial_moment(X, mu, scaling_factor, mMoments)
 ```
 
-##### Argumentss:
+##### Arguments:
 
 - `X::AbstractVector` : length `N` vector of grid points
 - `mu::Real` : location parameter (conditional mean)
