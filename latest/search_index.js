@@ -117,7 +117,7 @@ var documenterSearchIndex = {"docs": [
     "page": "QuantEcon",
     "title": "QuantEcon.LQ",
     "category": "Type",
-    "text": "Main constructor for LQ type\n\nSpecifies default argumets for all fields not part of the payoff function or transition equation.\n\nArguments\n\nQ::ScalarOrArray : k x k payoff coefficient for control variable u. Must be symmetric and nonnegative definite\nR::ScalarOrArray : n x n payoff coefficient matrix for state variable x. Must be symmetric and nonnegative definite\nA::ScalarOrArray : n x n coefficient on state in state transition\nB::ScalarOrArray : n x k coefficient on control in state transition\n;C::ScalarOrArray{zeros(size(R}(1))) : n x j coefficient on random shock in state transition\n;N::ScalarOrArray{zeros(size(B,1)}(size(A, 2))) : k x n cross product in payoff equation\n;bet::Real(1.0) : Discount factor in [0, 1]\ncapT::Union{Int, Void}(Void) : Terminal period in finite horizon problem\nrf::ScalarOrArray{fill(NaN}(size(R)...)) : n x n terminal payoff in finite horizon problem. Must be symmetric and nonnegative definite.\n\n\n\n"
+    "text": "Linear quadratic optimal control of either infinite or finite horizon\n\nThe infinite horizon problem can be written\n\nmin mathbbE sum_t=0^infty beta^t r(x_t u_t)\n\nwith\n\nr(x_t u_t) = x_t R x_t + u_t Q u_t + 2 u_t N x_t\n\nThe finite horizon form is\n\nmin mathbbE sum_t=0^T-1 beta^t r(x_t u_t) + beta^T x_T R_f x_T\n\nBoth are minimized subject to the law of motion\n\nx_t+1 = A x_t + B u_t + C w_t+1\n\nHere x is n x 1, u is k x 1, w is j x 1 and the matrices are conformable for these dimensions.  The sequence w_t is assumed to be white noise, with zero mean and mathbbE w_t w_t = I, the j x j identity.\n\nFor this model, the time t value (i.e., cost-to-go) function V_t takes the form\n\nx P_T x + d_T\n\nand the optimal policy is of the form u_T = -F_T x_T.  In the infinite horizon case, V P d and F are all stationary.\n\nFields\n\nQ::ScalarOrArray : k x k payoff coefficient for control variable u. Must be symmetric and nonnegative definite\nR::ScalarOrArray : n x n payoff coefficient matrix for state variable x. Must be symmetric and nonnegative definite\nA::ScalarOrArray : n x n coefficient on state in state transition\nB::ScalarOrArray : n x k coefficient on control in state transition\nC::ScalarOrArray : n x j coefficient on random shock in state transition\nN::ScalarOrArray : k x n cross product in payoff equation\nbet::Real : Discount factor in [0, 1]\ncapT::Union{Int, Void} : Terminal period in finite horizon problem\nrf::ScalarOrArray : n x n terminal payoff in finite horizon problem. Must be symmetric and nonnegative definite\nP::ScalarOrArray : n x n matrix in value function representation V(x) = xPx + d\nd::Real : Constant in value function representation\nF::ScalarOrArray : Policy rule that specifies optimal control in each period\n\n\n\n"
 },
 
 {
@@ -125,7 +125,7 @@ var documenterSearchIndex = {"docs": [
     "page": "QuantEcon",
     "title": "QuantEcon.LQ",
     "category": "Type",
-    "text": "Linear quadratic optimal control of either infinite or finite horizon\n\nThe infinite horizon problem can be written\n\nmin mathbbE sum_t=0^infty beta^t r(x_t u_t)\n\nwith\n\nr(x_t u_t) = x_t R x_t + u_t Q u_t + 2 u_t N x_t\n\nThe finite horizon form is\n\nmin mathbbE sum_t=0^T-1 beta^t r(x_t u_t) + beta^T x_T R_f x_T\n\nBoth are minimized subject to the law of motion\n\nx_t+1 = A x_t + B u_t + C w_t+1\n\nHere x is n x 1, u is k x 1, w is j x 1 and the matrices are conformable for these dimensions.  The sequence w_t is assumed to be white noise, with zero mean and mathbbE w_t w_t = I, the j x j identity.\n\nFor this model, the time t value (i.e., cost-to-go) function V_t takes the form\n\nx P_T x + d_T\n\nand the optimal policy is of the form u_T = -F_T x_T.  In the infinite horizon case, V P d and F are all stationary.\n\nFields\n\nQ::ScalarOrArray : k x k payoff coefficient for control variable u. Must be symmetric and nonnegative definite\nR::ScalarOrArray : n x n payoff coefficient matrix for state variable x. Must be symmetric and nonnegative definite\nA::ScalarOrArray : n x n coefficient on state in state transition\nB::ScalarOrArray : n x k coefficient on control in state transition\nC::ScalarOrArray : n x j coefficient on random shock in state transition\nN::ScalarOrArray : k x n cross product in payoff equation\nbet::Real : Discount factor in [0, 1]\ncapT::Union{Int, Void} : Terminal period in finite horizon problem\nrf::ScalarOrArray : n x n terminal payoff in finite horizon problem. Must be symmetric and nonnegative definite\nP::ScalarOrArray : n x n matrix in value function representation V(x) = xPx + d\nd::Real : Constant in value function representation\nF::ScalarOrArray : Policy rule that specifies optimal control in each period\n\n\n\n"
+    "text": "Main constructor for LQ type\n\nSpecifies default argumets for all fields not part of the payoff function or transition equation.\n\nArguments\n\nQ::ScalarOrArray : k x k payoff coefficient for control variable u. Must be symmetric and nonnegative definite\nR::ScalarOrArray : n x n payoff coefficient matrix for state variable x. Must be symmetric and nonnegative definite\nA::ScalarOrArray : n x n coefficient on state in state transition\nB::ScalarOrArray : n x k coefficient on control in state transition\n;C::ScalarOrArray{zeros(size(R}(1))) : n x j coefficient on random shock in state transition\n;N::ScalarOrArray{zeros(size(B,1)}(size(A, 2))) : k x n cross product in payoff equation\n;bet::Real(1.0) : Discount factor in [0, 1]\ncapT::Union{Int, Void}(Void) : Terminal period in finite horizon problem\nrf::ScalarOrArray{fill(NaN}(size(R)...)) : n x n terminal payoff in finite horizon problem. Must be symmetric and nonnegative definite.\n\n\n\n"
 },
 
 {
@@ -374,6 +374,14 @@ var documenterSearchIndex = {"docs": [
     "title": "QuantEcon.d_operator",
     "category": "Method",
     "text": "The D operator, mapping P into\n\n    D(P) = P + PC(theta I - CPC)^-1 CP\n\nArguments\n\nrlq::RBLQ: Instance of RBLQ type\nP::Matrix{Float64} : size is n x n\n\nReturns\n\ndP::Matrix{Float64} : The matrix P after applying the D operator\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.discrete_var",
+    "page": "QuantEcon",
+    "title": "QuantEcon.discrete_var",
+    "category": "Function",
+    "text": "Compute a finite-state Markov chain approximation to a VAR(1) process of the form\n\n    y_t+1 = b + By_t + Psi^frac12epsilon_t+1\n\nwhere epsilon_t+1 is an vector of independent standard normal innovations of length M\n\nP, X = discrete_var(b, B, Psi, Nm, n_moments, method, n_sigmas)\n\nArguments\n\nb::Union{Real, AbstractVector} : constant vector of length M.                                    M=1 corresponds scalar case\nB::Union{Real, AbstractMatrix} : M x M matrix of impact coefficients\nPsi::Union{Real, AbstractMatrix} : M x M variance-covariance matrix of                                      the innovations\ndiscrete_var only accepts non-singular variance-covariance matrices, Psi.\nNm::Integer > 3 : Desired number of discrete points in each dimension\n\nOptional\n\nn_moments::Integer : Desired number of moments to match. The default is 2.\nmethod::VAREstimationMethod : Specify the method used to determine the grid                                 points. Accepted inputs are Even().                                 Please see the paper for more details.                                 NOTE: Quantile() and Quadrature() are                                       not supported now.\nn_sigmas::Real : If the Even() option is specified, n_sigmas is used to                    determine the number of unconditional standard deviations                    used to set the endpoints of the grid. The default is                    sqrt(Nm-1).\n\nReturns\n\nP : Nm^M x Nm^M probability transition matrix. Each row       corresponds to a discrete conditional probability       distribution over the state M-tuples in X\nX : M x Nm^M matrix of states. Each column corresponds to an       M-tuple of values which correspond to the state associated       with each row of P\n\nNOTES\n\ndiscrete_var only constructs tensor product grids where each dimension contains the same number of points. For this reason it is recommended that this code not be used for problems of more than about 4 or 5 dimensions due to curse of dimensionality issues.\nFuture updates will allow for singular variance-covariance matrices and sparse grid specifications.\n\nReference\n\nFarmer, L. E., & Toda, A. A. (2017). \"Discretizing nonlinear, non‐Gaussian Markov processes with exact conditional moments,\" Quantitative Economics, 8(2), 651-683.\n\n\n\n"
 },
 
 {
@@ -897,6 +905,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api/QuantEcon.html#QuantEcon.VAREstimationMethod",
+    "page": "QuantEcon",
+    "title": "QuantEcon.VAREstimationMethod",
+    "category": "Type",
+    "text": "types specifying the method for discrete_var\n\n\n\n"
+},
+
+{
     "location": "api/QuantEcon.html#Base.:*-Tuple{Array{T,3},Array{T,1}}",
     "page": "QuantEcon",
     "title": "Base.:*",
@@ -985,6 +1001,62 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api/QuantEcon.html#QuantEcon.allcomb3-Tuple{Array{T,2}}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.allcomb3",
+    "category": "Method",
+    "text": "Return combinations of each column of matrix A. It is simiplifying allcomb2 by using gridmake from QuantEcon\n\nArguments\n\nA::AbstractMatrix : N x M Matrix\n\nReturns\n\nN^M x M Matrix, combination of each row of A.\n\nExample\n\njulia> allcomb3([1 4 7;\n                 2 5 8;\n                 3 6 9]) # numerical input\n27×3 Array{Int64,2}:\n 1  4  7\n 1  4  8\n 1  4  9\n 1  5  7\n 1  5  8\n 1  5  9\n 1  6  7\n 1  6  8\n 1  6  9\n 2  4  7\n ⋮\n 2  6  9\n 3  4  7\n 3  4  8\n 3  4  9\n 3  5  7\n 3  5  8\n 3  5  9\n 3  6  7\n 3  6  8\n 3  6  9\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.construct_1D_grid-Tuple{Union{Array{T,N},T},Integer,Integer,Real,QuantEcon.Even}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.construct_1D_grid",
+    "category": "Method",
+    "text": "construct one-dimensional grid of states\n\nArgument\n\nSigma::ScalarOrArray : variance-covariance matrix of the standardized process\nNm::Integer : number of grid points\nM::Integer : number of variables (M=1 corresponds to AR(1))\nn_sigmas::Real : number of standard error determining end points of grid\nmethod::Even : method for grid making\n\nReturn\n\ny1D : M x Nm matrix of variable grid\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.construct_prior_guess-Tuple{AbstractArray{T,1},Integer,AbstractArray{T,2},QuantEcon.Even}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.construct_prior_guess",
+    "category": "Method",
+    "text": "construct prior guess for evenly spaced grid method\n\nArguments\n\ncond_mean::AbstractVector : conditional Mean of each variable\nNm::Integer : number of grid points\ny1D::AbstractMatrix : grid of variable\nmethod::Even : method for grid making\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.discrete_approximation",
+    "page": "QuantEcon",
+    "title": "QuantEcon.discrete_approximation",
+    "category": "Function",
+    "text": "Compute a discrete state approximation to a distribution with known moments, using the maximum entropy procedure proposed in Tanaka and Toda (2013)\n\np, lambda_bar, moment_error = discrete_approximation(D, T, TBar, q, lambda0)\n\nArguments\n\nD::AbstractVector : vector of grid points of length N.                       N is the number of points at which an approximation                       is to be constructed.\nT::Function : A function that accepts a single AbstractVector of length N                 and returns an L x N matrix of moments evaluated                 at each grid point, where L is the number of moments to be                 matched.\nTBar::AbstractVector : length L vector of moments of the underlying distribution                          which should be matched\n\nOptional\n\nq::AbstractVector : length N vector of prior weights for each point in D.                       The default is for each point to have an equal weight.\nlambda0::AbstractVector : length L vector of initial guesses for the dual problem                             variables. The default is a vector of zeros.\n\nReturns\n\np : (1 x N) vector of probabilties assigned to each grid point in D.\nlambda_bar : length L vector of dual problem variables which solve the               maximum entropy problem\nmoment_error : vector of errors in moments (defined by moments of                 discretization minus actual moments) of length L\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.entropy_grad!-Tuple{AbstractArray{T,1},AbstractArray{T,1},AbstractArray{T,2},AbstractArray{T,1},AbstractArray{T,1}}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.entropy_grad!",
+    "category": "Method",
+    "text": "Compute gradient of objective function\n\nReturns\n\ngrad : length L gradient vector of the objective function evaluated at lambda\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.entropy_hess!-Tuple{AbstractArray{T,2},AbstractArray{T,1},AbstractArray{T,2},AbstractArray{T,1},AbstractArray{T,1}}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.entropy_hess!",
+    "category": "Method",
+    "text": "Compute hessian of objective function\n\nReturns\n\nhess : L x L hessian matrix of the objective function evaluated at lambda\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.entropy_obj-Tuple{AbstractArray{T,1},AbstractArray{T,2},AbstractArray{T,1},AbstractArray{T,1}}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.entropy_obj",
+    "category": "Method",
+    "text": "Compute the maximum entropy objective function used in discrete_approximation\n\nobj = entropy_obj(lambda, Tx, TBar, q)\n\nArguments\n\nlambda::AbstractVector : length L vector of values of the dual problem variables\nTx::AbstractMatrix : L x N matrix of moments evaluated at the grid points                        specified in discrete_approximation\nTBar::AbstractVector : length L vector of moments of the underlying distribution                          which should be matched\nq::AbstractVector : length N vector of prior weights for each point in the grid.\n\nReturns\n\nobj : scalar value of objective function evaluated at lambda\n\n\n\n"
+},
+
+{
     "location": "api/QuantEcon.html#QuantEcon.fix",
     "page": "QuantEcon",
     "title": "QuantEcon.fix",
@@ -1022,6 +1094,22 @@ var documenterSearchIndex = {"docs": [
     "title": "QuantEcon.gth_solve!",
     "category": "Method",
     "text": "Same as gth_solve, but overwrite the input A, instead of creating a copy.\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.min_var_trace-Tuple{AbstractArray{T,2}}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.min_var_trace",
+    "category": "Method",
+    "text": "find a unitary matrix U such that the diagonal components of U'AU is as close to a multiple of identity matrix as possible\n\nArguments\n\nA::AbstractMatrix : square matrix\n\nReturns\n\nU : unitary matrix\nfval : minimum value\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.polynomial_moment-Tuple{AbstractArray{T,1},Real,Real,Integer}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.polynomial_moment",
+    "category": "Method",
+    "text": "Compute the moment defining function used in discrete_approximation\n\nT = polynomial_moment(X, mu, scaling_factor, mMoments)\n\nArguments:\n\nX::AbstractVector : length N vector of grid points\nmu::Real : location parameter (conditional mean)\nscaling_factor::Real : scaling factor for numerical stability.                         (typically largest grid point)\nn_moments::Integer : number of polynomial moments\n\nReturn\n\nT : moment defining function used in discrete_approximation\n\n\n\n"
 },
 
 {
@@ -1070,6 +1158,22 @@ var documenterSearchIndex = {"docs": [
     "title": "QuantEcon.s_wise_max",
     "category": "Method",
     "text": "Return the Vector max_a vals(s, a),  where vals is represented as a AbstractMatrix of size (num_states, num_actions).\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.standardize_var-Tuple{AbstractArray{T,1},AbstractArray{T,2},AbstractArray{T,2},Integer}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.standardize_var",
+    "category": "Method",
+    "text": "return standerdized VAR(1) representation\n\nArguments\n\nb::AbstractVector : M x 1 constant term vector\nB::AbstractMatrix : M x M matrix of impact coefficients\nPsi::AbstractMatrix : M x M variance-covariance matrix of innovations\nM::Intger : number of variables of the VAR(1) model\n\nReturns\n\nA::Matirx : impact coefficients of standardized VAR(1) process\nC::AbstractMatrix : variance-covariance matrix of standardized model innovations\nmu::AbstractVector : mean of the standardized VAR(1) process\nSigma::AbstractMatrix : variance-covariance matrix of the standardized VAR(1) process\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.standardize_var-Tuple{Real,Real,Real,Integer}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.standardize_var",
+    "category": "Method",
+    "text": "return standerdized AR(1) representation\n\nArguments\n\nb::Real : constant term\nB::Real : impact coefficient\nPsi::Real : variance of innovation\nM::Integer == 1 : must be one since the function is for AR(1)\n\nReturns\n\nA::Real : impact coefficient of standardized AR(1) process\nC::Real : standard deviation of the innovation\nmu::Real : mean of the standardized AR(1) process\nSigma::Real : variance of the standardized AR(1) process\n\n\n\n"
 },
 
 {
