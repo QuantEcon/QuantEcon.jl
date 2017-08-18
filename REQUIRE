@@ -6,4 +6,4 @@ Primes
 Compat 0.18.0
 StatsBase
 Optim 0.7.3
-NLopt
+NLopt 0.3.4
