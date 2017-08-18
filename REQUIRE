@@ -5,5 +5,5 @@ LightGraphs
 Primes
 Compat 0.18.0
 StatsBase
-Optim
+Optim 0.7.3
 NLopt
