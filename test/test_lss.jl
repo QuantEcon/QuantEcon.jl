@@ -6,14 +6,15 @@
     A = .95
     C = .05
     G = 1.
+    H = 0
     mu_0 = [.75;]
     Sigma_0 = fill(0.000001, 1, 1)
 
-    ss = LSS(A, C, G, mu_0)
-    ss1 = LSS(A, C, G, mu_0, Sigma_0)
+    ss = LSS(A, C, G, H, mu_0)
+    ss1 = LSS(A, C, G, H, mu_0, Sigma_0)
 
     vals = stationary_distributions(ss, max_iter=1000, tol=1e-9)
-    
+
     @testset "test stationarity" begin
         vals = stationary_distributions(ss, max_iter=1000, tol=1e-9)
         ssmux, ssmuy, sssigx, sssigy = vals
@@ -52,11 +53,52 @@
 
     @testset "test constructors" begin
         # kwarg version
-        other_ss = LSS(A, C, G; mu_0=[mu_0;])
+        other_ss = LSS(A, C, G; H=H, mu_0=[mu_0;])
         for nm in fieldnames(ss)
             @test getfield(ss, nm) == getfield(other_ss, nm)
         end
     end
+    
+    @testset "test moment iterator" begin
+        m = QuantEcon.LSSMoments(ss)
 
+        # never done
+        @test !done(m, 1)
+
+        # start should give us mu_0, Sigma_0
+        @test start(m) == (ss.mu_0, ss.Sigma_0)
+    end
+
+    @testset "test positive semi-dfinite covariance" begin
+
+        # set up
+        A = [1.0      0.0       0.0 0.0;
+             10.0     0.9       0.0 0.0;
+             0.0      1.0       0.0 0.0;
+             68.9655  -0.689655 0.0 1.0]
+        C = [0.0;
+             1.0;
+             0.0;
+             0.0]
+        G = [0.0     1.0       0.0  0.0;
+             65.5172 0.344828  0.0  -0.05]
+        H = [0.6     1.3; 
+             -5.8    0.1]
+        mu_0 = [1.0;
+                99.9999;
+                99.9999;
+                0.0]
+        Sigma_0 = [0.0  0.0      0.0      0.0;
+                   0.0  5.26316  4.73684  0.0;
+                   0.0  4.73684  5.26316  0.0;
+                   0.0  0.0      0.0      0.0]
+
+        lss_psd = LSS(A, C, G, H, mu_0, Sigma_0)
+
+        @test isapprox(lss_psd.dist.Sigma,
+                    lss_psd.dist.Q*lss_psd.dist.Q')
+
+        @test size(rand(lss_psd.dist,10)) == (4,10)
+    end
 
 end  # @testset

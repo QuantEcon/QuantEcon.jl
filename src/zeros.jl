@@ -150,10 +150,10 @@ __zero_docstr_arg_ret = """
 - `x2::T`: Upper border for search interval
 - `;maxiter::Int(500)`: Maximum number of bisection iterations
 - `;xtol::Float64(1e-12)`: The routine converges when a root is known to lie
-within `xtol` of the value return. Should be >= 0. The routine modifies this to
-take into account the relative precision of doubles.
+  within `xtol` of the value return. Should be >= 0. The routine modifies this to
+  take into account the relative precision of doubles.
 - `;rtol::Float64(2*eps())`:The routine converges when a root is known to lie
-within `rtol` times the value returned of the value returned. Should be ≥ 0
+  within `rtol` times the value returned of the value returned. Should be ≥ 0
 
 ##### Returns
 
@@ -169,7 +169,7 @@ within `rtol` times the value returned of the value returned. Should be ≥ 0
 ## Bisection
 
 """
-Find the root of the `f` on the bracketing inverval `[x1, x2]` via bisection
+Find the root of the `f` on the bracketing inverval `[x1, x2]` via bisection.
 
 $__zero_docstr_arg_ret
 
@@ -218,8 +218,7 @@ function bisect{T<:AbstractFloat}(f::Function, x1::T, x2::T; maxiter::Int=500,
 end
 
 ## Brent's algorithm
-
-abstract BrentExtrapolation
+@compat abstract type BrentExtrapolation end
 
 immutable BrentQuadratic <: BrentExtrapolation
 end
@@ -323,7 +322,7 @@ function _brent_body{T<:AbstractFloat}(BE::BrentExtrapolation, f::Function,
 end
 
 """
-Find the root of the `f` on the bracketing inverval `[x1, x2]` via brent's algo
+Find the root of the `f` on the bracketing inverval `[x1, x2]` via brent's algo.
 
 $__zero_docstr_arg_ret
 

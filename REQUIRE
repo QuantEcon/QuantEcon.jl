@@ -1,7 +1,9 @@
-julia 0.4
+julia 0.5
 DSP
 Distributions 0.8.9
 LightGraphs
 Primes
-Compat 0.8.4
+Compat 0.18.0
 StatsBase
+Optim 0.7.3
+NLopt 0.3.4

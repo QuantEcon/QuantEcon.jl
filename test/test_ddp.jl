@@ -19,7 +19,7 @@ Tests for markov/ddp.jl
     # Formulation with Dense Matrices R: n x m, Q: n x m x n
     n, m = 2, 2  # number of states, number of actions
     R = [5.0 10.0; -1.0 -Inf]
-    Q = Array(Float64, n, m, n)
+    Q = Array{Float64}(n, m, n)
     Q[:, :, 1] = [0.5 0.0; 0.0 0.0]
     Q[:, :, 2] = [0.5 1.0; 1.0 1.0]
 
@@ -125,7 +125,7 @@ Tests for markov/ddp.jl
         res = solve(ddp0, VFI)
         res.Tv[:] = 500.0
         compute_greedy!(ddp0, res)
-        @test maxabs(res.Tv - 500.0) > 0
+        @test maximum(abs, res.Tv - 500.0) > 0
     end
 
     @testset "value_iteration" begin
@@ -137,8 +137,8 @@ Tests for markov/ddp.jl
             res_init = solve(ddp_item, v_init, VFI; epsilon=epsilon)
 
             # Check v is an epsilon/2-approxmation of v_star
-            @test maxabs(res.v - v_star) < epsilon/2
-            @test maxabs(res_init.v - v_star)    < epsilon/2
+            @test maximum(abs, res.v - v_star) < epsilon/2
+            @test maximum(abs, res_init.v - v_star)    < epsilon/2
 
             # Check sigma == sigma_star.
             # NOTE we need to convert from linear to row-by-row index
@@ -183,7 +183,7 @@ Tests for markov/ddp.jl
         r1 = solve(ddp_rational, PFI)
         r2 = solve(ddp_rational, MPFI)
         r3 = solve(ddp_rational, VFI)
-        @test maxabs(r1.v-v_star) < 1e-13
+        @test maximum(abs, r1.v-v_star) < 1e-13
         @test r1.sigma == r2.sigma
         @test r1.sigma == r3.sigma
         @test r1.mc.p == r2.mc.p
@@ -197,8 +197,8 @@ Tests for markov/ddp.jl
             res_init = solve(ddp_item, v_init, MPFI)
 
                     # Check v is an epsilon/2-approxmation of v_star
-            @test maxabs(res.v - v_star) < epsilon/2
-            @test maxabs(res_init.v - v_star) < epsilon/2
+            @test maximum(abs, res.v - v_star) < epsilon/2
+            @test maximum(abs, res_init.v - v_star) < epsilon/2
 
             # Check sigma == sigma_star
             @test res.sigma == sigma_star
@@ -209,7 +209,7 @@ Tests for markov/ddp.jl
             res = solve(ddp_item, MPFI; max_iter=max_iter, epsilon=epsilon, k=k)
 
             # Check v is an epsilon/2-approxmation of v_star
-            @test maxabs(res.v - v_star) < epsilon/2
+            @test maximum(abs, res.v - v_star) < epsilon/2
 
             # Check sigma == sigma_star
             @test res.sigma == sigma_star
@@ -266,7 +266,7 @@ Tests for markov/ddp.jl
             n, m = 2, 2
             _R = [-Inf -Inf; 1.0 2.0]
 
-            _Q = Array(Float64, n, m, n)
+            _Q = Array{Float64}(n, m, n)
             _Q[:, :, 1] = [0.5 0.0; 0.0 0.0]
             _Q[:, :, 2] = [0.5 1.0; 1.0 1.0]
             _beta = 0.95

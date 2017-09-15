@@ -21,15 +21,14 @@ type ECDF
     observations::Vector
 end
 
-ecdf(e::ECDF, x::Real) = mean(e.observations .<= x)
-ecdf(e::ECDF, x::Array) = map(i->ecdf(e, i), x)
-
 """
 Evaluate the empirical cdf at one or more points
 
 ##### Arguments
 
-- `e::ECDF`: The `ECDF` instance
 - `x::Union{Real, Array}`: The point(s) at which to evaluate the ECDF
 """
-ecdf
+(e::ECDF)(x::Real) = mean(e.observations .<= x)
+(e::ECDF)(x::AbstractArray) = e.(x)
+
+@deprecate ecdf(e::ECDF, x) e(x)

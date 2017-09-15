@@ -8,7 +8,7 @@ Discrete Decision Processes
 References
 ----------
 
-http://quant-econ.net/jl/ddp.html
+https://lectures.quantecon.org/py/discrete_dp.html
 
 Notes
 -----
@@ -53,7 +53,9 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
     a_indices::Nullable{Vector{Tind}}  # Action Indices
     a_indptr::Nullable{Vector{Tind}}   # Action Index Pointers
 
-    function DiscreteDP(R::Array, Q::Array, beta::Real)
+    function (::Type{DiscreteDP{T,NQ,NR,Tbeta,Tind}}){T,NQ,NR,Tbeta,Tind}(
+            R::Array, Q::Array, beta::Real
+        )
         # verify input integrity 1
         if NQ != 3
             msg = "Q must be 3-dimensional without s-a formulation"
@@ -84,13 +86,16 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
         _a_indices = Nullable{Vector{Int}}()
         a_indptr = Nullable{Vector{Int}}()
 
-        new(R, Q, beta, _a_indices, a_indptr)
+        new{T,NQ,NR,Tbeta,Tind}(R, Q, beta, _a_indices, a_indptr)
     end
 
     # Note: We left R, Q as type Array to produce more helpful error message with regards to shape.
     # R and Q are dense Arrays
-    function DiscreteDP(R::AbstractArray, Q::AbstractArray, beta::Real,
-                        s_indices::Vector, a_indices::Vector)
+
+    function (::Type{DiscreteDP{T,NQ,NR,Tbeta,Tind}}){T,NQ,NR,Tbeta,Tind}(
+            R::AbstractArray, Q::AbstractArray, beta::Real, s_indices::Vector,
+            a_indices::Vector
+        )
         # verify input integrity 1
         if NQ != 2
             throw(ArgumentError("Q must be 2-dimensional with s-a formulation"))
@@ -115,7 +120,7 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
         end
 
         if _has_sorted_sa_indices(s_indices, a_indices)
-            a_indptr = Array(Int64, num_states+1)
+            a_indptr = Array{Int64}(num_states+1)
             _a_indices = copy(a_indices)
             _generate_a_indptr!(num_states, s_indices, a_indptr)
         else
@@ -146,7 +151,7 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
         _a_indices = Nullable{Vector{Tind}}(_a_indices)
         a_indptr = Nullable{Vector{Tind}}(a_indptr)
 
-        new(R, full(Q), beta, _a_indices, a_indptr)
+        new{T,NQ,NR,Tbeta,Tind}(R, full(Q), beta, _a_indices, a_indptr)
     end
 end
 
@@ -199,8 +204,8 @@ end
 #-Type Aliases-#
 #--------------#
 
-typealias DDP{T,Tbeta,Tind} DiscreteDP{T,3,2,Tbeta,Tind}
-typealias DDPsa{T,Tbeta,Tind} DiscreteDP{T,2,1,Tbeta,Tind}
+@compat const DDP{T,Tbeta,Tind} =  DiscreteDP{T,3,2,Tbeta,Tind}
+@compat const DDPsa{T,Tbeta,Tind} =  DiscreteDP{T,2,1,Tbeta,Tind}
 
 #--------------------#
 #-Property Functions-#
@@ -210,14 +215,14 @@ num_states(ddp::DDP) = size(ddp.R, 1)
 num_states(ddp::DDPsa) = size(ddp.Q, 2)
 num_actions(ddp::DiscreteDP) = size(ddp.R, 2)
 
-abstract DDPAlgorithm
+@compat abstract type DDPAlgorithm end
 """
 This refers to the Value Iteration solution algorithm.
 
 References
 ----------
 
-http://quant-econ.net/jl/ddp.html
+https://lectures.quantecon.org/py/discrete_dp.html
 
 """
 immutable VFI <: DDPAlgorithm end
@@ -228,7 +233,7 @@ This refers to the Policy Iteration solution algorithm.
 References
 ----------
 
-http://quant-econ.net/jl/ddp.html
+https://lectures.quantecon.org/py/discrete_dp.html
 
 """
 immutable PFI <: DDPAlgorithm end
@@ -239,13 +244,13 @@ This refers to the Modified Policy Iteration solution algorithm.
 References
 ----------
 
-http://quant-econ.net/jl/ddp.html
+https://lectures.quantecon.org/py/discrete_dp.html
 
 """
 immutable MPFI <: DDPAlgorithm end
 
 """
-DPSolveResult is an object for retaining results and associated metadata after
+`DPSolveResult` is an object for retaining results and associated metadata after
 solving the model
 
 ##### Parameters
@@ -254,7 +259,7 @@ solving the model
 
 ##### Returns
 
-- `ddpr::DPSolveResult` : DiscreteDP Results object
+- `ddpr::DPSolveResult` : DiscreteDP results object
 
 """
 type DPSolveResult{Algo<:DDPAlgorithm,Tval<:Real}
@@ -264,9 +269,11 @@ type DPSolveResult{Algo<:DDPAlgorithm,Tval<:Real}
     sigma::Array{Int,1}
     mc::MarkovChain
 
-    function DPSolveResult(ddp::DiscreteDP)
+    function (::Type{DPSolveResult{Algo,Tval}}){Algo,Tval}(
+            ddp::DiscreteDP
+        )
         v = s_wise_max(ddp, ddp.R) # Initialise v with v_init
-        ddpr = new(v, similar(v), 0, similar(v, Int))
+        ddpr = new{Algo,Tval}(v, similar(v), 0, similar(v, Int))
 
         # fill in sigma with proper values
         compute_greedy!(ddp, ddpr)
@@ -274,8 +281,10 @@ type DPSolveResult{Algo<:DDPAlgorithm,Tval<:Real}
     end
 
     # method to pass initial value function (skip the s-wise max)
-    function DPSolveResult(ddp::DiscreteDP, v::Vector)
-        ddpr = new(v, similar(v), 0, similar(v, Int))
+    function (::Type{DPSolveResult{Algo,Tval}}){Algo,Tval}(
+            ddp::DiscreteDP, v::Vector
+        )
+        ddpr = new{Algo,Tval}(v, similar(v), 0, similar(v, Int))
 
         # fill in sigma with proper values
         compute_greedy!(ddp, ddpr)
@@ -287,9 +296,9 @@ end
 # Bellman operator methods #
 # ------------------------ #
 
-"""
-The Bellman operator, which computes and returns the updated value function Tv
-for a value function v.
+doc"""
+The Bellman operator, which computes and returns the updated value function ``Tv``
+for a value function ``v``.
 
 ##### Parameters
 
@@ -311,7 +320,7 @@ function bellman_operator!(ddp::DiscreteDP, v::Vector, Tv::Vector, sigma::Vector
     Tv, sigma
 end
 
-"""
+doc"""
 Apply the Bellman operator using `v=ddpr.v`, `Tv=ddpr.Tv`, and `sigma=ddpr.sigma`
 
 ##### Notes
@@ -323,11 +332,11 @@ bellman_operator!(ddp::DiscreteDP, ddpr::DPSolveResult) =
     bellman_operator!(ddp, ddpr.v, ddpr.Tv, ddpr.sigma)
 
 """
-The Bellman operator, which computes and returns the updated value function Tv
-for a given value function v.
+The Bellman operator, which computes and returns the updated value function ``Tv``
+for a given value function ``v``.
 
 This function will fill the input `v` with `Tv` and the input `sigma` with the
-corresponding policy rule
+corresponding policy rule.
 
 ##### Parameters
 
@@ -353,9 +362,9 @@ function bellman_operator!{T1<:Rational,T2<:Rational,NR,NQ,T3<:Rational}(ddp::Di
     bellman_operator!(ddp, v, v, sigma)
 end
 
-"""
-The Bellman operator, which computes and returns the updated value function Tv
-for a given value function v.
+doc"""
+The Bellman operator, which computes and returns the updated value function ``Tv``
+for a given value function ``v``.
 
 ##### Parameters
 
@@ -373,8 +382,8 @@ bellman_operator(ddp::DiscreteDP, v::Vector) =
 # Compute greedy methods #
 # ---------------------- #
 
-"""
-Compute the v-greedy policy
+doc"""
+Compute the ``v``-greedy policy
 
 ##### Parameters
 
@@ -393,8 +402,8 @@ modifies ddpr.sigma and ddpr.Tv in place
 compute_greedy!(ddp::DiscreteDP, ddpr::DPSolveResult) =
     (bellman_operator!(ddp, ddpr); ddpr.sigma)
 
-"""
-Compute the v-greedy policy.
+doc"""
+Compute the ``v``-greedy policy.
 
 #### Arguments
 
@@ -435,7 +444,7 @@ Compute the value of a policy.
 
 ##### Returns
 
-- `v_sigma::Array{Float64}` : Value vector of `sigma`, of length n.
+- `v_sigma::Array{Float64}` : Value vector of `sigma`, of length `n`.
 
 """
 function evaluate_policy{T<:Integer}(ddp::DiscreteDP, sigma::Vector{T})
@@ -456,18 +465,18 @@ Solve the dynamic programming problem.
 
 - `ddp::DiscreteDP` : Object that contains the Model Parameters
 - `method::Type{T<Algo}(VFI)`: Type name specifying solution method. Acceptable
-arguments are `VFI` for value function iteration or `PFI` for policy function
-iteration or `MPFI` for modified policy function iteration
+  arguments are `VFI` for value function iteration or `PFI` for policy function
+  iteration or `MPFI` for modified policy function iteration
 - `;max_iter::Int(250)` : Maximum number of iterations
 - `;epsilon::Float64(1e-3)` : Value for epsilon-optimality. Only used if
-`method` is `VFI`
+  `method` is `VFI`
 - `;k::Int(20)` : Number of iterations for partial policy evaluation in modified
-policy iteration (irrelevant for other methods).
+  policy iteration (irrelevant for other methods).
 
 ##### Returns
 
 - `ddpr::DPSolveResult{Algo}` : Optimization result represented as a
-DPSolveResult. See `DPSolveResult` for details.
+  `DPSolveResult`. See `DPSolveResult` for details.
 """
 function solve{Algo<:DDPAlgorithm,T}(ddp::DiscreteDP{T}, method::Type{Algo}=VFI;
                                      max_iter::Integer=250, epsilon::Real=1e-3,
@@ -525,10 +534,10 @@ the transition probability matrix `Q_sigma`.
 
 ##### Returns
 
-- `R_sigma::Array{Float64}`: Reward vector for `sigma`, of length n.
+- `R_sigma::Array{Float64}`: Reward vector for `sigma`, of length `n`.
 
 - `Q_sigma::Array{Float64}`: Transition probability matrix for `sigma`,
-  of shape (n, n).
+  of shape `(n, n)`.
 
 """
 function RQ_sigma{T<:Integer}(ddp::DDP, sigma::Array{T})
@@ -539,7 +548,7 @@ end
 
 # TODO: express it in a similar way as above to exploit Julia's column major order
 function RQ_sigma{T<:Integer}(ddp::DDPsa, sigma::Array{T})
-    sigma_indices = Array(T, num_states(ddp))
+    sigma_indices = Array{T}(num_states(ddp))
     _find_indices!(get(ddp.a_indices), get(ddp.a_indptr), sigma, sigma_indices)
     R_sigma = ddp.R[sigma_indices]
     Q_sigma = ddp.Q[sigma_indices, :]
@@ -573,7 +582,7 @@ s_wise_max!(vals::AbstractMatrix, out::Vector) = (println("calling this one! ");
 Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
 `AbstractMatrix` of size `(num_states, num_actions)`.
 
-Also fills `out_argmax` with the column number associated with the indmax in
+Also fills `out_argmax` with the column number associated with the `indmax` in
 each row
 """
 function s_wise_max!(vals::AbstractMatrix, out::Vector, out_argmax::Vector)
@@ -602,7 +611,7 @@ end
 
 function s_wise_max(ddp::DDPsa, vals::Vector)
     s_wise_max!(get(ddp.a_indices), get(ddp.a_indptr), vals,
-                 Array(Float64, num_states(ddp)))
+                 Array{Float64}(num_states(ddp)))
 end
 
 s_wise_max!(ddp::DDPsa, vals::Vector, out::Vector, out_argmax::Vector) =
@@ -633,7 +642,7 @@ end
 Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
 `Vector` of size `(num_sa_pairs,)`.
 
-Also fills `out_argmax` with the cartesiean index associated with the indmax in
+Also fills `out_argmax` with the cartesiean index associated with the `indmax` in
 each row
 """
 function s_wise_max!(a_indices::Vector, a_indptr::Vector, vals::Vector,
@@ -660,7 +669,7 @@ Check whether `s_indices` and `a_indices` are sorted in lexicographic order.
 
 Parameters
 ----------
-s_indices, a_indices : Vectors
+`s_indices`, `a_indices` : Vectors
 
 Returns
 -------
@@ -687,11 +696,10 @@ in sorted order.
 
 Parameters
 ----------
-num_states : Int
+- `num_states::Integer`
+- `s_indices::Vector{T}`
+- `out::Vector{T}` :  with length = `num_states` + 1
 
-s_indices : Vector{Int}
-
-out : Vector{Int} with length = num_states+1
 """
 function _generate_a_indptr!(num_states::Int, s_indices::Vector, out::Vector)
     idx = 1
@@ -718,10 +726,10 @@ function _find_indices!(a_indices::Vector, a_indptr::Vector, sigma::Vector,
     end
 end
 
-"""
+doc"""
 Define Matrix Multiplication between 3-dimensional matrix and a vector
 
-Matrix multiplication over the last dimension of A
+Matrix multiplication over the last dimension of ``A``
 
 """
 function *{T}(A::Array{T,3}, v::Vector)
@@ -751,7 +759,7 @@ function _solve!(ddp::DiscreteDP, ddpr::DPSolveResult{VFI}, max_iter::Integer,
         bellman_operator!(ddp, ddpr)
 
         # compute error and update the v inside ddpr
-        err = maxabs(ddpr.Tv .- ddpr.v)
+        err = maximum(abs, ddpr.Tv .- ddpr.v)
         copy!(ddpr.v, ddpr.Tv)
         ddpr.num_iter += 1
 
