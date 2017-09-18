@@ -101,4 +101,46 @@
         @test size(rand(lss_psd.dist,10)) == (4,10)
     end
 
+    @testset "test stability checks: unstable systems" begin
+
+        phi_0, phi_1, phi_2 = 1.1, 1.8, -1.8
+
+        A = [1.0   0.0   0
+            phi_0 phi_1 phi_2
+            0.0   1.0   0.0]
+        C = zeros(3, 1)
+        G = [0.0 1.0 0.0]
+
+        lss = LSS(A, C, G)
+        lss2 = LSS(A[2:end, 2:end], C[2:end, :], G[:, 2:end])   # system without constant
+        lss_vec = [lss, lss2]
+
+        for sys in lss_vec
+            @test is_stable(sys) == false
+            @test_throws ErrorException stationary_distributions(sys)
+            @test_throws ErrorException geometric_sums(sys, 0.97, rand(3))
+        end
+
+    end
+
+    @testset "test stability checks: stable systems" begin
+
+        phi_0, phi_1, phi_2 = 1.1, 0.8, -0.8
+
+        A = [1.0   0.0   0
+            phi_0 phi_1 phi_2
+            0.0   1.0   0.0]
+        C = zeros(3, 1)
+        G = [0.0 1.0 0.0]
+
+        lss = LSS(A, C, G)
+        lss2 = LSS(A[2:end, 2:end], C[2:end, :], G[:, 2:end])   # system without constant
+        lss_vec = [lss, lss2]
+
+        for sys in lss_vec
+            @test is_stable(sys) == true
+        end
+
+    end
+
 end  # @testset
