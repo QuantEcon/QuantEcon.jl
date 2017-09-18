@@ -1,5 +1,12 @@
 language: julia
 sudo: false
+os: 
+    - linux
+addons:
+  apt:
+    packages:
+    - libnlopt0
+    - hdf5-tools
 julia:
     - 0.5
     - 0.6
