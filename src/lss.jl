@@ -193,7 +193,7 @@ initial conditions `lss.mu_0` and `lss.Sigma_0`
 
 """
 function stationary_distributions(lss::LSS; max_iter=200, tol=1e-5)
-    is_stable(lss)
+    !is_stable(lss) ? error("Cannot compute stationary distribution because the system is not stable.") : nothing
 
     # Initialize iteration
     m = moment_sequence(lss)
@@ -219,7 +219,7 @@ function stationary_distributions(lss::LSS; max_iter=200, tol=1e-5)
 end
 
 function geometric_sums(lss::LSS, bet, x_t)
-    is_stable(lss)
+    !is_stable(lss) ? error("Cannot compute geometric sum because the system is not stable.") : nothing
     I = eye(lss.n)
     S_x = (I - bet .* lss.A) \ x_t
     S_y = lss.G * S_x
@@ -246,34 +246,6 @@ function is_stable(lss::LSS)
 
     # Check for stability
     stable = is_stable(A)
-    if stable==false
-        warn("Stationary distribution does not exist.")
-    end
-    return stable
-
-end
-
-doc"""
-General function for testing for stability of matrix ``A``. Just
-checks that eigenvalues are less than 1 in absolute value.
-
-#### Arguments
-
-- `A::Matrix` The matrix we want to check
-
-#### Returns
-
-- `stable::Bool` Whether or not the matrix is stable
-
-"""
-function is_stable(A::AbstractMatrix)
-
-    # Check for stability by testing that eigenvalues are less than 1
-    stable = true
-    d = eigvals(A)
-    if maximum(abs, d) > 1.0
-        stable = false
-    end
     return stable
 
 end
@@ -293,24 +265,16 @@ to be checked for stability.
 
 """
 function remove_constants(lss::LSS)
-
-    # Find the index of the constant
-    cons_ind = 0
-    for j in 1:lss.n
-        if (lss.A[j, :] - eye(lss.n)[j, :]) == zeros(lss.n, )
-            if (lss.C[j, :] - zeros(lss.m, )) == zeros(lss.m, )
-                cons_ind = j
-            end
-        end
-    end
-
-    # Delete constant row and column of matrix, if necessary
+    # Get size of matrix
     A = lss.A
-    if cons_ind > 0
-        A = lss.A[[collect(1:cons_ind-1); collect(cons_ind+1:end)], :]
-        A = A[:, [collect(1:cons_ind-1); collect(cons_ind+1:end)]]
-    end
+    n, m = size(A)
+    @assert n==m
 
-    return A
+    # Sum the absolute values of each row -> Do this because we
+    # want to find rows that the sum of the absolute values is 1
+    row_sums_to_one = (vec(sum(abs, A, 2) - 1.0)) .< 1e-14
+    is_ii_one = map(i->abs(A[i, i] - 1.0) < 1e-14, 1:n)
+    not_constant_index = .!(row_sums_to_one .& is_ii_one)
 
+    return A[not_constant_index, not_constant_index]
 end

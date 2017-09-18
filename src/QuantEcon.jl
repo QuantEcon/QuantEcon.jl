@@ -74,6 +74,9 @@ export
     replicate,
     moment_sequence,
     stationary_distributions,
+    geometric_sums,
+    is_stable,
+    remove_constants,
 
 # kalman
     Kalman,
@@ -91,7 +94,7 @@ export
     smooth, periodogram, ar_periodogram,
 
 # util
-    meshgrid, gridmake, gridmake!, ckron,
+    meshgrid, gridmake, gridmake!, ckron, is_stable,
 
 # robustlq
     RBLQ,
