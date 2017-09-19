@@ -193,6 +193,8 @@ initial conditions `lss.mu_0` and `lss.Sigma_0`
 
 """
 function stationary_distributions(lss::LSS; max_iter=200, tol=1e-5)
+    !is_stable(lss) ? error("Cannot compute stationary distribution because the system is not stable.") : nothing
+
     # Initialize iteration
     m = moment_sequence(lss)
     mu_x, mu_y, Sigma_x, Sigma_y = first(m)
@@ -216,10 +218,63 @@ function stationary_distributions(lss::LSS; max_iter=200, tol=1e-5)
     return mu_x, mu_y, Sigma_x, Sigma_y
 end
 
-
 function geometric_sums(lss::LSS, bet, x_t)
+    !is_stable(lss) ? error("Cannot compute geometric sum because the system is not stable.") : nothing
     I = eye(lss.n)
     S_x = (I - bet .* lss.A) \ x_t
     S_y = lss.G * S_x
     return S_x, S_y
+end
+
+doc"""
+Test for stability of linear state space system.
+First removes the constant row and column.
+
+#### Arguments
+
+- `lss::LSS` The linear state space system
+
+#### Returns
+
+- `stable::Bool` Whether or not the system is stable
+
+"""
+function is_stable(lss::LSS)
+
+    # Get version of A without constant row/column
+    A = remove_constants(lss)
+
+    # Check for stability
+    stable = is_stable(A)
+    return stable
+
+end
+
+doc"""
+Finds the row and column, if any,  that correspond to the constant 
+term in a `LSS` system and removes them to get the matrix that needs 
+to be checked for stability.
+
+#### Arguments
+
+- `lss::LSS` The linear state space system
+
+#### Returns
+
+- `A::Matrix` The matrix A with constant row and column removed
+
+"""
+function remove_constants(lss::LSS)
+    # Get size of matrix
+    A = lss.A
+    n, m = size(A)
+    @assert n==m
+
+    # Sum the absolute values of each row -> Do this because we
+    # want to find rows that the sum of the absolute values is 1
+    row_sums_to_one = (vec(sum(abs, A, 2) - 1.0)) .< 1e-14
+    is_ii_one = map(i->abs(A[i, i] - 1.0) < 1e-14, 1:n)
+    not_constant_index = .!(row_sums_to_one .& is_ii_one)
+
+    return A[not_constant_index, not_constant_index]
 end
