@@ -43,6 +43,12 @@ end
 #     out_x, out_f
 # end
 
+"""
+Applies Golden-section search to search for the _maximum_ of a function in
+the interval (a, b)
+
+https://en.wikipedia.org/wiki/Golden-section_search
+"""
 function golden_method(f::Function, a::Real, b::Real; tol::Float64=10*eps(),
                        maxit::Int=1000)
     α1 = (3 - sqrt(5)) / 2
