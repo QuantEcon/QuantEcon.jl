@@ -106,8 +106,8 @@ _out_eltype{TV,TB}(li::LinInterp{TV,TB}) = promote_type(eltype(TV), eltype(TB))
     @inbounds begin
         # handle corner cases
         if ix == 1
-            for col in cols
-                out[col] = li.vals[1, col]
+            for (ix, col) in enumerate(cols)
+                out[ix] = li.vals[1, col]
             end
             return out
         end
