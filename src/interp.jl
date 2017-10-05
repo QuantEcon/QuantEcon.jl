@@ -106,15 +106,15 @@ _out_eltype{TV,TB}(li::LinInterp{TV,TB}) = promote_type(eltype(TV), eltype(TB))
     @inbounds begin
         # handle corner cases
         if ix == 1
-            for col in cols
-                out[col] = li.vals[1, col]
+            for (ind, col) in enumerate(cols)
+                out[ind] = li.vals[1, col]
             end
             return out
         end
 
         if ix == li._n + 1
-            for col in cols
-                out[col] = li.vals[end, col]
+            for (ind, col) in enumerate(cols)
+                out[ind] = li.vals[end, col]
             end
             return out
         end
@@ -122,8 +122,8 @@ _out_eltype{TV,TB}(li::LinInterp{TV,TB}) = promote_type(eltype(TV), eltype(TB))
         # now get on to the real work...
         z = (li.breaks[ix] - xp)/(li.breaks[ix] - li.breaks[ix-1])
 
-        for col in cols
-            out[col] = (1-z) * li.vals[ix, col] + z * li.vals[ix-1, col]
+        for (ind, col) in enumerate(cols)
+            out[ind] = (1-z) * li.vals[ix, col] + z * li.vals[ix-1, col]
         end
 
         return out
