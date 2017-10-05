@@ -54,7 +54,7 @@ export
     discrete_var, Even,
 
 # modeltools
-    AbstractUtility, LogUtility, CRRAUtility, derivative,
+    AbstractUtility, LogUtility, CRRAUtility, ConstantFrisch, derivative,
 
 # gth_solve
     gth_solve,

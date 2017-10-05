@@ -23,6 +23,21 @@ struct CRRAUtility <: AbstractUtility
 end
 
 (u::CRRAUtility)(c::Float64) = ifelse(c > 1e-10, u.ξ * (c^(1.0 - u.γ) - 1.0) / (1.0 - u.γ), -1e10)
-derivative(u::CRRAUtility, c::Float64) = ifelse(c > 1e-10, u.ξ * c^(-u.γ), -1e10)
+derivative(u::CRRAUtility, c::Float64) = ifelse(c > 1e-10, u.ξ * c^(-u.γ), 1e10)
 
+struct ConstantFrisch <: AbstractUtility
+    ϕ::Float64
+    ξ::Float64
+
+    function ConstantFrisch(ϕ, ξ=1.0)
+        if abs(ϕ - 1.0) < 1e-8
+            error("Your value for ϕ is very close to 1... Consider using LogUtility")
+        end
+
+        return new(ξ, γ)
+    end
+end
+
+(u::ConstantFrisch)(l::Float64) = ifelse(l > 1e-10, u.ξ * l^(1.0 + 1.0/u.ϕ)/(1.0 + 1.0/u.ϕ), -1e10)
+derivative(u::ConstantFrisch, l::Float64) = ifelse(l > 1e-10, u.ξ * l^(1.0/u.ϕ), 1e10)
 
