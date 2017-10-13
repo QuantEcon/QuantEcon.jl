@@ -19,6 +19,7 @@ tests = [
         "markov_approx",
         "matrix_eqn",
         "mc_tools",
+        "modeltool",
         "quad",
         "quadsum",
         "random_mc",

@@ -27,7 +27,7 @@ struct CRRAUtility <: AbstractUtility
             error("Your value for γ is very close to 1... Consider using LogUtility")
         end
 
-        return new(ξ, γ)
+        return new(γ, ξ)
     end
 end
 
@@ -39,23 +39,23 @@ derivative(u::CRRAUtility, c::Float64) =
 
 # Labor Utility
 
-struct CFUtility <: AbstractUtility
+struct CFEUtility <: AbstractUtility
     ϕ::Float64
     ξ::Float64
 
-    function CFUtility(ϕ, ξ=1.0)
+    function CFEUtility(ϕ, ξ=1.0)
         if abs(ϕ - 1.0) < 1e-8
             error("Your value for ϕ is very close to 1... Consider using LogUtility")
         end
 
-        return new(ξ, γ)
+        return new(ϕ, ξ)
     end
 end
 
-(u::CFUtility)(l::Float64) =
-    ifelse(l > 1e-10, u.ξ * l^(1.0 + 1.0/u.ϕ)/(1.0 + 1.0/u.ϕ), -1e10)
-derivative(u::CFUtility, l::Float64) =
-    ifelse(l > 1e-10, u.ξ * l^(1.0/u.ϕ), 1e10)
+(u::CFEUtility)(l::Float64) =
+    ifelse(l > 1e-10, -u.ξ * l^(1.0 + 1.0/u.ϕ)/(1.0 + 1.0/u.ϕ), -1e10)
+derivative(u::CFEUtility, l::Float64) =
+    ifelse(l > 1e-10, -u.ξ * l^(1.0/u.ϕ), 1e10)
 
 
 struct EllipticalUtility <: AbstractUtility
