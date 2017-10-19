@@ -28,15 +28,12 @@ state transitions.
 - `p::AbstractMatrix` : The transition matrix. Must be square, all elements must be nonnegative, and all rows must sum to unity.
 - `state_values::AbstractVector` : Vector containing the values associated with the states.
 """
-type MarkovChain{T, TM<:AbstractMatrix, TV<:AbstractVector}
+type MarkovChain{T, TM<:AbstractMatrix{T}, TV<:AbstractVector}
     p::TM # valid stochastic matrix
     state_values::TV
 
     function (::Type{MarkovChain{T,TM,TV}}){T,TM,TV}(p::AbstractMatrix, state_values)
         n, m = size(p)
-
-        eltype(p) != T &&
-            throw(ArgumentError("Types must be consistent with given matrix"))
 
         n != m &&
             throw(DimensionMismatch("stochastic matrix must be square"))
