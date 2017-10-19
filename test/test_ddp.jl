@@ -36,6 +36,8 @@ Tests for markov/ddp.jl
     Q_sa[3, :] = Q[2, 1, :]
     ddp0_sa = DiscreteDP(R_sa, Q_sa, beta, s_indices, a_indices)
 
+    @test issparse(ddp0_sa.Q)
+
     # List of ddp formulations
     ddp0_collection = (ddp0, ddp0_sa)
 
