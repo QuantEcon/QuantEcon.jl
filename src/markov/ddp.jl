@@ -46,15 +46,15 @@ DiscreteDP type for specifying paramters for discrete dynamic programming model
 - `ddp::DiscreteDP` : DiscreteDP object
 
 """
-type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
+mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}}
     R::Array{T,NR}                     # Reward Array
-    Q::Array{T,NQ}                     # Transition Probability Array
+    Q::TQ                     # Transition Probability Array
     beta::Tbeta                        # Discount Factor
     a_indices::Nullable{Vector{Tind}}  # Action Indices
     a_indptr::Nullable{Vector{Tind}}   # Action Index Pointers
 
-    function (::Type{DiscreteDP{T,NQ,NR,Tbeta,Tind}}){T,NQ,NR,Tbeta,Tind}(
-            R::Array, Q::Array, beta::Real
+    function (::Type{DiscreteDP{T,NQ,NR,Tbeta,Tind,TQ}}){T,NQ,NR,Tbeta,Tind,TQ}(
+            R::Array, Q::TQ, beta::Real
         )
         # verify input integrity 1
         if NQ != 3
@@ -86,14 +86,14 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
         _a_indices = Nullable{Vector{Int}}()
         a_indptr = Nullable{Vector{Int}}()
 
-        new{T,NQ,NR,Tbeta,Tind}(R, Q, beta, _a_indices, a_indptr)
+        new{T,NQ,NR,Tbeta,Tind,typeof(Q)}(R, Q, beta, _a_indices, a_indptr)
     end
 
     # Note: We left R, Q as type Array to produce more helpful error message with regards to shape.
     # R and Q are dense Arrays
 
-    function (::Type{DiscreteDP{T,NQ,NR,Tbeta,Tind}}){T,NQ,NR,Tbeta,Tind}(
-            R::AbstractArray, Q::AbstractArray, beta::Real, s_indices::Vector,
+    function (::Type{DiscreteDP{T,NQ,NR,Tbeta,Tind,TQ}}){T,NQ,NR,Tbeta,Tind,TQ}(
+            R::AbstractArray, Q::TQ, beta::Real, s_indices::Vector,
             a_indices::Vector
         )
         # verify input integrity 1
@@ -151,7 +151,7 @@ type DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind}
         _a_indices = Nullable{Vector{Tind}}(_a_indices)
         a_indptr = Nullable{Vector{Tind}}(a_indptr)
 
-        new{T,NQ,NR,Tbeta,Tind}(R, full(Q), beta, _a_indices, a_indptr)
+        new{T,NQ,NR,Tbeta,Tind,typeof(Q)}(R, Q, beta, _a_indices, a_indptr)
     end
 end
 
@@ -169,8 +169,10 @@ model Dense Matrix Formulation
 
 - `ddp::DiscreteDP` : Constructor for DiscreteDP object
 """
-DiscreteDP{T,NQ,NR,Tbeta}(R::Array{T,NR}, Q::Array{T,NQ}, beta::Tbeta) =
-    DiscreteDP{T,NQ,NR,Tbeta,Int}(R, Q, beta)
+function DiscreteDP{T,NQ,NR,Tbeta}(
+    R::Array{T,NR}, Q::AbstractArray{T,NQ}, beta::Tbeta)
+    DiscreteDP{T,NQ,NR,Tbeta,Int,typeof(Q)}(R, Q, beta)
+end
 
 """
 DiscreteDP type for specifying parameters for discrete dynamic programming
@@ -197,15 +199,15 @@ function DiscreteDP{T,NQ,NR,Tbeta,Tind}(R::AbstractArray{T,NR},
                                         Q::AbstractArray{T,NQ},
                                         beta::Tbeta, s_indices::Vector{Tind},
                                         a_indices::Vector{Tind})
-    DiscreteDP{T,NQ,NR,Tbeta,Tind}(R, Q, beta, s_indices, a_indices)
+    DiscreteDP{T,NQ,NR,Tbeta,Tind,typeof(Q)}(R, Q, beta, s_indices, a_indices)
 end
 
 #--------------#
 #-Type Aliases-#
 #--------------#
 
-@compat const DDP{T,Tbeta,Tind} =  DiscreteDP{T,3,2,Tbeta,Tind}
-@compat const DDPsa{T,Tbeta,Tind} =  DiscreteDP{T,2,1,Tbeta,Tind}
+@compat const DDP{T,Tbeta,Tind,TQ} =  DiscreteDP{T,3,2,Tbeta,Tind,TQ}
+@compat const DDPsa{T,Tbeta,Tind,TQ} =  DiscreteDP{T,2,1,Tbeta,Tind,TQ}
 
 #--------------------#
 #-Property Functions-#
