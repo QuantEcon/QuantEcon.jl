@@ -129,7 +129,7 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
             m = maximum(a_indices)
             n = maximum(s_indices)
             msg = "Duplicate s-a pair found"
-            as_ptr = sparse(a_indices, s_indices, 1:3, m, n,
+            as_ptr = sparse(a_indices, s_indices, 1:num_sa_pairs, m, n,
                             (x,y)->throw(ArgumentError(msg)))
             _a_indices = as_ptr.rowval
             a_indptr = as_ptr.colptr
