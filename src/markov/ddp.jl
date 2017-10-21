@@ -69,6 +69,22 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
 
         # verify input integrity 2
         num_actions, num_states = size(R)
+
+        # check for 'old' form R[s, a].
+        # NOTE: Will only work if na != ns!
+        if size(Q) == (num_actions, num_states, num_actions) && (num_actions != num_states)
+            msg = """
+            DiscreteDP internals have chagned to order R by (actions, states)
+            and Q by (state', actions, states). We will do the re-ordering
+            for you, but please update your code as the automatic re-ordering
+            will be removed in a future release of QuantEcon.jl
+            """
+            warn(msg)
+            R = R'
+            Q = permutedims(Q, (3, 2, 1))
+            num_actions, num_states = size(R)
+        end
+
         if size(Q) != (num_states, num_actions, num_states)
             throw(ArgumentError("shapes of R and Q must be (n,m) and (n,m,n)"))
         end
@@ -107,6 +123,20 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
 
         # verify input integrity (same length)
         num_states, num_sa_pairs = size(Q)
+
+        # check for 'old' form R[s, a].
+        # NOTE: Will only work if na != ns!
+        if length(R) == (num_states) && (num_states != num_sa_pairs)
+            msg = """
+            DiscreteDP SA-pair form internals have changed to order Q by
+            (state', state-action). We will do the re-ordering for you,
+            but please update your code as the automatic re-ordering
+            will be removed in a future release of QuantEcon.jl
+            """
+            Q = Q'
+            num_states, num_sa_pairs = size(Q)
+        end
+
         if length(R) != num_sa_pairs
             throw(ArgumentError("shapes of R and Q must be (L,) and (n,L)"))
         end
