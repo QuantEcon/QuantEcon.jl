@@ -48,7 +48,7 @@ DiscreteDP type for specifying paramters for discrete dynamic programming model
 """
 mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}}
     R::Array{T,NR}                     # Reward Array
-    Q::TQ                     # Transition Probability Array
+    Q::TQ                              # Transition Probability Array
     beta::Tbeta                        # Discount Factor
     a_indices::Nullable{Vector{Tind}}  # Action Indices
     a_indptr::Nullable{Vector{Tind}}   # Action Index Pointers
@@ -126,28 +126,25 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
         else
             # transpose matrix to use Julia's CSC; now rows are actions and
             # columns are states (this is why it's called as_ptr not sa_ptr)
-            error("Fix this stuff for when Q is (s', as)!!!")
             m = maximum(a_indices)
             n = maximum(s_indices)
             msg = "Duplicate s-a pair found"
-            as_ptr = sparse(a_indices, s_indices, 1:num_sa_pairs, m, n,
+            as_ptr = sparse(a_indices, s_indices, 1:3, m, n,
                             (x,y)->throw(ArgumentError(msg)))
             _a_indices = as_ptr.rowval
             a_indptr = as_ptr.colptr
 
             R = R[as_ptr.nzval]
-            Q = Q[as_ptr.nzval, :]
+            Q = Q[:, as_ptr.nzval]
         end
 
-
-        error("Fix this for Q ordered (s', as)")
         # check feasibility
         aptr_diff = diff(a_indptr)
-        if any(aptr_diff .== 0.0)
+        if any(aptr_diff .== 0)
             # First state index such that no action is available
             s = find(aptr_diff .== 0.0)  # Only Gives True
             throw(ArgumentError("for every state at least one action
-                must be available: violated for state $s"))
+                must be available: violated for state(s) $s"))
         end
 
         # package into nullables before constructing type
@@ -562,8 +559,8 @@ function RQ_sigma{T<:Integer}(ddp::DDPsa, sigma::AbstractVector{T})
     sigma_indices = Array{T}(num_states(ddp))
     _find_indices!(get(ddp.a_indices), get(ddp.a_indptr), sigma, sigma_indices)
     R_sigma = ddp.R[sigma_indices]
-    Q_sigma = ddp.Q[sigma_indices, :]
-    return R_sigma, Q_sigma
+    Q_sigma = ddp.Q[:, sigma_indices]
+    return R_sigma, Q_sigma'
 end
 
 # ---------------- #
@@ -647,7 +644,6 @@ function s_wise_max!(
         a_indices::AbstractVector, a_indptr::AbstractVector,
         vals::AbstractVector, out::AbstractVector
     )
-    error("Need to implement!!!")
     n = length(out)
     for i in 1:n
         if a_indptr[i] != a_indptr[i+1]
@@ -674,7 +670,6 @@ function s_wise_max!(
         a_indices::AbstractVector, a_indptr::AbstractVector, vals::AbstractVector,
         out::AbstractVector, out_argmax::AbstractVector
     )
-    error("Need to implement!!!")
     n = length(out)
     for i in 1:n
         if a_indptr[i] != a_indptr[i+1]
@@ -708,11 +703,11 @@ function _has_sorted_sa_indices(
     )
     L = length(a_indices)
     for i in 1:L-1
-        if a_indices[i] > a_indices[i+1]
+        if s_indices[i] > s_indices[i+1]
             return false
         end
-        if a_indices[i] == a_indices[i+1]
-            if s_indices[i] >= s_indices[i+1]
+        if s_indices[i] == s_indices[i+1]
+            if a_indices[i] >= a_indices[i+1]
                 return false
             end
         end
@@ -726,18 +721,17 @@ in sorted order.
 
 Parameters
 ----------
-- `num_states::Integer`
+- `n_s::Integer`
 - `s_indices::AbstractVector{T}`
-- `out::AbstractVector{T}` :  with length = `num_states` + 1
+- `out::AbstractVector{T}` :  with length = `n_s` + 1
 
 """
 function _generate_a_indptr!(
-        num_states::Int, s_indices::AbstractVector, out::AbstractVector
+        n_s::Int, s_indices::AbstractVector, out::AbstractVector
     )
-    error("need to implement!!!")
     idx = 1
     out[1] = 1
-    for s in 1:num_states-1
+    for s in 1:n_s-1
         while(s_indices[idx] == s)
             idx += 1
         end
@@ -745,13 +739,13 @@ function _generate_a_indptr!(
     end
     # need this +1 to be consistent with Julia's sparse pointers:
     # colptr[i]:(colptr[i+1]-1)
-    out[num_states+1] = length(s_indices)+1
+    out[n_s+1] = length(s_indices)+1
     out
 end
 
 function _find_indices!(
-        a_indices::AbstractVector, a_indptr::AbstractVector, sigma::AbstractVector,
-        out::AbstractVector
+        a_indices::AbstractVector, a_indptr::AbstractVector,
+        sigma::AbstractVector, out::AbstractVector
     )
     n = length(sigma)
     for i in 1:n, j in a_indptr[i]:(a_indptr[i+1]-1)
@@ -777,7 +771,7 @@ function _mul_v_Q(v::AbstractVector{T1}, Q::Array{T2,3}) where T1 where T2
     reshape(_get_vec(At_mul_B(v, B)), m, n)
 end
 
-_mul_v_Q(Q::AbstractMatrix, v::AbstractVector) = _get_vec(At_mul_B(v, Q))
+_mul_v_Q(v::AbstractVector, Q::AbstractMatrix) = _get_vec(At_mul_B(v, Q))
 
 """
 Impliments Value Iteration

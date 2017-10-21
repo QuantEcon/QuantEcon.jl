@@ -27,13 +27,13 @@ Tests for markov/ddp.jl
 
     # Formulation with state-action pairs
     L = 3  # Number of state-action pairs
-    s_indices = [1, 1, 2]
     a_indices = [1, 2, 1]
-    R_sa = [R[1, 1], R[1, 2], R[2, 1]]
-    Q_sa = spzeros(L, n)
-    Q_sa[1, :] = Q[1, 1, :]
-    Q_sa[2, :] = Q[1, 2, :]
-    Q_sa[3, :] = Q[2, 1, :]
+    s_indices = [1, 1, 2]
+    R_sa = [R[1, 1], R[2, 1], R[1, 2]]
+    Q_sa = spzeros(n, L)
+    Q_sa[:, 1] = Q[:, 1, 1]
+    Q_sa[:, 2] = Q[:, 1, 2]
+    Q_sa[:, 3] = Q[:, 2, 1]
     ddp0_sa = DiscreteDP(R_sa, Q_sa, beta, s_indices, a_indices)
 
     @test issparse(ddp0_sa.Q)
@@ -303,7 +303,7 @@ Tests for markov/ddp.jl
         # s_indices = [0, 0, 1, 1, 2, 2]
         # a_indices = [0, 1, 0, 1, 0, 1]
         # R_sa = reshape(R, n*m)
-        # Q_sa_dense = reshape(Q, n*m, n)          #TODO: @sglyon Not sure how to reshape in Julia
+        # Q_sa_dense = reshape(Q, n*m, n)
         #
         # @test_throws ArgumentError DiscreteDP(R_sa, Q_sa, beta, s_indices, a_indices)
     end
