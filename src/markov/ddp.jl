@@ -305,18 +305,21 @@ for a value function ``v``.
 ##### Parameters
 
 - `ddp::DiscreteDP` : Object that contains the model parameters
-- `v::Vector{T<:AbstractFloat}`: The current guess of the value function
-- `Tv::Vector{T<:AbstractFloat}`: A buffer array to hold the updated value
+- `v::AbstractVector{T<:AbstractFloat}`: The current guess of the value function
+- `Tv::AbstractVector{T<:AbstractFloat}`: A buffer array to hold the updated value
   function. Initial value not used and will be overwritten
-- `sigma::Vector`: A buffer array to hold the policy function. Initial
+- `sigma::AbstractVector`: A buffer array to hold the policy function. Initial
   values not used and will be overwritten
 
 ##### Returns
 
-- `Tv::Vector` : Updated value function vector
-- `sigma::Vector` : Updated policiy function vector
+- `Tv::typeof(Tv)` : Updated value function vector
+- `sigma::typeof(sigma)` : Updated policiy function vector
 """
-function bellman_operator!(ddp::DiscreteDP, v::Vector, Tv::Vector, sigma::Vector)
+function bellman_operator!(
+        ddp::DiscreteDP, v::AbstractVector, Tv::AbstractVector,
+        sigma::AbstractVector
+    )
     vals = ddp.R + ddp.beta * (ddp.Q * v)
     s_wise_max!(ddp, vals, Tv, sigma)
     Tv, sigma
@@ -343,24 +346,24 @@ corresponding policy rule.
 ##### Parameters
 
 - `ddp::DiscreteDP`: The ddp model
-- `v::Vector{T<:AbstractFloat}`: The current guess of the value function. This
+- `v::AbstractVector{T<:AbstractFloat}`: The current guess of the value function. This
   array will be overwritten
-- `sigma::Vector`: A buffer array to hold the policy function. Initial
+- `sigma::AbstractVector`: A buffer array to hold the policy function. Initial
   values not used and will be overwritten
 
 ##### Returns
 
 - `Tv::Vector`: Updated value function vector
-- `sigma::Vector{T<:Integer}`: Policy rule
+- `sigma::typeof(sigma)`: Policy rule
 """
-bellman_operator!{T<:AbstractFloat}(ddp::DiscreteDP, v::Vector{T}, sigma::Vector) =
+bellman_operator!{T<:AbstractFloat}(ddp::DiscreteDP, v::AbstractVector{T}, sigma::AbstractVector) =
     bellman_operator!(ddp, v, v, sigma)
 
 # method to allow dispatch on rationals
 # TODO from albep: not sure how to update this to the state-action pair formulation
-function bellman_operator!{T1<:Rational,T2<:Rational,NR,NQ,T3<:Rational}(ddp::DiscreteDP{T1,NR,NQ,T2},
-                                                                         v::Vector{T3},
-                                                                         sigma::Vector)
+function bellman_operator!{T1<:Rational,T2<:Rational,NR,NQ,T3<:Rational}(
+        ddp::DiscreteDP{T1,NR,NQ,T2}, v::AbstractVector{T3}, sigma::AbstractVector
+    )
     bellman_operator!(ddp, v, v, sigma)
 end
 
@@ -371,13 +374,13 @@ for a given value function ``v``.
 ##### Parameters
 
 - `ddp::DiscreteDP`: The ddp model
-- `v::Vector`: The current guess of the value function
+- `v::AbstractVector`: The current guess of the value function
 
 ##### Returns
 
 - `Tv::Vector` : Updated value function vector
 """
-bellman_operator(ddp::DiscreteDP, v::Vector) =
+bellman_operator(ddp::DiscreteDP, v::AbstractVector) =
     s_wise_max(ddp, ddp.R + ddp.beta * (ddp.Q * v))
 
 # ---------------------- #
@@ -409,7 +412,7 @@ Compute the ``v``-greedy policy.
 
 #### Arguments
 
-- `v::Vector` Value function vector of length `n`
+- `v::AbstractVector` Value function vector of length `n`
 - `ddp::DiscreteDP` Object that contains the model parameters
 
 #### Returns
@@ -417,7 +420,7 @@ Compute the ``v``-greedy policy.
 - `sigma:: v-greedy policy vector, of length `n`
 
 """
-function compute_greedy{TV<:Real}(ddp::DiscreteDP, v::Vector{TV})
+function compute_greedy{TV<:Real}(ddp::DiscreteDP, v::AbstractVector{TV})
     Tv = similar(v)
     sigma = ones(Int, length(v))
     bellman_operator!(ddp, v, Tv, sigma)
@@ -442,14 +445,14 @@ Compute the value of a policy.
 ##### Parameters
 
 - `ddp::DiscreteDP` : Object that contains the model parameters
-- `sigma::Vector{T<:Integer}` : Policy rule vector
+- `sigma::AbstractVector{T<:Integer}` : Policy rule vector
 
 ##### Returns
 
 - `v_sigma::Array{Float64}` : Value vector of `sigma`, of length `n`.
 
 """
-function evaluate_policy{T<:Integer}(ddp::DiscreteDP, sigma::Vector{T})
+function evaluate_policy{T<:Integer}(ddp::DiscreteDP, sigma::AbstractVector{T})
     R_sigma, Q_sigma = RQ_sigma(ddp, sigma)
     b = R_sigma
     A = I - ddp.beta * Q_sigma
@@ -466,32 +469,34 @@ Solve the dynamic programming problem.
 ##### Parameters
 
 - `ddp::DiscreteDP` : Object that contains the Model Parameters
-- `method::Type{T<Algo}(VFI)`: Type name specifying solution method. Acceptable
-  arguments are `VFI` for value function iteration or `PFI` for policy function
-  iteration or `MPFI` for modified policy function iteration
+- `method::Type{T<Algo}(VFI)`: Type name specifying solution method.
+  Acceptable arguments are `VFI` for value function iteration or `PFI` for
+  policy function iteration or `MPFI` for modified policy function iteration
 - `;max_iter::Int(250)` : Maximum number of iterations
 - `;epsilon::Float64(1e-3)` : Value for epsilon-optimality. Only used if
   `method` is `VFI`
-- `;k::Int(20)` : Number of iterations for partial policy evaluation in modified
-  policy iteration (irrelevant for other methods).
+- `;k::Int(20)` : Number of iterations for partial policy evaluation in
+   modified policy iteration (irrelevant for other methods).
 
 ##### Returns
 
 - `ddpr::DPSolveResult{Algo}` : Optimization result represented as a
   `DPSolveResult`. See `DPSolveResult` for details.
 """
-function solve{Algo<:DDPAlgorithm,T}(ddp::DiscreteDP{T}, method::Type{Algo}=VFI;
-                                     max_iter::Integer=250, epsilon::Real=1e-3,
-                                     k::Integer=20)
+function solve{Algo<:DDPAlgorithm,T}(
+        ddp::DiscreteDP{T}, method::Type{Algo}=VFI;
+        max_iter::Integer=250, epsilon::Real=1e-3, k::Integer=20
+    )
     ddpr = DPSolveResult{Algo,T}(ddp)
     _solve!(ddp, ddpr, max_iter, epsilon, k)
     ddpr.mc = MarkovChain(ddp, ddpr)
     ddpr
 end
 
-function solve{Algo<:DDPAlgorithm,T}(ddp::DiscreteDP{T}, v_init::Vector{T},
-                                   method::Type{Algo}=VFI; max_iter::Integer=250,
-                                   epsilon::Real=1e-3, k::Integer=20)
+function solve{Algo<:DDPAlgorithm,T}(
+        ddp::DiscreteDP{T}, v_init::AbstractVector{T}, method::Type{Algo}=VFI;
+        max_iter::Integer=250, epsilon::Real=1e-3, k::Integer=20
+    )
     ddpr = DPSolveResult{Algo,T}(ddp, v_init)
     _solve!(ddp, ddpr, max_iter, epsilon, k)
     ddpr.mc = MarkovChain(ddp, ddpr)
@@ -532,7 +537,7 @@ the transition probability matrix `Q_sigma`.
 ##### Parameters
 
 - `ddp::DiscreteDP` : Object that contains the model parameters
-- `sigma::Vector{Int}`: policy rule vector
+- `sigma::AbstractVector{Int}`: policy rule vector
 
 ##### Returns
 
@@ -542,14 +547,14 @@ the transition probability matrix `Q_sigma`.
   of shape `(n, n)`.
 
 """
-function RQ_sigma{T<:Integer}(ddp::DDP, sigma::Array{T})
+function RQ_sigma{T<:Integer}(ddp::DDP, sigma::AbstractVector{T})
     R_sigma = [ddp.R[i, sigma[i]] for i in 1:length(sigma)]
     Q_sigma = hcat([getindex(ddp.Q, i, sigma[i], Colon())[:] for i=1:num_states(ddp)]...)
     return R_sigma, Q_sigma'
 end
 
 # TODO: express it in a similar way as above to exploit Julia's column major order
-function RQ_sigma{T<:Integer}(ddp::DDPsa, sigma::Array{T})
+function RQ_sigma{T<:Integer}(ddp::DDPsa, sigma::AbstractVector{T})
     sigma_indices = Array{T}(num_states(ddp))
     _find_indices!(get(ddp.a_indices), get(ddp.a_indptr), sigma, sigma_indices)
     R_sigma = ddp.R[sigma_indices]
@@ -565,8 +570,12 @@ end
 
 s_wise_max(ddp::DiscreteDP, vals::AbstractMatrix) = s_wise_max(vals)
 
-s_wise_max!(ddp::DiscreteDP, vals::AbstractMatrix, out::Vector, out_argmax::Vector) =
+function s_wise_max!(
+        ddp::DiscreteDP, vals::AbstractMatrix, out::AbstractVector,
+        out_argmax::AbstractVector
+    )
     s_wise_max!(vals, out, out_argmax)
+end
 
 """
 Return the `Vector` `max_a vals(s, a)`,  where `vals` is represented as a
@@ -578,7 +587,7 @@ s_wise_max(vals::AbstractMatrix) = vec(maximum(vals, 2))
 Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
 `AbstractMatrix` of size `(num_states, num_actions)`.
 """
-s_wise_max!(vals::AbstractMatrix, out::Vector) = (println("calling this one! "); maximum!(out, vals))
+s_wise_max!(vals::AbstractMatrix, out::AbstractVector) = (println("calling this one! "); maximum!(out, vals))
 
 """
 Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
@@ -587,7 +596,9 @@ Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
 Also fills `out_argmax` with the column number associated with the `indmax` in
 each row
 """
-function s_wise_max!(vals::AbstractMatrix, out::Vector, out_argmax::Vector)
+function s_wise_max!(
+        vals::AbstractMatrix, out::AbstractVector, out_argmax::AbstractVector
+    )
     # naive implementation where I just iterate over the rows
     nr, nc = size(vals)
     for i_r in 1:nr
@@ -611,20 +622,26 @@ end
 
 ## s_wise_max for DDPsa
 
-function s_wise_max(ddp::DDPsa, vals::Vector)
+function s_wise_max(ddp::DDPsa, vals::AbstractVector)
     s_wise_max!(get(ddp.a_indices), get(ddp.a_indptr), vals,
                  Array{Float64}(num_states(ddp)))
 end
 
-s_wise_max!(ddp::DDPsa, vals::Vector, out::Vector, out_argmax::Vector) =
+function s_wise_max!(
+        ddp::DDPsa, vals::AbstractVector, out::AbstractVector,
+        out_argmax::AbstractVector
+    )
     s_wise_max!(get(ddp.a_indices), get(ddp.a_indptr), vals, out, out_argmax)
+end
 
 """
 Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
 `Vector` of size `(num_sa_pairs,)`.
 """
-function s_wise_max!(a_indices::Vector, a_indptr::Vector, vals::Vector,
-                      out::Vector)
+function s_wise_max!(
+        a_indices::AbstractVector, a_indptr::AbstractVector,
+        vals::AbstractVector, out::AbstractVector
+    )
     n = length(out)
     for i in 1:n
         if a_indptr[i] != a_indptr[i+1]
@@ -647,8 +664,10 @@ Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
 Also fills `out_argmax` with the cartesiean index associated with the `indmax` in
 each row
 """
-function s_wise_max!(a_indices::Vector, a_indptr::Vector, vals::Vector,
-                      out::Vector, out_argmax::Vector)
+function s_wise_max!(
+        a_indices::AbstractVector, a_indptr::AbstractVector, vals::AbstractVector,
+        out::AbstractVector, out_argmax::AbstractVector
+    )
     n = length(out)
     for i in 1:n
         if a_indptr[i] != a_indptr[i+1]
@@ -677,7 +696,9 @@ Returns
 -------
 bool: Whether `s_indices` and `a_indices` are sorted.
 """
-function _has_sorted_sa_indices(s_indices::Vector, a_indices::Vector)
+function _has_sorted_sa_indices(
+        s_indices::AbstractVector, a_indices::AbstractVector
+    )
     L = length(s_indices)
     for i in 1:L-1
         if s_indices[i] > s_indices[i+1]
@@ -699,11 +720,13 @@ in sorted order.
 Parameters
 ----------
 - `num_states::Integer`
-- `s_indices::Vector{T}`
-- `out::Vector{T}` :  with length = `num_states` + 1
+- `s_indices::AbstractVector{T}`
+- `out::AbstractVector{T}` :  with length = `num_states` + 1
 
 """
-function _generate_a_indptr!(num_states::Int, s_indices::Vector, out::Vector)
+function _generate_a_indptr!(
+        num_states::Int, s_indices::AbstractVector, out::AbstractVector
+    )
     idx = 1
     out[1] = 1
     for s in 1:num_states-1
@@ -718,8 +741,10 @@ function _generate_a_indptr!(num_states::Int, s_indices::Vector, out::Vector)
     out
 end
 
-function _find_indices!(a_indices::Vector, a_indptr::Vector, sigma::Vector,
-                        out::Vector)
+function _find_indices!(
+        a_indices::AbstractVector, a_indptr::AbstractVector, sigma::AbstractVector,
+        out::AbstractVector
+    )
     n = length(sigma)
     for i in 1:n, j in a_indptr[i]:(a_indptr[i+1]-1)
         if sigma[i] == a_indices[j]
@@ -734,7 +759,7 @@ Define Matrix Multiplication between 3-dimensional matrix and a vector
 Matrix multiplication over the last dimension of ``A``
 
 """
-function *{T}(A::Array{T,3}, v::Vector)
+function *{T}(A::Array{T,3}, v::AbstractVector)
     shape = size(A)
     size(v, 1) == shape[end] || error("wrong dimensions")
 
@@ -748,8 +773,10 @@ end
 Impliments Value Iteration
 NOTE: See `solve` for further details
 """
-function _solve!(ddp::DiscreteDP, ddpr::DPSolveResult{VFI}, max_iter::Integer,
-                 epsilon::Real, k::Integer)
+function _solve!(
+        ddp::DiscreteDP, ddpr::DPSolveResult{VFI}, max_iter::Integer,
+        epsilon::Real, k::Integer
+    )
     if ddp.beta == 0.0
         tol = Inf
     else
@@ -780,8 +807,10 @@ NOTE: The epsilon is ignored in this method. It is only here so dispatch can
       go from `solve(::DiscreteDP, ::Type{Algo})` to any of the algorithms.
       See `solve` for further details
 """
-function _solve!(ddp::DiscreteDP, ddpr::DPSolveResult{PFI}, max_iter::Integer,
-                 epsilon::Real, k::Integer)
+function _solve!(
+        ddp::DiscreteDP, ddpr::DPSolveResult{PFI}, max_iter::Integer,
+        epsilon::Real, k::Integer
+    )
     old_sigma = copy(ddpr.sigma)
 
     for i in 1:max_iter
@@ -799,14 +828,16 @@ function _solve!(ddp::DiscreteDP, ddpr::DPSolveResult{PFI}, max_iter::Integer,
     ddpr
 end
 
-span(x::Vector) = maximum(x) - minimum(x)
-midrange(x::Vector) = mean(extrema(x))
+span(x::AbstractVector) = maximum(x) - minimum(x)
+midrange(x::AbstractVector) = mean(extrema(x))
 
 """
 Modified Policy Function Iteration
 """
-function _solve!(ddp::DiscreteDP, ddpr::DPSolveResult{MPFI}, max_iter::Integer,
-                 epsilon::Real, k::Integer)
+function _solve!(
+        ddp::DiscreteDP, ddpr::DPSolveResult{MPFI}, max_iter::Integer,
+        epsilon::Real, k::Integer
+    )
     beta = ddp.beta
     fill!(ddpr.v, minimum(ddp.R[ddp.R .> -Inf]) / (1.0 - beta))
     old_sigma = copy(ddpr.sigma)
