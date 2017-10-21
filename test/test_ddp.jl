@@ -16,12 +16,12 @@ Tests for markov/ddp.jl
     # Example from Puterman 2005, Section 3.1
     beta = 0.95
 
-    # Formulation with Dense Matrices R: n x m, Q: n x m x n
+    # Formulation with Dense Matrices R: a x s, Q: s' x a x s
     n, m = 2, 2  # number of states, number of actions
-    R = [5.0 10.0; -1.0 -Inf]
+    R = [5.0 -1.0; 10.0 -Inf]
     Q = Array{Float64}(n, m, n)
-    Q[:, :, 1] = [0.5 0.0; 0.0 0.0]
-    Q[:, :, 2] = [0.5 1.0; 1.0 1.0]
+    Q[1, :, :] = [0.5 0.0; 0.0 0.0]
+    Q[2, :, :] = [0.5 1.0; 1.0 1.0]
 
     ddp0 = DiscreteDP(R, Q, beta)
 
@@ -64,9 +64,9 @@ Tests for markov/ddp.jl
             r, q = RQ_sigma(ddp0, sig)
 
             for i_r in 1:nr
-                @test r[i_r] == ddp0.R[i_r, sig[i_r]]
+                @test r[i_r] == ddp0.R[sig[i_r], i_r]
                 for i_c in 1:length(sig)
-                    @test vec(q[i_c, :]) == vec(ddp0.Q[i_c, sig[i_c], :])
+                    @test vec(q[i_c, :]) == vec(ddp0.Q[:, sig[i_c], i_c])
                 end
             end
         end
@@ -266,11 +266,11 @@ Tests for markov/ddp.jl
         @testset "feasbile action pair" begin
             #Dense Matrix
             n, m = 2, 2
-            _R = [-Inf -Inf; 1.0 2.0]
+            _R = [-Inf 1.0; -Inf 2.0]
 
             _Q = Array{Float64}(n, m, n)
-            _Q[:, :, 1] = [0.5 0.0; 0.0 0.0]
-            _Q[:, :, 2] = [0.5 1.0; 1.0 1.0]
+            _Q[1, :, :] = [0.5 0.0; 0.0 0.0]
+            _Q[2, :, :] = [0.5 1.0; 1.0 1.0]
             _beta = 0.95
 
             @test_throws ArgumentError DiscreteDP(_R, _Q, _beta)
@@ -292,9 +292,7 @@ Tests for markov/ddp.jl
     @testset "ddp_negative_inf_error()" begin
         # Dense Matrix
         n, m = 3, 2
-        R = [0 1;
-             0 -Inf;
-            -Inf -Inf]
+        R = [0.0 0.0 -Inf; 1.0 -Inf -Inf]
         Q = fill(1.0/n, n, m, n)
         beta = 0.95
 

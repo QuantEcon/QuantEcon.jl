@@ -68,7 +68,7 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
         (beta < 0 || beta >= 1) &&  throw(ArgumentError("beta must be [0, 1)"))
 
         # verify input integrity 2
-        num_states, num_actions = size(R)
+        num_actions, num_states = size(R)
         if size(Q) != (num_states, num_actions, num_states)
             throw(ArgumentError("shapes of R and Q must be (n,m) and (n,m,n)"))
         end
@@ -106,9 +106,9 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
         (beta < 0 || beta >= 1) && throw(ArgumentError("beta must be [0, 1)"))
 
         # verify input integrity (same length)
-        num_sa_pairs, num_states = size(Q)
+        num_states, num_sa_pairs = size(Q)
         if length(R) != num_sa_pairs
-            throw(ArgumentError("shapes of R and Q must be (L,) and (L,n)"))
+            throw(ArgumentError("shapes of R and Q must be (L,) and (n,L)"))
         end
         if length(s_indices) != num_sa_pairs
             msg = "length of s_indices must be equal to the number of s-a pairs"
@@ -126,6 +126,7 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
         else
             # transpose matrix to use Julia's CSC; now rows are actions and
             # columns are states (this is why it's called as_ptr not sa_ptr)
+            error("Fix this stuff for when Q is (s', as)!!!")
             m = maximum(a_indices)
             n = maximum(s_indices)
             msg = "Duplicate s-a pair found"
@@ -138,6 +139,8 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
             Q = Q[as_ptr.nzval, :]
         end
 
+
+        error("Fix this for Q ordered (s', as)")
         # check feasibility
         aptr_diff = diff(a_indptr)
         if any(aptr_diff .== 0.0)
@@ -213,9 +216,8 @@ end
 #-Property Functions-#
 #--------------------#
 
-num_states(ddp::DDP) = size(ddp.R, 1)
-num_states(ddp::DDPsa) = size(ddp.Q, 2)
-num_actions(ddp::DiscreteDP) = size(ddp.R, 2)
+num_states(ddp::DDP) = size(ddp.R, 2)
+num_states(ddp::DDPsa) = size(ddp.Q, 1)
 
 @compat abstract type DDPAlgorithm end
 """
@@ -320,7 +322,7 @@ function bellman_operator!(
         ddp::DiscreteDP, v::AbstractVector, Tv::AbstractVector,
         sigma::AbstractVector
     )
-    vals = ddp.R + ddp.beta * (ddp.Q * v)
+    vals = ddp.R + ddp.beta * _mul_v_Q(v, ddp.Q)
     s_wise_max!(ddp, vals, Tv, sigma)
     Tv, sigma
 end
@@ -368,8 +370,8 @@ function bellman_operator!{T1<:Rational,T2<:Rational,NR,NQ,T3<:Rational}(
 end
 
 doc"""
-The Bellman operator, which computes and returns the updated value function ``Tv``
-for a given value function ``v``.
+The Bellman operator, which computes and returns the updated value function
+``Tv`` for a given value function ``v``.
 
 ##### Parameters
 
@@ -380,8 +382,10 @@ for a given value function ``v``.
 
 - `Tv::Vector` : Updated value function vector
 """
-bellman_operator(ddp::DiscreteDP, v::AbstractVector) =
-    s_wise_max(ddp, ddp.R + ddp.beta * (ddp.Q * v))
+function bellman_operator(ddp::DiscreteDP, v::AbstractVector)
+    # vals[a, s] = R[a, s] + beta * sum_s' Q[s', a, s] v[s']
+    s_wise_max(ddp, ddp.R + ddp.beta * _mul_v_Q(v, ddp.Q))
+end
 
 # ---------------------- #
 # Compute greedy methods #
@@ -548,8 +552,8 @@ the transition probability matrix `Q_sigma`.
 
 """
 function RQ_sigma{T<:Integer}(ddp::DDP, sigma::AbstractVector{T})
-    R_sigma = [ddp.R[i, sigma[i]] for i in 1:length(sigma)]
-    Q_sigma = hcat([getindex(ddp.Q, i, sigma[i], Colon())[:] for i=1:num_states(ddp)]...)
+    R_sigma = [ddp.R[sigma[i], i] for i in 1:length(sigma)]
+    Q_sigma = hcat([vec(ddp.Q[:, sigma[i], i]) for i=1:num_states(ddp)]...)
     return R_sigma, Q_sigma'
 end
 
@@ -581,7 +585,7 @@ end
 Return the `Vector` `max_a vals(s, a)`,  where `vals` is represented as a
 `AbstractMatrix` of size `(num_states, num_actions)`.
 """
-s_wise_max(vals::AbstractMatrix) = vec(maximum(vals, 2))
+s_wise_max(vals::AbstractMatrix) = vec(maximum(vals, 1))
 
 """
 Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
@@ -601,19 +605,20 @@ function s_wise_max!(
     )
     # naive implementation where I just iterate over the rows
     nr, nc = size(vals)
-    for i_r in 1:nr
+    for i_c in 1:nc
         # reset temporaries
-        cur_max = -Inf
-        out_argmax[i_r] = 1
+        cur_max = vals[1, i_c]
+        cur_argmax = 1
 
-        for i_c in 1:nc
+        for i_r in 1:nr
             @inbounds v_rc = vals[i_r, i_c]
             if v_rc > cur_max
-                out[i_r] = v_rc
-                out_argmax[i_r] = i_c
                 cur_max = v_rc
+                cur_argmax = i_r
             end
         end
+        out[i_c] = cur_max
+        out_argmax[i_c] = cur_argmax
 
     end
     out, out_argmax
@@ -642,6 +647,7 @@ function s_wise_max!(
         a_indices::AbstractVector, a_indptr::AbstractVector,
         vals::AbstractVector, out::AbstractVector
     )
+    error("Need to implement!!!")
     n = length(out)
     for i in 1:n
         if a_indptr[i] != a_indptr[i+1]
@@ -668,6 +674,7 @@ function s_wise_max!(
         a_indices::AbstractVector, a_indptr::AbstractVector, vals::AbstractVector,
         out::AbstractVector, out_argmax::AbstractVector
     )
+    error("Need to implement!!!")
     n = length(out)
     for i in 1:n
         if a_indptr[i] != a_indptr[i+1]
@@ -699,13 +706,13 @@ bool: Whether `s_indices` and `a_indices` are sorted.
 function _has_sorted_sa_indices(
         s_indices::AbstractVector, a_indices::AbstractVector
     )
-    L = length(s_indices)
+    L = length(a_indices)
     for i in 1:L-1
-        if s_indices[i] > s_indices[i+1]
+        if a_indices[i] > a_indices[i+1]
             return false
         end
-        if s_indices[i] == s_indices[i+1]
-            if a_indices[i] >= a_indices[i+1]
+        if a_indices[i] == a_indices[i+1]
+            if s_indices[i] >= s_indices[i+1]
                 return false
             end
         end
@@ -727,6 +734,7 @@ Parameters
 function _generate_a_indptr!(
         num_states::Int, s_indices::AbstractVector, out::AbstractVector
     )
+    error("need to implement!!!")
     idx = 1
     out[1] = 1
     for s in 1:num_states-1
@@ -753,21 +761,23 @@ function _find_indices!(
     end
 end
 
-doc"""
-Define Matrix Multiplication between 3-dimensional matrix and a vector
+_get_vec(a::Array) = vec(a)
+_get_vec(z::Base.RowVector) = vec(z.vec)
 
-Matrix multiplication over the last dimension of ``A``
+doc"""
+Define Matrix Multiplication between 3-dimensional array and a vector
+
+Matrix multiplication over the first dimension of ``A``
 
 """
-function *{T}(A::Array{T,3}, v::AbstractVector)
-    shape = size(A)
-    size(v, 1) == shape[end] || error("wrong dimensions")
-
-    B = reshape(A, (prod(shape[1:end-1]), shape[end]))
-    out = B * v
-
-    return reshape(out, shape[1:end-1])
+function _mul_v_Q(v::AbstractVector{T1}, Q::Array{T2,3}) where T1 where T2
+    l, m, n = size(Q)
+    size(v, 1) == l || error("wrong dimensions")
+    B = reshape(Q, (l, m*n))
+    reshape(_get_vec(At_mul_B(v, B)), m, n)
 end
+
+_mul_v_Q(Q::AbstractMatrix, v::AbstractVector) = _get_vec(At_mul_B(v, Q))
 
 """
 Impliments Value Iteration
@@ -863,7 +873,7 @@ function _solve!(
         # now do k iterations of policy iteration
         R_sigma, Q_sigma = RQ_sigma(ddp, ddpr)
         for i in 1:k
-            ddpr.Tv = R_sigma + beta * Q_sigma * ddpr.v
+            ddpr.Tv = R_sigma + beta * (Q_sigma * ddpr.v)
             copy!(ddpr.v, ddpr.Tv)
         end
 
