@@ -616,8 +616,8 @@ function discrete_approximation(D::AbstractVector, T::Function, TBar::AbstractVe
     # Compute maximum entropy discrete distribution
     options = Optim.Options(f_tol=1e-16, x_tol=1e-16)
     obj(lambda) = entropy_obj(lambda, Tx, TBar, q)
-    grad!(lambda, grad) = entropy_grad!(grad, lambda, Tx, TBar, q)
-    hess!(lambda, hess) = entropy_hess!(hess, lambda, Tx, TBar, q)
+    grad!(grad, lambda) = entropy_grad!(grad, lambda, Tx, TBar, q)
+    hess!(hess, lambda) = entropy_hess!(hess, lambda, Tx, TBar, q)
     res = Optim.optimize(obj, grad!, hess!, lambda0, Optim.Newton(), options)
     # Sometimes the algorithm fails to converge if the initial guess is too far
     # away from the truth. If this occurs, the program tries an initial guess
@@ -635,7 +635,7 @@ function discrete_approximation(D::AbstractVector, T::Function, TBar::AbstractVe
     Tdiff = Tx .- TBar
     p = (q'.*exp.(lambda_bar'*Tdiff))/minimum_value
     grad = similar(lambda0)
-    grad!(Optim.minimizer(res), grad)
+    grad!(grad, Optim.minimizer(res))
     moment_error = grad/minimum_value
     return p, lambda_bar, moment_error
 end

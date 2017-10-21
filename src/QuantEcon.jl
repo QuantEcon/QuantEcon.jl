@@ -53,6 +53,9 @@ export
     communication_classes, n_states,
     discrete_var, Even,
 
+# modeltools
+    AbstractUtility, LogUtility, CRRAUtility, CFEUtility, EllipticalUtility, derivative,
+
 # gth_solve
     gth_solve,
 
@@ -156,5 +159,6 @@ include("quad.jl")
 include("quadsums.jl")
 include("zeros.jl")
 include("optimization.jl")
+include("modeltools/utility.jl")
 
 end # module
