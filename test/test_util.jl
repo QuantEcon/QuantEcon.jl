@@ -42,4 +42,23 @@
     end
 
     @test ([1 2; 1 2], [3 3; 4 4]) == @inferred meshgrid([1, 2], [3, 4])
+
+    @testset "simplex_tools" begin
+        grid_3_4 = [0  0  0  0  0  1  1  1  1  2  2  2  3  3  4
+                    0  1  2  3  4  0  1  2  3  0  1  2  0  1  0
+                    4  3  2  1  0  3  2  1  0  2  1  0  1  0  0]
+        points = [0 1 4
+                  0 1 0
+                  4 2 0]
+        idx = Array{Int}(3)
+
+        for i in 1:3
+            idx[i] = simplex_index(points[:, i], 3, 4)
+        end
+
+        @test all(simplex_grid(3, 4) .== grid_3_4)
+        @test all(grid_3_4[:, idx] .== points)
+        @test size(grid_3_4, 2) == num_compositions(3, 4)
+
+    end
 end
