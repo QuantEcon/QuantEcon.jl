@@ -29,6 +29,7 @@ tests = [
         "optimization",
         "interp",
         "sampler",
+        "util",
         ]
 
 

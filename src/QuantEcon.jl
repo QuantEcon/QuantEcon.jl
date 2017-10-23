@@ -97,7 +97,7 @@ export
     smooth, periodogram, ar_periodogram,
 
 # util
-    meshgrid, gridmake, gridmake!, ckron, is_stable,
+    meshgrid, gridmake, gridmake!, ckron, is_stable, num_compositions, simplex_grid, simplex_index,
 
 # robustlq
     RBLQ,
