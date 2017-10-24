@@ -23,9 +23,9 @@ end
 LogUtility() = LogUtility(1.0)
 
 (u::LogUtility)(c::Float64) =
-    ifelse(c > 1e-10, u.ξ*log(c), u.ξ*(log(1e-10) + 1e10*(c - 1e-10)))
+    c > 1e-10 ? u.ξ*log(c) : u.ξ*(log(1e-10) + 1e10*(c - 1e-10))
 derivative(u::LogUtility, c::Float64) =
-    ifelse(c > 1e-10, u.ξ / c, u.ξ*1e10)
+    c > 1e-10 ? u.ξ / c : u.ξ*1e10
 
 """
 Type used to evaluate CRRA utility. CRRA utility takes the form
@@ -50,11 +50,11 @@ struct CRRAUtility <: AbstractUtility
 end
 
 (u::CRRAUtility)(c::Float64) =
-    ifelse(c > 1e-10,
-           u.ξ * (c^(1.0 - u.γ) - 1.0) / (1.0 - u.γ),
-           u.ξ * ((1e-10^(1.0 - u.γ) - 1.0) / (1.0 - u.γ) + 1e-10^(-u.γ)*(c - 1e-10)))
+    c > 1e-10 ?
+           u.ξ * (c^(1.0 - u.γ) - 1.0) / (1.0 - u.γ) :
+           u.ξ * ((1e-10^(1.0 - u.γ) - 1.0) / (1.0 - u.γ) + 1e-10^(-u.γ)*(c - 1e-10))
 derivative(u::CRRAUtility, c::Float64) =
-    ifelse(c > 1e-10, u.ξ * c^(-u.γ), u.ξ*1e-10^(-u.γ))
+    c > 1e-10 ? u.ξ * c^(-u.γ) : u.ξ*1e-10^(-u.γ)
 
 
 # Labor Utility
@@ -83,11 +83,11 @@ struct CFEUtility <: AbstractUtility
 end
 
 (u::CFEUtility)(l::Float64) =
-    ifelse(l > 1e-10,
-           -u.ξ * l^(1.0 + 1.0/u.ϕ)/(1.0 + 1.0/u.ϕ),
-           -u.ξ * (1e-10^(1.0 + 1.0/u.ϕ)/(1.0 + 1.0/u.ϕ) + 1e-10^(1.0/u.ϕ) * (l - 1e-10)))
+    l > 1e-10 ?
+           -u.ξ * l^(1.0 + 1.0/u.ϕ)/(1.0 + 1.0/u.ϕ) :
+           -u.ξ * (1e-10^(1.0 + 1.0/u.ϕ)/(1.0 + 1.0/u.ϕ) + 1e-10^(1.0/u.ϕ) * (l - 1e-10))
 derivative(u::CFEUtility, l::Float64) =
-    ifelse(l > 1e-10, -u.ξ * l^(1.0/u.ϕ), -u.ξ * 1e-10^(1.0/u.ϕ))
+    l > 1e-10 ? -u.ξ * l^(1.0/u.ϕ) : -u.ξ * 1e-10^(1.0/u.ϕ)
 
 
 """
