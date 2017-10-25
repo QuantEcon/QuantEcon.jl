@@ -1,6 +1,6 @@
 @testset "Testing matrix_eqn.jl" begin
     rough_kwargs = Dict(:atol => 1e-7, :rtol => 1e-7)
-    
+
     @testset "simple test where X is all zero" begin
         A = eye(4) .* .95
         B = zeros(4, 4)
@@ -38,14 +38,14 @@
     @testset "testing ricatti golden_num_float" begin
         val = solve_discrete_riccati(1.0, 1.0, 1.0, 1.0)
         gold_ratio = (1 + sqrt(5)) / 2.
-        @test val[1] == (gold_ratio)
+        @test isapprox(val[1], gold_ratio; rough_kwargs...)
     end
 
     @testset "testing ricatti golden_num_2d" begin
         A, B, R, Q = eye(2), eye(2), eye(2), eye(2)
         gold_diag = eye(2) .* (1 + sqrt(5)) ./ 2.
         val = solve_discrete_riccati(A, B, Q, R)
-        @test val == (gold_diag)
+        @test isapprox(val, gold_diag; rough_kwargs...)
     end
 
     @testset "test tjm 1" begin
