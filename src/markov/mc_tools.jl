@@ -28,11 +28,11 @@ state transitions.
 - `p::AbstractMatrix` : The transition matrix. Must be square, all elements must be nonnegative, and all rows must sum to unity.
 - `state_values::AbstractVector` : Vector containing the values associated with the states.
 """
-type MarkovChain{T, TM<:AbstractMatrix{T}, TV<:AbstractVector}
+mutable struct MarkovChain{T, TM<:AbstractMatrix{T}, TV<:AbstractVector}
     p::TM # valid stochastic matrix
     state_values::TV
 
-    function (::Type{MarkovChain{T,TM,TV}}){T,TM,TV}(p::AbstractMatrix, state_values)
+    function MarkovChain{T,TM,TV}(p::AbstractMatrix, state_values) where {T,TM,TV}
         n, m = size(p)
 
         n != m &&
@@ -55,12 +55,12 @@ end
 MarkovChain(p::AbstractMatrix, state_values=1:size(p, 1)) =
     MarkovChain{eltype(p), typeof(p), typeof(state_values)}(p, state_values)
 
-Base.eltype{T,TM,TV}(mc::MarkovChain{T,TM,TV}) = eltype(TV)
+Base.eltype(mc::MarkovChain{T,TM,TV}) where {T,TM,TV} = eltype(TV)
 
 "Number of states in the Markov chain `mc`"
 n_states(mc::MarkovChain) = size(mc.p, 1)
 
-function Base.show{T,TM}(io::IO, mc::MarkovChain{T,TM})
+function Base.show(io::IO, mc::MarkovChain{T,TM}) where {T,TM}
     println(io, "Discrete Markov Chain")
     println(io, "stochastic matrix of type $TM:")
     print(io, mc.p)
@@ -104,17 +104,17 @@ used as the input data. For a nice exposition of the algorithm, see Stewart
   University Press, 2009.
 
 """
-gth_solve{T<:Real}(A::Matrix{T}) = gth_solve!(copy(A))
+gth_solve(A::Matrix{T}) where {T<:Real} = gth_solve!(copy(A))
 
 # convert already makes a copy, hence gth_solve!
-gth_solve{T<:Integer}(A::Matrix{T}) =
+gth_solve(A::Matrix{T}) where {T<:Integer} =
     gth_solve!(convert(Matrix{Rational{T}}, A))
 
 """
 Same as `gth_solve`, but overwrite the input `A`, instead of creating a copy.
 
 """
-function gth_solve!{T<:Real}(A::Matrix{T})
+function gth_solve!(A::Matrix{T}) where T<:Real
     n = size(A, 1)
     x = zeros(T, n)
 
@@ -232,7 +232,7 @@ end
 
 for (S, ex_T, ex_gth) in ((Real, :(T), :(gth_solve!)),
                           (Integer, :(Rational{T}), :(gth_solve)))
-    @eval function stationary_distributions{T<:$S}(mc::MarkovChain{T})
+    @eval function stationary_distributions(mc::MarkovChain{T}) where T<:$S
         n = n_states(mc)
         rec_classes = recurrent_classes(mc)
         T1 = $ex_T
@@ -288,7 +288,7 @@ end
 todense(::Type, A::Array) = A
 
 
-type MCIndSimulator{T<:MarkovChain,S}
+mutable struct MCIndSimulator{T<:MarkovChain,S}
     mc::T
     len::Int
     init::Int
@@ -315,7 +315,7 @@ Base.done(mcis::MCIndSimulator, s::Tuple{Int,Int}) = s[2] >= mcis.len
 Base.length(mcis::MCIndSimulator) = mcis.len
 Base.eltype(mcis::MCIndSimulator) = Int
 
-type MCSimulator{T<:MCIndSimulator}
+mutable struct MCSimulator{T<:MCIndSimulator}
     mcis::T
 end
 
@@ -433,8 +433,8 @@ of the sample paths of the Markov chain `mc`.
       initial condition until all columns have an initial condition
       (allows for more columns than initial conditions)
 """
-function simulate_indices!{T<:Integer}(X::Union{AbstractVector{T},AbstractMatrix{T}},
-                           mc::MarkovChain; init=rand(1:n_states(mc), size(X, 2)))
+function simulate_indices!(X::Union{AbstractVector{T},AbstractMatrix{T}},
+               mc::MarkovChain; init=rand(1:n_states(mc), size(X, 2))) where T<:Integer
     mcis = MCIndSimulator(mc, size(X, 1), init[1])
 
     for (i, init) in enumerate(take(cycle(init), size(X, 2)))

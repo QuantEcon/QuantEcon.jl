@@ -14,7 +14,7 @@ https://lectures.quantecon.org/jl/kalman.html
 TODO: Do docstrings here after implementing LinerStateSpace
 =#
 
-type Kalman
+mutable struct Kalman
     A
     G
     Q

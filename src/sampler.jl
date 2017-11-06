@@ -4,13 +4,13 @@
 
 import Base: ==
 
-immutable MVNSampler{TM<:Real,TS<:Real,TQ<:LinAlg.BlasReal}
+struct MVNSampler{TM<:Real,TS<:Real,TQ<:LinAlg.BlasReal}
     mu::Vector{TM}
     Sigma::Matrix{TS}
     Q::Matrix{TQ}
 end
 
-function MVNSampler{TM<:Real,TS<:Real}(mu::Vector{TM}, Sigma::Matrix{TS})
+function MVNSampler(mu::Vector{TM}, Sigma::Matrix{TS}) where {TM<:Real,TS<:Real}
     ATOL1, RTOL1 = 1e-8, 1e-8
     ATOL2, RTOL2 = 1e-8, 1e-14
 

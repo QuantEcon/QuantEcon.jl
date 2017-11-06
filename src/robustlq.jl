@@ -39,7 +39,7 @@ and with model misspecification parameter ``\theta``.
 - `k, n, j::Int` : Dimensions of input matrices
 
 """
-type RBLQ
+mutable struct RBLQ
     A::Matrix
     B::Matrix
     C::Matrix

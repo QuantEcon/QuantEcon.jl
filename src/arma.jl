@@ -65,7 +65,7 @@ require(joinpath(dirname(@__FILE__),"..", "examples", "arma_plots.jl"))
 quad_plot(lp)
 ```
 """
-type ARMA
+mutable struct ARMA
     phi::Vector      # AR parameters phi_1, ..., phi_p
     theta::Vector    # MA parameters theta_1, ..., theta_q
     p::Integer       # Number of AR coefficients
