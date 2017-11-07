@@ -48,12 +48,12 @@ x_star = compute_fixed_point(x->T(x, 0.3), 0.4)  # (4μ - 1)/(4μ)
 ```
 
 """
-function compute_fixed_point{TV}(T::Function, 
-                                v::TV; 
-                                err_tol=1e-4,
-                                max_iter=100, 
-                                verbose=2, 
-                                print_skip=10)
+function compute_fixed_point(T::Function, 
+                            v::TV; 
+                            err_tol=1e-4,
+                            max_iter=100, 
+                            verbose=2, 
+                            print_skip=10) where TV
 
     if !(verbose in (0, 1, 2))
         throw(ArgumentError("verbose should be 0, 1 or 2"))

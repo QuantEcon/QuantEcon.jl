@@ -36,7 +36,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 THE POSSIBILITY OF SUCH DAMAGE.
 
 =#
-type ConvergenceError <: Exception
+mutable struct ConvergenceError <: Exception
     msg::AbstractString
 end
 
@@ -67,8 +67,8 @@ This method is `zbrac` from numerical recipies in C++
 
 - Throws a `ConvergenceError` if the maximum number of iterations is exceeded
 """
-function expand_bracket{T<:Number}(f::Function, x1::T, x2::T;
-                                   ntry::Int=50, fac::Float64=1.6)
+function expand_bracket(f::Function, x1::T, x2::T;
+                        ntry::Int=50, fac::Float64=1.6) where T<:Number
 
     # x1 <= x2 || throw(ArgumentError("x1 must be less than x2"))
 
@@ -92,7 +92,7 @@ function expand_bracket{T<:Number}(f::Function, x1::T, x2::T;
     throw(ConvergenceError("failed to find bracket in $ntry iterations"))
 end
 
-expand_bracket{T<:Number}(f::Function, x1::T; ntry::Int=50, fac::Float64=1.6) =
+expand_bracket(f::Function, x1::T; ntry::Int=50, fac::Float64=1.6) where {T<:Number} =
     expand_bracket(f, 0.9x1, 1.1x1; ntry=ntry, fac=fac)
 
 """
@@ -118,7 +118,7 @@ sequentially with any bracketing pairs that are found.
 
 This is `zbrack` from Numerical Recepies Recepies in C++
 """
-function divide_bracket{T<:Number}(f::Function, x1::T, x2::T, n::Int=50)
+function divide_bracket(f::Function, x1::T, x2::T, n::Int=50) where T<:Number
     x1 <= x2 || throw(ArgumentError("x1 must be less than x2"))
 
     xs = linspace(x1, x2, n)
@@ -177,8 +177,8 @@ $__zero_docstr_arg_ret
 
 Matches `bisect` function from scipy/scipy/optimize/Zeros/bisect.c
 """
-function bisect{T<:AbstractFloat}(f::Function, x1::T, x2::T; maxiter::Int=500,
-                                  xtol::Float64=1e-12, rtol::Float64=2*eps())
+function bisect(f::Function, x1::T, x2::T; maxiter::Int=500,
+                xtol::Float64=1e-12, rtol::Float64=2*eps()) where T<:AbstractFloat
 
     tol = xtol + rtol*(abs(x1) + abs(x2))
 
@@ -218,12 +218,12 @@ function bisect{T<:AbstractFloat}(f::Function, x1::T, x2::T; maxiter::Int=500,
 end
 
 ## Brent's algorithm
-@compat abstract type BrentExtrapolation end
+abstract type BrentExtrapolation end
 
-immutable BrentQuadratic <: BrentExtrapolation
+struct BrentQuadratic <: BrentExtrapolation
 end
 
-immutable BrentHyperbolic <: BrentExtrapolation
+struct BrentHyperbolic <: BrentExtrapolation
 end
 
 @inline evaluate(::BrentQuadratic, fcur, fblk, fpre, dpre, dblk) =
@@ -233,10 +233,10 @@ end
     -fcur*(fblk - fpre)/(fblk*dpre - fpre*dblk)
 
 
-function _brent_body{T<:AbstractFloat}(BE::BrentExtrapolation, f::Function,
-                                       xa::T, xb::T, maxiter::Int=500,
-                                       xtol::Float64=1e-12,
-                                       rtol::Float64=2*eps())
+function _brent_body(BE::BrentExtrapolation, f::Function,
+                     xa::T, xb::T, maxiter::Int=500,
+                     xtol::Float64=1e-12,
+                     rtol::Float64=2*eps()) where T<:AbstractFloat
     xpre, xcur = xa, xb
     xblk = fblk = spre = scur = 0.0
 
@@ -330,8 +330,8 @@ $__zero_docstr_arg_ret
 
 Matches `brentq` function from scipy/scipy/optimize/Zeros/bisectq.c
 """
-function brent{T<:AbstractFloat}(f::Function, xa::T, xb::T; maxiter::Int=500,
-                                 xtol::Float64=1e-12, rtol::Float64=2*eps())
+function brent(f::Function, xa::T, xb::T; maxiter::Int=500,
+               xtol::Float64=1e-12, rtol::Float64=2*eps()) where T<:AbstractFloat
     _brent_body(BrentQuadratic(), f, xa, xb, maxiter, xtol, rtol)
 end
 
@@ -348,8 +348,8 @@ $__zero_docstr_arg_ret
 
 Matches `brenth` function from scipy/scipy/optimize/Zeros/bisecth.c
 """
-function brenth{T<:AbstractFloat}(f::Function, xa::T, xb::T; maxiter::Int=500,
-                                  xtol::Float64=1e-12, rtol::Float64=2*eps())
+function brenth(f::Function, xa::T, xb::T; maxiter::Int=500,
+                xtol::Float64=1e-12, rtol::Float64=2*eps()) where T<:AbstractFloat
     _brent_body(BrentHyperbolic(), f, xa, xb, maxiter, xtol, rtol)
 end
 
@@ -364,8 +364,8 @@ $__zero_docstr_arg_ret
 
 Matches `ridder` function from scipy/scipy/optimize/Zeros/ridder.c
 """
-function ridder{T<:AbstractFloat}(f::Function, xa::T, xb::T; maxiter::Int=500,
-                                  xtol::Float64=1e-12, rtol::Float64=2*eps())
+function ridder(f::Function, xa::T, xb::T; maxiter::Int=500,
+                xtol::Float64=1e-12, rtol::Float64=2*eps()) where T<:AbstractFloat
     tol = xtol + rtol*(abs(xa) + abs(xb))
 
     fa, fb = f(xa), f(xb)

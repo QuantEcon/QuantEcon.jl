@@ -9,7 +9,7 @@ Filename: finite_dp_og.jl
 Set up R, Q and beta, the three elements that define an instance of
 the DiscreteDP object.
 """
-type SimpleOG
+mutable struct SimpleOG
 	#-Paramters-#
 	B::Int64
 	M::Int64

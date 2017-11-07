@@ -10,8 +10,8 @@ meshgrid(x::AbstractVector, y::AbstractVector) = (repmat(x, 1, length(y))',
                                                   repmat(y, 1, length(x)))
 
 fix(x::Real) = x >= 0 ? floor(Int, x) : ceil(Int, x)
-fix!{T<:Real}(x::AbstractArray{T}, out::Array{Int}) = map!(fix, out, x)
-fix{T<:Real}(x::AbstractArray{T}) = fix!(x, similar(x, Int))
+fix!(x::AbstractArray{T}, out::Array{Int}) where {T<:Real} = map!(fix, out, x)
+fix(x::AbstractArray{T}) where {T<:Real} = fix!(x, similar(x, Int))
 
 """
 `fix(x)`

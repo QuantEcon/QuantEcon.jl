@@ -17,7 +17,7 @@ observations.
 
 - `observations::Vector`: The vector of observations
 """
-type ECDF
+mutable struct ECDF
     observations::Vector
 end
 

@@ -2,7 +2,7 @@
     using Base.Iterators: take, cycle
 end
 
-function kmr_markov_matrix_sequential{T<:Real}(n::Integer, p::T, ε::T)
+function kmr_markov_matrix_sequential(n::Integer, p::T, ε::T) where T<:Real
     """
     Generate the markov matrix for the KMR model with *sequential* move
 
@@ -30,8 +30,8 @@ function kmr_markov_matrix_sequential{T<:Real}(n::Integer, p::T, ε::T)
 end
 
 
-function Base.isapprox{T<:Real,S<:Real}(x::Vector{Vector{T}},
-                                        y::Vector{Vector{S}})
+function Base.isapprox(x::Vector{Vector{T}},
+                       y::Vector{Vector{S}}) where {T<:Real,S<:Real}
     n = length(x)
     length(y) == n || return false
     for i in 1:n
