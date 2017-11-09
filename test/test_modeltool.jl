@@ -63,3 +63,52 @@
     end
 
 end
+
+module Test_at_def_sim
+    using QuantEcon
+    using Base.Test
+
+    @def_sim Simulation (T => Float64,) struct Observation{T<:Number}
+        c::T
+        k::T
+        i_z::Int
+    end
+
+    @testset "@def_sim" begin
+        @test isdefined(:Observation)
+        @test isdefined(:Simulation)
+        @test method_exists(Simulation, Tuple{NTuple})
+        @test method_exists(Base.endof, Tuple{Simulation})
+        @test method_exists(Base.length, Tuple{Simulation})
+        @test method_exists(Base.start, Tuple{Simulation})
+        @test method_exists(Base.next, Tuple{Simulation,Int})
+        @test method_exists(Base.done, Tuple{Simulation,Int})
+        @test method_exists(Base.getindex, Tuple{Simulation,Int})
+
+        sim = Simulation([0.1, 0.2], [1.1, 1.2], [3, 4])
+        @test isa(sim, Simulation{1,Float64})
+        @test length(sim) == 2
+        @test endof(sim) == 2
+        obs12 = [Observation(0.1, 1.1, 3), Observation(0.2, 1.2, 4)]
+
+        for (i, have) in enumerate(sim)
+            @test have == obs12[i]
+            @test obs12[i] == @inferred sim[i]
+        end
+
+        sim10 = @inferred Simulation((2, 1, 2, 1, 2, 1, 2, 1, 2, 1))
+        @test isa(sim10, Simulation{10,Float64})
+        @test length(sim10) == 32
+        @test endof(sim10) == 32
+
+        sim4 = @inferred Simulation(rand(4, 4, 4, 4), rand(4, 4, 4, 4), rand(Int, 4, 4, 4, 4))
+        @test isa(sim4, Simulation{4,Float64})
+        @test length(sim4) == 4*4*4*4
+        @test endof(sim4) == 4*4*4*4
+
+        sim2 = @inferred Simulation(rand(Float16, 4, 4), rand(Float16, 4, 4), rand(Int, 4,4))
+        @test isa(sim2, Simulation{2,Float16})
+        @test length(sim2) == 4*4
+        @test endof(sim2) == 4*4
+    end
+end
