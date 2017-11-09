@@ -46,7 +46,7 @@
 
     # Test "extrapolation evaluations"
     @test isapprox(v(0.5e-10), v(1e-10) + derivative(v, 1e-10)*(0.5e-10 - 1e-10))
-    @test v(-0.5) < v(-0.1)  # Make sure it doesn't fail with negative values
+    @test v(-0.5) > v(-0.1)  # Make sure it doesn't fail with negative values
 
     @test_throws ErrorException CRRAUtility(1.0)  # Test error throwing at ϕ=1.0
     end
