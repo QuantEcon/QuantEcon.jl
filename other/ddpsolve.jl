@@ -1,5 +1,5 @@
 # TODO: the stdlib function findmax(arr, dim) should do this now
-function indvalmax{T}(a::Matrix{T}, dim::Integer=2)
+function indvalmax(a::Matrix{T}, dim::Integer=2) where T
     out_size = dim == 2 ? size(a, 1) : size(a, 2)
     out_v = Array(T, out_size)
     out_i = Array(Int64, out_size)
@@ -43,7 +43,7 @@ function expandg(g)
 end
 
 
-function diagmult{T <: Real}(a::Vector{T}, b::Matrix{T})
+function diagmult(a::Vector{T}, b::Matrix{T}) where T <: Real
     n = length(a)
     return sparse(1:n, 1:n, a, n, n)*b
 end

@@ -15,8 +15,8 @@ import Optim
 import NLopt
 import Distributions: pdf, Normal
 
-std_norm_cdf{T <: Real}(x::T) = 0.5 * erfc(-x/sqrt(2))
-std_norm_cdf{T <: Real}(x::Array{T}) = 0.5 .* erfc(-x./sqrt(2))
+std_norm_cdf(x::T) where {T <: Real} = 0.5 * erfc(-x/sqrt(2))
+std_norm_cdf(x::Array{T}) where {T <: Real} = 0.5 .* erfc(-x./sqrt(2))
 
 doc"""
 Tauchen's (1996) method for approximating AR(1) process with finite markov chain
@@ -139,8 +139,8 @@ end
 
 
 # These are to help me order types other than vectors
-@inline _emcd_lt{T}(a::T, b::T) = isless(a, b)
-@inline _emcd_lt{T}(a::Vector{T}, b::Vector{T}) = Base.lt(Base.Order.Lexicographic, a, b)
+@inline _emcd_lt(a::T, b::T) where {T} = isless(a, b)
+@inline _emcd_lt(a::Vector{T}, b::Vector{T}) where {T} = Base.lt(Base.Order.Lexicographic, a, b)
 
 doc"""
 Accepts the simulation of a discrete state Markov chain and estimates
@@ -183,7 +183,7 @@ For more info, refer to:
   transition matrix
 
 """
-function estimate_mc_discrete{T}(X::Vector{T}, states::Vector{T})
+function estimate_mc_discrete(X::Vector{T}, states::Vector{T}) where T
     # Get length of simulation
     capT = length(X)
 
@@ -217,7 +217,7 @@ function estimate_mc_discrete{T}(X::Vector{T}, states::Vector{T})
     return MarkovChain(P, states)
 end
 
-function estimate_mc_discrete{T}(X::Vector{T})
+function estimate_mc_discrete(X::Vector{T}) where T
     # Get unique states and sort them
     states = sort!(unique(X); lt=_emcd_lt)
 
@@ -229,8 +229,8 @@ doc"""
 types specifying the method for `discrete_var`
 
 """
-@compat abstract type VAREstimationMethod end
-immutable Even <: VAREstimationMethod end
+abstract type VAREstimationMethod end
+struct Even <: VAREstimationMethod end
 # immutable type Quantile <: VAREstimationMethod end
 # immutable type Quadrature <: VAREstimationMethod end
 

@@ -22,13 +22,13 @@ li.([0.1, 0.2, 0.3])
 ```
 
 """
-immutable LinInterp{TV<:AbstractArray,TB<:AbstractVector}
+struct LinInterp{TV<:AbstractArray,TB<:AbstractVector}
     breaks::TB
     vals::TV
     _n::Int
     _ncol::Int
 
-    function (::Type{LinInterp{TV,TB}}){TB,TV}(b::TB, v::TV)
+    function LinInterp{TV,TB}(b::TB, v::TV) where {TB,TV}
         if size(b, 1) != size(v, 1)
             m = "breaks and vals must have same number of elements"
             throw(DimensionMismatch(m))
@@ -46,11 +46,11 @@ function Base.:(==)(li1::LinInterp, li2::LinInterp)
     all(getfield(li1, f) == getfield(li2, f) for f in fieldnames(li1))
 end
 
-function LinInterp{TV<:AbstractArray,TB<:AbstractVector}(b::TB, v::TV)
+function LinInterp(b::TB, v::TV) where {TV<:AbstractArray,TB<:AbstractVector}
     LinInterp{TV,TB}(b, v)
 end
 
-@compat function (li::LinInterp{<:AbstractVector})(xp::Number)
+function (li::LinInterp{<:AbstractVector})(xp::Number)
     ix = searchsortedfirst(li.breaks, xp)
 
     # handle corner cases
@@ -65,7 +65,7 @@ end
     end
 end
 
-@compat function (li::LinInterp{<:AbstractMatrix})(xp::Number, col::Int)
+function (li::LinInterp{<:AbstractMatrix})(xp::Number, col::Int)
     ix = searchsortedfirst(li.breaks, xp)
     @boundscheck begin
         if col > li._ncol || col < 1
@@ -86,9 +86,9 @@ end
     end
 end
 
-_out_eltype{TV,TB}(li::LinInterp{TV,TB}) = promote_type(eltype(TV), eltype(TB))
+_out_eltype(li::LinInterp{TV,TB}) where {TV,TB} = promote_type(eltype(TV), eltype(TB))
 
-@compat function (li::LinInterp{<:AbstractMatrix})(
+function (li::LinInterp{<:AbstractMatrix})(
         xp::Number, cols::AbstractVector{<:Integer}
     )
     ix = searchsortedfirst(li.breaks, xp)
@@ -130,7 +130,7 @@ _out_eltype{TV,TB}(li::LinInterp{TV,TB}) = promote_type(eltype(TV), eltype(TB))
     end
 end
 
-@compat (li::LinInterp{<:AbstractMatrix})(xp::Number) = li(xp, 1:li._ncol)
+(li::LinInterp{<:AbstractMatrix})(xp::Number) = li(xp, 1:li._ncol)
 
 """
     interp(grid::AbstractVector, function_vals::AbstractVector)

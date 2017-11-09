@@ -53,9 +53,9 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
     a_indices::Nullable{Vector{Tind}}  # Action Indices
     a_indptr::Nullable{Vector{Tind}}   # Action Index Pointers
 
-    function (::Type{DiscreteDP{T,NQ,NR,Tbeta,Tind,TQ}}){T,NQ,NR,Tbeta,Tind,TQ}(
+    function DiscreteDP{T,NQ,NR,Tbeta,Tind,TQ}(
             R::Array, Q::TQ, beta::Real
-        )
+        ) where {T,NQ,NR,Tbeta,Tind,TQ}
         # verify input integrity 1
         if NQ != 3
             msg = "Q must be 3-dimensional without s-a formulation"
@@ -92,10 +92,10 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
     # Note: We left R, Q as type Array to produce more helpful error message with regards to shape.
     # R and Q are dense Arrays
 
-    function (::Type{DiscreteDP{T,NQ,NR,Tbeta,Tind,TQ}}){T,NQ,NR,Tbeta,Tind,TQ}(
+    function DiscreteDP{T,NQ,NR,Tbeta,Tind,TQ}(
             R::AbstractArray, Q::TQ, beta::Real, s_indices::Vector,
             a_indices::Vector
-        )
+        ) where {T,NQ,NR,Tbeta,Tind,TQ}
         # verify input integrity 1
         if NQ != 2
             throw(ArgumentError("Q must be 2-dimensional with s-a formulation"))
@@ -169,8 +169,8 @@ model Dense Matrix Formulation
 
 - `ddp::DiscreteDP` : Constructor for DiscreteDP object
 """
-function DiscreteDP{T,NQ,NR,Tbeta}(
-    R::Array{T,NR}, Q::AbstractArray{T,NQ}, beta::Tbeta)
+function DiscreteDP(
+    R::Array{T,NR}, Q::AbstractArray{T,NQ}, beta::Tbeta) where {T,NQ,NR,Tbeta}
     DiscreteDP{T,NQ,NR,Tbeta,Int,typeof(Q)}(R, Q, beta)
 end
 
@@ -195,10 +195,10 @@ model State-Action Pair Formulation
 - `ddp::DiscreteDP` : Constructor for DiscreteDP object
 
 """
-function DiscreteDP{T,NQ,NR,Tbeta,Tind}(R::AbstractArray{T,NR},
-                                        Q::AbstractArray{T,NQ},
-                                        beta::Tbeta, s_indices::Vector{Tind},
-                                        a_indices::Vector{Tind})
+function DiscreteDP(R::AbstractArray{T,NR},
+                    Q::AbstractArray{T,NQ},
+                    beta::Tbeta, s_indices::Vector{Tind},
+                    a_indices::Vector{Tind}) where {T,NQ,NR,Tbeta,Tind}
     DiscreteDP{T,NQ,NR,Tbeta,Tind,typeof(Q)}(R, Q, beta, s_indices, a_indices)
 end
 
@@ -206,8 +206,8 @@ end
 #-Type Aliases-#
 #--------------#
 
-@compat const DDP{T,Tbeta,Tind,TQ} =  DiscreteDP{T,3,2,Tbeta,Tind,TQ}
-@compat const DDPsa{T,Tbeta,Tind,TQ} =  DiscreteDP{T,2,1,Tbeta,Tind,TQ}
+const DDP{T,Tbeta,Tind,TQ} =  DiscreteDP{T,3,2,Tbeta,Tind,TQ}
+const DDPsa{T,Tbeta,Tind,TQ} =  DiscreteDP{T,2,1,Tbeta,Tind,TQ}
 
 #--------------------#
 #-Property Functions-#
@@ -217,7 +217,7 @@ num_states(ddp::DDP) = size(ddp.R, 1)
 num_states(ddp::DDPsa) = size(ddp.Q, 2)
 num_actions(ddp::DiscreteDP) = size(ddp.R, 2)
 
-@compat abstract type DDPAlgorithm end
+abstract type DDPAlgorithm end
 """
 This refers to the Value Iteration solution algorithm.
 
@@ -227,7 +227,7 @@ References
 https://lectures.quantecon.org/py/discrete_dp.html
 
 """
-immutable VFI <: DDPAlgorithm end
+struct VFI <: DDPAlgorithm end
 
 """
 This refers to the Policy Iteration solution algorithm.
@@ -238,7 +238,7 @@ References
 https://lectures.quantecon.org/py/discrete_dp.html
 
 """
-immutable PFI <: DDPAlgorithm end
+struct PFI <: DDPAlgorithm end
 
 """
 This refers to the Modified Policy Iteration solution algorithm.
@@ -249,7 +249,7 @@ References
 https://lectures.quantecon.org/py/discrete_dp.html
 
 """
-immutable MPFI <: DDPAlgorithm end
+struct MPFI <: DDPAlgorithm end
 
 """
 `DPSolveResult` is an object for retaining results and associated metadata after
@@ -264,16 +264,16 @@ solving the model
 - `ddpr::DPSolveResult` : DiscreteDP results object
 
 """
-type DPSolveResult{Algo<:DDPAlgorithm,Tval<:Real}
+mutable struct DPSolveResult{Algo<:DDPAlgorithm,Tval<:Real}
     v::Vector{Tval}
     Tv::Array{Tval}
     num_iter::Int
     sigma::Array{Int,1}
     mc::MarkovChain
 
-    function (::Type{DPSolveResult{Algo,Tval}}){Algo,Tval}(
+    function DPSolveResult{Algo,Tval}(
             ddp::DiscreteDP
-        )
+        ) where {Algo,Tval}
         v = s_wise_max(ddp, ddp.R) # Initialise v with v_init
         ddpr = new{Algo,Tval}(v, similar(v), 0, similar(v, Int))
 
@@ -283,9 +283,9 @@ type DPSolveResult{Algo<:DDPAlgorithm,Tval<:Real}
     end
 
     # method to pass initial value function (skip the s-wise max)
-    function (::Type{DPSolveResult{Algo,Tval}}){Algo,Tval}(
+    function DPSolveResult{Algo,Tval}(
             ddp::DiscreteDP, v::Vector
-        )
+        ) where {Algo,Tval}
         ddpr = new{Algo,Tval}(v, similar(v), 0, similar(v, Int))
 
         # fill in sigma with proper values
@@ -356,14 +356,14 @@ corresponding policy rule.
 - `Tv::Vector`: Updated value function vector
 - `sigma::typeof(sigma)`: Policy rule
 """
-bellman_operator!{T<:AbstractFloat}(ddp::DiscreteDP, v::AbstractVector{T}, sigma::AbstractVector) =
+bellman_operator!(ddp::DiscreteDP, v::AbstractVector{T}, sigma::AbstractVector) where {T<:AbstractFloat} =
     bellman_operator!(ddp, v, v, sigma)
 
 # method to allow dispatch on rationals
 # TODO from albep: not sure how to update this to the state-action pair formulation
-function bellman_operator!{T1<:Rational,T2<:Rational,NR,NQ,T3<:Rational}(
-        ddp::DiscreteDP{T1,NR,NQ,T2}, v::AbstractVector{T3}, sigma::AbstractVector
-    )
+function bellman_operator!(ddp::DiscreteDP{T1,NR,NQ,T2},
+                           v::AbstractVector{T3},
+                           sigma::AbstractVector) where {T1<:Rational,T2<:Rational,NR,NQ,T3<:Rational}
     bellman_operator!(ddp, v, v, sigma)
 end
 
@@ -420,7 +420,7 @@ Compute the ``v``-greedy policy.
 - `sigma:: v-greedy policy vector, of length `n`
 
 """
-function compute_greedy{TV<:Real}(ddp::DiscreteDP, v::AbstractVector{TV})
+function compute_greedy(ddp::DiscreteDP, v::AbstractVector{TV}) where TV<:Real
     Tv = similar(v)
     sigma = ones(Int, length(v))
     bellman_operator!(ddp, v, Tv, sigma)
@@ -452,7 +452,7 @@ Compute the value of a policy.
 - `v_sigma::Array{Float64}` : Value vector of `sigma`, of length `n`.
 
 """
-function evaluate_policy{T<:Integer}(ddp::DiscreteDP, sigma::AbstractVector{T})
+function evaluate_policy(ddp::DiscreteDP, sigma::AbstractVector{T}) where T<:Integer
     R_sigma, Q_sigma = RQ_sigma(ddp, sigma)
     b = R_sigma
     A = I - ddp.beta * Q_sigma
@@ -483,20 +483,18 @@ Solve the dynamic programming problem.
 - `ddpr::DPSolveResult{Algo}` : Optimization result represented as a
   `DPSolveResult`. See `DPSolveResult` for details.
 """
-function solve{Algo<:DDPAlgorithm,T}(
-        ddp::DiscreteDP{T}, method::Type{Algo}=VFI;
-        max_iter::Integer=250, epsilon::Real=1e-3, k::Integer=20
-    )
+function solve(ddp::DiscreteDP{T}, method::Type{Algo}=VFI;
+               max_iter::Integer=250, epsilon::Real=1e-3,
+               k::Integer=20) where {Algo<:DDPAlgorithm,T}
     ddpr = DPSolveResult{Algo,T}(ddp)
     _solve!(ddp, ddpr, max_iter, epsilon, k)
     ddpr.mc = MarkovChain(ddp, ddpr)
     ddpr
 end
 
-function solve{Algo<:DDPAlgorithm,T}(
-        ddp::DiscreteDP{T}, v_init::AbstractVector{T}, method::Type{Algo}=VFI;
-        max_iter::Integer=250, epsilon::Real=1e-3, k::Integer=20
-    )
+function solve(ddp::DiscreteDP{T}, v_init::AbstractVector{T},
+             method::Type{Algo}=VFI; max_iter::Integer=250,
+             epsilon::Real=1e-3, k::Integer=20) where {Algo<:DDPAlgorithm,T}
     ddpr = DPSolveResult{Algo,T}(ddp, v_init)
     _solve!(ddp, ddpr, max_iter, epsilon, k)
     ddpr.mc = MarkovChain(ddp, ddpr)
@@ -547,14 +545,14 @@ the transition probability matrix `Q_sigma`.
   of shape `(n, n)`.
 
 """
-function RQ_sigma{T<:Integer}(ddp::DDP, sigma::AbstractVector{T})
+function RQ_sigma(ddp::DDP, sigma::AbstractVector{T}) where T<:Integer
     R_sigma = [ddp.R[i, sigma[i]] for i in 1:length(sigma)]
     Q_sigma = hcat([getindex(ddp.Q, i, sigma[i], Colon())[:] for i=1:num_states(ddp)]...)
     return R_sigma, Q_sigma'
 end
 
 # TODO: express it in a similar way as above to exploit Julia's column major order
-function RQ_sigma{T<:Integer}(ddp::DDPsa, sigma::AbstractVector{T})
+function RQ_sigma(ddp::DDPsa, sigma::AbstractVector{T}) where T<:Integer
     sigma_indices = Array{T}(num_states(ddp))
     _find_indices!(get(ddp.a_indices), get(ddp.a_indptr), sigma, sigma_indices)
     R_sigma = ddp.R[sigma_indices]
@@ -759,7 +757,7 @@ Define Matrix Multiplication between 3-dimensional matrix and a vector
 Matrix multiplication over the last dimension of ``A``
 
 """
-function *{T}(A::Array{T,3}, v::AbstractVector)
+function *(A::Array{T,3}, v::AbstractVector) where T
     shape = size(A)
     size(v, 1) == shape[end] || error("wrong dimensions")
 

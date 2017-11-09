@@ -10,8 +10,8 @@ meshgrid(x::AbstractVector, y::AbstractVector) = (repmat(x, 1, length(y))',
                                                   repmat(y, 1, length(x)))
 
 fix(x::Real) = x >= 0 ? floor(Int, x) : ceil(Int, x)
-fix!{T<:Real}(x::AbstractArray{T}, out::Array{Int}) = map!(fix, out, x)
-fix{T<:Real}(x::AbstractArray{T}) = fix!(x, similar(x, Int))
+fix!(x::AbstractArray{T}, out::Array{Int}) where {T<:Real} = map!(fix, out, x)
+fix(x::AbstractArray{T}) where {T<:Real} = fix!(x, similar(x, Int))
 
 """
 `fix(x)`
@@ -143,5 +143,130 @@ function is_stable(A::AbstractMatrix)
     end
     return stable
 
+end
+
+
+"""
+The total number of m-part compositions of n, which is equal to
+
+(n + m - 1) choose (m - 1)
+
+##### Arguments
+
+- `m`::Int : Number of parts of composition
+- `n`::Int : Integer to decompose
+
+##### Returns
+
+- ::Int - Total number of m-part compositions of n
+"""
+function num_compositions(m, n)
+    return binomial(n+m-1, m-1)
+end
+
+
+"""
+Construct an array consisting of the integer points in the
+(m-1)-dimensional simplex :math:`\{x \mid x_0 + \cdots + x_{m-1} = n
+\}`, or equivalently, the m-part compositions of n, which are listed
+in lexicographic order. The total number of the points (hence the
+length of the output array) is L = (n+m-1)!/(n!*(m-1)!) (i.e.,
+(n+m-1) choose (m-1)).
+
+##### Arguments
+
+- `m`::Int : Dimension of each point. Must be a positive integer.
+- `n`::Int : Number which the coordinates of each point sum to. Must
+             be a nonnegative integer.
+
+##### Returns
+- `out`::Matrix{Int} : Array of shape (m, L) containing the integer
+                       points in the simplex, aligned in lexicographic
+                       order.
+
+##### Notes
+
+A grid of the (m-1)-dimensional *unit* simplex with n subdivisions
+along each dimension can be obtained by `simplex_grid(m, n) / n`.
+
+##### Examples
+
+>>> simplex_grid(3, 4)
+
+3×15 Array{Int64,2}:
+ 0  0  0  0  0  1  1  1  1  2  2  2  3  3  4
+ 0  1  2  3  4  0  1  2  3  0  1  2  0  1  0
+ 4  3  2  1  0  3  2  1  0  2  1  0  1  0  0
+
+##### References
+
+A. Nijenhuis and H. S. Wilf, Combinatorial Algorithms, Chapter 5,
+   Academic Press, 1978.
+"""
+function simplex_grid(m, n)
+    # Get number of elements in array and allocate
+    L = num_compositions(m, n)
+    out = Array{Int}(m, L)
+
+    x = zeros(Int, m)
+    x[m] = n
+
+    # Fill in first column
+    copy!(out, 1, x, 1, m)
+
+    h = m
+    for i in 2:L
+        h -= 1
+
+        val = x[h+1]
+        x[h+1] = 0
+        x[m] = val - 1
+        x[h] += 1
+
+        copy!(out, 3*(i-1) + 1, x, 1, m)
+
+        if val != 1
+            h = m
+        end
+    end
+
+    return out
+end
+
+
+"""
+Return the index of the point x in the lexicographic order of the
+integer points of the (m-1)-dimensional simplex :math:`\{x \mid x_0
++ \cdots + x_{m-1} = n\}`.
+
+##### Arguments
+
+- `x`::Array{Int,1} : Integer point in the simplex, i.e., an array of
+                      m nonnegative integers that sum to n.
+- `m`::Int : Dimension of each point. Must be a positive integer.
+- `n`::Int : Number which the coordinates of each point sum to. Must be a
+             nonnegative integer.
+
+##### Returns
+- `idx`::Int : Index of x.
+
+"""
+function simplex_index(x, m, n)
+    # If only one element then only one point in simplex
+    if m==1
+        return 1
+    end
+
+    decumsum = reverse(cumsum(reverse(x[2:end])))
+    idx = binomial(n+m-1, m-1)
+    for i in 1:m-1
+        if decumsum[i] == 0
+            break
+        end
+
+        idx -= num_compositions(m - (i-1), decumsum[i]-1)
+    end
+
+    return idx
 end
 

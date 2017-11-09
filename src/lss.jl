@@ -50,7 +50,7 @@ where ``{w_t}`` and ``{v_t}`` are independent and standard normal with dimension
                     also should be positive definite and symmetric
 
 """
-type LSS{TSampler<:MVNSampler}
+mutable struct LSS{TSampler<:MVNSampler}
     A::Matrix
     C::Matrix
     G::Matrix
@@ -139,7 +139,7 @@ end
 replicate(lss::LSS; t::Integer=10, num_reps::Integer=100) =
     replicate(lss, t, num_reps)
 
-immutable LSSMoments
+struct LSSMoments
     lss::LSS
 end
 

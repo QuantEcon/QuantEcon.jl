@@ -72,7 +72,7 @@ case, ``V, P, d`` and ``F`` are all stationary.
 - `F::ScalarOrArray` : Policy rule that specifies optimal control in each period
 
 """
-type LQ
+mutable struct LQ
     Q::ScalarOrArray
     R::ScalarOrArray
     A::ScalarOrArray
@@ -236,7 +236,7 @@ end
 """
 Private method implementing `compute_sequence` when state is a scalar
 """
-function _compute_sequence{T}(lq::LQ, x0::T, policies)
+function _compute_sequence(lq::LQ, x0::T, policies) where T
     capT = length(policies)
 
     x_path = Array{T}(capT+1)
@@ -259,7 +259,7 @@ end
 """
 Private method implementing `compute_sequence` when state is a scalar
 """
-function _compute_sequence{T}(lq::LQ, x0::Vector{T}, policies)
+function _compute_sequence(lq::LQ, x0::Vector{T}, policies) where T
     # Ensure correct dimensionality
     n, j, k = size(lq.C, 1), size(lq.C, 2), size(lq.B, 2)
     capT = length(policies)

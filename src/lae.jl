@@ -31,7 +31,7 @@ of observations `X`.
   any kind of `AbstractArray` and will be coerced into an `n x 1` vector.
 
 """
-type LAE
+mutable struct LAE
     p::Function
     X::Matrix
 
@@ -55,7 +55,7 @@ values in the array `y`.
 - `psi_vals::Vector`: Density at `(x, y)`
 
 """
-function lae_est{T}(l::LAE, y::AbstractArray{T})
+function lae_est(l::LAE, y::AbstractArray{T}) where T
     k = length(y)
     v = l.p(l.X, reshape(y, 1, k))
     psi_vals = mean(v, 1)

@@ -115,14 +115,14 @@ function solve_discrete_riccati(A::ScalarOrArray, B::ScalarOrArray,
     I = eye(k)
 
     current_min = Inf
-    candidates = [0.0, 0.01, 0.1, 0.25, 0.5, 1.0, 2.0, 10.0, 100.0, 10e5]
+    candidates = [0.01, 0.1, 0.25, 0.5, 1.0, 2.0, 10.0, 100.0, 10e5]
     BB = B' * B
     BTA = B' * A
 
     for gamma in candidates
         Z = getZ(R, gamma, BB)
         cn = cond(Z)
-        if isfinite(cn)
+        if cn * eps() < 1
             Q_tilde = -Q + N' * (Z \ (N + gamma .* BTA)) + gamma .* I
             G0 = B * (Z \ B')
             A0 = (I - gamma .* G0) * A - B * (Z \ N)
