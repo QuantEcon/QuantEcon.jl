@@ -12,6 +12,7 @@
 
     # Test "extrapolation evaluations"
     @test isapprox(u(0.5e-10), u(1e-10) + derivative(u, 1e-10)*(0.5e-10 - 1e-10))
+    @test u(-0.5) < u(-0.1)  # Make sure it doesn't fail with negative values
 
     @test isapprox(LogUtility().ξ, 1.0)  # Test default constructor
 
@@ -29,6 +30,7 @@
 
     # Test "extrapolation evaluations"
     @test isapprox(u(0.5e-10), u(1e-10) + derivative(u, 1e-10)*(0.5e-10 - 1e-10))
+    @test u(-0.5) < u(-0.1)  # Make sure it doesn't fail with negative values
 
     @test_throws ErrorException CRRAUtility(1.0)  # Test error throwing at γ=1.0
     end
@@ -44,6 +46,7 @@
 
     # Test "extrapolation evaluations"
     @test isapprox(v(0.5e-10), v(1e-10) + derivative(v, 1e-10)*(0.5e-10 - 1e-10))
+    @test v(-0.5) < v(-0.1)  # Make sure it doesn't fail with negative values
 
     @test_throws ErrorException CRRAUtility(1.0)  # Test error throwing at ϕ=1.0
     end
@@ -60,6 +63,7 @@
     # Test default values
     @test isapprox(EllipticalUtility().b, 0.5223)
     @test isapprox(EllipticalUtility().μ, 2.2926)
+
     end
 
 end
