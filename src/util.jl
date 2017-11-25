@@ -223,7 +223,7 @@ function simplex_grid(m, n)
         x[m] = val - 1
         x[h] += 1
 
-        copy!(out, 3*(i-1) + 1, x, 1, m)
+        copy!(out, m*(i-1) + 1, x, 1, m)
 
         if val != 1
             h = m
