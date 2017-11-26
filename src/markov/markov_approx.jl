@@ -13,7 +13,7 @@ https://lectures.quantecon.org/jl/finite_markov.html
 
 import Optim
 import NLopt
-import Distributions: pdf, Normal
+import Distributions: pdf, Normal, quantile
 
 std_norm_cdf(x::T) where {T <: Real} = 0.5 * erfc(-x/sqrt(2))
 std_norm_cdf(x::Array{T}) where {T <: Real} = 0.5 .* erfc(-x./sqrt(2))
@@ -231,7 +231,7 @@ types specifying the method for `discrete_var`
 """
 abstract type VAREstimationMethod end
 struct Even <: VAREstimationMethod end
-# immutable type Quantile <: VAREstimationMethod end
+struct Quantile <: VAREstimationMethod end
 # immutable type Quadrature <: VAREstimationMethod end
 
 doc"""
@@ -263,10 +263,9 @@ P, X = discrete_var(b, B, Psi, Nm, n_moments, method, n_sigmas)
 
 - `n_moments::Integer` : Desired number of moments to match. The default is 2.
 - `method::VAREstimationMethod` : Specify the method used to determine the grid
-                                  points. Accepted inputs are `Even()`.
+                                  points. Accepted inputs are `Even()` or `Quantile()`.
                                   Please see the paper for more details.
-                                  NOTE: `Quantile()` and `Quadrature()` are
-                                        not supported now.
+                                  NOTE: `Quadrature()` is not supported now.
 - `n_sigmas::Real` : If the `Even()` option is specified, `n_sigmas` is used to
                      determine the number of unconditional standard deviations
                      used to set the endpoints of the grid. The default is
@@ -334,7 +333,7 @@ function discrete_var(b::Union{Real, AbstractVector},
     A, C, mu, Sigma = standardize_var(b, B, Psi, M)
 
     # Construct 1-D grids
-    y1D = construct_1D_grid(Sigma, Nm, M, n_sigmas, method)
+    y1D, y1Dbounds = construct_1D_grid(Sigma, Nm, M, n_sigmas, method)
 
     # Construct all possible combinations of elements of the 1-D grids
     D = allcomb3(y1D')'
@@ -356,7 +355,7 @@ function discrete_var(b::Union{Real, AbstractVector},
     for ii = 1:(Nm^M)
 
         # Construct prior guesses for maximum entropy optimizations
-        q = construct_prior_guess(cond_mean[:, ii], Nm, y1D, method)
+        q = construct_prior_guess(cond_mean[:, ii], Nm, y1D, y1Dbounds, method)
 
         # Make sure all elements of the prior are stricly positive
         q[q.<kappa] = kappa
@@ -485,16 +484,33 @@ construct prior guess for evenly spaced grid method
 - `cond_mean::AbstractVector` : conditional Mean of each variable
 - `Nm::Integer` : number of grid points
 - `y1D::AbstractMatrix` : grid of variable
+- `::AbstractMatrix` : bounds of each grid bin
 - `method::Even` : method for grid making
 
 """
 construct_prior_guess(cond_mean::AbstractVector, Nm::Integer,
-                      y1D::AbstractMatrix, method::Even) =
+                      y1D::AbstractMatrix, ::Void, method::Even) =
     pdf.(Normal.(repmat(cond_mean, 1, Nm), 1), y1D)
 
 """
+construct prior guess for quantile grid method
 
-construct one-dimensional grid of states
+##### Arguments
+
+- `cond_mean::AbstractVector` : conditional Mean of each variable
+- `Nm::Integer` : number of grid points
+- `::AbstractMatrix` : grid of variable
+- `y1Dbounds::AbstractMatrix` : bounds of each grid bin
+- `method::Quantile` : method for grid making
+
+"""
+construct_prior_guess(cond_mean::AbstractVector, Nm::Integer,
+                      ::AbstractMatrix, y1Dbounds::AbstractMatrix, method::Quantile) =
+    cdf.(Normal.(repmat(cond_mean, 1, Nm), 1), y1Dbounds[:, 2:end]) -
+           cdf.(Normal.(repmat(cond_mean, 1, Nm), 1), y1Dbounds[:, 1:end-1])
+"""
+
+construct one-dimensional evenly spaced grid of states
 
 ##### Argument
 
@@ -507,6 +523,7 @@ construct one-dimensional grid of states
 ##### Return
 
 - `y1D` : `M x Nm` matrix of variable grid
+- `nothing` : `nothing` of type `Void`
 
 """
 function construct_1D_grid(Sigma::ScalarOrArray, Nm::Integer,
@@ -514,8 +531,39 @@ function construct_1D_grid(Sigma::ScalarOrArray, Nm::Integer,
     min_sigmas = sqrt(minimum(eigfact(Sigma).values))
     y1Drow = collect(linspace(-min_sigmas*n_sigmas, min_sigmas*n_sigmas, Nm))'
     y1D = repmat(y1Drow, M, 1)
-    return y1D
+    return y1D, nothing
 end
+
+"""
+
+construct one-dimensional quantile grid of states
+
+##### Argument
+
+- `Sigma::ScalarOrArray` : variance-covariance matrix of the standardized process
+- `Nm::Integer` : number of grid points
+- `M::Integer` : number of variables (`M=1` corresponds to AR(1))
+- `n_sigmas::Real` : number of standard error determining end points of grid
+- `method::Quntile` : method for grid making
+
+##### Return
+
+- `y1D` : `M x Nm` matrix of variable grid
+- `y1Dbounds` : bounds of each grid bin
+
+"""
+function construct_1D_grid(Sigma::AbstractMatrix, Nm::Integer,
+                           M::Integer, n_sigmas::Real, method::Quantile)
+    sigmas = sqrt.(diag(Sigma))
+    y1D = quantile.(Normal.(0, sigmas), (2*(1:Nm)'-1)/(2*Nm))
+    y1Dbounds = hcat(fill(-Inf, M, 1),
+                     quantile.(Normal.(0, sigmas), ((1:(Nm-1))')/Nm),
+                     fill(Inf, M, 1))
+    return y1D, y1Dbounds
+end
+construct_1D_grid(Sigma::Real, Nm::Integer,
+                  M::Integer, n_sigmas::Real, method::Quantile) =
+    construct_1D_grid(fill(Sigma, 1, 1), Nm, M, n_sigmas, method)
 
 """
 
