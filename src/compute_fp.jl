@@ -74,7 +74,7 @@ function compute_fixed_point(T::Function,
     end
 
     if verbose >= 1
-        if iterate == max_iter
+        if err > err_tol
             warn("max_iter attained in compute_fixed_point")
         elseif verbose == 2
             println("Converged in $iterate steps")
