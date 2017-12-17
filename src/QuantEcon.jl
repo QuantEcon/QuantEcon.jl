@@ -11,6 +11,9 @@ using DSP: TFFilter, freqz
 using Primes: primes
 using Compat: view, @compat
 
+using StatsBase
+import StatsBase:ecdf
+
 @static if isdefined(Base, :Iterators)
     using Base.Iterators: cycle, take
 end
@@ -18,14 +21,12 @@ end
 # useful types
 ScalarOrArray{T} = Union{T,Array{T}}
 
-
 export
 # arma
     ARMA,
     spectral_density, autocovariance, impulse_response, simulation,
 
 # ecdf
-    ECDF,
     ecdf,
 
 # lqcontrol
@@ -146,7 +147,7 @@ include("markov/mc_tools.jl")
 include("markov/ddp.jl")
 include("markov/random_mc.jl")
 include("discrete_rv.jl")
-include("ecdf.jl")
+
 include("estspec.jl")
 include("kalman.jl")
 include("lae.jl")
