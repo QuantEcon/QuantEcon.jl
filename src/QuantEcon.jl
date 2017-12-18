@@ -133,7 +133,10 @@ export
     interp, LinInterp,
 
 # sampler
-    MVNSampler
+    MVNSampler,
+
+# modeltools
+    @def_sim
 
 
 include("sampler.jl")
@@ -160,5 +163,6 @@ include("quadsums.jl")
 include("zeros.jl")
 include("optimization.jl")
 include("modeltools/utility.jl")
+include("modeltools/types.jl")
 
 end # module
