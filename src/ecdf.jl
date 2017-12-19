@@ -9,23 +9,4 @@ of observations.
 
 =#
 
-"""
-One-dimensional empirical distribution function given a vector of
-observations.
-
-##### Fields
-
-- `observations::Vector`: The vector of observations
-"""
-mutable struct ECDF
-    observations::Vector
-end
-
-"""
-Evaluate the empirical cdf at one or more points
-
-##### Arguments
-
-- `x::Union{Real, Array}`: The point(s) at which to evaluate the ECDF
-"""
 @deprecate ECDF(x) StatsBase.ecdf(x)

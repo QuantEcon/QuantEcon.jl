@@ -25,7 +25,6 @@ export
     spectral_density, autocovariance, impulse_response, simulation,
 
 # ecdf
-    ECDF,
     ecdf,
 
 # lqcontrol

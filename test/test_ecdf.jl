@@ -2,7 +2,7 @@
     # set up
 
     obs = rand(40)
-    e = ECDF(obs)
+    e = ecdf(obs)
 
     # 1.1 is larger than all obs, so ecdf should be 1
     @test e(1.1) ≈ 1.0
