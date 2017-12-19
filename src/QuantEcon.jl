@@ -10,9 +10,7 @@ import Distributions: pdf, skewness, BetaBinomial
 using DSP: TFFilter, freqz
 using Primes: primes
 using Compat: view, @compat
-
-using StatsBase
-import StatsBase:ecdf
+using StatsBase:ecdf
 
 @static if isdefined(Base, :Iterators)
     using Base.Iterators: cycle, take
@@ -147,7 +145,7 @@ include("markov/mc_tools.jl")
 include("markov/ddp.jl")
 include("markov/random_mc.jl")
 include("discrete_rv.jl")
-
+include("ecdf.jl")
 include("estspec.jl")
 include("kalman.jl")
 include("lae.jl")

@@ -28,7 +28,4 @@ Evaluate the empirical cdf at one or more points
 
 - `x::Union{Real, Array}`: The point(s) at which to evaluate the ECDF
 """
-(e::ECDF)(x::Real) = mean(e.observations .<= x)
-(e::ECDF)(x::AbstractArray) = e.(x)
-
-@deprecate ecdf(e::ECDF, x) e(x)
+@deprecate ECDF(x) StatsBase.ecdf(x)
