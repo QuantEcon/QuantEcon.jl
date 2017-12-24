@@ -13,6 +13,7 @@ https://lectures.quantecon.org/jl/finite_markov.html
 
 import Optim
 import NLopt
+import FastGaussQuadrature: gausshermite
 import Distributions: pdf, Normal, quantile
 
 std_norm_cdf(x::T) where {T <: Real} = 0.5 * erfc(-x/sqrt(2))
@@ -232,7 +233,7 @@ types specifying the method for `discrete_var`
 abstract type VAREstimationMethod end
 struct Even <: VAREstimationMethod end
 struct Quantile <: VAREstimationMethod end
-# immutable type Quadrature <: VAREstimationMethod end
+struct Quadrature <: VAREstimationMethod end
 
 doc"""
 
@@ -263,9 +264,8 @@ P, X = discrete_var(b, B, Psi, Nm, n_moments, method, n_sigmas)
 
 - `n_moments::Integer` : Desired number of moments to match. The default is 2.
 - `method::VAREstimationMethod` : Specify the method used to determine the grid
-                                  points. Accepted inputs are `Even()` or `Quantile()`.
-                                  Please see the paper for more details.
-                                  NOTE: `Quadrature()` is not supported now.
+                                  points. Accepted inputs are `Even()`, `Quantile()`,
+                                  or 'Quadrature()'. Please see the paper for more details.
 - `n_sigmas::Real` : If the `Even()` option is specified, `n_sigmas` is used to
                      determine the number of unconditional standard deviations
                      used to set the endpoints of the grid. The default is
@@ -321,6 +321,9 @@ function discrete_var(b::Union{Real, AbstractVector},
         error("n_moments must be either 1 or a positive even integer")
     end
 
+    # warning about persistency
+    warn_persistency(B, method)
+
     # Compute polynomial moments of standard normal distribution
     gaussian_moment = zeros(n_moments)
     c = 1
@@ -333,7 +336,7 @@ function discrete_var(b::Union{Real, AbstractVector},
     A, C, mu, Sigma = standardize_var(b, B, Psi, M)
 
     # Construct 1-D grids
-    y1D, y1Dbounds = construct_1D_grid(Sigma, Nm, M, n_sigmas, method)
+    y1D, y1Dhelper = construct_1D_grid(Sigma, Nm, M, n_sigmas, method)
 
     # Construct all possible combinations of elements of the 1-D grids
     D = allcomb3(y1D')'
@@ -355,7 +358,7 @@ function discrete_var(b::Union{Real, AbstractVector},
     for ii = 1:(Nm^M)
 
         # Construct prior guesses for maximum entropy optimizations
-        q = construct_prior_guess(cond_mean[:, ii], Nm, y1D, y1Dbounds, method)
+        q = construct_prior_guess(cond_mean[:, ii], Nm, y1D, y1Dhelper, method)
 
         # Make sure all elements of the prior are stricly positive
         q[q.<kappa] = kappa
@@ -377,11 +380,11 @@ function discrete_var(b::Union{Real, AbstractVector},
                 p, lambda, moment_error = discrete_approximation(y1D[jj, :],
                     X -> polynomial_moment(X, cond_mean[jj, ii], scaling_factor[jj], 2),
                     [0; 1]./(scaling_factor[jj].^(1:2)), q[jj, :], lambda_guess)
-                if norm(moment_error) > 1e-5 # if 2 moments fail, just match 1 moment
+                if any(isnan.(moment_error)) || norm(moment_error) > 1e-5 # if 2 moments fail, just match 1 moment
                     warn("Failed to match first 2 moments. Just matching 1.")
                     temp[:, jj], _, _ = discrete_approximation(y1D[jj, :],
-                        X -> (X-cond_mean[jj,ii])/scaling_factor[jj],
-                        0, q[jj, :], 0)
+                    X -> (X'-cond_mean[jj, ii])/scaling_factor[jj],
+                        0.0, q[jj, :], 0.0)
                     lambda_bar[(jj-1)*2+1:jj*2, ii] = zeros(2,1)
                 elseif n_moments == 2
                     lambda_bar[(jj-1)*2+1:jj*2, ii] = lambda
@@ -414,6 +417,12 @@ function discrete_var(b::Union{Real, AbstractVector},
 
     M != 1 || (return MarkovChain(P, vec(X)))
     return MarkovChain(P, [X[:, i] for i in 1:Nm^M])
+end
+
+warn_persistency(B::Union{Real, AbstractMatrix}, method::VAREstimationMethod) = nothing
+
+function warn_persistency(B::Union{Real, AbstractMatrix}, method::Quadrature)
+    warn("The quadrature method may perform poorly for highly persistent processes.")
 end
 
 """
@@ -508,6 +517,23 @@ construct_prior_guess(cond_mean::AbstractVector, Nm::Integer,
                       ::AbstractMatrix, y1Dbounds::AbstractMatrix, method::Quantile) =
     cdf.(Normal.(repmat(cond_mean, 1, Nm), 1), y1Dbounds[:, 2:end]) -
            cdf.(Normal.(repmat(cond_mean, 1, Nm), 1), y1Dbounds[:, 1:end-1])
+
+"""
+construct prior guess for quadrature grid method
+
+##### Arguments
+
+- `cond_mean::AbstractVector` : conditional Mean of each variable
+- `Nm::Integer` : number of grid points
+- `y1D::AbstractMatrix` : grid of variable
+- `weights::AbstractVector` : weights of grid `y1D`
+- `method::Quadrate` : method for grid making
+
+"""
+construct_prior_guess(cond_mean::AbstractVector, Nm::Integer,
+                      y1D::AbstractMatrix, weights::AbstractVector, method::Quadrature) =
+    (pdf.(Normal.(repmat(cond_mean, 1, Nm), 1), y1D) ./ pdf.(Normal(0, 1), y1D)).*
+    (weights'/sqrt(pi))
 """
 
 construct one-dimensional evenly spaced grid of states
@@ -564,6 +590,31 @@ end
 construct_1D_grid(Sigma::Real, Nm::Integer,
                   M::Integer, n_sigmas::Real, method::Quantile) =
     construct_1D_grid(fill(Sigma, 1, 1), Nm, M, n_sigmas, method)
+
+"""
+
+construct one-dimensional quantile grid of states
+
+##### Argument
+
+- `Sigma::ScalarOrArray` : variance-covariance matrix of the standardized process
+- `Nm::Integer` : number of grid points
+- `M::Integer` : number of variables (`M=1` corresponds to AR(1))
+- `n_sigmas::Real` : number of standard error determining end points of grid
+- `method::Qudrature` : method for grid making
+
+##### Return
+
+- `y1D` : `M x Nm` matrix of variable grid
+- `y1Dbounds` : bounds of each grid bin
+
+"""
+function construct_1D_grid(::ScalarOrArray, Nm::Integer,
+                           M::Integer, ::Real, method::Quadrature)
+    nodes, weights = gausshermite(Nm)
+    y1D = repmat(sqrt(2)*nodes', M, 1)
+    return y1D, weights
+end
 
 """
 
@@ -687,6 +738,9 @@ function discrete_approximation(D::AbstractVector, T::Function, TBar::AbstractVe
     moment_error = grad/minimum_value
     return p, lambda_bar, moment_error
 end
+discrete_approximation(D::AbstractVector, T::Function, TBar::Real,
+                       q::AbstractVector=ones(N)/N, lambda0::Real=0) =
+    discrete_approximation(D, T, [TBar], q, [lambda0])
 
 """
 
