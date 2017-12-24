@@ -235,6 +235,7 @@ struct Even <: VAREstimationMethod end
 struct Quantile <: VAREstimationMethod end
 struct Quadrature <: VAREstimationMethod end
 
+
 doc"""
 
 Compute a finite-state Markov chain approximation to a VAR(1) process of the form
@@ -615,6 +616,9 @@ function construct_1D_grid(::ScalarOrArray, Nm::Integer,
     y1D = repmat(sqrt(2)*nodes', M, 1)
     return y1D, weights
 end
+construct_1D_grid(Sigma::Real, Nm::Integer,
+                  M::Integer, n_sigmas::Real, method::Quantile) =
+    construct_1D_grid(fill(Sigma, 1, 1), Nm, M, n_sigmas, method)
 
 """
 

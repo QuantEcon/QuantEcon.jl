@@ -10,6 +10,7 @@ import Distributions: pdf, skewness, BetaBinomial
 using DSP: TFFilter, freqz
 using Primes: primes
 using Compat: view, @compat
+using StatsBase:ecdf
 
 @static if isdefined(Base, :Iterators)
     using Base.Iterators: cycle, take
@@ -18,14 +19,12 @@ end
 # useful types
 ScalarOrArray{T} = Union{T,Array{T}}
 
-
 export
 # arma
     ARMA,
     spectral_density, autocovariance, impulse_response, simulation,
 
 # ecdf
-    ECDF,
     ecdf,
 
 # lqcontrol
@@ -133,7 +132,10 @@ export
     interp, LinInterp,
 
 # sampler
-    MVNSampler
+    MVNSampler,
+
+# modeltools
+    @def_sim
 
 
 include("sampler.jl")
@@ -160,5 +162,6 @@ include("quadsums.jl")
 include("zeros.jl")
 include("optimization.jl")
 include("modeltools/utility.jl")
+include("modeltools/types.jl")
 
 end # module
