@@ -375,17 +375,17 @@ function discrete_var(b::Union{Real, AbstractVector},
             # Maximum entropy optimization
             if n_moments == 1 # match only 1 moment
                 temp[:, jj], _, _ = discrete_approximation(y1D[jj, :],
-                    X -> (reshape(X, 1, Nm)-cond_mean[jj, ii])/scaling_factor[jj],
+                    X -> (X'-cond_mean[jj, ii])/scaling_factor[jj],
                     [0.0], q[jj, :], [0.0])
             else # match 2 moments first
                 p, lambda, moment_error = discrete_approximation(y1D[jj, :],
                     X -> polynomial_moment(X, cond_mean[jj, ii], scaling_factor[jj], 2),
                     [0; 1]./(scaling_factor[jj].^(1:2)), q[jj, :], lambda_guess)
-                if any(isnan.(moment_error)) || norm(moment_error) > 1e-5 # if 2 moments fail, just match 1 moment
+                if !(norm(moment_error) < 1e-5) # if 2 moments fail, just match 1 moment
                     warn("Failed to match first 2 moments. Just matching 1.")
                     temp[:, jj], _, _ = discrete_approximation(y1D[jj, :],
                     X -> (X'-cond_mean[jj, ii])/scaling_factor[jj],
-                        0.0, q[jj, :], 0.0)
+                        [0.0], q[jj, :], [0.0])
                     lambda_bar[(jj-1)*2+1:jj*2, ii] = zeros(2,1)
                 elseif n_moments == 2
                     lambda_bar[(jj-1)*2+1:jj*2, ii] = lambda
@@ -422,9 +422,8 @@ end
 
 warn_persistency(B::Union{Real, AbstractMatrix}, method::VAREstimationMethod) = nothing
 
-function warn_persistency(B::Union{Real, AbstractMatrix}, method::Quadrature)
+warn_persistency(B::Union{Real, AbstractMatrix}, method::Quadrature) =
     warn("The quadrature method may perform poorly for highly persistent processes.")
-end
 
 """
 
@@ -528,7 +527,7 @@ construct prior guess for quadrature grid method
 - `Nm::Integer` : number of grid points
 - `y1D::AbstractMatrix` : grid of variable
 - `weights::AbstractVector` : weights of grid `y1D`
-- `method::Quadrate` : method for grid making
+- `method::Quadrature` : method for grid making
 
 """
 construct_prior_guess(cond_mean::AbstractVector, Nm::Integer,
@@ -567,7 +566,7 @@ construct one-dimensional quantile grid of states
 
 ##### Argument
 
-- `Sigma::ScalarOrArray` : variance-covariance matrix of the standardized process
+- `Sigma::AbstractMatrix` : variance-covariance matrix of the standardized process
 - `Nm::Integer` : number of grid points
 - `M::Integer` : number of variables (`M=1` corresponds to AR(1))
 - `n_sigmas::Real` : number of standard error determining end points of grid
@@ -594,20 +593,20 @@ construct_1D_grid(Sigma::Real, Nm::Integer,
 
 """
 
-construct one-dimensional quantile grid of states
+construct one-dimensional quadrature grid of states
 
 ##### Argument
 
-- `Sigma::ScalarOrArray` : variance-covariance matrix of the standardized process
+- `::ScalarOrArray` : not used
 - `Nm::Integer` : number of grid points
 - `M::Integer` : number of variables (`M=1` corresponds to AR(1))
-- `n_sigmas::Real` : number of standard error determining end points of grid
-- `method::Qudrature` : method for grid making
+- `n_sigmas::Real` : not used
+- `method::Quadrature` : method for grid making
 
 ##### Return
 
 - `y1D` : `M x Nm` matrix of variable grid
-- `y1Dbounds` : bounds of each grid bin
+- `weights` : weights on each grid
 
 """
 function construct_1D_grid(::ScalarOrArray, Nm::Integer,
@@ -616,9 +615,6 @@ function construct_1D_grid(::ScalarOrArray, Nm::Integer,
     y1D = repmat(sqrt(2)*nodes', M, 1)
     return y1D, weights
 end
-construct_1D_grid(Sigma::Real, Nm::Integer,
-                  M::Integer, n_sigmas::Real, method::Quantile) =
-    construct_1D_grid(fill(Sigma, 1, 1), Nm, M, n_sigmas, method)
 
 """
 
@@ -742,9 +738,9 @@ function discrete_approximation(D::AbstractVector, T::Function, TBar::AbstractVe
     moment_error = grad/minimum_value
     return p, lambda_bar, moment_error
 end
-discrete_approximation(D::AbstractVector, T::Function, TBar::Real,
-                       q::AbstractVector=ones(N)/N, lambda0::Real=0) =
-    discrete_approximation(D, T, [TBar], q, [lambda0])
+# discrete_approximation(D::AbstractVector, T::Function, TBar::Real,
+#                        q::AbstractVector=ones(N)/N, lambda0::Real=0) =
+#     discrete_approximation(D, T, [TBar], q, [lambda0])
 
 """
 
