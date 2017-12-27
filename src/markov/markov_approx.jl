@@ -266,7 +266,7 @@ P, X = discrete_var(b, B, Psi, Nm, n_moments, method, n_sigmas)
 - `n_moments::Integer` : Desired number of moments to match. The default is 2.
 - `method::VAREstimationMethod` : Specify the method used to determine the grid
                                   points. Accepted inputs are `Even()`, `Quantile()`,
-                                  or 'Quadrature()'. Please see the paper for more details.
+                                  or `Quadrature()`. Please see the paper for more details.
 - `n_sigmas::Real` : If the `Even()` option is specified, `n_sigmas` is used to
                      determine the number of unconditional standard deviations
                      used to set the endpoints of the grid. The default is
@@ -420,10 +420,26 @@ function discrete_var(b::Union{Real, AbstractVector},
     return MarkovChain(P, [X[:, i] for i in 1:Nm^M])
 end
 
-warn_persistency(B::Union{Real, AbstractMatrix}, method::VAREstimationMethod) = nothing
+"""
+check persistency when `method` is `Quadrature` and give warning if needed
 
-warn_persistency(B::Union{Real, AbstractMatrix}, method::Quadrature) =
-    warn("The quadrature method may perform poorly for highly persistent processes.")
+##### Arguments
+- `B::Union{Real, AbstractMatrix}` : impact coefficient
+- `method::VAREstimationMethod` : method for grid making
+
+##### Returns
+- `nothing`
+
+"""
+function warn_persistency(B::AbstractMatrix, ::Quadrature)
+    if any(eig(B)[1] .> 0.9)
+        warn("The quadrature method may perform poorly for highly persistent processes.")
+    end
+    return nothing
+end
+warn_persistency(B::Real, method::Quadrature) = warn_persistency(fill(B, 1, 1), method)
+warn_persistency(::Union{Real, AbstractMatrix}, ::Union{Even, Quantile}) = nothing
+
 
 """
 
@@ -552,7 +568,7 @@ construct one-dimensional evenly spaced grid of states
 - `nothing` : `nothing` of type `Void`
 
 """
-function construct_1D_grid(Sigma::ScalarOrArray, Nm::Integer,
+function construct_1D_grid(Sigma::Union{Real, AbstractMatrix}, Nm::Integer,
                            M::Integer, n_sigmas::Real, method::Even)
     min_sigmas = sqrt(minimum(eigfact(Sigma).values))
     y1Drow = collect(linspace(-min_sigmas*n_sigmas, min_sigmas*n_sigmas, Nm))'
