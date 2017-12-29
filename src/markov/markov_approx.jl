@@ -13,7 +13,6 @@ https://lectures.quantecon.org/jl/finite_markov.html
 
 import Optim
 import NLopt
-import FastGaussQuadrature: gausshermite
 import Distributions: pdf, Normal, quantile
 
 std_norm_cdf(x::T) where {T <: Real} = 0.5 * erfc(-x/sqrt(2))
@@ -548,8 +547,7 @@ construct prior guess for quadrature grid method
 """
 construct_prior_guess(cond_mean::AbstractVector, Nm::Integer,
                       y1D::AbstractMatrix, weights::AbstractVector, method::Quadrature) =
-    (pdf.(Normal.(repmat(cond_mean, 1, Nm), 1), y1D) ./ pdf.(Normal(0, 1), y1D)).*
-    (weights'/sqrt(pi))
+    (pdf.(Normal.(repmat(cond_mean, 1, Nm), 1), y1D) ./ pdf.(Normal(0, 1), y1D)).*weights'
 """
 
 construct one-dimensional evenly spaced grid of states
@@ -627,8 +625,8 @@ construct one-dimensional quadrature grid of states
 """
 function construct_1D_grid(::ScalarOrArray, Nm::Integer,
                            M::Integer, ::Real, method::Quadrature)
-    nodes, weights = gausshermite(Nm)
-    y1D = repmat(sqrt(2)*nodes', M, 1)
+    nodes, weights = qnwnorm(Nm, 0, 1)
+    y1D = repmat(nodes', M, 1)
     return y1D, weights
 end
 
