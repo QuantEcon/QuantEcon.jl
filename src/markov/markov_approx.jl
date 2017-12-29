@@ -437,7 +437,7 @@ function warn_persistency(B::AbstractMatrix, ::Quadrature)
     return nothing
 end
 warn_persistency(B::Real, method::Quadrature) = warn_persistency(fill(B, 1, 1), method)
-warn_persistency(::Union{Real, AbstractMatrix}, ::Union{Even, Quantile}) = nothing
+warn_persistency(::Union{Real, AbstractMatrix}, ::VAREstimationMethod) = nothing
 
 
 """
