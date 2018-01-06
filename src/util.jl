@@ -270,3 +270,92 @@ function simplex_index(x, m, n)
     return idx
 end
 
+"""
+    next_k_array!(a)
+
+Given an array `a` of k distinct positive integers, sorted in
+ascending order, return the next k-array in the lexicographic
+ordering of the descending sequences of the elements, following
+[Combinatorial number system]
+(https://en.wikipedia.org/wiki/Combinatorial_number_system). `a` is
+modified in place.
+
+# Arguments
+
+- `a::Vector{T}`: Array of length k. T<:Integer.
+
+# Returns
+
+- `a::Vector{T}`: View of `a`.
+
+# Examples
+
+```julia
+julia> n, k = 4, 2;
+
+julia> a = collect(1:2);
+
+julia> while a[end] <= n
+           @show a
+           next_k_array!(a)
+       end
+a = [1, 2]
+a = [1, 3]
+a = [2, 3]
+a = [1, 4]
+a = [2, 4]
+a = [3, 4]
+```
+"""
+function next_k_array!(a::Vector{T}) where T <: Integer
+
+    k = length(a)
+    if k == 1 || a[1] + 1 < a[2]
+        a[1] += 1
+        return a
+    end
+
+    a[1] = 1
+    i = 2
+    x = a[i] + 1
+
+    while i < k && x == a[i+1]
+        i += 1
+        a[i-1] = i - 1
+        x = a[i] + 1
+    end
+    a[i] = x
+
+    return a
+end
+
+"""
+    k_array_rank(a)
+
+Given an array `a` of k distinct positive integers, sorted in
+ascending order, return its ranking in the lexicographic ordering of
+the descending sequences of the elements, following
+[Combinatorial number system]
+(https://en.wikipedia.org/wiki/Combinatorial_number_system).
+
+# Arguments
+
+- `a::Vector{T}`: Array of length k. T<:Integer.
+
+# Returns
+
+- `idx::Integer`: Ranking of `a`.
+"""
+function k_array_rank(a::Vector{T}) where T <: Integer
+    k = length(a)
+    idx = one(T)
+    for i = 1:k
+        try
+            idx += binomial(a[i]-1, i)
+        catch InexactError
+            idx += binomial(BigInt(a[i]-1), BigInt(i))
+        end
+    end
+    
+    return idx
+end

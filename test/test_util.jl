@@ -79,4 +79,43 @@
         @test simplex_grid(5, 4) == reshape(grid_5_4', 5, 70)
     end
 
+    @testset "next_k_array" begin
+        
+        k_arrays = [1  2  3;
+                    1  2  4;
+                    1  3  4;
+                    2  3  4;
+                    1  2  5;
+                    1  3  5;
+                    2  3  5;
+                    1  4  5;
+                    2  4  5;
+                    3  4  5;
+                    1  2  6;
+                    1  3  6;
+                    2  3  6;
+                    1  4  6;
+                    2  4  6;
+                    3  4  6;
+                    1  5  6;
+                    2  5  6;
+                    3  5  6;
+                    4  5  6]
+        L, k = size(k_arrays)
+
+        k_arrays_computed = similar(k_arrays)
+        k_arrays_computed[1, :] = collect(1:k)
+        @test k_array_rank(k_arrays_computed[1, :]) == 1
+        for i = 2:L
+            k_arrays_computed[i, :] = next_k_array!(k_arrays_computed[i-1, :])
+            @test k_array_rank(k_arrays_computed[i, :]) == i
+        end
+
+        @test k_arrays_computed == k_arrays
+
+        n, k = BigInt(100), BigInt(50)
+        @test k_array_rank(collect(n-k+1:n)) == binomial(n, k)
+
+    end
+
 end
