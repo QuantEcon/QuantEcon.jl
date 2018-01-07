@@ -113,8 +113,9 @@
 
         @test k_arrays_computed == k_arrays
 
-        n, k = BigInt(100), BigInt(50)
-        @test k_array_rank(collect(n-k+1:n)) == binomial(n, k)
+        n, k = 100, 50
+        @test k_array_rank(BigInt, collect(n-k+1:n)) == binomial(BigInt(n), BigInt(k))
+        @test_throws InexactError k_array_rank(collect(n-k+1:n))
 
     end
 

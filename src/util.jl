@@ -282,11 +282,11 @@ modified in place.
 
 # Arguments
 
-- `a::Vector{T}`: Array of length k. T<:Integer.
+- `a::Vector{<:Integer}`: Array of length k.
 
 # Returns
 
-- `a::Vector{T}`: View of `a`.
+- `a::Vector{<:Integer}`: View of `a`.
 
 # Examples
 
@@ -307,7 +307,7 @@ a = [2, 4]
 a = [3, 4]
 ```
 """
-function next_k_array!(a::Vector{T}) where T <: Integer
+function next_k_array!(a::Vector{<:Integer})
 
     k = length(a)
     if k == 1 || a[1] + 1 < a[2]
@@ -330,7 +330,7 @@ function next_k_array!(a::Vector{T}) where T <: Integer
 end
 
 """
-    k_array_rank(a)
+    k_array_rank([T=Int], a)
 
 Given an array `a` of k distinct positive integers, sorted in
 ascending order, return its ranking in the lexicographic ordering of
@@ -338,24 +338,31 @@ the descending sequences of the elements, following
 [Combinatorial number system]
 (https://en.wikipedia.org/wiki/Combinatorial_number_system).
 
+# Notes
+
+`InexactError` exception will be thrown if overflow occurs during
+the computation. It is the user's responsibility to ensure
+that the rank of the input array fits within the range of `T`;
+a sufficient condition for it is 
+`binomial(BigInt(a[end]), BigInt(length(a))) <= typemax(T)`.
+
 # Arguments
 
-- `a::Vector{T}`: Array of length k. T<:Integer.
+- `T::Type{<:Integer}`: The numeric type of ranking to be returned.
+- `a::Vector{<:Integer}`: Array of length k.
 
 # Returns
 
-- `idx::Integer`: Ranking of `a`.
+- `idx::T`: Ranking of `a`.
 """
-function k_array_rank(a::Vector{T}) where T <: Integer
+function k_array_rank(T::Type{<:Integer}, a::Vector{<:Integer})
     k = length(a)
     idx = one(T)
     for i = 1:k
-        try
-            idx += binomial(a[i]-1, i)
-        catch InexactError
-            idx += binomial(BigInt(a[i]-1), BigInt(i))
-        end
+        idx += binomial(T(a[i])-one(T), T(i))
     end
-    
+
     return idx
 end
+
+k_array_rank(a::Vector{<:Integer}) = k_array_rank(Int, a)
