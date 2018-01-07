@@ -113,9 +113,15 @@
 
         @test k_arrays_computed == k_arrays
 
+        # test InexactError when ranking is out of range
         n, k = 100, 50
         @test k_array_rank(BigInt, collect(n-k+1:n)) == binomial(BigInt(n), BigInt(k))
         @test_throws InexactError k_array_rank(collect(n-k+1:n))
+
+        # test returning wrong value when ranking is out of range
+        n, k = 68, 29
+        @test k_array_rank(BigInt, collect(n-k+1:n)) == binomial(BigInt(n), BigInt(k))
+        @test k_array_rank(collect(n-k+1:n)) != binomial(BigInt(n), BigInt(k))
 
     end
 

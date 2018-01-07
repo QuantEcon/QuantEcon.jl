@@ -340,10 +340,10 @@ the descending sequences of the elements, following
 
 # Notes
 
-`InexactError` exception will be thrown if overflow occurs during
-the computation. It is the user's responsibility to ensure
-that the rank of the input array fits within the range of `T`;
-a sufficient condition for it is 
+`InexactError` exception will be thrown, or an incorrect value will be
+returned without warning if overflow occurs during the computation.
+It is the user's responsibility to ensure that the rank of the input
+array fits within the range of `T`; a sufficient condition for it is 
 `binomial(BigInt(a[end]), BigInt(length(a))) <= typemax(T)`.
 
 # Arguments
