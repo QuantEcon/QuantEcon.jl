@@ -270,3 +270,99 @@ function simplex_index(x, m, n)
     return idx
 end
 
+"""
+    next_k_array!(a)
+
+Given an array `a` of k distinct positive integers, sorted in
+ascending order, return the next k-array in the lexicographic
+ordering of the descending sequences of the elements, following
+[Combinatorial number system]
+(https://en.wikipedia.org/wiki/Combinatorial_number_system). `a` is
+modified in place.
+
+# Arguments
+
+- `a::Vector{<:Integer}`: Array of length k.
+
+# Returns
+
+- `a::Vector{<:Integer}`: View of `a`.
+
+# Examples
+
+```julia
+julia> n, k = 4, 2;
+
+julia> a = collect(1:2);
+
+julia> while a[end] <= n
+           @show a
+           next_k_array!(a)
+       end
+a = [1, 2]
+a = [1, 3]
+a = [2, 3]
+a = [1, 4]
+a = [2, 4]
+a = [3, 4]
+```
+"""
+function next_k_array!(a::Vector{<:Integer})
+
+    k = length(a)
+    if k == 1 || a[1] + 1 < a[2]
+        a[1] += 1
+        return a
+    end
+
+    a[1] = 1
+    i = 2
+    x = a[i] + 1
+
+    while i < k && x == a[i+1]
+        i += 1
+        a[i-1] = i - 1
+        x = a[i] + 1
+    end
+    a[i] = x
+
+    return a
+end
+
+"""
+    k_array_rank([T=Int], a)
+
+Given an array `a` of k distinct positive integers, sorted in
+ascending order, return its ranking in the lexicographic ordering of
+the descending sequences of the elements, following
+[Combinatorial number system]
+(https://en.wikipedia.org/wiki/Combinatorial_number_system).
+
+# Notes
+
+`InexactError` exception will be thrown, or an incorrect value will be
+returned without warning if overflow occurs during the computation.
+It is the user's responsibility to ensure that the rank of the input
+array fits within the range of `T`; a sufficient condition for it is 
+`binomial(BigInt(a[end]), BigInt(length(a))) <= typemax(T)`.
+
+# Arguments
+
+- `T::Type{<:Integer}`: The numeric type of ranking to be returned.
+- `a::Vector{<:Integer}`: Array of length k.
+
+# Returns
+
+- `idx::T`: Ranking of `a`.
+"""
+function k_array_rank(T::Type{<:Integer}, a::Vector{<:Integer})
+    k = length(a)
+    idx = one(T)
+    for i = 1:k
+        idx += binomial(T(a[i])-one(T), T(i))
+    end
+
+    return idx
+end
+
+k_array_rank(a::Vector{<:Integer}) = k_array_rank(Int, a)

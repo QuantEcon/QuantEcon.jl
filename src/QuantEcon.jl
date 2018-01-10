@@ -97,6 +97,7 @@ export
 
 # util
     meshgrid, gridmake, gridmake!, ckron, is_stable, num_compositions, simplex_grid, simplex_index,
+    next_k_array!, k_array_rank,
 
 # robustlq
     RBLQ,
