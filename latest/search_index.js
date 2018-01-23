@@ -65,6 +65,22 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api/QuantEcon.html#QuantEcon.CFEUtility",
+    "page": "QuantEcon",
+    "title": "QuantEcon.CFEUtility",
+    "category": "Type",
+    "text": "Type used to evaluate constant Frisch elasticity (CFE) utility. CFE utility takes the form\n\nv(l) = ξ l^(1 + 1/ϕ) / (1 + 1/ϕ)\n\nAdditionally, this code assumes that if l < 1e-10 then\n\nv(l) = ξ (1e-10^(1 + 1/ϕ) / (1 + 1/ϕ) - 1e-10^(1/ϕ) * (1e-10 - l))\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.CRRAUtility",
+    "page": "QuantEcon",
+    "title": "QuantEcon.CRRAUtility",
+    "category": "Type",
+    "text": "Type used to evaluate CRRA utility. CRRA utility takes the form\n\nu(c) = ξ c^(1 - γ) / (1 - γ)\n\nAdditionally, this code assumes that if c < 1e-10 then\n\nu(c) = ξ (1e-10^(1 - γ) / (1 - γ) + 1e-10^(-γ) * (c - 1e-10))\n\n\n\n"
+},
+
+{
     "location": "api/QuantEcon.html#QuantEcon.DiscreteDP",
     "page": "QuantEcon",
     "title": "QuantEcon.DiscreteDP",
@@ -73,7 +89,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.DiscreteDP-Tuple{AbstractArray{T,NR},AbstractArray{T,NQ},Tbeta,Array{Tind,1},Array{Tind,1}}",
+    "location": "api/QuantEcon.html#QuantEcon.DiscreteDP-Union{Tuple{AbstractArray{T,NR},AbstractArray{T,NQ},Tbeta,Array{Tind,1},Array{Tind,1}}, Tuple{NQ}, Tuple{NR}, Tuple{Tbeta}, Tuple{Tind}, Tuple{T}} where Tind where Tbeta where NR where NQ where T",
     "page": "QuantEcon",
     "title": "QuantEcon.DiscreteDP",
     "category": "Method",
@@ -81,7 +97,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.DiscreteDP-Tuple{Array{T,NR},Array{T,NQ},Tbeta}",
+    "location": "api/QuantEcon.html#QuantEcon.DiscreteDP-Union{Tuple{Array{T,NR},AbstractArray{T,NQ},Tbeta}, Tuple{NQ}, Tuple{NR}, Tuple{Tbeta}, Tuple{T}} where Tbeta where NR where NQ where T",
     "page": "QuantEcon",
     "title": "QuantEcon.DiscreteDP",
     "category": "Method",
@@ -97,11 +113,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.ECDF",
+    "location": "api/QuantEcon.html#QuantEcon.EllipticalUtility",
     "page": "QuantEcon",
-    "title": "QuantEcon.ECDF",
+    "title": "QuantEcon.EllipticalUtility",
     "category": "Type",
-    "text": "One-dimensional empirical distribution function given a vector of observations.\n\nFields\n\nobservations::Vector: The vector of observations\n\n\n\n"
+    "text": "Type used to evaluate elliptical utility function. Elliptical utility takes form\n\nv(l) = b (1 - l^μ)^(1 / μ)\n\n\n\n"
 },
 
 {
@@ -142,6 +158,14 @@ var documenterSearchIndex = {"docs": [
     "title": "QuantEcon.LinInterp",
     "category": "Type",
     "text": "Linear interpolation in one dimension\n\nFields\n\nbreaks::AbstractVector : A sorted array of grid points on which to interpolate\nvals::AbstractVector : The function values associated with each of the grid points\n\nExamples\n\nbreaks = cumsum(0.1 .* rand(20))\nvals = 0.1 .* sin.(breaks)\nli = LinInterp(breaks, vals)\n\n# do interpolation via `call` method on a LinInterp object\nli(0.2)\n\n# use broadcasting to evaluate at multiple points\nli.([0.1, 0.2, 0.3])\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.LogUtility",
+    "page": "QuantEcon",
+    "title": "QuantEcon.LogUtility",
+    "category": "Type",
+    "text": "Type used to evaluate log utility. Log utility takes the form\n\nu(c) = log(c)\n\nAdditionally, this code assumes that if c < 1e-10 then\n\nu(c) = log(1e-10) + 1e10*(c - 1e-10)\n\n\n\n"
 },
 
 {
@@ -201,7 +225,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.F_to_K-Tuple{QuantEcon.RBLQ,Array{T,2}}",
+    "location": "api/QuantEcon.html#QuantEcon.F_to_K-Tuple{QuantEcon.RBLQ,Array{T,2} where T}",
     "page": "QuantEcon",
     "title": "QuantEcon.F_to_K",
     "category": "Method",
@@ -209,7 +233,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.K_to_F-Tuple{QuantEcon.RBLQ,Array{T,2}}",
+    "location": "api/QuantEcon.html#QuantEcon.K_to_F-Tuple{QuantEcon.RBLQ,Array{T,2} where T}",
     "page": "QuantEcon",
     "title": "QuantEcon.K_to_F",
     "category": "Method",
@@ -225,11 +249,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.RQ_sigma-Tuple{QuantEcon.DiscreteDP{T,3,2,Tbeta,Tind},Array{T<:Integer,N}}",
+    "location": "api/QuantEcon.html#QuantEcon.RQ_sigma-Union{Tuple{QuantEcon.DiscreteDP{T,3,2,Tbeta,Tind,TQ} where TQ where Tind where Tbeta where T,AbstractArray{T,1}}, Tuple{T}} where T<:Integer",
     "page": "QuantEcon",
     "title": "QuantEcon.RQ_sigma",
     "category": "Method",
-    "text": "Given a policy sigma, return the reward vector R_sigma and the transition probability matrix Q_sigma.\n\nParameters\n\nddp::DiscreteDP : Object that contains the model parameters\nsigma::Vector{Int}: policy rule vector\n\nReturns\n\nR_sigma::Array{Float64}: Reward vector for sigma, of length n.\nQ_sigma::Array{Float64}: Transition probability matrix for sigma, of shape (n, n).\n\n\n\n"
+    "text": "Given a policy sigma, return the reward vector R_sigma and the transition probability matrix Q_sigma.\n\nParameters\n\nddp::DiscreteDP : Object that contains the model parameters\nsigma::AbstractVector{Int}: policy rule vector\n\nReturns\n\nR_sigma::Array{Float64}: Reward vector for sigma, of length n.\nQ_sigma::Array{Float64}: Transition probability matrix for sigma, of shape (n, n).\n\n\n\n"
 },
 
 {
@@ -249,7 +273,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.b_operator-Tuple{QuantEcon.RBLQ,Array{T,2}}",
+    "location": "api/QuantEcon.html#QuantEcon.b_operator-Tuple{QuantEcon.RBLQ,Array{T,2} where T}",
     "page": "QuantEcon",
     "title": "QuantEcon.b_operator",
     "category": "Method",
@@ -257,19 +281,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.bellman_operator!-Tuple{QuantEcon.DiscreteDP,Array{T,1},Array{T,1},Array{T,1}}",
+    "location": "api/QuantEcon.html#QuantEcon.bellman_operator!-Tuple{QuantEcon.DiscreteDP,AbstractArray{T,1} where T,AbstractArray{T,1} where T,AbstractArray{T,1} where T}",
     "page": "QuantEcon",
     "title": "QuantEcon.bellman_operator!",
     "category": "Method",
-    "text": "The Bellman operator, which computes and returns the updated value function Tv for a value function v.\n\nParameters\n\nddp::DiscreteDP : Object that contains the model parameters\nv::Vector{T<:AbstractFloat}: The current guess of the value function\nTv::Vector{T<:AbstractFloat}: A buffer array to hold the updated value function. Initial value not used and will be overwritten\nsigma::Vector: A buffer array to hold the policy function. Initial values not used and will be overwritten\n\nReturns\n\nTv::Vector : Updated value function vector\nsigma::Vector : Updated policiy function vector\n\n\n\n"
-},
-
-{
-    "location": "api/QuantEcon.html#QuantEcon.bellman_operator!-Tuple{QuantEcon.DiscreteDP,Array{T<:AbstractFloat,1},Array{T,1}}",
-    "page": "QuantEcon",
-    "title": "QuantEcon.bellman_operator!",
-    "category": "Method",
-    "text": "The Bellman operator, which computes and returns the updated value function Tv for a given value function v.\n\nThis function will fill the input v with Tv and the input sigma with the corresponding policy rule.\n\nParameters\n\nddp::DiscreteDP: The ddp model\nv::Vector{T<:AbstractFloat}: The current guess of the value function. This array will be overwritten\nsigma::Vector: A buffer array to hold the policy function. Initial values not used and will be overwritten\n\nReturns\n\nTv::Vector: Updated value function vector\nsigma::Vector{T<:Integer}: Policy rule\n\n\n\n"
+    "text": "The Bellman operator, which computes and returns the updated value function Tv for a value function v.\n\nParameters\n\nddp::DiscreteDP : Object that contains the model parameters\nv::AbstractVector{T<:AbstractFloat}: The current guess of the value function\nTv::AbstractVector{T<:AbstractFloat}: A buffer array to hold the updated value function. Initial value not used and will be overwritten\nsigma::AbstractVector: A buffer array to hold the policy function. Initial values not used and will be overwritten\n\nReturns\n\nTv::typeof(Tv) : Updated value function vector\nsigma::typeof(sigma) : Updated policiy function vector\n\n\n\n"
 },
 
 {
@@ -281,15 +297,23 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.bellman_operator-Tuple{QuantEcon.DiscreteDP,Array{T,1}}",
+    "location": "api/QuantEcon.html#QuantEcon.bellman_operator!-Union{Tuple{QuantEcon.DiscreteDP,AbstractArray{T,1},AbstractArray{T,1} where T}, Tuple{T}} where T<:AbstractFloat",
     "page": "QuantEcon",
-    "title": "QuantEcon.bellman_operator",
+    "title": "QuantEcon.bellman_operator!",
     "category": "Method",
-    "text": "The Bellman operator, which computes and returns the updated value function Tv for a given value function v.\n\nParameters\n\nddp::DiscreteDP: The ddp model\nv::Vector: The current guess of the value function\n\nReturns\n\nTv::Vector : Updated value function vector\n\n\n\n"
+    "text": "The Bellman operator, which computes and returns the updated value function Tv for a given value function v.\n\nThis function will fill the input v with Tv and the input sigma with the corresponding policy rule.\n\nParameters\n\nddp::DiscreteDP: The ddp model\nv::AbstractVector{T<:AbstractFloat}: The current guess of the value function. This array will be overwritten\nsigma::AbstractVector: A buffer array to hold the policy function. Initial values not used and will be overwritten\n\nReturns\n\nTv::Vector: Updated value function vector\nsigma::typeof(sigma): Policy rule\n\n\n\n"
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.bisect-Tuple{Function,T<:AbstractFloat,T<:AbstractFloat}",
+    "location": "api/QuantEcon.html#QuantEcon.bellman_operator-Tuple{QuantEcon.DiscreteDP,AbstractArray{T,1} where T}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.bellman_operator",
+    "category": "Method",
+    "text": "The Bellman operator, which computes and returns the updated value function Tv for a given value function v.\n\nParameters\n\nddp::DiscreteDP: The ddp model\nv::AbstractVector: The current guess of the value function\n\nReturns\n\nTv::Vector : Updated value function vector\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.bisect-Union{Tuple{Function,T,T}, Tuple{T}} where T<:AbstractFloat",
     "page": "QuantEcon",
     "title": "QuantEcon.bisect",
     "category": "Method",
@@ -297,7 +321,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.brent-Tuple{Function,T<:AbstractFloat,T<:AbstractFloat}",
+    "location": "api/QuantEcon.html#QuantEcon.brent-Union{Tuple{Function,T,T}, Tuple{T}} where T<:AbstractFloat",
     "page": "QuantEcon",
     "title": "QuantEcon.brent",
     "category": "Method",
@@ -305,7 +329,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.brenth-Tuple{Function,T<:AbstractFloat,T<:AbstractFloat}",
+    "location": "api/QuantEcon.html#QuantEcon.brenth-Union{Tuple{Function,T,T}, Tuple{T}} where T<:AbstractFloat",
     "page": "QuantEcon",
     "title": "QuantEcon.brenth",
     "category": "Method",
@@ -337,7 +361,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.compute_fixed_point-Tuple{Function,TV}",
+    "location": "api/QuantEcon.html#QuantEcon.compute_fixed_point-Union{Tuple{Function,TV}, Tuple{TV}} where TV",
     "page": "QuantEcon",
     "title": "QuantEcon.compute_fixed_point",
     "category": "Method",
@@ -353,11 +377,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.compute_greedy-Tuple{QuantEcon.DiscreteDP,Array{TV<:Real,1}}",
+    "location": "api/QuantEcon.html#QuantEcon.compute_greedy-Union{Tuple{QuantEcon.DiscreteDP,AbstractArray{TV,1}}, Tuple{TV}} where TV<:Real",
     "page": "QuantEcon",
     "title": "QuantEcon.compute_greedy",
     "category": "Method",
-    "text": "Compute the v-greedy policy.\n\nArguments\n\nv::Vector Value function vector of length n\nddp::DiscreteDP Object that contains the model parameters\n\nReturns\n\nsigma:: v-greedy policy vector, of lengthn`\n\n\n\n"
+    "text": "Compute the v-greedy policy.\n\nArguments\n\nv::AbstractVector Value function vector of length n\nddp::DiscreteDP Object that contains the model parameters\n\nReturns\n\nsigma:: v-greedy policy vector, of lengthn`\n\n\n\n"
 },
 
 {
@@ -369,7 +393,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.d_operator-Tuple{QuantEcon.RBLQ,Array{T,2}}",
+    "location": "api/QuantEcon.html#QuantEcon.d_operator-Tuple{QuantEcon.RBLQ,Array{T,2} where T}",
     "page": "QuantEcon",
     "title": "QuantEcon.d_operator",
     "category": "Method",
@@ -381,19 +405,19 @@ var documenterSearchIndex = {"docs": [
     "page": "QuantEcon",
     "title": "QuantEcon.discrete_var",
     "category": "Function",
-    "text": "Compute a finite-state Markov chain approximation to a VAR(1) process of the form\n\n    y_t+1 = b + By_t + Psi^frac12epsilon_t+1\n\nwhere epsilon_t+1 is an vector of independent standard normal innovations of length M\n\nP, X = discrete_var(b, B, Psi, Nm, n_moments, method, n_sigmas)\n\nArguments\n\nb::Union{Real, AbstractVector} : constant vector of length M.                                    M=1 corresponds scalar case\nB::Union{Real, AbstractMatrix} : M x M matrix of impact coefficients\nPsi::Union{Real, AbstractMatrix} : M x M variance-covariance matrix of                                      the innovations\ndiscrete_var only accepts non-singular variance-covariance matrices, Psi.\nNm::Integer > 3 : Desired number of discrete points in each dimension\n\nOptional\n\nn_moments::Integer : Desired number of moments to match. The default is 2.\nmethod::VAREstimationMethod : Specify the method used to determine the grid                                 points. Accepted inputs are Even().                                 Please see the paper for more details.                                 NOTE: Quantile() and Quadrature() are                                       not supported now.\nn_sigmas::Real : If the Even() option is specified, n_sigmas is used to                    determine the number of unconditional standard deviations                    used to set the endpoints of the grid. The default is                    sqrt(Nm-1).\n\nReturns\n\nP : Nm^M x Nm^M probability transition matrix. Each row       corresponds to a discrete conditional probability       distribution over the state M-tuples in X\nX : M x Nm^M matrix of states. Each column corresponds to an       M-tuple of values which correspond to the state associated       with each row of P\n\nNOTES\n\ndiscrete_var only constructs tensor product grids where each dimension contains the same number of points. For this reason it is recommended that this code not be used for problems of more than about 4 or 5 dimensions due to curse of dimensionality issues.\nFuture updates will allow for singular variance-covariance matrices and sparse grid specifications.\n\nReference\n\nFarmer, L. E., & Toda, A. A. (2017). \"Discretizing nonlinear, non‐Gaussian Markov processes with exact conditional moments,\" Quantitative Economics, 8(2), 651-683.\n\n\n\n"
+    "text": "Compute a finite-state Markov chain approximation to a VAR(1) process of the form\n\n    y_t+1 = b + By_t + Psi^frac12epsilon_t+1\n\nwhere epsilon_t+1 is an vector of independent standard normal innovations of length M\n\nP, X = discrete_var(b, B, Psi, Nm, n_moments, method, n_sigmas)\n\nArguments\n\nb::Union{Real, AbstractVector} : constant vector of length M.                                    M=1 corresponds scalar case\nB::Union{Real, AbstractMatrix} : M x M matrix of impact coefficients\nPsi::Union{Real, AbstractMatrix} : M x M variance-covariance matrix of                                      the innovations\ndiscrete_var only accepts non-singular variance-covariance matrices, Psi.\nNm::Integer > 3 : Desired number of discrete points in each dimension\n\nOptional\n\nn_moments::Integer : Desired number of moments to match. The default is 2.\nmethod::VAREstimationMethod : Specify the method used to determine the grid                                 points. Accepted inputs are Even(), Quantile(),                                 or Quadrature(). Please see the paper for more details.\nn_sigmas::Real : If the Even() option is specified, n_sigmas is used to                    determine the number of unconditional standard deviations                    used to set the endpoints of the grid. The default is                    sqrt(Nm-1).\n\nReturns\n\nP : Nm^M x Nm^M probability transition matrix. Each row       corresponds to a discrete conditional probability       distribution over the state M-tuples in X\nX : M x Nm^M matrix of states. Each column corresponds to an       M-tuple of values which correspond to the state associated       with each row of P\n\nNOTES\n\ndiscrete_var only constructs tensor product grids where each dimension contains the same number of points. For this reason it is recommended that this code not be used for problems of more than about 4 or 5 dimensions due to curse of dimensionality issues.\nFuture updates will allow for singular variance-covariance matrices and sparse grid specifications.\n\nReference\n\nFarmer, L. E., & Toda, A. A. (2017). \"Discretizing nonlinear, non‐Gaussian Markov processes with exact conditional moments,\" Quantitative Economics, 8(2), 651-683.\n\n\n\n"
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.divide_bracket",
+    "location": "api/QuantEcon.html#QuantEcon.divide_bracket-Union{Tuple{Function,T,T,Int64}, Tuple{Function,T,T}, Tuple{T}} where T<:Number",
     "page": "QuantEcon",
     "title": "QuantEcon.divide_bracket",
-    "category": "Function",
+    "category": "Method",
     "text": "Given a function f defined on the interval [x1, x2], subdivide the interval into n equally spaced segments, and search for zero crossings of the function. nroot will be set to the number of bracketing pairs found. If it is positive, the arrays xb1[1..nroot] and xb2[1..nroot] will be filled sequentially with any bracketing pairs that are found.\n\nArguments\n\nf::Function: The function you want to bracket\nx1::T: Lower border for search interval\nx2::T: Upper border for search interval\nn::Int(50): The number of sub-intervals to divide [x1, x2] into\n\nReturns\n\nx1b::Vector{T}: Vector of lower borders of bracketing intervals\nx2b::Vector{T}: Vector of upper borders of bracketing intervals\n\nReferences\n\nThis is zbrack from Numerical Recepies Recepies in C++\n\n\n\n"
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.do_quad-Tuple{Function,Array,Array{T,1},Vararg{Any,N}}",
+    "location": "api/QuantEcon.html#QuantEcon.do_quad-Tuple{Function,Array,Array{T,1} where T,Vararg{Any,N} where N}",
     "page": "QuantEcon",
     "title": "QuantEcon.do_quad",
     "category": "Method",
@@ -401,7 +425,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.estimate_mc_discrete-Tuple{Array{T,1},Array{T,1}}",
+    "location": "api/QuantEcon.html#QuantEcon.estimate_mc_discrete-Union{Tuple{Array{T,1},Array{T,1}}, Tuple{T}} where T",
     "page": "QuantEcon",
     "title": "QuantEcon.estimate_mc_discrete",
     "category": "Method",
@@ -409,19 +433,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.evaluate_F-Tuple{QuantEcon.RBLQ,Array{T,2}}",
+    "location": "api/QuantEcon.html#QuantEcon.evaluate_F-Tuple{QuantEcon.RBLQ,Array{T,2} where T}",
     "page": "QuantEcon",
     "title": "QuantEcon.evaluate_F",
     "category": "Method",
     "text": "Given a fixed policy F, with the interpretation u = -F x, this function computes the matrix P_F and constant d_F associated with discounted cost J_F(x) = x P_F x + d_F.\n\nArguments\n\nrlq::RBLQ: Instance of RBLQ type\nF::Matrix{Float64} :  The policy function, a k x n array\n\nReturns\n\nP_F::Matrix{Float64} : Matrix for discounted cost\nd_F::Float64 : Constant for discounted cost\nK_F::Matrix{Float64} : Worst case policy\nO_F::Matrix{Float64} : Matrix for discounted entropy\no_F::Float64 : Constant for discounted entropy\n\n\n\n"
-},
-
-{
-    "location": "api/QuantEcon.html#QuantEcon.evaluate_policy-Tuple{QuantEcon.DiscreteDP,Array{T<:Integer,1}}",
-    "page": "QuantEcon",
-    "title": "QuantEcon.evaluate_policy",
-    "category": "Method",
-    "text": "Compute the value of a policy.\n\nParameters\n\nddp::DiscreteDP : Object that contains the model parameters\nsigma::Vector{T<:Integer} : Policy rule vector\n\nReturns\n\nv_sigma::Array{Float64} : Value vector of sigma, of length n.\n\n\n\n"
 },
 
 {
@@ -433,7 +449,15 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.expand_bracket-Tuple{Function,T<:Number,T<:Number}",
+    "location": "api/QuantEcon.html#QuantEcon.evaluate_policy-Union{Tuple{QuantEcon.DiscreteDP,AbstractArray{T,1}}, Tuple{T}} where T<:Integer",
+    "page": "QuantEcon",
+    "title": "QuantEcon.evaluate_policy",
+    "category": "Method",
+    "text": "Compute the value of a policy.\n\nParameters\n\nddp::DiscreteDP : Object that contains the model parameters\nsigma::AbstractVector{T<:Integer} : Policy rule vector\n\nReturns\n\nv_sigma::Array{Float64} : Value vector of sigma, of length n.\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.expand_bracket-Union{Tuple{Function,T,T}, Tuple{T}} where T<:Number",
     "page": "QuantEcon",
     "title": "QuantEcon.expand_bracket",
     "category": "Method",
@@ -449,6 +473,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api/QuantEcon.html#QuantEcon.golden_method-Tuple{Function,Real,Real}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.golden_method",
+    "category": "Method",
+    "text": "Applies Golden-section search to search for the _maximum_ of a function in the interval (a, b)\n\nhttps://en.wikipedia.org/wiki/Golden-section_search\n\n\n\n"
+},
+
+{
     "location": "api/QuantEcon.html#QuantEcon.gridmake",
     "page": "QuantEcon",
     "title": "QuantEcon.gridmake",
@@ -457,7 +489,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.gridmake!-Tuple{Any,Vararg{Union{AbstractArray{T,1},AbstractArray{T,2}},N}}",
+    "location": "api/QuantEcon.html#QuantEcon.gridmake!-Tuple{Any,Vararg{Union{AbstractArray{T,1} where T, AbstractArray{T,2} where T},N} where N}",
     "page": "QuantEcon",
     "title": "QuantEcon.gridmake!",
     "category": "Method",
@@ -465,7 +497,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.gth_solve-Tuple{Array{T<:Real,2}}",
+    "location": "api/QuantEcon.html#QuantEcon.gth_solve-Union{Tuple{Array{T,2}}, Tuple{T}} where T<:Real",
     "page": "QuantEcon",
     "title": "QuantEcon.gth_solve",
     "category": "Method",
@@ -481,7 +513,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.interp-Tuple{AbstractArray{T,1},AbstractArray{T,1}}",
+    "location": "api/QuantEcon.html#QuantEcon.interp-Tuple{AbstractArray{T,1} where T,AbstractArray{T,1} where T}",
     "page": "QuantEcon",
     "title": "QuantEcon.interp",
     "category": "Method",
@@ -505,7 +537,31 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.lae_est-Tuple{QuantEcon.LAE,AbstractArray{T,N}}",
+    "location": "api/QuantEcon.html#QuantEcon.is_stable-Tuple{AbstractArray{T,2} where T}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.is_stable",
+    "category": "Method",
+    "text": "General function for testing for stability of matrix A. Just checks that eigenvalues are less than 1 in absolute value.\n\nArguments\n\nA::Matrix The matrix we want to check\n\nReturns\n\nstable::Bool Whether or not the matrix is stable\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.is_stable-Tuple{QuantEcon.LSS}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.is_stable",
+    "category": "Method",
+    "text": "Test for stability of linear state space system. First removes the constant row and column.\n\nArguments\n\nlss::LSS The linear state space system\n\nReturns\n\nstable::Bool Whether or not the system is stable\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.k_array_rank-Tuple{Type{#s2} where #s2<:Integer,Array{#s1,1} where #s1<:Integer}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.k_array_rank",
+    "category": "Method",
+    "text": "k_array_rank([T=Int], a)\n\nGiven an array a of k distinct positive integers, sorted in ascending order, return its ranking in the lexicographic ordering of the descending sequences of the elements, following Combinatorial number system.\n\nNotes\n\nInexactError exception will be thrown, or an incorrect value will be returned without warning if overflow occurs during the computation. It is the user's responsibility to ensure that the rank of the input array fits within the range of T; a sufficient condition for it is  binomial(BigInt(a[end]), BigInt(length(a))) <= typemax(T).\n\nArguments\n\nT::Type{<:Integer}: The numeric type of ranking to be returned.\na::Vector{<:Integer}: Array of length k.\n\nReturns\n\nidx::T: Ranking of a.\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.lae_est-Union{Tuple{QuantEcon.LAE,AbstractArray{T,N} where N}, Tuple{T}} where T",
     "page": "QuantEcon",
     "title": "QuantEcon.lae_est",
     "category": "Method",
@@ -513,7 +569,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.m_quadratic_sum-Tuple{Array{T,2},Array{T,2}}",
+    "location": "api/QuantEcon.html#QuantEcon.m_quadratic_sum-Tuple{Array{T,2} where T,Array{T,2} where T}",
     "page": "QuantEcon",
     "title": "QuantEcon.m_quadratic_sum",
     "category": "Method",
@@ -537,11 +593,27 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.nnash-Tuple{Any,Any,Any,Any,Any,Any,Any,Any,Any,Any,Any,Any,Any}",
+    "location": "api/QuantEcon.html#QuantEcon.next_k_array!-Tuple{Array{#s4,1} where #s4<:Integer}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.next_k_array!",
+    "category": "Method",
+    "text": "next_k_array!(a)\n\nGiven an array a of k distinct positive integers, sorted in ascending order, return the next k-array in the lexicographic ordering of the descending sequences of the elements, following Combinatorial number system. a is modified in place.\n\nArguments\n\na::Vector{<:Integer}: Array of length k.\n\nReturns\n\na::Vector{<:Integer}: View of a.\n\nExamples\n\njulia> n, k = 4, 2;\n\njulia> a = collect(1:2);\n\njulia> while a[end] <= n\n           @show a\n           next_k_array!(a)\n       end\na = [1, 2]\na = [1, 3]\na = [2, 3]\na = [1, 4]\na = [2, 4]\na = [3, 4]\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.nnash-NTuple{13,Any}",
     "page": "QuantEcon",
     "title": "QuantEcon.nnash",
     "category": "Method",
     "text": "Compute the limit of a Nash linear quadratic dynamic game.\n\nPlayer i minimizes\n\n    sum_t=1^infty(x_t r_i x_t + 2 x_t w_i\n    u_it +u_it q_i u_it + u_jt s_i u_jt + 2 u_jt\n    m_i u_it)\n\nsubject to the law of motion\n\n    x_t+1 = A x_t + b_1 u_1t + b_2 u_2t\n\nand a perceived control law u_j(t) = - f_j x_t for the other player.\n\nThe solution computed in this routine is the f_i and p_i of the associated double optimal linear regulator problem.\n\nArguments\n\nA : Corresponds to the above equation, should be of size (n, n)\nB1 : As above, size (n, k_1)\nB2 : As above, size (n, k_2)\nR1 : As above, size (n, n)\nR2 : As above, size (n, n)\nQ1 : As above, size (k_1, k_1)\nQ2 : As above, size (k_2, k_2)\nS1 : As above, size (k_1, k_1)\nS2 : As above, size (k_2, k_2)\nW1 : As above, size (n, k_1)\nW2 : As above, size (n, k_2)\nM1 : As above, size (k_2, k_1)\nM2 : As above, size (k_1, k_2)\n;beta::Float64(1.0) Discount rate\n;tol::Float64(1e-8) : Tolerance level for convergence\n;max_iter::Int(1000) : Maximum number of iterations allowed\n\nReturns\n\nF1::Matrix{Float64}: (k_1, n) matrix representing feedback law for agent 1\nF2::Matrix{Float64}: (k_2, n) matrix representing feedback law for agent 2\nP1::Matrix{Float64}: (n, n) matrix representing the steady-state solution to the associated discrete matrix ticcati equation for agent 1\nP2::Matrix{Float64}: (n, n) matrix representing the steady-state solution to the associated discrete matrix riccati equation for agent 2\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.num_compositions-Tuple{Any,Any}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.num_compositions",
+    "category": "Method",
+    "text": "The total number of m-part compositions of n, which is equal to\n\n(n + m - 1) choose (m - 1)\n\nArguments\n\nm::Int : Number of parts of composition\nn::Int : Integer to decompose\n\nReturns\n\n::Int - Total number of m-part compositions of n\n\n\n\n"
 },
 
 {
@@ -689,6 +761,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api/QuantEcon.html#QuantEcon.remove_constants-Tuple{QuantEcon.LSS}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.remove_constants",
+    "category": "Method",
+    "text": "Finds the row and column, if any,  that correspond to the constant  term in a LSS system and removes them to get the matrix that needs  to be checked for stability.\n\nArguments\n\nlss::LSS The linear state space system\n\nReturns\n\nA::Matrix The matrix A with constant row and column removed\n\n\n\n"
+},
+
+{
     "location": "api/QuantEcon.html#QuantEcon.replicate",
     "page": "QuantEcon",
     "title": "QuantEcon.replicate",
@@ -697,7 +777,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.ridder-Tuple{Function,T<:AbstractFloat,T<:AbstractFloat}",
+    "location": "api/QuantEcon.html#QuantEcon.ridder-Union{Tuple{Function,T,T}, Tuple{T}} where T<:AbstractFloat",
     "page": "QuantEcon",
     "title": "QuantEcon.ridder",
     "category": "Method",
@@ -729,7 +809,23 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.simulate!-Tuple{Union{AbstractArray{T,1},AbstractArray{T,2}},QuantEcon.MarkovChain}",
+    "location": "api/QuantEcon.html#QuantEcon.simplex_grid-Tuple{Any,Any}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.simplex_grid",
+    "category": "Method",
+    "text": "Construct an array consisting of the integer points in the (m-1)-dimensional simplex :math:{x mid x_0 + cdots + x_{m-1} = n }, or equivalently, the m-part compositions of n, which are listed in lexicographic order. The total number of the points (hence the length of the output array) is L = (n+m-1)!/(n!*(m-1)!) (i.e., (n+m-1) choose (m-1)).\n\nArguments\n\nm::Int : Dimension of each point. Must be a positive integer.\nn::Int : Number which the coordinates of each point sum to. Must            be a nonnegative integer.\n\nReturns\n\nout::Matrix{Int} : Array of shape (m, L) containing the integer                      points in the simplex, aligned in lexicographic                      order.\n\nNotes\n\nA grid of the (m-1)-dimensional unit simplex with n subdivisions along each dimension can be obtained by simplex_grid(m, n) / n.\n\nExamples\n\nsimplex_grid(3, 4)\n\n3×15 Array{Int64,2}:  0  0  0  0  0  1  1  1  1  2  2  2  3  3  4  0  1  2  3  4  0  1  2  3  0  1  2  0  1  0  4  3  2  1  0  3  2  1  0  2  1  0  1  0  0\n\nReferences\n\nA. Nijenhuis and H. S. Wilf, Combinatorial Algorithms, Chapter 5,    Academic Press, 1978.\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.simplex_index-Tuple{Any,Any,Any}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.simplex_index",
+    "category": "Method",
+    "text": "Return the index of the point x in the lexicographic order of the integer points of the (m-1)-dimensional simplex :math:`{x mid x_0\n\ncdots + x_{m-1} = n}`.\n\nArguments\n\nx::Array{Int,1} : Integer point in the simplex, i.e., an array of                     m nonnegative integers that sum to n.\nm::Int : Dimension of each point. Must be a positive integer.\nn::Int : Number which the coordinates of each point sum to. Must be a            nonnegative integer.\n\nReturns\n\nidx::Int : Index of x.\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.simulate!-Tuple{Union{AbstractArray{T,1} where T, AbstractArray{T,2} where T},QuantEcon.MarkovChain}",
     "page": "QuantEcon",
     "title": "QuantEcon.simulate!",
     "category": "Method",
@@ -745,7 +841,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.simulate_indices!-Tuple{Union{AbstractArray{T<:Integer,1},AbstractArray{T<:Integer,2}},QuantEcon.MarkovChain}",
+    "location": "api/QuantEcon.html#QuantEcon.simulate_indices!-Union{Tuple{T}, Tuple{Union{AbstractArray{T,1}, AbstractArray{T,2}},QuantEcon.MarkovChain}} where T<:Integer",
     "page": "QuantEcon",
     "title": "QuantEcon.simulate_indices!",
     "category": "Method",
@@ -785,11 +881,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.solve",
+    "location": "api/QuantEcon.html#QuantEcon.solve-Union{Tuple{Algo}, Tuple{QuantEcon.DiscreteDP{T,NQ,NR,Tbeta,Tind,TQ} where TQ<:AbstractArray{T,NQ} where Tind where Tbeta<:Real where NR where NQ,Type{Algo}}, Tuple{QuantEcon.DiscreteDP{T,NQ,NR,Tbeta,Tind,TQ} where TQ<:AbstractArray{T,NQ} where Tind where Tbeta<:Real where NR where NQ}, Tuple{T}} where T where Algo<:QuantEcon.DDPAlgorithm",
     "page": "QuantEcon",
     "title": "QuantEcon.solve",
-    "category": "Function",
-    "text": "Solve the dynamic programming problem.\n\nParameters\n\nddp::DiscreteDP : Object that contains the Model Parameters\nmethod::Type{T<Algo}(VFI): Type name specifying solution method. Acceptable arguments are VFI for value function iteration or PFI for policy function iteration or MPFI for modified policy function iteration\n;max_iter::Int(250) : Maximum number of iterations\n;epsilon::Float64(1e-3) : Value for epsilon-optimality. Only used if method is VFI\n;k::Int(20) : Number of iterations for partial policy evaluation in modified policy iteration (irrelevant for other methods).\n\nReturns\n\nddpr::DPSolveResult{Algo} : Optimization result represented as a DPSolveResult. See DPSolveResult for details.\n\n\n\n"
+    "category": "Method",
+    "text": "Solve the dynamic programming problem.\n\nParameters\n\nddp::DiscreteDP : Object that contains the Model Parameters\nmethod::Type{T<Algo}(VFI): Type name specifying solution method. Acceptable arguments are VFI for value function iteration or PFI for policy function iteration or MPFI for modified policy function iteration\n;max_iter::Int(250) : Maximum number of iterations\n;epsilon::Float64(1e-3) : Value for epsilon-optimality. Only used if method is VFI\n;k::Int(20) : Number of iterations for partial policy evaluation in  modified policy iteration (irrelevant for other methods).\n\nReturns\n\nddpr::DPSolveResult{Algo} : Optimization result represented as a DPSolveResult. See DPSolveResult for details.\n\n\n\n"
 },
 
 {
@@ -873,11 +969,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.var_quadratic_sum-Tuple{Union{Array{T,N},T},Union{Array{T,N},T},Union{Array{T,N},T},Real,Union{Array{T,N},T}}",
+    "location": "api/QuantEcon.html#QuantEcon.var_quadratic_sum-Tuple{Union{Array{T,N} where N, T} where T,Union{Array{T,N} where N, T} where T,Union{Array{T,N} where N, T} where T,Real,Union{Array{T,N} where N, T} where T}",
     "page": "QuantEcon",
     "title": "QuantEcon.var_quadratic_sum",
     "category": "Method",
     "text": "Computes the expected discounted quadratic sum\n\n    q(x_0) = mathbbE sum_t=0^infty beta^t x_t H x_t\n\nHere x_t is the VAR process x_t+1 = A x_t + C w_t with w_t standard normal and x_0 the initial condition.\n\nArguments\n\nA::Union{Float64, Matrix{Float64}} The n x n matrix described above (scalar) if n = 1\nC::Union{Float64, Matrix{Float64}} The n x n matrix described above (scalar) if n = 1\nH::Union{Float64, Matrix{Float64}} The n x n matrix described above (scalar) if n = 1\nbeta::Float64: Discount factor in (0, 1)\nx_0::Union{Float64, Vector{Float64}} The initial condtion. A conformable array (of length n) or a scalar if n = 1\n\nReturns\n\nq0::Float64 : Represents the value q(x_0)\n\nNotes\n\nThe formula for computing q(x_0) is q(x_0) = x_0 Q x_0 + v where\n\nQ is the solution to Q = H + beta A Q A and\nv = fractrace(C Q C) beta1 - beta\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.@def_sim-Tuple{Any,Any,Any}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.@def_sim",
+    "category": "Macro",
+    "text": "@def_sim sim_name default_type_params begin\n    obs_typedef\nend\n\nGiven a type definition for a single observation in a simulation (obs_typedef), evaluate that type definition as is, but also creates a second type named sim_name as well as various methods on the new type.\n\nThe fields of sim_name will have the same name as the fields of obs_typedef, but will be arrays of whatever the type of the corresponding obs_typedef field was. The intention is for sim_name to be a struct of arrays (see https://en.wikipedia.org/wiki/AOS_and_SOA). If you want an array of structs, just simply collect an array of instances of the type defined in obs_typedef. The struct of arrays storage format has better cache efficiency and data locality if you want to operate on all values of a particular field at once, rather than all the fields of a particular value.\n\nIn addition to the new type sim_name, the following methods will be defined:\n\nsim_name(sz::NTuple{N,Int}). This is a constructor for sim_name that allocates arrays of size sz for each field. If obs_typedef inlcuded any type parameters, then the default values (specified in default_type_params) will be used.\nBase.endof(::sim_name): equal to the length of any of its fields\nBase.length(::sim_name): equal to the length of any of its fields\nThe iterator protocol for sim_name. The type of each element of the iterator is the type defined in obs_typedef. This amounts tho defining the following methods\nBase.start(::sim_name)::Int\nBase.next(::sim_name, ::Int)::Tuple{Observation,Int}\nBase.done(::sim_name, ::Int)::Bool\nBase.getindex(sim::sim_name, ix::Int). This implements _linear indexing_ for sim_name and will return an instance of the type defined in obs_typedef\n\nExample\n\nNOTE: the using MacroTools  and call to MacroTools.prettify is not necessary and is only used here to clean up the output so it is easier to read\n\njulia> using MacroTools\n\njulia> macroexpand(:(@def_sim Simulation (T => Float64,) struct Observation{T<:Number}\n           c::T\n           k::T\n           i_z::Int\n       end\n       )) |> MacroTools.prettify\nquote\n    struct Simulation{prairiedog, T <: Number}\n        c::Array{T, prairiedog}\n        k::Array{T, prairiedog}\n        i_z::Array{Int, prairiedog}\n    end\n    function Simulation{prairiedog}(sz::NTuple{prairiedog, Int})\n        c = Array{Float64, prairiedog}(sz)\n        k = Array{Float64, prairiedog}(sz)\n        i_z = Array{Int, prairiedog}(sz)\n        Simulation(c, k, i_z)\n    end\n    struct Observation{T <: Number}\n        c::T\n        k::T\n        i_z::Int\n    end\n    Base.endof(sim::Simulation) = length(sim.c)\n    Base.length(sim::Simulation) = endof(sim)\n    Base.start(sim::Simulation) = 1\n    Base.next(sim::Simulation, ix::Int) = (sim[ix], ix + 1)\n    Base.done(sim::Simulation, ix::Int) = ix >= length(sim)\n    function Base.getindex(sim::Simulation, ix::Int)\n        $(Expr(:boundscheck, true))\n        if ix > length(sim)\n            throw(BoundsError(\"$(length(sim))-element Simulation at index $(ix)\"))\n        end\n        $(Expr(:boundscheck, :pop))\n        $(Expr(:inbounds, true))\n        out = Observation(sim.c[ix], sim.k[ix], sim.i_z[ix])\n        $(Expr(:inbounds, :pop))\n        return out\n    end\nend\n\n\n\n"
 },
 
 {
@@ -886,14 +990,6 @@ var documenterSearchIndex = {"docs": [
     "title": "Exported",
     "category": "section",
     "text": "Modules = [QuantEcon]\nPrivate = false"
-},
-
-{
-    "location": "api/QuantEcon.html#Base.e-Tuple{Real}",
-    "page": "QuantEcon",
-    "title": "Base.e",
-    "category": "Method",
-    "text": "Evaluate the empirical cdf at one or more points\n\nArguments\n\nx::Union{Real, Array}: The point(s) at which to evaluate the ECDF\n\n\n\n"
 },
 
 {
@@ -913,7 +1009,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#Base.:*-Tuple{Array{T,3},Array{T,1}}",
+    "location": "api/QuantEcon.html#Base.:*-Union{Tuple{Array{T,3},AbstractArray{T,1} where T}, Tuple{T}} where T",
     "page": "QuantEcon",
     "title": "Base.:*",
     "category": "Method",
@@ -937,7 +1033,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon._compute_sequence-Tuple{QuantEcon.LQ,Array{T,1},Any}",
+    "location": "api/QuantEcon.html#QuantEcon._compute_sequence-Union{Tuple{QuantEcon.LQ,Array{T,1},Any}, Tuple{T}} where T",
     "page": "QuantEcon",
     "title": "QuantEcon._compute_sequence",
     "category": "Method",
@@ -945,7 +1041,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon._compute_sequence-Tuple{QuantEcon.LQ,T,Any}",
+    "location": "api/QuantEcon.html#QuantEcon._compute_sequence-Union{Tuple{QuantEcon.LQ,T,Any}, Tuple{T}} where T",
     "page": "QuantEcon",
     "title": "QuantEcon._compute_sequence",
     "category": "Method",
@@ -953,15 +1049,15 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon._generate_a_indptr!-Tuple{Int64,Array{T,1},Array{T,1}}",
+    "location": "api/QuantEcon.html#QuantEcon._generate_a_indptr!-Tuple{Int64,AbstractArray{T,1} where T,AbstractArray{T,1} where T}",
     "page": "QuantEcon",
     "title": "QuantEcon._generate_a_indptr!",
     "category": "Method",
-    "text": "Generate a_indptr; stored in out. s_indices is assumed to be in sorted order.\n\nParameters\n\nnum_states::Integer\ns_indices::Vector{T}\nout::Vector{T} :  with length = num_states + 1\n\n\n\n"
+    "text": "Generate a_indptr; stored in out. s_indices is assumed to be in sorted order.\n\nParameters\n\nnum_states::Integer\ns_indices::AbstractVector{T}\nout::AbstractVector{T} :  with length = num_states + 1\n\n\n\n"
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon._has_sorted_sa_indices-Tuple{Array{T,1},Array{T,1}}",
+    "location": "api/QuantEcon.html#QuantEcon._has_sorted_sa_indices-Tuple{AbstractArray{T,1} where T,AbstractArray{T,1} where T}",
     "page": "QuantEcon",
     "title": "QuantEcon._has_sorted_sa_indices",
     "category": "Method",
@@ -977,7 +1073,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon._solve!-Tuple{QuantEcon.DiscreteDP,QuantEcon.DPSolveResult{QuantEcon.MPFI,Tval<:Real},Integer,Real,Integer}",
+    "location": "api/QuantEcon.html#QuantEcon._solve!-Tuple{QuantEcon.DiscreteDP,QuantEcon.DPSolveResult{QuantEcon.MPFI,Tval} where Tval<:Real,Integer,Real,Integer}",
     "page": "QuantEcon",
     "title": "QuantEcon._solve!",
     "category": "Method",
@@ -985,7 +1081,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon._solve!-Tuple{QuantEcon.DiscreteDP,QuantEcon.DPSolveResult{QuantEcon.PFI,Tval<:Real},Integer,Real,Integer}",
+    "location": "api/QuantEcon.html#QuantEcon._solve!-Tuple{QuantEcon.DiscreteDP,QuantEcon.DPSolveResult{QuantEcon.PFI,Tval} where Tval<:Real,Integer,Real,Integer}",
     "page": "QuantEcon",
     "title": "QuantEcon._solve!",
     "category": "Method",
@@ -993,7 +1089,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon._solve!-Tuple{QuantEcon.DiscreteDP,QuantEcon.DPSolveResult{QuantEcon.VFI,Tval<:Real},Integer,Real,Integer}",
+    "location": "api/QuantEcon.html#QuantEcon._solve!-Tuple{QuantEcon.DiscreteDP,QuantEcon.DPSolveResult{QuantEcon.VFI,Tval} where Tval<:Real,Integer,Real,Integer}",
     "page": "QuantEcon",
     "title": "QuantEcon._solve!",
     "category": "Method",
@@ -1001,7 +1097,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.allcomb3-Tuple{Array{T,2}}",
+    "location": "api/QuantEcon.html#QuantEcon.allcomb3-Tuple{Array{T,2} where T}",
     "page": "QuantEcon",
     "title": "QuantEcon.allcomb3",
     "category": "Method",
@@ -1009,19 +1105,51 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.construct_1D_grid-Tuple{Union{Array{T,N},T},Integer,Integer,Real,QuantEcon.Even}",
+    "location": "api/QuantEcon.html#QuantEcon.construct_1D_grid-Tuple{AbstractArray{T,2} where T,Integer,Integer,Real,QuantEcon.Quantile}",
     "page": "QuantEcon",
     "title": "QuantEcon.construct_1D_grid",
     "category": "Method",
-    "text": "construct one-dimensional grid of states\n\nArgument\n\nSigma::ScalarOrArray : variance-covariance matrix of the standardized process\nNm::Integer : number of grid points\nM::Integer : number of variables (M=1 corresponds to AR(1))\nn_sigmas::Real : number of standard error determining end points of grid\nmethod::Even : method for grid making\n\nReturn\n\ny1D : M x Nm matrix of variable grid\n\n\n\n"
+    "text": "construct one-dimensional quantile grid of states\n\nArgument\n\nSigma::AbstractMatrix : variance-covariance matrix of the standardized process\nNm::Integer : number of grid points\nM::Integer : number of variables (M=1 corresponds to AR(1))\nn_sigmas::Real : number of standard error determining end points of grid\nmethod::Quntile : method for grid making\n\nReturn\n\ny1D : M x Nm matrix of variable grid\ny1Dbounds : bounds of each grid bin\n\n\n\n"
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.construct_prior_guess-Tuple{AbstractArray{T,1},Integer,AbstractArray{T,2},QuantEcon.Even}",
+    "location": "api/QuantEcon.html#QuantEcon.construct_1D_grid-Tuple{Union{AbstractArray{T,2} where T, Real},Integer,Integer,Real,QuantEcon.Even}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.construct_1D_grid",
+    "category": "Method",
+    "text": "construct one-dimensional evenly spaced grid of states\n\nArgument\n\nSigma::ScalarOrArray : variance-covariance matrix of the standardized process\nNm::Integer : number of grid points\nM::Integer : number of variables (M=1 corresponds to AR(1))\nn_sigmas::Real : number of standard error determining end points of grid\nmethod::Even : method for grid making\n\nReturn\n\ny1D : M x Nm matrix of variable grid\nnothing : nothing of type Void\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.construct_1D_grid-Tuple{Union{Array{T,N} where N, T} where T,Integer,Integer,Real,QuantEcon.Quadrature}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.construct_1D_grid",
+    "category": "Method",
+    "text": "construct one-dimensional quadrature grid of states\n\nArgument\n\n::ScalarOrArray : not used\nNm::Integer : number of grid points\nM::Integer : number of variables (M=1 corresponds to AR(1))\nn_sigmas::Real : not used\nmethod::Quadrature : method for grid making\n\nReturn\n\ny1D : M x Nm matrix of variable grid\nweights : weights on each grid\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.construct_prior_guess-Tuple{AbstractArray{T,1} where T,Integer,AbstractArray{T,2} where T,AbstractArray{T,1} where T,QuantEcon.Quadrature}",
     "page": "QuantEcon",
     "title": "QuantEcon.construct_prior_guess",
     "category": "Method",
-    "text": "construct prior guess for evenly spaced grid method\n\nArguments\n\ncond_mean::AbstractVector : conditional Mean of each variable\nNm::Integer : number of grid points\ny1D::AbstractMatrix : grid of variable\nmethod::Even : method for grid making\n\n\n\n"
+    "text": "construct prior guess for quadrature grid method\n\nArguments\n\ncond_mean::AbstractVector : conditional Mean of each variable\nNm::Integer : number of grid points\ny1D::AbstractMatrix : grid of variable\nweights::AbstractVector : weights of grid y1D\nmethod::Quadrature : method for grid making\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.construct_prior_guess-Tuple{AbstractArray{T,1} where T,Integer,AbstractArray{T,2} where T,AbstractArray{T,2} where T,QuantEcon.Quantile}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.construct_prior_guess",
+    "category": "Method",
+    "text": "construct prior guess for quantile grid method\n\nArguments\n\ncond_mean::AbstractVector : conditional Mean of each variable\nNm::Integer : number of grid points\n::AbstractMatrix : grid of variable\ny1Dbounds::AbstractMatrix : bounds of each grid bin\nmethod::Quantile : method for grid making\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.construct_prior_guess-Tuple{AbstractArray{T,1} where T,Integer,AbstractArray{T,2} where T,Void,QuantEcon.Even}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.construct_prior_guess",
+    "category": "Method",
+    "text": "construct prior guess for evenly spaced grid method\n\nArguments\n\ncond_mean::AbstractVector : conditional Mean of each variable\nNm::Integer : number of grid points\ny1D::AbstractMatrix : grid of variable\n::AbstractMatrix : bounds of each grid bin\nmethod::Even : method for grid making\n\n\n\n"
 },
 
 {
@@ -1033,7 +1161,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.entropy_grad!-Tuple{AbstractArray{T,1},AbstractArray{T,1},AbstractArray{T,2},AbstractArray{T,1},AbstractArray{T,1}}",
+    "location": "api/QuantEcon.html#QuantEcon.entropy_grad!-Tuple{AbstractArray{T,1} where T,AbstractArray{T,1} where T,AbstractArray{T,2} where T,AbstractArray{T,1} where T,AbstractArray{T,1} where T}",
     "page": "QuantEcon",
     "title": "QuantEcon.entropy_grad!",
     "category": "Method",
@@ -1041,7 +1169,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.entropy_hess!-Tuple{AbstractArray{T,2},AbstractArray{T,1},AbstractArray{T,2},AbstractArray{T,1},AbstractArray{T,1}}",
+    "location": "api/QuantEcon.html#QuantEcon.entropy_hess!-Tuple{AbstractArray{T,2} where T,AbstractArray{T,1} where T,AbstractArray{T,2} where T,AbstractArray{T,1} where T,AbstractArray{T,1} where T}",
     "page": "QuantEcon",
     "title": "QuantEcon.entropy_hess!",
     "category": "Method",
@@ -1049,7 +1177,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.entropy_obj-Tuple{AbstractArray{T,1},AbstractArray{T,2},AbstractArray{T,1},AbstractArray{T,1}}",
+    "location": "api/QuantEcon.html#QuantEcon.entropy_obj-Tuple{AbstractArray{T,1} where T,AbstractArray{T,2} where T,AbstractArray{T,1} where T,AbstractArray{T,1} where T}",
     "page": "QuantEcon",
     "title": "QuantEcon.entropy_obj",
     "category": "Method",
@@ -1065,7 +1193,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.getZ-Tuple{Array{T,2},Float64,Array{T,2}}",
+    "location": "api/QuantEcon.html#QuantEcon.getZ-Tuple{Array{T,2} where T,Float64,Array{T,2} where T}",
     "page": "QuantEcon",
     "title": "QuantEcon.getZ",
     "category": "Method",
@@ -1081,7 +1209,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.getZ-Tuple{Float64,Float64,Union{Array{T,1},Array{T,2}}}",
+    "location": "api/QuantEcon.html#QuantEcon.getZ-Tuple{Float64,Float64,Union{Array{T,1} where T, Array{T,2} where T}}",
     "page": "QuantEcon",
     "title": "QuantEcon.getZ",
     "category": "Method",
@@ -1089,7 +1217,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.gth_solve!-Tuple{Array{T<:Real,2}}",
+    "location": "api/QuantEcon.html#QuantEcon.gth_solve!-Union{Tuple{Array{T,2}}, Tuple{T}} where T<:Real",
     "page": "QuantEcon",
     "title": "QuantEcon.gth_solve!",
     "category": "Method",
@@ -1097,7 +1225,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.min_var_trace-Tuple{AbstractArray{T,2}}",
+    "location": "api/QuantEcon.html#QuantEcon.min_var_trace-Tuple{AbstractArray{T,2} where T}",
     "page": "QuantEcon",
     "title": "QuantEcon.min_var_trace",
     "category": "Method",
@@ -1105,7 +1233,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.polynomial_moment-Tuple{AbstractArray{T,1},Real,Real,Integer}",
+    "location": "api/QuantEcon.html#QuantEcon.polynomial_moment-Tuple{AbstractArray{T,1} where T,Real,Real,Integer}",
     "page": "QuantEcon",
     "title": "QuantEcon.polynomial_moment",
     "category": "Method",
@@ -1121,31 +1249,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.s_wise_max!-Tuple{AbstractArray{T,2},Array{T,1},Array{T,1}}",
-    "page": "QuantEcon",
-    "title": "QuantEcon.s_wise_max!",
-    "category": "Method",
-    "text": "Populate out with  max_a vals(s, a),  where vals is represented as a AbstractMatrix of size (num_states, num_actions).\n\nAlso fills out_argmax with the column number associated with the indmax in each row\n\n\n\n"
-},
-
-{
-    "location": "api/QuantEcon.html#QuantEcon.s_wise_max!-Tuple{AbstractArray{T,2},Array{T,1}}",
-    "page": "QuantEcon",
-    "title": "QuantEcon.s_wise_max!",
-    "category": "Method",
-    "text": "Populate out with  max_a vals(s, a),  where vals is represented as a AbstractMatrix of size (num_states, num_actions).\n\n\n\n"
-},
-
-{
-    "location": "api/QuantEcon.html#QuantEcon.s_wise_max!-Tuple{Array{T,1},Array{T,1},Array{T,1},Array{T,1},Array{T,1}}",
-    "page": "QuantEcon",
-    "title": "QuantEcon.s_wise_max!",
-    "category": "Method",
-    "text": "Populate out with  max_a vals(s, a),  where vals is represented as a Vector of size (num_sa_pairs,).\n\nAlso fills out_argmax with the cartesiean index associated with the indmax in each row\n\n\n\n"
-},
-
-{
-    "location": "api/QuantEcon.html#QuantEcon.s_wise_max!-Tuple{Array{T,1},Array{T,1},Array{T,1},Array{T,1}}",
+    "location": "api/QuantEcon.html#QuantEcon.s_wise_max!-NTuple{4,AbstractArray{T,1} where T}",
     "page": "QuantEcon",
     "title": "QuantEcon.s_wise_max!",
     "category": "Method",
@@ -1153,7 +1257,31 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.s_wise_max-Tuple{AbstractArray{T,2}}",
+    "location": "api/QuantEcon.html#QuantEcon.s_wise_max!-NTuple{5,AbstractArray{T,1} where T}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.s_wise_max!",
+    "category": "Method",
+    "text": "Populate out with  max_a vals(s, a),  where vals is represented as a Vector of size (num_sa_pairs,).\n\nAlso fills out_argmax with the cartesiean index associated with the indmax in each row\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.s_wise_max!-Tuple{AbstractArray{T,2} where T,AbstractArray{T,1} where T,AbstractArray{T,1} where T}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.s_wise_max!",
+    "category": "Method",
+    "text": "Populate out with  max_a vals(s, a),  where vals is represented as a AbstractMatrix of size (num_states, num_actions).\n\nAlso fills out_argmax with the column number associated with the indmax in each row\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.s_wise_max!-Tuple{AbstractArray{T,2} where T,AbstractArray{T,1} where T}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.s_wise_max!",
+    "category": "Method",
+    "text": "Populate out with  max_a vals(s, a),  where vals is represented as a AbstractMatrix of size (num_states, num_actions).\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.s_wise_max-Tuple{AbstractArray{T,2} where T}",
     "page": "QuantEcon",
     "title": "QuantEcon.s_wise_max",
     "category": "Method",
@@ -1161,7 +1289,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.standardize_var-Tuple{AbstractArray{T,1},AbstractArray{T,2},AbstractArray{T,2},Integer}",
+    "location": "api/QuantEcon.html#QuantEcon.standardize_var-Tuple{AbstractArray{T,1} where T,AbstractArray{T,2} where T,AbstractArray{T,2} where T,Integer}",
     "page": "QuantEcon",
     "title": "QuantEcon.standardize_var",
     "category": "Method",
@@ -1190,6 +1318,14 @@ var documenterSearchIndex = {"docs": [
     "title": "QuantEcon.todense",
     "category": "Method",
     "text": "Custom version of full, which allows convertion to type T\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.warn_persistency-Tuple{AbstractArray{T,2} where T,QuantEcon.Quadrature}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.warn_persistency",
+    "category": "Method",
+    "text": "check persistency when method is Quadrature and give warning if needed\n\nArguments\n\nB::Union{Real, AbstractMatrix} : impact coefficient\nmethod::VAREstimationMethod : method for grid making\n\nReturns\n\nnothing\n\n\n\n"
 },
 
 {
