@@ -431,13 +431,13 @@ function qnwgamma(n::Int, a::Real=1.0, b::Real=1.0)
         end
 
         # rootfinding iterations
-        it = 0
         pp = 0.0
         p2 = 0.0
-        for it = 1:maxit
+        err = 100.0
+        for it in 1:maxit
             p1 = 1.0
             p2 = 0.0
-            for j=1:n
+            for j in 1:n
                 # Recurrance relation for Laguerre polynomials
                 p3 = p2
                 p2 = p1
@@ -446,12 +446,13 @@ function qnwgamma(n::Int, a::Real=1.0, b::Real=1.0)
             pp = (n*p1-(n+a)*p2)./z
             z1 = z
             z = z1-p1 ./ pp
-            if abs(z - z1) < 3e-14
+            err = abs(z - z1)
+            if err < 3e-14
                 break
             end
-        end
 
-        if it >= maxit
+        end
+        if err > 3e-14
             error("failure to converge.")
         end
 
@@ -869,4 +870,37 @@ function qnwmonomial2(vcv::AbstractMatrix)
               (4-n)/(2*(n+2)^2) * ones(size(z1, 1)),
                1/(n+2)^2 * ones(size(z2, 1)))
     return ϵj, ωj
+end
+
+
+function _quadnodes(
+        d::Distributions.ContinuousUnivariateDistribution, N::Int,
+        q0::Real, qN::Real, ::Union{Even,Type{Even}}
+    )
+    collect(linspace(quantile(d, q0), quantile(d, qN), N))
+end
+
+function _quadnodes(
+        d::Distributions.ContinuousUnivariateDistribution, N::Int,
+        q0::Real, qN::Real, ::Union{Quantile,Type{Quantile}}
+    )
+    quantiles = linspace(q0, qN, N)
+    z = quantile.(d, quantiles)
+end
+
+
+function qnwdist(
+        d::Distributions.ContinuousUnivariateDistribution, N::Int,
+        q0::Real=0.001, qN::Real=0.999, method::Union{T,Type{T}}=Quantile
+    ) where T <: VAREstimationMethod
+
+    z = _quadnodes(d, N, q0, qN, method)
+    zprob = zeros(N)
+
+    for i in 2:N-1
+        zprob[i] = cdf(d, (z[i] + z[i+1])/2) - cdf(d, (z[i] + z[i-1])/2)
+    end
+    zprob[1] = cdf(d, (z[1] + z[2])/2)
+    zprob[end] = 1 - cdf(d, (z[end-1] + z[end])/2)
+    return z, zprob
 end
