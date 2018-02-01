@@ -53,7 +53,8 @@ export
     discrete_var, Even, Quantile, Quadrature,
 
 # modeltools
-    AbstractUtility, LogUtility, CRRAUtility, CFEUtility, EllipticalUtility, derivative,
+    AbstractUtility, LogUtility, CRRAUtility, CFEUtility, EllipticalUtility,
+    derivative,
 
 # gth_solve
     gth_solve,
@@ -96,8 +97,8 @@ export
     smooth, periodogram, ar_periodogram,
 
 # util
-    meshgrid, gridmake, gridmake!, ckron, is_stable, num_compositions, simplex_grid, simplex_index,
-    next_k_array!, k_array_rank,
+    meshgrid, gridmake, gridmake!, ckron, is_stable, num_compositions,
+    simplex_grid, simplex_index, next_k_array!, k_array_rank,
 
 # robustlq
     RBLQ,
@@ -109,7 +110,7 @@ export
 
 # quad
     qnwlege, qnwcheb, qnwsimp, qnwtrap, qnwbeta, qnwgamma, qnwequi, qnwnorm,
-    qnwunif, qnwlogn, qnwmonomial1, qnwmonomial2,
+    qnwunif, qnwlogn, qnwmonomial1, qnwmonomial2, qnwdist,
     quadrect,
     do_quad,
 
