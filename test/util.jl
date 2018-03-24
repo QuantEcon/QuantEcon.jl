@@ -12,6 +12,7 @@ const data_path = joinpath(test_path, "data")
 
 const quad_data_file_name = joinpath(data_path, "matlab_quad.mat")
 const ml_quad_data_url = "https://github.com/spencerlyon2/QuantEcon.jl/releases/download/v0.0.1/matlab_quad.mat"
+const filter_data_file_name = joinpath(data_path, "employment.csv")
 
 if !(isfile(quad_data_file_name))
     try
@@ -25,4 +26,3 @@ if !(isfile(quad_data_file_name))
         warn(m)
     end
 end
-
