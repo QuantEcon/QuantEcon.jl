@@ -5,7 +5,7 @@ Utilities for testing QuantEcon
 
 @date: 2014-08-26
 =#
-using HDF5, JLD, MAT
+using HDF5, JLD, MAT, CSV
 
 const test_path = dirname(@__FILE__())
 const data_path = joinpath(test_path, "data")

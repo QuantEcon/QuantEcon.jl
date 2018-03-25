@@ -2,7 +2,6 @@ using QuantEcon
 using DataStructures: counter
 using Distributions: LogNormal, pdf
 using Compat
-using CSV
 
 using Base.Test
 
