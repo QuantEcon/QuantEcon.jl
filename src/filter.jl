@@ -3,14 +3,14 @@ doc"""
 apply Hodrick-Prescott filter to `AbstractDataVector`.
 
 ##### Arguments
-- `y::DaraFrames.AbstractDataVector` : data to be detrended
+- `y::DaraFrames.DataArrays.AbstractDataVector` : data to be detrended
 - `λ::Real` : penalty on variation in trend
 
 ##### Returns
 - `y_cyclical::Vector`: cyclical component
 - `y_trend::Vector`: trend component
 """
-hp_filter(y::DataFrames.AbstractDataVector{T}, λ::Real) where T <: Real  =
+hp_filter(y::DataFrames.DataArrays.AbstractDataVector{T}, λ::Real) where T <: Real  =
     hp_filter(Vector(y), λ)
 
 doc"""
@@ -43,7 +43,7 @@ This function applies "Hamilton filter" to the data of type `<: AbstractDataVect
 http://econweb.ucsd.edu/~jhamilto/hp.pdf
 
 ##### Arguments
-- `y::DataFrames.AbstractDataVector` : data to be filtered
+- `y::DataFrames.DataArrays.AbstractDataVector` : data to be filtered
 - `h::Integer` : Time horizon that we are likely to predict incorrectly.
                  Original paper recommends 2 for annual data, 8 for quarterly data,
                  24 for monthly data.
@@ -55,7 +55,7 @@ Note: For seasonal data, it's desirable for `p` and `h` to be integer multiples
 - `y_cycle::Vector` : cyclical component
 - `y_trend::Vector` : trend component
 """
-hamilton_filter(y::DataFrames.AbstractDataVector, h::Integer, p::Integer) =
+hamilton_filter(y::DataFrames.DataArrays.AbstractDataVector, h::Integer, p::Integer) =
     hamilton_filter(Vector(y), h, p)
 
 doc"""
@@ -94,13 +94,13 @@ function hamilton_filter(y::AbstractVector, h::Integer, p::Integer)
 end
 
 doc"""
-This function applies "Hamilton filter" to the data of type `<:AbstractDataVector`
+This function applies "Hamilton filter" to the data of type `<:DataArrays.AbstractDataVector`
 under random walk assumption.
 
 http://econweb.ucsd.edu/~jhamilto/hp.pdf
 
 ##### Arguments
-- `y::DataFrames.AbstractDataVector` : data to be filtered
+- `y::DataFrames.DataArrays.AbstractDataVector` : data to be filtered
 - `h::Integer` : Time horizon that we are likely to predict incorrectly.
                  Original paper recommends 2 for annual data, 8 for quarterly data,
                  24 for monthly data.
@@ -111,7 +111,7 @@ Note: For seasonal data, it's desirable for `h` to be an integer multiple
 - `y_cycle::Vector` : cyclical component
 - `y_trend::Vector` : trend component
 """
-hamilton_filter(y::DataFrames.AbstractDataVector, h::Integer) =
+hamilton_filter(y::DataFrames.DataArrays.AbstractDataVector, h::Integer) =
     hamilton_filter(Vector(y), h)
 doc"""
 This function applies "Hamilton filter" to the data of type `<:AbstractVector`
