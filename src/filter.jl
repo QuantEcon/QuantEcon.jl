@@ -1,4 +1,4 @@
-import DataFrames: AbstractDataVector
+import DataArrays: AbstractDataVector
 
 doc"""
 apply Hodrick-Prescott filter to `AbstractDataVector`.
