@@ -65,7 +65,7 @@ This function applies "Hamilton filter" to the data of type `<: AbstractVector`.
 http://econweb.ucsd.edu/~jhamilto/hp.pdf
 
 ##### Arguments
-- `y::AbstractVector` : data to be filtered
+- `y::Vector` : data to be filtered
 - `h::Integer` : Time horizon that we are likely to predict incorrectly.
                  Original paper recommends 2 for annual data, 8 for quarterly data,
                  24 for monthly data.
@@ -121,7 +121,7 @@ under random walk assumption.
 http://econweb.ucsd.edu/~jhamilto/hp.pdf
 
 ##### Arguments
-- `y::AbstractVector` : data to be filtered
+- `y::Vector` : data to be filtered
 - `h::Integer` : Time horizon that we are likely to predict incorrectly.
                  Original paper recommends 2 for annual data, 8 for quarterly data,
                  24 for monthly data.
