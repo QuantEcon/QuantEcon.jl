@@ -5,6 +5,8 @@
     df[:data] = 100*log.(df[:empl])
     @testset "test hp filter" begin
         df[:hp_c], df[:hp_t] = hp_filter(df[:data], 1600)
+        @show df[:hp_c]
+        @show df[:hp_c_mat]
         @test isapprox(df[:hp_c], df[:hp_c_mat])
     end
 
