@@ -77,7 +77,7 @@ Note: For seasonal data, it's desirable for `p` and `h` to be integer multiples
 - `y_cycle::Vector` : cyclical component
 - `y_trend::Vector` : trend component
 """
-function hamilton_filter(y::AbstractVector, h::Integer, p::Integer)
+function hamilton_filter(y::Vector, h::Integer, p::Integer)
     T = length(y)
     y_cycle = fill(NaN, T)
 
@@ -132,7 +132,7 @@ Note: For seasonal data, it's desirable for `h` to be an integer multiple
 - `y_cycle::Vector` : cyclical component
 - `y_trend::Vector` : trend component
 """
-function hamilton_filter(y::AbstractVector, h::Integer)
+function hamilton_filter(y::Vector, h::Integer)
     T = length(y)
     y_cycle = fill(NaN, T)
     y_cycle[h+1:T] = y[h+1:T] - y[1:T-h]
