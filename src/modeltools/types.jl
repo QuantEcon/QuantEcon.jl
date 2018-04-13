@@ -147,10 +147,18 @@ macro def_sim(sim_name, default_type_params, obs_typedef)
         Expr(:ref, :(sim.$(expr.args[1])), :ix)
     end...)
 
+    vec_out_expr = Expr(:call, sim_name, map(sim_fields.args) do expr
+        Expr(:call, :vec, :(sim.$(expr.args[1])))
+    end...)
 
+    row_slice_expr = Expr(:call, sim_name, map(sim_fields.args) do expr
+        Expr(:ref, :(sim.$(expr.args[1])), :ix, :)
+    end...)
 
     others = quote
         Base.endof(sim::$(sim_name)) = length(sim.$(sim_fields.args[1].args[1]))
+        Base.size(sim::$(sim_name)) = size(sim.$(sim_fields.args[1].args[1]))
+        Base.size(sim::$(sim_name), i::Integer...) = size(sim.$(sim_fields.args[1].args[1]), i...)
         Base.length(sim::$(sim_name)) = endof(sim)
         Base.start(sim::$(sim_name)) = 1
         Base.next(sim::$(sim_name), ix::Int) = (sim[ix], ix+1)
@@ -163,6 +171,18 @@ macro def_sim(sim_name, default_type_params, obs_typedef)
             end
             @inbounds out = $getindex_out_expr
             return out
+        end
+
+        function Base.vec(sim::$(sim_name))
+            $vec_out_expr
+        end
+        function Base.getindex(sim::$(sim_name), ::Colon)
+            vec(sim)
+        end
+        
+        # get a cross section from the panel
+        function Base.getindex(sim::$(sim_name){2}, ix::$(Union{Int,<:UnitRange}), ::Colon)
+            $row_slice_expr
         end
     end
     out = esc(Expr(:block, sim_type, sim_constructor, obs_typedef, others))
