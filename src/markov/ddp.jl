@@ -68,11 +68,11 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
         (beta < 0 || beta >= 1) &&  throw(ArgumentError("beta must be [0, 1)"))
 
         # verify input integrity 2
-        num_states, num_actions = size(R)
-        if size(Q) != (num_states, num_actions, num_states)
+        n, m = size(R)
+        if size(Q) != (n, m, n)
             throw(ArgumentError("shapes of R and Q must be (n,m) and (n,m,n)"))
         end
-
+	num_states=n
         # check feasibility
         R_max = s_wise_max(R)
         if any(R_max .== -Inf)
@@ -215,7 +215,7 @@ const DDPsa{T,Tbeta,Tind,TQ} =  DiscreteDP{T,2,1,Tbeta,Tind,TQ}
 
 num_states(ddp::DDP) = size(ddp.R, 1)
 num_states(ddp::DDPsa) = size(ddp.Q, 2)
-num_actions(ddp::DiscreteDP) = size(ddp.R, 2)
+
 
 abstract type DDPAlgorithm end
 """
@@ -577,19 +577,19 @@ end
 
 """
 Return the `Vector` `max_a vals(s, a)`,  where `vals` is represented as a
-`AbstractMatrix` of size `(num_states, num_actions)`.
+`AbstractMatrix` of size `(num_states, m)`.
 """
 s_wise_max(vals::AbstractMatrix) = vec(maximum(vals, 2))
 
 """
 Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
-`AbstractMatrix` of size `(num_states, num_actions)`.
+`AbstractMatrix` of size `(num_states, m)`.
 """
 s_wise_max!(vals::AbstractMatrix, out::AbstractVector) = (println("calling this one! "); maximum!(out, vals))
 
 """
 Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
-`AbstractMatrix` of size `(num_states, num_actions)`.
+`AbstractMatrix` of size `(num_states, m)`.
 
 Also fills `out_argmax` with the column number associated with the `indmax` in
 each row
