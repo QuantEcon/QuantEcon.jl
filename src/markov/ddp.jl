@@ -64,15 +64,15 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
         if NR != 2
             msg = "R must be 2-dimensional without s-a formulation"
             throw(ArgumentError(msg))
-        end
+      	end
         (beta < 0 || beta >= 1) &&  throw(ArgumentError("beta must be [0, 1)"))
 
         # verify input integrity 2
-        n, m = size(R)
-        if size(Q) != (n, m, n)
+ 	num_states, num_actions = size(R)
+        if size(Q) != (num_states, num_actions, num_states)
             throw(ArgumentError("shapes of R and Q must be (n,m) and (n,m,n)"))
         end
-	num_states=n
+	
         # check feasibility
         R_max = s_wise_max(R)
         if any(R_max .== -Inf)
@@ -577,19 +577,19 @@ end
 
 """
 Return the `Vector` `max_a vals(s, a)`,  where `vals` is represented as a
-`AbstractMatrix` of size `(num_states, m)`.
+`AbstractMatrix` of size `(num_states, num_actions).
 """
 s_wise_max(vals::AbstractMatrix) = vec(maximum(vals, 2))
 
 """
 Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
-`AbstractMatrix` of size `(num_states, m)`.
+`AbstractMatrix` of size `(num_states, num_actions)`.
 """
 s_wise_max!(vals::AbstractMatrix, out::AbstractVector) = (println("calling this one! "); maximum!(out, vals))
 
 """
 Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
-`AbstractMatrix` of size `(num_states, m)`.
+`AbstractMatrix` of size `(num_states, num_actions).
 
 Also fills `out_argmax` with the column number associated with the `indmax` in
 each row
