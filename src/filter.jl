@@ -1,5 +1,3 @@
-import DataArrays: AbstractDataVector
-
 doc"""
 apply Hodrick-Prescott filter to `AbstractVector`.
 
