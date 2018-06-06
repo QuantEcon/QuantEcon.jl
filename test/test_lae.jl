@@ -11,7 +11,7 @@
         d = s * x.^α
 
         pdf_arg = clamp.((y .- (1 .- δ) .* x) ./ d, eps(), Inf)
-        return pdf(ϕ, pdf_arg) ./ d
+        return pdf.(ϕ, pdf_arg) ./ d
     end
 
 
