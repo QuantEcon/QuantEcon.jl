@@ -25,4 +25,3 @@ if !(isfile(quad_data_file_name))
         warn(m)
     end
 end
-

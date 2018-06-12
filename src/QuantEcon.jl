@@ -137,7 +137,11 @@ export
     MVNSampler,
 
 # modeltools
-    @def_sim
+    @def_sim,
+
+# filter
+    hp_filter,
+    hamilton_filter
 
 
 include("sampler.jl")
@@ -152,6 +156,7 @@ include("markov/random_mc.jl")
 include("discrete_rv.jl")
 include("ecdf.jl")
 include("estspec.jl")
+include("filter.jl")
 include("kalman.jl")
 include("lae.jl")
 include("lqcontrol.jl")

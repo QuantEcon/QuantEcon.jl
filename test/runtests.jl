@@ -11,6 +11,7 @@ tests = [
         "discrete_rv",
         "ecdf",
         "estspec",
+        "filter",
         "kalman",
         "lae",
         "lqcontrol",
