@@ -505,6 +505,30 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api/QuantEcon.html#QuantEcon.hamilton_filter-Tuple{AbstractArray{T,1} where T,Integer,Integer}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.hamilton_filter",
+    "category": "method",
+    "text": "This function applies \"Hamilton filter\" to AbstractVector.\n\nhttp://econweb.ucsd.edu/~jhamilto/hp.pdf\n\nArguments\n\ny::AbstractVector : data to be filtered\nh::Integer : Time horizon that we are likely to predict incorrectly.                Original paper recommends 2 for annual data, 8 for quarterly data,                24 for monthly data.\np::Integer : Number of lags in regression. Must be greater than h.\n\nNote: For seasonal data, it\'s desirable for p and h to be integer multiples       of the number of obsevations in a year.       e.g. For quarterly data, h = 8 and p = 4 are recommended.\n\nReturns\n\ny_cycle::Vector : cyclical component\ny_trend::Vector : trend component\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.hamilton_filter-Tuple{AbstractArray{T,1} where T,Integer}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.hamilton_filter",
+    "category": "method",
+    "text": "This function applies \"Hamilton filter\" to <:AbstractVector under random walk assumption.\n\nhttp://econweb.ucsd.edu/~jhamilto/hp.pdf\n\nArguments\n\ny::AbstractVector : data to be filtered\nh::Integer : Time horizon that we are likely to predict incorrectly.                Original paper recommends 2 for annual data, 8 for quarterly data,                24 for monthly data.\n\nNote: For seasonal data, it\'s desirable for h to be an integer multiple       of the number of obsevations in a year.       e.g. For quarterly data, h = 8 is recommended.\n\nReturns\n\ny_cycle::Vector : cyclical component\ny_trend::Vector : trend component\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.hp_filter-Union{Tuple{AbstractArray{T,1},Real}, Tuple{T}} where T<:Real",
+    "page": "QuantEcon",
+    "title": "QuantEcon.hp_filter",
+    "category": "method",
+    "text": "apply Hodrick-Prescott filter to AbstractVector.\n\nArguments\n\ny::AbstractVector : data to be detrended\nλ::Real : penalty on variation in trend\n\nReturns\n\ny_cyclical::Vector: cyclical component\ny_trend::Vector: trend component\n\n\n\n"
+},
+
+{
     "location": "api/QuantEcon.html#QuantEcon.impulse_response-Tuple{QuantEcon.ARMA}",
     "page": "QuantEcon",
     "title": "QuantEcon.impulse_response",
