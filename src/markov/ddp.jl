@@ -64,15 +64,15 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
         if NR != 2
             msg = "R must be 2-dimensional without s-a formulation"
             throw(ArgumentError(msg))
-        end
+      	end
         (beta < 0 || beta >= 1) &&  throw(ArgumentError("beta must be [0, 1)"))
 
         # verify input integrity 2
-        num_states, num_actions = size(R)
+ 	num_states, num_actions = size(R)
         if size(Q) != (num_states, num_actions, num_states)
             throw(ArgumentError("shapes of R and Q must be (n,m) and (n,m,n)"))
         end
-
+	
         # check feasibility
         R_max = s_wise_max(R)
         if any(R_max .== -Inf)
@@ -215,7 +215,7 @@ const DDPsa{T,Tbeta,Tind,TQ} =  DiscreteDP{T,2,1,Tbeta,Tind,TQ}
 
 num_states(ddp::DDP) = size(ddp.R, 1)
 num_states(ddp::DDPsa) = size(ddp.Q, 2)
-num_actions(ddp::DiscreteDP) = size(ddp.R, 2)
+
 
 abstract type DDPAlgorithm end
 """
