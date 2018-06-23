@@ -577,7 +577,7 @@ end
 
 """
 Return the `Vector` `max_a vals(s, a)`,  where `vals` is represented as a
-`AbstractMatrix` of size `(num_states, num_actions).
+`AbstractMatrix` of size `(num_states, num_actions)`.
 """
 s_wise_max(vals::AbstractMatrix) = vec(maximum(vals, 2))
 
@@ -589,7 +589,7 @@ s_wise_max!(vals::AbstractMatrix, out::AbstractVector) = (println("calling this 
 
 """
 Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
-`AbstractMatrix` of size `(num_states, num_actions).
+`AbstractMatrix` of size `(num_states, num_actions)`.
 
 Also fills `out_argmax` with the column number associated with the `indmax` in
 each row
