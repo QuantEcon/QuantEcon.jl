@@ -155,7 +155,7 @@ function smooth(kn::Kalman, y::AbstractMatrix)
         x_filtered[:, t], sigma_filtered[:, :, t] = kn.cur_x_hat, kn.cur_sigma
         filtered_to_forecast!(kn)
         sigma_forecast[:, :, t] = kn.cur_sigma
-        logL = logL - (log(2*pi) - log(norm(inv(ETA))) + eta'/ETA*eta)
+        logL = logL - (log(2*pi) - log(norm(inv(ETA))) + eta'/ETA*eta)[1]
     end
     # smoothing
     x_smoothed = copy(x_filtered)
