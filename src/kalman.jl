@@ -137,37 +137,37 @@ end
 - `x_smoothed::AbstractMatrix`: `k x T` matrix of smoothed mean of states.
                                 `k` is the number of states.
 - `logL::Real`: log-likelihood. 
-- `P_smoothed::AbstractArray` `k x k x T` array of smoothed covariance matrix of states.
+- `sigma_smoothed::AbstractArray` `k x k x T` array of smoothed covariance matrix of states.
 """
 function smooth(kn::Kalman, y::AbstractMatrix)
     G, R = kn.G, kn.R
     
     n, T = size(y)
     x_filtered = Matrix{Float64}(n, T)
-    P_filtered = Array{Float64}(n, n, T)
-    P_forecast = Array{Float64}(n, n, T)
+    sigma_filtered = Array{Float64}(n, n, T)
+    sigma_forecast = Array{Float64}(n, n, T)
     logL = 0
     # forecast and update
     for t in 1:T
         eta = y[:, t] - G*kn.cur_x_hat # forecast error
         ETA = G*kn.cur_sigma*G' + R# covariance matrix of forecast error
         prior_to_filtered!(kn, y[:, t])
-        x_filtered[:, t], P_filtered[:, :, t] = kn.cur_x_hat, kn.cur_sigma
+        x_filtered[:, t], sigma_filtered[:, :, t] = kn.cur_x_hat, kn.cur_sigma
         filtered_to_forecast!(kn)
-        P_forecast[:, :, t] = kn.cur_sigma
+        sigma_forecast[:, :, t] = kn.cur_sigma
         logL = logL - (log(2*pi) - log(norm(inv(ETA))) + eta'/ETA*eta)
     end
     # smoothing
     x_smoothed = copy(x_filtered)
-    P_smoothed = copy(P_filtered)
+    sigma_smoothed = copy(sigma_filtered)
     for t in (T-1):-1:1
-        x_smoothed[:, t], P_smoothed[:, :, t] =
-            smooth(kn, x_filtered[:, t], P_filtered[:, :, t],
-                   P_forecast[:, :, t], x_smoothed[:, t+1],
-                   P_smoothed[:, :, t+1])
+        x_smoothed[:, t], sigma_smoothed[:, :, t] =
+            go_backward(kn, x_filtered[:, t], sigma_filtered[:, :, t],
+                        sigma_forecast[:, :, t], x_smoothed[:, t+1],
+                        sigma_smoothed[:, :, t+1])
     end
     
-    return x_smoothed, logL, P_smoothed
+    return x_smoothed, logL, sigma_smoothed
 end
 
 """
@@ -183,8 +183,9 @@ end
 - `x_s1::Vector`: smoothed mean of state for period ``t``
 - `sigma_s1::Vector`: smoothed covariance of state for period ``t``
 """
-function smooth(k::Kalman, x_fi::Vector, sigma_fi::Matrix, sigma_fo::Matrix, 
-                x_s1::Vector, sigma_s1::Matrix)
+function go_backward(k::Kalman, x_fi::Vector,
+                     sigma_fi::Matrix, sigma_fo::Matrix, 
+                     x_s1::Vector, sigma_s1::Matrix)
     A = k.A
     temp = sigma_fi*A'/sigma_fo
     x_s = x_fi + temp*(x_s1-A*x_fi)
