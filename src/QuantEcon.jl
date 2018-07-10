@@ -88,6 +88,7 @@ export
     filtered_to_forecast!,
     update!,
     stationary_values,
+    smooth,
 
 # distributions
     BetaBinomial,
