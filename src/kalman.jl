@@ -71,8 +71,8 @@ function prior_to_filtered!(k::Kalman, y)
         reshape(y, k.k, 1)
     end
     A = Sigma * G'
-    B = G * Sigma' * G' + R
-    M = A * inv(B)
+    B = G * Sigma * G' + R
+    M = A / B
     k.cur_x_hat = x_hat + M * (y - G * x_hat)
     k.cur_sigma = Sigma - M * G * Sigma
     Void
@@ -123,4 +123,71 @@ function stationary_values(k::Kalman)
     Sigma_inf = solve_discrete_riccati(A', G', Q, R)
     K_inf = A * Sigma_inf * G' * inv(G * Sigma_inf * G' + R)
     return Sigma_inf, K_inf
+end
+
+
+"""
+##### Arguments
+- `kn::Kalman`: `Kalman` specifying the model. Initial value must be the prior 
+                for t=1 period observation, i.e. ``x_{1|0}``.
+- `y::AbstractMatrix`: `n x T` matrix of observed data. 
+                       `n` is the number of observed variables in one period.
+                       Each column is a vector of observations at each period. 
+##### Returns
+- `x_smoothed::AbstractMatrix`: `k x T` matrix of smoothed mean of states.
+                                `k` is the number of states.
+- `logL::Real`: log-likelihood. 
+- `P_smoothed::AbstractArray` `k x k x T` array of smoothed covariance matrix of states.
+"""
+function smooth(kn::Kalman, y::AbstractMatrix)
+    G, R = kn.G, kn.R
+    
+    n, T = size(y)
+    x_filtered = Matrix{Float64}(n, T)
+    P_filtered = Array{Float64}(n, n, T)
+    P_forecast = Array{Float64}(n, n, T)
+    logL = 0
+    # forecast and update
+    for t in 1:T
+        eta = y[:, t] - G*kn.cur_x_hat # forecast error
+        ETA = G*kn.cur_sigma*G' + R# covariance matrix of forecast error
+        prior_to_filtered!(kn, y[:, t])
+        x_filtered[:, t], P_filtered[:, :, t] = kn.cur_x_hat, kn.cur_sigma
+        filtered_to_forecast!(kn)
+        P_forecast[:, :, t] = kn.cur_sigma
+        logL = logL - (log(2*pi) - log(norm(inv(ETA))) + eta'/ETA*eta)
+    end
+    # smoothing
+    x_smoothed = copy(x_filtered)
+    P_smoothed = copy(P_filtered)
+    for t in (T-1):-1:1
+        x_smoothed[:, t], P_smoothed[:, :, t] =
+            smooth(kn, x_filtered[:, t], P_filtered[:, :, t],
+                   P_forecast[:, :, t], x_smoothed[:, t+1],
+                   P_smoothed[:, :, t+1])
+    end
+    
+    return x_smoothed, logL, P_smoothed
+end
+
+"""
+##### Arguments
+- `kn::Kalman`: `Kalman` specifying the model.
+- `x_fi::Vector`: filtered mean of state for period ``t``
+- `sigma_fi::Vector`: filtered covariance matrix of state for period ``t``
+- `sigma_fo::Vector`: forecast of covariance matrix of state for period ``t+1``
+                      conditional on period ``t`` observations
+- `x_s1::Vector`: smoothed mean of state for period ``t+1``
+- `sigma_s1::Vector`: smoothed covariance of state for period ``t+1``
+##### Returns
+- `x_s1::Vector`: smoothed mean of state for period ``t``
+- `sigma_s1::Vector`: smoothed covariance of state for period ``t``
+"""
+function smooth(k::Kalman, x_fi::Vector, sigma_fi::Matrix, sigma_fo::Matrix, 
+                x_s1::Vector, sigma_s1::Matrix)
+    A = k.A
+    temp = sigma_fi*A'/sigma_fo
+    x_s = x_fi + temp*(x_s1-A*x_fi)
+    sigma_s = sigma_fi + temp*(sigma_s1-sigma_fo)*temp'
+    return x_s, sigma_s
 end
