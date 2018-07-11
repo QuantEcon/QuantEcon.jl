@@ -125,6 +125,46 @@ function stationary_values(k::Kalman)
     return Sigma_inf, K_inf
 end
 
+"""
+computes log-likelihood of period ``t``
+
+##### Arguments
+- `kn::Kalman`: `Kalman` specifying the model. Current values must be the 
+                forecast for period ``t`` observation conditional on ``t-1``
+                observation.
+- `y::AbstractVector`: observations at period ``t``
+##### Returns
+- `logL::Real`: log-likelihood of observations at period ``t``
+"""
+function log_likelihood(k::Kalman, y::AbstractVector)
+    eta = y - k.G*k.cur_x_hat # forecast error
+    P = k.G*k.cur_sigma*k.G' + k.R # covariance matrix of forecast error
+    logL = - (length(y)*log(2pi) + logdet(P) + eta'/P*eta)[1]/2
+    return logL
+end
+
+"""
+computes log-likelihood of entire observations
+
+##### Arguments
+- `kn::Kalman`: `Kalman` specifying the model. Initial value must be the prior 
+                for t=1 period observation, i.e. ``x_{1|0}``.
+- `y::AbstractMatrix`: `n x T` matrix of observed data. 
+                       `n` is the number of observed variables in one period.
+                       Each column is a vector of observations at each period. 
+##### Returns
+- `logL::Real`: log-likelihood of all observations
+"""
+function compute_loglikelihood(kn::Kalman, y::AbstractMatrix)    
+    T = size(y, 2)
+    logL = 0
+    # forecast and update
+    for t in 1:T
+        logL = logL + log_likelihood(kn, y[:, t])
+        update!(kn, y[:, t])
+    end
+    return logL
+end
 
 """
 ##### Arguments
@@ -136,7 +176,7 @@ end
 ##### Returns
 - `x_smoothed::AbstractMatrix`: `k x T` matrix of smoothed mean of states.
                                 `k` is the number of states.
-- `logL::Real`: log-likelihood. 
+- `logL::Real`: log-likelihood of all observations
 - `sigma_smoothed::AbstractArray` `k x k x T` array of smoothed covariance matrix of states.
 """
 function smooth(kn::Kalman, y::AbstractMatrix)
@@ -149,13 +189,11 @@ function smooth(kn::Kalman, y::AbstractMatrix)
     logL = 0
     # forecast and update
     for t in 1:T
-        eta = y[:, t] - G*kn.cur_x_hat # forecast error
-        ETA = G*kn.cur_sigma*G' + R# covariance matrix of forecast error
+        logL = logL + log_likelihood(kn, y[:, t])
         prior_to_filtered!(kn, y[:, t])
         x_filtered[:, t], sigma_filtered[:, :, t] = kn.cur_x_hat, kn.cur_sigma
         filtered_to_forecast!(kn)
         sigma_forecast[:, :, t] = kn.cur_sigma
-        logL = logL - (log(2*pi) + logdet(ETA) + eta'/ETA*eta)[1]
     end
     # smoothing
     x_smoothed = copy(x_filtered)
@@ -166,7 +204,7 @@ function smooth(kn::Kalman, y::AbstractMatrix)
                         sigma_forecast[:, :, t], x_smoothed[:, t+1],
                         sigma_smoothed[:, :, t+1])
     end
-    
+
     return x_smoothed, logL, sigma_smoothed
 end
 

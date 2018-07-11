@@ -89,6 +89,7 @@ export
     update!,
     stationary_values,
     smooth,
+    compute_loglikelihood,
 
 # distributions
     BetaBinomial,
