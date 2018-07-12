@@ -132,7 +132,8 @@ computes log-likelihood of period ``t``
 - `kn::Kalman`: `Kalman` specifying the model. Current values must be the 
                 forecast for period ``t`` observation conditional on ``t-1``
                 observation.
-- `y::AbstractVector`: observations at period ``t``
+- `y::AbstractVector`: Respondentbservations at period ``t``
+
 ##### Returns
 - `logL::Real`: log-likelihood of observations at period ``t``
 """
@@ -152,6 +153,7 @@ computes log-likelihood of entire observations
 - `y::AbstractMatrix`: `n x T` matrix of observed data. 
                        `n` is the number of observed variables in one period.
                        Each column is a vector of observations at each period. 
+
 ##### Returns
 - `logL::Real`: log-likelihood of all observations
 """
@@ -173,6 +175,7 @@ end
 - `y::AbstractMatrix`: `n x T` matrix of observed data. 
                        `n` is the number of observed variables in one period.
                        Each column is a vector of observations at each period. 
+
 ##### Returns
 - `x_smoothed::AbstractMatrix`: `k x T` matrix of smoothed mean of states.
                                 `k` is the number of states.
@@ -217,6 +220,7 @@ end
                       conditional on period ``t`` observations
 - `x_s1::Vector`: smoothed mean of state for period ``t+1``
 - `sigma_s1::Vector`: smoothed covariance of state for period ``t+1``
+
 ##### Returns
 - `x_s1::Vector`: smoothed mean of state for period ``t``
 - `sigma_s1::Vector`: smoothed covariance of state for period ``t``
