@@ -1,6 +1,6 @@
 language: julia
 sudo: false
-os: 
+os:
     - linux
 addons:
   apt:
@@ -8,7 +8,7 @@ addons:
     - libnlopt0
     - hdf5-tools
 julia:
-    - 0.6
+    - 0.7
     - nightly
 matrix:
     allow_failures:
