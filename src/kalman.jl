@@ -215,15 +215,15 @@ end
 ##### Arguments
 - `kn::Kalman`: `Kalman` specifying the model.
 - `x_fi::Vector`: filtered mean of state for period ``t``
-- `sigma_fi::Vector`: filtered covariance matrix of state for period ``t``
-- `sigma_fo::Vector`: forecast of covariance matrix of state for period ``t+1``
+- `sigma_fi::Matrix`: filtered covariance matrix of state for period ``t``
+- `sigma_fo::Matrix`: forecast of covariance matrix of state for period ``t+1``
                       conditional on period ``t`` observations
 - `x_s1::Vector`: smoothed mean of state for period ``t+1``
-- `sigma_s1::Vector`: smoothed covariance of state for period ``t+1``
+- `sigma_s1::Matrix`: smoothed covariance of state for period ``t+1``
 
 ##### Returns
 - `x_s1::Vector`: smoothed mean of state for period ``t``
-- `sigma_s1::Vector`: smoothed covariance of state for period ``t``
+- `sigma_s1::Matrix`: smoothed covariance of state for period ``t``
 """
 function go_backward(k::Kalman, x_fi::Vector,
                      sigma_fi::Matrix, sigma_fo::Matrix, 
