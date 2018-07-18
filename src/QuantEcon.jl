@@ -2,19 +2,15 @@ __precompile__()
 
 module QuantEcon
 
-import Base: mean, std, var, show, isapprox
+import Base: show, isapprox
+import Statistics: mean, std, var
 
 # 3rd party
 using Distributions
 import Distributions: pdf, skewness, BetaBinomial
 using DSP: TFFilter, freqz
 using Primes: primes
-using Compat: view, @compat
-using StatsBase:ecdf
-
-@static if isdefined(Base, :Iterators)
-    using Base.Iterators: cycle, take
-end
+using StatsBase: ecdf
 
 # useful types
 ScalarOrArray{T} = Union{T,Array{T}}
