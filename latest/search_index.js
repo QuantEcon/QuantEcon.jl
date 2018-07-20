@@ -385,6 +385,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api/QuantEcon.html#QuantEcon.compute_loglikelihood-Tuple{QuantEcon.Kalman,AbstractArray{T,2} where T}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.compute_loglikelihood",
+    "category": "method",
+    "text": "computes log-likelihood of entire observations\n\nArguments\n\nkn::Kalman: Kalman specifying the model. Initial value must be the prior                for t=1 period observation, i.e. x_10.\ny::AbstractMatrix: n x T matrix of observed data.                       n is the number of observed variables in one period.                      Each column is a vector of observations at each period. \n\nReturns\n\nlogL::Real: log-likelihood of all observations\n\n\n\n"
+},
+
+{
     "location": "api/QuantEcon.html#QuantEcon.compute_sequence",
     "page": "QuantEcon",
     "title": "QuantEcon.compute_sequence",
@@ -913,6 +921,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api/QuantEcon.html#QuantEcon.smooth-Tuple{QuantEcon.Kalman,AbstractArray{T,2} where T}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.smooth",
+    "category": "method",
+    "text": "Arguments\n\nkn::Kalman: Kalman specifying the model. Initial value must be the prior                for t=1 period observation, i.e. x_10.\ny::AbstractMatrix: n x T matrix of observed data.                       n is the number of observed variables in one period.                      Each column is a vector of observations at each period. \n\nReturns\n\nx_smoothed::AbstractMatrix: k x T matrix of smoothed mean of states.                               k is the number of states.\nlogL::Real: log-likelihood of all observations\nsigma_smoothed::AbstractArray k x k x T array of smoothed covariance matrix of states.\n\n\n\n"
+},
+
+{
     "location": "api/QuantEcon.html#QuantEcon.solve-Union{Tuple{Algo}, Tuple{QuantEcon.DiscreteDP{T,NQ,NR,Tbeta,Tind,TQ} where TQ<:AbstractArray{T,NQ} where Tind where Tbeta<:Real where NR where NQ,Type{Algo}}, Tuple{QuantEcon.DiscreteDP{T,NQ,NR,Tbeta,Tind,TQ} where TQ<:AbstractArray{T,NQ} where Tind where Tbeta<:Real where NR where NQ}, Tuple{T}} where T where Algo<:QuantEcon.DDPAlgorithm",
     "page": "QuantEcon",
     "title": "QuantEcon.solve",
@@ -1249,11 +1265,27 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api/QuantEcon.html#QuantEcon.go_backward-Tuple{QuantEcon.Kalman,Array{T,1} where T,Array{T,2} where T,Array{T,2} where T,Array{T,1} where T,Array{T,2} where T}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.go_backward",
+    "category": "method",
+    "text": "Arguments\n\nkn::Kalman: Kalman specifying the model.\nx_fi::Vector: filtered mean of state for period t\nsigma_fi::Matrix: filtered covariance matrix of state for period t\nsigma_fo::Matrix: forecast of covariance matrix of state for period t+1                     conditional on period t observations\nx_s1::Vector: smoothed mean of state for period t+1\nsigma_s1::Matrix: smoothed covariance of state for period t+1\n\nReturns\n\nx_s1::Vector: smoothed mean of state for period t\nsigma_s1::Matrix: smoothed covariance of state for period t\n\n\n\n"
+},
+
+{
     "location": "api/QuantEcon.html#QuantEcon.gth_solve!-Union{Tuple{Array{T,2}}, Tuple{T}} where T<:Real",
     "page": "QuantEcon",
     "title": "QuantEcon.gth_solve!",
     "category": "method",
     "text": "Same as gth_solve, but overwrite the input A, instead of creating a copy.\n\n\n\n"
+},
+
+{
+    "location": "api/QuantEcon.html#QuantEcon.log_likelihood-Tuple{QuantEcon.Kalman,AbstractArray{T,1} where T}",
+    "page": "QuantEcon",
+    "title": "QuantEcon.log_likelihood",
+    "category": "method",
+    "text": "computes log-likelihood of period t\n\nArguments\n\nkn::Kalman: Kalman specifying the model. Current values must be the                forecast for period t observation conditional on t-1               observation.\ny::AbstractVector: Respondentbservations at period t\n\nReturns\n\nlogL::Real: log-likelihood of observations at period t\n\n\n\n"
 },
 
 {
