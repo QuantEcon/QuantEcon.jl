@@ -42,6 +42,7 @@ export
 
 # discrete_rv
     DiscreteRV,
+    MVDiscreteRV,
     draw,
 
 # mc_tools
