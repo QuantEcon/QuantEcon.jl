@@ -23,6 +23,7 @@ Notes
 =#
 
 import Base: *
+using Nullables
 
 #------------------------#
 #-Types and Constructors-#
@@ -72,7 +73,7 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
         if size(Q) != (num_states, num_actions, num_states)
             throw(ArgumentError("shapes of R and Q must be (n,m) and (n,m,n)"))
         end
-	
+
         # check feasibility
         R_max = s_wise_max(R)
         if any(R_max .== -Inf)
