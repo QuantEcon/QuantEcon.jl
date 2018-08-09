@@ -165,10 +165,10 @@ function num_compositions(m, n)
 end
 
 
-"""
+doc"""
 Construct an array consisting of the integer points in the
-(m-1)-dimensional simplex :math:`\{x \mid x_0 + \cdots + x_{m-1} = n
-\}`, or equivalently, the m-part compositions of n, which are listed
+(m-1)-dimensional simplex $\{x \mid x_0 + \cdots + x_{m-1} = n
+\}$, or equivalently, the m-part compositions of n, which are listed
 in lexicographic order. The total number of the points (hence the
 length of the output array) is L = (n+m-1)!/(n!*(m-1)!) (i.e.,
 (n+m-1) choose (m-1)).
@@ -234,10 +234,10 @@ function simplex_grid(m, n)
 end
 
 
-"""
+doc"""
 Return the index of the point x in the lexicographic order of the
-integer points of the (m-1)-dimensional simplex :math:`\{x \mid x_0
-+ \cdots + x_{m-1} = n\}`.
+integer points of the (m-1)-dimensional simplex $\{x \mid x_0
++ \cdots + x_{m-1} = n\}$.
 
 ##### Arguments
 
@@ -343,7 +343,7 @@ the descending sequences of the elements, following
 `InexactError` exception will be thrown, or an incorrect value will be
 returned without warning if overflow occurs during the computation.
 It is the user's responsibility to ensure that the rank of the input
-array fits within the range of `T`; a sufficient condition for it is 
+array fits within the range of `T`; a sufficient condition for it is
 `binomial(BigInt(a[end]), BigInt(length(a))) <= typemax(T)`.
 
 # Arguments
