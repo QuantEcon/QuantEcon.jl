@@ -16,6 +16,12 @@ using StatsBase:ecdf
     using Base.Iterators: cycle, take
 end
 
+# 0.6/0.7 compatibility
+using Compat
+using Compat.LinearAlgebra
+using Compat.Random
+using Compat.SparseArrays
+
 # useful types
 ScalarOrArray{T} = Union{T,Array{T}}
 

@@ -6,7 +6,7 @@ abstract type AbstractUtility end
 
 # Consumption utility
 
-"""
+doc"""
 Type used to evaluate log utility. Log utility takes the form
 
 u(c) = \log(c)

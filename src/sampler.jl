@@ -3,8 +3,9 @@
 =#
 
 import Base: ==
+import Compat.LinearAlgebra: BlasReal
 
-struct MVNSampler{TM<:Real,TS<:Real,TQ<:LinAlg.BlasReal}
+struct MVNSampler{TM<:Real,TS<:Real,TQ<:BlasReal}
     mu::Vector{TM}
     Sigma::Matrix{TS}
     Q::Matrix{TQ}
@@ -51,14 +52,14 @@ function MVNSampler(mu::Vector{TM}, Sigma::Matrix{TS}) where {TM<:Real,TS<:Real}
 end
 
 # methods with the optional rng argument first
-Base.rand(rng::AbstractRNG, d::MVNSampler) =
+Random.rand(rng::AbstractRNG, d::MVNSampler) =
     d.mu + d.Q * randn(rng, length(d.mu))
-Base.rand(rng::AbstractRNG, d::MVNSampler, n::Integer) =
+Random.rand(rng::AbstractRNG, d::MVNSampler, n::Integer) =
     d.mu .+ d.Q * randn(rng, (length(d.mu), n))
 
 # methods to draw from `MVNSampler`
-Base.rand(d::MVNSampler) = rand(Base.GLOBAL_RNG, d)
-Base.rand(d::MVNSampler, n::Integer) = rand(Base.GLOBAL_RNG, d, n)
+Random.rand(d::MVNSampler) = rand(Random.GLOBAL_RNG, d)
+Random.rand(d::MVNSampler, n::Integer) = rand(Random.GLOBAL_RNG, d, n)
 
 ==(f1::MVNSampler, f2::MVNSampler) =
     (f1.mu == f2.mu) && (f1.Sigma == f2.Sigma) && (f1.Q == f2.Q)
