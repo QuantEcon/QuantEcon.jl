@@ -5,6 +5,12 @@
 import Base: ==
 import Compat.LinearAlgebra: BlasReal
 
+# For v0.6 compatibility
+@static if !isdefined(Compat.LinearAlgebra, :cholesky)
+    cholesky(A::AbstractMatrix, ::Val{true}; check::Bool=false) =
+        cholfact(A, Val{true})
+end
+
 struct MVNSampler{TM<:Real,TS<:Real,TQ<:BlasReal}
     mu::Vector{TM}
     Sigma::Matrix{TS}
@@ -25,7 +31,7 @@ function MVNSampler(mu::Vector{TM}, Sigma::Matrix{TS}) where {TM<:Real,TS<:Real}
 
     issymmetric(Sigma) || throw(ArgumentError("Sigma must be symmetric"))
 
-    C = cholfact(Symmetric(Sigma, :L), Val{true})
+    C = cholesky(Symmetric(Sigma, :L), Val(true), check=false)
     A = C.factors
     r = C.rank
     p = invperm(C.piv)
