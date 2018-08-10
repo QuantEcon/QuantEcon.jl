@@ -20,6 +20,7 @@ end
 using Compat
 using Compat.LinearAlgebra
 using Compat.Random
+using Compat.SparseArrays
 
 # useful types
 ScalarOrArray{T} = Union{T,Array{T}}
