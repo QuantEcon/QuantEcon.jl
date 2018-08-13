@@ -1,60 +1,60 @@
 @testset "Testing sampler.jl" begin
 
-    n = 4
-    mu = collect(linspace(0.2, 0.6, n))
+    local n = 4
+    local μ = collect(range(0.2, stop = 0.6, length = n))
     @testset "check positive definite" begin
-        Sigma = [3.0 1.0 1.0 1.0;
-                 1.0 2.0 1.0 1.0;
-                 1.0 1.0 2.0 1.0;
-                 1.0 1.0 1.0 1.0]
-        mvns = MVNSampler(mu, Sigma)
-        @test isapprox(mvns.Q * mvns.Q', mvns.Sigma)
+        local Σ = [3.0 1.0 1.0 1.0;
+                   1.0 2.0 1.0 1.0;
+                   1.0 1.0 2.0 1.0;
+                   1.0 1.0 1.0 1.0]
+        local mvns = MVNSampler(μ, Σ)
+        @test isapprox(mvns.Q * transpose(mvns.Q), mvns.Σ)
     end
 
     @testset "check positive semi-definite zeros" begin
-        mvns = MVNSampler(mu, zeros(n, n))
-        @test rand(mvns) == mu
+        local mvns = MVNSampler(μ, zeros(n, n))
+        @test rand(mvns) == μ
     end
 
     @testset "check positive semi-definite ones" begin
-        mvns = MVNSampler(mu, ones(n, n))
-        c = rand(mvns)-mvns.mu
-        @test all(broadcast(isapprox,c[1],c))
+        local mvns = MVNSampler(μ, ones(n, n))
+        local c = rand(mvns) - mvns.μ
+        @test all(elem -> isapprox(c[1], elem), c)
     end
 
     @testset "check positive semi-definite 1 and -1/(n-1)" begin
-        Sigma = -1/(n-1)*ones(n, n) + n/(n-1)*eye(n, n)
-        mvns = MVNSampler(mu, Sigma)
-        @test isapprox(sum(rand(mvns)) , sum(mu), atol=1e-4, rtol=1e-4)
+        local Σ = -1 / (n-1) * ones(n, n) + n / (n - 1) * Diagonal(ones(n))
+        local mvns = MVNSampler(μ, Σ)
+        @test isapprox(sum(rand(mvns)) , sum(μ), atol = 1e-4, rtol = 1e-4)
     end
 
     @testset "check non-positive definite" begin
-        Sigma = [2.0 1.0 3.0 1.0;
-                 1.0 2.0 1.0 1.0;
-                 3.0 1.0 2.0 1.0;
-                 1.0 1.0 1.0 1.0]
-        @test_throws ArgumentError MVNSampler(mu, Sigma)
+        local Σ = [2.0 1.0 3.0 1.0;
+                   1.0 2.0 1.0 1.0;
+                   3.0 1.0 2.0 1.0;
+                   1.0 1.0 1.0 1.0]
+        @test_throws ArgumentError MVNSampler(μ, Σ)
     end
 
     @testset "check availability of rank deficient matrix" begin
-        A = randn(n,n)
-        for r=1:n-2
-            r=2
-            for i = 1:r
-                A[:, end+1-i] = sum(A[:, 1:end-r], 2)
+        local A = randn(n,n)
+        for r ∈ 1:n-2
+            r = 2
+            for i ∈ 1:r
+                A[:, end+1-i] = sum(A[:, 1:end-r], dims = 2)
             end
-            Sigma = A * A'
-            @test typeof(MVNSampler(mu,Sigma)) <: MVNSampler
+            local Σ = A * transpose(A)
+            @test isa(MVNSampler(μ, Σ), MVNSampler)
         end
     end
 
     @testset "test covariance matrices of Int and Rational" begin
-        n = 2
-        mu = zeros(2)
-        for T in [Int, Rational{Int}]
-            Sigma = eye(T, n)
-            @test typeof(MVNSampler(mu, Sigma)) <: MVNSampler
+        local n = 2
+        local μ = zeros(2)
+        for T ∈ [Int, Rational{Int}]
+            local Σ = Matrix(Diagonal(ones(T, n)))
+            @test isa(MVNSampler(μ, Σ), MVNSampler)
         end
     end
 
-end  # @testset
+end
