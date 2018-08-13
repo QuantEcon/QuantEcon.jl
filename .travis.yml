@@ -8,13 +8,9 @@ addons:
     - libnlopt0
     - hdf5-tools
 julia:
-    - 0.6
-    - 0.7
-    - nightly
+    - 1.0
 matrix:
     allow_failures:
-        - julia: 0.7
-        - julia: nightly
 notifications:
     email: false
 #script: # use the default script setting which is equivalent to the following

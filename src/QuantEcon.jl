@@ -1,5 +1,3 @@
-__precompile__()
-
 module QuantEcon
 
 import Base: mean, std, var, show, isapprox
