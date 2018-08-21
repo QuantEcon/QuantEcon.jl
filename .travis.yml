@@ -8,7 +8,7 @@ addons:
     - libnlopt0
     - hdf5-tools
 julia:
-    - 1.0
+    - 0.7
 matrix:
     allow_failures:
 notifications:
