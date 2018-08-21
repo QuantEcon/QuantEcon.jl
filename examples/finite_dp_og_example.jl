@@ -52,11 +52,10 @@ function populate_R!(n,m,R,u,alpha)
             end
         end
     end
-end         
+end
 
 function populate_Q!(m,Q,B)
     for a in 1:m
-        Q[:, a, a:(a + B)] = 1.0 / (B+1)
+        Q[:, a, a:(a + B)] .= 1.0 / (B+1)
     end
 end
-

@@ -6,7 +6,7 @@ abstract type AbstractUtility end
 
 # Consumption utility
 
-doc"""
+@doc doc"""
 Type used to evaluate log utility. Log utility takes the form
 
 u(c) = \log(c)
@@ -107,4 +107,3 @@ EllipticalUtility(;b=0.5223, μ=2.2926) = EllipticalUtility(b, μ)
     u.b * (1.0 - l^u.μ)^(1.0 / u.μ)
 derivative(u::EllipticalUtility, l::Float64) =
     -u.b * (1.0 - l^u.μ)^(1.0/u.μ - 1.0) * l^(u.μ - 1.0)
-

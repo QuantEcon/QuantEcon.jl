@@ -58,6 +58,6 @@ values in the array `y`.
 function lae_est(l::LAE, y::AbstractArray{T}) where T
     k = length(y)
     v = l.p(l.X, reshape(y, 1, k))
-    psi_vals = mean(v, 1)
-    return squeeze(psi_vals, 1)
+    psi_vals = mean(v, dims = 1)
+    return dropdims(psi_vals, dims = 1)
 end

@@ -26,7 +26,7 @@
     C = [0.0 0.0 sigma_d]'
 
     rblq = RBLQ(Q, R, A, B, C, β, θ)
-    lq = LQ(Q, R, A, B, C, β)
+    lq = QuantEcon.LQ(Q, R, A, B, C, β)
 
     Fr, Kr, Pr = robust_rule(rblq)
 

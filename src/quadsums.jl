@@ -6,7 +6,7 @@ Functions to compute quadratic sums
 @date : 2014-08-19
 =#
 
-doc"""
+@doc doc"""
 Computes the expected discounted quadratic sum
 
 ```math
@@ -53,12 +53,12 @@ function var_quadratic_sum(A::ScalarOrArray, C::ScalarOrArray, H::ScalarOrArray,
     # solve system
     Q = solve_discrete_lyapunov(sqrt(bet) .* A', H)
     cq = C'*Q*C
-    v = trace(cq) * bet / (1 - bet)
+    v = tr(cq) * bet / (1 - bet)
     q0 = x0'*Q*x0 + v
     return q0[1]
 end
 
-doc"""
+@doc doc"""
 Computes the quadratic sum
 
 ```math

@@ -1,6 +1,6 @@
 @testset "Testing quadsums.jl" begin
     rough_kwargs = Dict(:atol => 1e-10, :rtol => 1e-10)
-    
+
     @testset "test simple var sum" begin
         beta = .95
         A = 1.
@@ -15,9 +15,9 @@
 
     @testset "test identity var sum" begin
         beta = .95
-        A = eye(3)
+        A = Matrix(I, 3, 3)
         C = zeros(3, 3)
-        H = eye(3)
+        H = Matrix(I, 3, 3)
         x0 = ones(3)
 
         val = var_quadratic_sum(A, C, H, beta, x0)

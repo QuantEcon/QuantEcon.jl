@@ -1,4 +1,4 @@
-doc"""
+@doc doc"""
 apply Hodrick-Prescott filter to `AbstractVector`.
 
 ##### Arguments
@@ -18,12 +18,12 @@ function hp_filter(y::AbstractVector{T}, λ::Real) where T <: Real
                            1 + 5λ, 1 + λ),
                  1 => vcat(-2λ, fill(-4λ, N - 3), -2λ),
                  2 => fill(λ, N-2))
-    y_trend = H \ y
+    y_trend = float(H) \ y
     y_cyclical = y - y_trend
     return y_cyclical, y_trend
 end
 
-doc"""
+@doc doc"""
 This function applies "Hamilton filter" to `AbstractVector`.
 
 http://econweb.ucsd.edu/~jhamilto/hp.pdf
@@ -59,7 +59,7 @@ function hamilton_filter(y::AbstractVector, h::Integer, p::Integer)
     return y_cycle, y_trend
 end
 
-doc"""
+@doc doc"""
 This function applies "Hamilton filter" to `<:AbstractVector`
 under random walk assumption.
 
