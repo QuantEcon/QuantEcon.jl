@@ -197,7 +197,7 @@ Compute a simulated sample path assuming Gaussian shocks.
 
 """
 function simulation(arma::ARMA; ts_length=90, impulse_length=30)
-    # Simulate the ARMA process arma assuing Gaussian shocks
+    # Simulate the ARMA process arma assuming Gaussian shocks
     J = impulse_length
     T = ts_length
     psi = impulse_response(arma, impulse_length=impulse_length)
