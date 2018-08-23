@@ -14,7 +14,7 @@ https://lectures.quantecon.org/jl/lqcontrol.html
 
 =#
 
-doc"""
+@doc doc"""
 Linear quadratic optimal control of either infinite or finite horizon
 
 The infinite horizon problem can be written
@@ -80,7 +80,7 @@ mutable struct LQ
     C::ScalarOrArray
     N::ScalarOrArray
     bet::Real
-    capT::Union{Int, Void} # terminal period
+    capT::Union{Int, Nothing} # terminal period
     rf::ScalarOrArray
     P::ScalarOrArray
     d::Real
@@ -121,7 +121,7 @@ function LQ(Q::ScalarOrArray,
             C::ScalarOrArray=zeros(size(R, 1)),
             N::ScalarOrArray=zero(B'A);
             bet::ScalarOrArray=1.0,
-            capT::Union{Int,Void}=nothing,
+            capT::Union{Int,Nothing}=nothing,
             rf::ScalarOrArray=fill(NaN, size(R)...))
 
     k = size(Q, 1)
@@ -133,7 +133,7 @@ function LQ(Q::ScalarOrArray,
     LQ(Q, R, A, B, C, N, bet, capT, rf, P, d, F)
 end
 
-doc"""
+@doc doc"""
 Update `P` and `d` from the value function representation in finite horizon case
 
 ##### Arguments
@@ -167,14 +167,14 @@ function update_values!(lq::LQ)
     # Shift P back in time one step
     new_P = R - s2'lq.F + s3
 
-    # Recalling that trace(AB) = trace(BA)
-    new_d = lq.bet * (d + trace(P * C * C'))
+    # Recalling that tr(AB) = tr(BA)
+    new_d = lq.bet * (d + tr(P * C * C'))
 
     # Set new state
     lq.P, lq.d = new_P, new_d
 end
 
-doc"""
+@doc doc"""
 Computes value and policy functions in infinite horizon model.
 
 ##### Arguments
@@ -202,12 +202,12 @@ function stationary_values!(lq::LQ)
     P = solve_discrete_riccati(A0, B0, R, Q, N)
 
     # Compute F
-    s1 = Q + lq.bet * (B' * P * B)
-    s2 = lq.bet * (B' * P * A) + N
+    s1 = Q .+ lq.bet * (B' * P * B)
+    s2 = lq.bet * (B' * P * A) .+ N
     F = s1 \ s2
 
     # Compute d
-    d = lq.bet * trace(P * C * C') / (1 - lq.bet)
+    d = lq.bet * tr(P * C * C') / (1 - lq.bet)
 
     # Bind states
     lq.P, lq.F, lq.d = P, F, d
@@ -239,8 +239,8 @@ Private method implementing `compute_sequence` when state is a scalar
 function _compute_sequence(lq::LQ, x0::T, policies) where T
     capT = length(policies)
 
-    x_path = Array{T}(capT+1)
-    u_path = Array{T}(capT)
+    x_path = Vector{T}(undef, capT+1)
+    u_path = Vector{T}(undef, capT)
 
     x_path[1] = x0
     u_path[1] = -(first(policies)*x0)
@@ -266,8 +266,8 @@ function _compute_sequence(lq::LQ, x0::Vector{T}, policies) where T
 
     A, B, C = lq.A, reshape(lq.B, n, k), reshape(lq.C, n, j)
 
-    x_path = Array{T}(n, capT+1)
-    u_path = Array{T}(k, capT)
+    x_path = Matrix{T}(undef, n, capT+1)
+    u_path = Matrix{T}(undef, k, capT)
     w_path = C*randn(j, capT+1)
 
     x_path[:, 1] = x0
@@ -283,7 +283,7 @@ function _compute_sequence(lq::LQ, x0::Vector{T}, policies) where T
     x_path, u_path, w_path
 end
 
-doc"""
+@doc doc"""
 Compute and return the optimal state and control sequence, assuming innovation ``N(0,1)``
 
 ##### Arguments
@@ -302,12 +302,12 @@ Compute and return the optimal state and control sequence, assuming innovation `
 function compute_sequence(lq::LQ, x0::ScalarOrArray, ts_length::Integer=100)
 
     # Compute and record the sequence of policies
-    if isa(lq.capT, Void)
+    if isa(lq.capT, Nothing)
         stationary_values!(lq)
         policies = fill(lq.F, ts_length)
     else
         capT = min(ts_length, lq.capT)
-        policies = Array{typeof(lq.F)}(capT)
+        policies = Vector{typeof(lq.F)}(undef, capT)
         for t = capT:-1:1
             update_values!(lq)
             policies[t] = lq.F

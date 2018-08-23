@@ -78,7 +78,7 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
         R_max = s_wise_max(R)
         if any(R_max .== -Inf)
             # First state index such that all actions yield -Inf
-            s = find(R_max .== -Inf) #-Only Gives True
+            s = findall(R_max .== -Inf) #-Only Gives True
             throw(ArgumentError("for every state the reward must be finite for
                 some action: violated for state $s"))
         end
@@ -121,7 +121,7 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
         end
 
         if _has_sorted_sa_indices(s_indices, a_indices)
-            a_indptr = Array{Int64}(num_states+1)
+            a_indptr = Array{Int64}(undef, num_states + 1)
             _a_indices = copy(a_indices)
             _generate_a_indptr!(num_states, s_indices, a_indptr)
         else
@@ -143,7 +143,7 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
         aptr_diff = diff(a_indptr)
         if any(aptr_diff .== 0.0)
             # First state index such that no action is available
-            s = find(aptr_diff .== 0.0)  # Only Gives True
+            s = findall(aptr_diff .== 0.0)  # Only Gives True
             throw(ArgumentError("for every state at least one action
                 must be available: violated for state $s"))
         end
@@ -299,7 +299,7 @@ end
 # Bellman operator methods #
 # ------------------------ #
 
-doc"""
+@doc doc"""
 The Bellman operator, which computes and returns the updated value function ``Tv``
 for a value function ``v``.
 
@@ -326,7 +326,7 @@ function bellman_operator!(
     Tv, sigma
 end
 
-doc"""
+@doc doc"""
 Apply the Bellman operator using `v=ddpr.v`, `Tv=ddpr.Tv`, and `sigma=ddpr.sigma`
 
 ##### Notes
@@ -368,7 +368,7 @@ function bellman_operator!(ddp::DiscreteDP{T1,NR,NQ,T2},
     bellman_operator!(ddp, v, v, sigma)
 end
 
-doc"""
+@doc doc"""
 The Bellman operator, which computes and returns the updated value function ``Tv``
 for a given value function ``v``.
 
@@ -388,7 +388,7 @@ bellman_operator(ddp::DiscreteDP, v::AbstractVector) =
 # Compute greedy methods #
 # ---------------------- #
 
-doc"""
+@doc doc"""
 Compute the ``v``-greedy policy
 
 ##### Parameters
@@ -408,7 +408,7 @@ modifies ddpr.sigma and ddpr.Tv in place
 compute_greedy!(ddp::DiscreteDP, ddpr::DPSolveResult) =
     (bellman_operator!(ddp, ddpr); ddpr.sigma)
 
-doc"""
+@doc doc"""
 Compute the ``v``-greedy policy.
 
 #### Arguments
@@ -554,7 +554,7 @@ end
 
 # TODO: express it in a similar way as above to exploit Julia's column major order
 function RQ_sigma(ddp::DDPsa, sigma::AbstractVector{T}) where T<:Integer
-    sigma_indices = Array{T}(num_states(ddp))
+    sigma_indices = Array{T}(undef, num_states(ddp))
     _find_indices!(get(ddp.a_indices), get(ddp.a_indptr), sigma, sigma_indices)
     R_sigma = ddp.R[sigma_indices]
     Q_sigma = ddp.Q[sigma_indices, :]
@@ -580,7 +580,7 @@ end
 Return the `Vector` `max_a vals(s, a)`,  where `vals` is represented as a
 `AbstractMatrix` of size `(num_states, num_actions)`.
 """
-s_wise_max(vals::AbstractMatrix) = vec(maximum(vals, 2))
+s_wise_max(vals::AbstractMatrix) = vec(maximum(vals, dims = 2))
 
 """
 Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
@@ -623,7 +623,7 @@ end
 
 function s_wise_max(ddp::DDPsa, vals::AbstractVector)
     s_wise_max!(get(ddp.a_indices), get(ddp.a_indptr), vals,
-                 Array{Float64}(num_states(ddp)))
+                 Array{Float64}(undef, num_states(ddp)))
 end
 
 function s_wise_max!(
@@ -752,7 +752,7 @@ function _find_indices!(
     end
 end
 
-doc"""
+@doc doc"""
 Define Matrix Multiplication between 3-dimensional matrix and a vector
 
 Matrix multiplication over the last dimension of ``A``
@@ -788,7 +788,7 @@ function _solve!(
 
         # compute error and update the v inside ddpr
         err = maximum(abs, ddpr.Tv .- ddpr.v)
-        copy!(ddpr.v, ddpr.Tv)
+        copyto!(ddpr.v, ddpr.Tv)
         ddpr.num_iter += 1
 
         if err < tol
@@ -820,7 +820,7 @@ function _solve!(
        if all(old_sigma .== ddpr.sigma)
            break
        end
-       copy!(old_sigma, ddpr.sigma)
+       copyto!(old_sigma, ddpr.sigma)
 
     end
 
@@ -851,19 +851,19 @@ function _solve!(
 
         # check convergence
         if span(dif) < tol
-            ddpr.v = ddpr.Tv + midrange(dif) * beta / (1-beta)
+            ddpr.v = ddpr.Tv .+ midrange(dif) * beta / (1-beta)
             break
         end
 
         # now update v to use the output of the bellman step when entering
         # policy loop
-        copy!(ddpr.v, ddpr.Tv)
+        copyto!(ddpr.v, ddpr.Tv)
 
         # now do k iterations of policy iteration
         R_sigma, Q_sigma = RQ_sigma(ddp, ddpr)
         for i in 1:k
             ddpr.Tv = R_sigma + beta * Q_sigma * ddpr.v
-            copy!(ddpr.v, ddpr.Tv)
+            copyto!(ddpr.v, ddpr.Tv)
         end
 
     end

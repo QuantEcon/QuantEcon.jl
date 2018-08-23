@@ -95,7 +95,7 @@ each row.
 - `p::Array` : Stochastic matrix.
 
 """
-function random_stochastic_matrix(n::Integer, k::Union{Integer, Void}=nothing)
+function random_stochastic_matrix(n::Integer, k::Union{Integer, Nothing}=nothing)
     if !(n > 0)
         throw(ArgumentError("n must be a positive integer"))
     end
@@ -127,7 +127,7 @@ as columns `m` probability vectors of length `n` with `k` nonzero entries.
 
 """
 function _random_stochastic_matrix(n::Integer, m::Integer;
-                                   k::Union{Integer, Void}=nothing)
+                                   k::Union{Integer, Nothing}=nothing)
     if k == nothing
         k = n
     end
@@ -137,7 +137,7 @@ function _random_stochastic_matrix(n::Integer, m::Integer;
 
     # if k < n
     # Randomly sample row indices for each column for nonzero values
-    row_indices = Vector{Int}(k*m)
+    row_indices = Vector{Int}(undef, k*m)
     for j in 1:m
         row_indices[(j-1)*k+1:j*k] = sample(1:n, k, replace=false)
     end
@@ -177,8 +177,8 @@ distribution with mean 0 and standard deviation `scale`.
 """
 function random_discrete_dp(num_states::Integer,
                             num_actions::Integer,
-                            beta::Union{Real, Void}=nothing;
-                            k::Union{Integer, Void}=nothing,
+                            beta::Union{Real, Nothing}=nothing;
+                            k::Union{Integer, Nothing}=nothing,
                             scale::Real=1)
     L = num_states * num_actions
     R = scale * randn(L)
@@ -214,10 +214,10 @@ function random_probvec(k::Integer, m::Integer)
     k == 1 && return ones((k, m))
 
     # if k >= 2
-    x = Array{Float64}((k, m))
+    x = Matrix{Float64}(undef, k, m)
 
     r = rand(k-1, m)
-    x[1:end-1, :] = sort(r, 1)
+    x[1:end .- 1, :] = sort(r, dims = 1)
 
     for j in 1:m
         x[end, j] = 1 - x[end-1, j]

@@ -139,7 +139,7 @@ macro def_sim(sim_name, default_type_params, obs_typedef)
         Expr(:(=), expr.args[1], Expr(:call, arr_type, :sz))
     end..., :($(sim_name)($([i.args[1] for i in sim_fields.args]...))))
 
-    sim_constructor = :(function $(sim_name){$N_sym}(sz::NTuple{$N_sym,Int})
+    sim_constructor = :(function $(sim_name)(sz::NTuple{$N_sym,Int}) where $N_sym
     $body
     end)
 
