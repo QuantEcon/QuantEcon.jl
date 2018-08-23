@@ -21,7 +21,7 @@
     #
     # Test discrete estimation
     #
-    srand(42)
+    Random.seed!(42)
     P = [0.5 0.25 0.25
          0.25 0.5 0.25
          0.25 0.25 0.5]

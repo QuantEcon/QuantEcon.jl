@@ -1,20 +1,16 @@
-@static if isdefined(Base, :Iterators)
-    using Base.Iterators: take, cycle
-end
+"""
+Generate the markov matrix for the KMR model with *sequential* move
 
+n: number of players
+p: level of p-dominance for action 2
+   = the value of p such that action 2 is the BR for (1-q, q) for any q > p,
+     where q (1-q, resp.) is the prob that the opponent plays action 2 (1, resp.)
+ε: mutation probability
+
+References:
+    kmr_markov_matrix_sequential is contributed from https://github.com/oyamad
+"""
 function kmr_markov_matrix_sequential(n::Integer, p::T, ε::T) where T<:Real
-    """
-    Generate the markov matrix for the KMR model with *sequential* move
-
-    n: number of players
-    p: level of p-dominance for action 2
-       = the value of p such that action 2 is the BR for (1-q, q) for any q > p,
-         where q (1-q, resp.) is the prob that the opponent plays action 2 (1, resp.)
-    ε: mutation probability
-
-    References:
-        kmr_markov_matrix_sequential is contributed from https://github.com/oyamad
-    """
     P = zeros(T, n+1, n+1)
 
     P[1, 1], P[1, 2] = 1 - ε/2, ε/2
@@ -30,14 +26,10 @@ function kmr_markov_matrix_sequential(n::Integer, p::T, ε::T) where T<:Real
 end
 
 
-function Base.isapprox(x::Vector{Vector{T}},
-                       y::Vector{Vector{S}}) where {T<:Real,S<:Real}
-    n = length(x)
-    length(y) == n || return false
-    for i in 1:n
-        isapprox(x[i], y[i])::Bool || return false
-    end
-    return true
+function Base.isapprox(x::Vector{Vector{<:Real}},
+                       y::Vector{Vector{<:Real}})
+    length(x) == length(y) || return false
+    return all(xy -> isapprox(x, y), zip(x, y))
 end
 
 
@@ -127,7 +119,7 @@ end
             # "cyclic_classes" => Vector[[1], [2]],
         ),
         Dict(
-            "P" => eye(2),
+            "P" => Matrix{Float64}(I, 2, 2),
             "stationary_dists" => Vector{Float64}[[1, 0], [0, 1]],
             "comm_classes" => Vector{Int}[[1], [2]],
             "rec_classes" => Vector{Int}[[1], [2]],
@@ -235,7 +227,7 @@ end
             # "cyclic_classes" => Vector[[1], [2]],
         ),
         Dict(
-            "P" => eye(Int, 2),
+            "P" => Matrix{Int}(I, 2, 2),
             "stationary_dists" => Vector{Rational{Int}}[[1, 0], [0, 1]],
             "comm_classes" => Vector{Int}[[1], [2]],
             "rec_classes" => Vector{Int}[[1], [2]],
@@ -406,7 +398,7 @@ end
             @test size(simulate_indices(mc, ts_length; init=init)) ==
                        (ts_length, )
             for num_sims in nums_sims
-                X = Array{Int64}(ts_length, num_sims)
+                X = Matrix{Int64}(undef, ts_length, num_sims)
                 @test size(simulate_indices!(X, mc)) ==
                            (ts_length, num_sims)
                 @test size(simulate_indices!(X, mc; init=init)) ==
@@ -423,7 +415,7 @@ end
             @test Y[1] == init
 
             num_sims = 5
-            X = Array{Int64}(ts_length, num_sims)
+            X = Matrix{Int64}(undef, ts_length, num_sims)
             simulate_indices!(X, mc; init=init)
             @test vec(X[1, :]) == init .* ones(Int, num_sims)
 
@@ -470,7 +462,7 @@ end
 
                 @test size(@inferred(simulate(mc, ts_length))) == (ts_length,)
                 for num_sims in nums_sims
-                    X = Array{T}(ts_length, num_sims)
+                    X = Matrix{T}(undef, ts_length, num_sims)
                     @test size(simulate!(X, mc)) ==
                            (ts_length, num_sims)
                     @test size(simulate!(X, mc; init=init)) ==
@@ -487,7 +479,7 @@ end
                 @test Y[1] == mc.state_values[init]
 
                 num_sims = 5
-                X = Array{eltype(mc.state_values)}(ts_length, num_sims)
+                X = Array{eltype(mc.state_values)}(undef, ts_length, num_sims)
                 simulate!(X, mc; init=init)
                 @test vec(X[1, :]) == mc.state_values[init .* ones(Int, num_sims)]
 
@@ -508,7 +500,7 @@ end
         mcis = MCIndSimulator(mc, 50, 1)
 
         want = collect(take(cycle(1:4), 50))
-        have = Array{Int}(50)
+        have = Vector{Int}(undef, 50)
         for (ix, i) in enumerate(mcis)
             have[ix] = i
         end
@@ -539,10 +531,6 @@ end
         @test length(mcs) == 50
         @test eltype(mcs) == Float64
 
-        if isdefined(Base, :iteratorsize)
-            @test Base.iteratorsize(mcs) == Base.HasLength()
-            @test Base.iteratorsize(mcis) == Base.HasLength()
-        end
     end
 
 end  # testset
