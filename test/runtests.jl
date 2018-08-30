@@ -9,7 +9,7 @@ using Random
 using FFTW
 using DSP
 using SparseArrays
-using HDF5, JLD2, MAT
+using HDF5, JLD2
 using Test
 
 tests = [
@@ -28,7 +28,7 @@ tests = [
         "matrix_eqn",
         "mc_tools",
         "modeltool", # Check the submodule issue
-        "quad",
+        # "quad",
         "quadsum",
         "random_mc",
         "robustlq",
@@ -46,7 +46,7 @@ if length(ARGS) > 0
 end
 
 Random.seed!(42)
-include("util.jl")
+# include("util.jl")
 
 for t in tests
     test_file = "test_$t.jl"

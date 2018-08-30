@@ -506,11 +506,7 @@ end
         end
         @test have == want
 
-        @test start(mcis) == (1, 0)
-        for i in 1:49
-            @test !done(mcis, (1, i))
-        end
-        @test done(mcis, (1, 50))
+        @test iterate(mcis) == (1, (2, 1))
         @test length(mcis) == 50
         @test eltype(mcis) == Int
 
@@ -523,14 +519,9 @@ end
 
         @test have == want
 
-        @test start(mcs) == (1, 0)
-        for i in 1:49
-            @test !done(mcs, (1, i))
-        end
-        @test done(mcs, (1, 50))
+        @test iterate(mcs) == (10.0, (2, 1))
         @test length(mcs) == 50
         @test eltype(mcs) == Float64
-
     end
 
 end  # testset

@@ -38,7 +38,7 @@
         x_seq, u_seq, w_seq = compute_sequence(lq_mat, x0)
 
         @test isapprox(sum(u_seq), 0.95 * sum(x0); rough_kwargs...)
-        @test isapprox(x_seq[:,end], zeros(x0); rough_kwargs...)
+        @test isapprox(x_seq[:,end], zero(x0); rough_kwargs...)
     end
 
     @testset "test stationary matrix" begin

@@ -303,28 +303,24 @@ function MCIndSimulator(mc::MarkovChain, len::Int, init::Int)
     MCIndSimulator(mc, len, init, drvs)
 end
 
-# function Base.iterate(iter::MCIndSimulator, state=(iter.init, 0))
-#     element, count = state
-#     if count ≥ length(iter)
-#         return nothing
-#     end
-#     return (element, (rand(iter.drvs[element]), count + 1))
+# Base.start(mcis::MCIndSimulator) = (mcis.init, 0)
+# function Base.next(mcis::MCIndSimulator, state::Tuple{Int,Int})
+#     ix, t = state
+#     (ix, (rand(mcis.drvs[ix]), t+1))
 # end
-#
-# Base.length(iter::MCIndSimulator) = iter.len
-#
-# Base.eltype(iter::MCIndSimulator) = Int
+# Base.done(mcis::MCIndSimulator, s::Tuple{Int,Int}) = s[2] >= mcis.len
 
-Base.start(mcis::MCIndSimulator) = (mcis.init, 0)
-
-function Base.next(mcis::MCIndSimulator, state::Tuple{Int,Int})
+function Base.iterate(mcis::MCIndSimulator, state::Tuple{Int,Int}=(mcis.init, 0))
     ix, t = state
+    if t >= mcis.len
+        return nothing
+    end
     (ix, (rand(mcis.drvs[ix]), t+1))
 end
 
-Base.done(mcis::MCIndSimulator, s::Tuple{Int,Int}) = s[2] >= mcis.len
 Base.length(mcis::MCIndSimulator) = mcis.len
 Base.eltype(mcis::MCIndSimulator) = Int
+Base.IteratorSize(mcis::MCIndSimulator) = Base.HasLength()
 
 
 mutable struct MCSimulator{T<:MCIndSimulator}
@@ -336,17 +332,18 @@ function MCSimulator(mc::MarkovChain, len::Int, init::Int)
 end
 
 # only need to implement next and eltype differently...
-function Base.next(mcs::MCSimulator, state::Tuple{Int,Int})
-    ix, new_state = next(mcs.mcis, state)
+function Base.iterate(mcs::MCSimulator, state::Tuple{Int,Int}=(mcs.mcis.init, 0))
+    output = iterate(mcs.mcis, state)
+    if output === nothing
+        return output
+    end
+    ix, new_state = output
     (mcs.mcis.mc.state_values[ix], new_state)
 end
 Base.eltype(mcs::MCSimulator) = eltype(mcs.mcis.mc)
 
 # ...the rest of the interface can derive from mcis
-Base.start(mcs::MCSimulator) = start(mcs.mcis)
-Base.done(mcs::MCSimulator, state::Tuple{Int,Int}) = done(mcs.mcis, state)
 Base.length(mcs::MCSimulator) = length(mcs.mcis)
-Base.IteratorSize(mcis::MCIndSimulator) = Base.HasLength()
 Base.IteratorSize(mcs::MCSimulator) = Base.IteratorSize(mcs.mcis)
 
 """

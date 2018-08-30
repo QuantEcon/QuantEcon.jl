@@ -125,9 +125,9 @@ Tests for markov/ddp.jl
 
     @testset "compute_greedy! changes ddpr.v" begin
         res = solve(ddp0, VFI)
-        res.Tv[:] = 500.0
+        res.Tv[:] .= 500.0
         compute_greedy!(ddp0, res)
-        @test maximum(abs, res.Tv - 500.0) > 0
+        @test maximum(abs, res.Tv .- 500.0) > 0
     end
 
     @testset "value_iteration" begin

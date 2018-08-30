@@ -211,11 +211,10 @@ function stationary_distributions(lss::LSS; max_iter=200, tol=1e-5)
         mu_x, Sigma_x = mu_x1, Sigma_x1
 
         if err < tol && i > 1
-            break
+            # return here because of how scoping works in loops.
+            return mu_x1, mu_y, Sigma_x1, Sigma_y
         end
     end
-
-    return mu_x, mu_y, Sigma_x, Sigma_y
 end
 
 function geometric_sums(lss::LSS, bet, x_t)

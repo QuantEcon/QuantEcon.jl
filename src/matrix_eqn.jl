@@ -150,8 +150,8 @@ function solve_discrete_riccati(A::ScalarOrArray, B::ScalarOrArray,
     # Initial conditions
     Q_tilde = -Q .+ N' * (R_hat\(N .+ gamma .* BTA)) .+ gamma .* Im
     G0 = B * (R_hat\B')
-    A0 = (Im - gamma .* G0) * A - B * (R_hat\N)
-    H0 = gamma .* A'*A0 - Q_tilde
+    A0 = (Im .- gamma .* G0) * A .- B * (R_hat\N)
+    H0 = gamma .* A'*A0 .- Q_tilde
     i = 1
 
     # Main loop
@@ -162,9 +162,9 @@ function solve_discrete_riccati(A::ScalarOrArray, B::ScalarOrArray,
             error(msg)
         end
 
-        A1 = A0 * ((Im + G0 * H0)\A0)
-        G1 = G0 + A0 * G0 * ((Im + H0 * G0)\A0')
-        H1 = H0 + A0' * ((Im + H0*G0)\(H0*A0))
+        A1 = A0 * ((Im .+ G0 * H0)\A0)
+        G1 = G0 .+ A0 * G0 * ((Im .+ H0 * G0)\A0')
+        H1 = H0 .+ A0' * ((Im .+ H0*G0)\(H0*A0))
 
         dist = maximum(abs, H1 - H0)
         A0 = A1

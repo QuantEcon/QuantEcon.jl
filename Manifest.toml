@@ -6,9 +6,9 @@ version = "0.3.2"
 
 [[Arpack]]
 deps = ["BinaryProvider", "Libdl", "LinearAlgebra", "Random", "SparseArrays", "Test"]
-git-tree-sha1 = "ffc099065b47835213386df346e4a8b807c320cd"
+git-tree-sha1 = "5b046410fb617d9cf2f8bc0edd5da05a2e5a2ad4"
 uuid = "7d9fca2a-8960-54d3-9f78-7d1dccf2cb97"
-version = "0.2.2"
+version = "0.2.3"
 
 [[Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
@@ -21,9 +21,9 @@ version = "0.8.10"
 
 [[BinaryProvider]]
 deps = ["Libdl", "Pkg", "SHA", "Test"]
-git-tree-sha1 = "ffbf89cc49b073cffdb91381b7ee60557a03ec96"
+git-tree-sha1 = "b530fbeb6f41ab5a83fbe3db1fcbe879334bcd2d"
 uuid = "b99e7846-7c00-51b0-8f62-c81ae34c0232"
-version = "0.4.1"
+version = "0.4.2"
 
 [[Blosc]]
 deps = ["BinaryProvider", "CMakeWrapper", "Compat", "Libdl"]
@@ -69,9 +69,9 @@ version = "0.2.0"
 
 [[Compat]]
 deps = ["Base64", "Dates", "DelimitedFiles", "Distributed", "InteractiveUtils", "LibGit2", "Libdl", "LinearAlgebra", "Markdown", "Mmap", "Pkg", "Printf", "REPL", "Random", "Serialization", "SharedArrays", "Sockets", "SparseArrays", "Statistics", "Test", "UUIDs", "Unicode"]
-git-tree-sha1 = "277d3807440d9793421354b6680911fc95d91a84"
+git-tree-sha1 = "ae262fa91da6a74e8937add6b613f58cd56cdad4"
 uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
-version = "1.0.1"
+version = "1.1.0"
 
 [[Conda]]
 deps = ["Compat", "JSON", "VersionParsing"]
@@ -87,9 +87,9 @@ version = "0.5.1"
 
 [[DataStructures]]
 deps = ["InteractiveUtils", "REPL", "Random", "Serialization", "Test"]
-git-tree-sha1 = "6e72a9098f5774601c8c8d6a4511a68270594910"
+git-tree-sha1 = "2afbbd0294306b0b74a753c196be50b35edb625c"
 uuid = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
-version = "0.11.0"
+version = "0.11.1"
 
 [[Dates]]
 deps = ["Printf"]
@@ -146,10 +146,10 @@ uuid = "f6369f11-7733-5829-9624-2563aa707210"
 version = "0.8.5"
 
 [[HDF5]]
-deps = ["BinDeps", "Blosc", "Compat", "Homebrew", "Libdl", "Pkg", "WinRPM"]
-git-tree-sha1 = "6e1cd8a2a71fe223ceccd8779b43a7daf006db9e"
+deps = ["BinDeps", "Blosc", "Distributed", "Homebrew", "Libdl", "LinearAlgebra", "Pkg", "Test", "WinRPM"]
+git-tree-sha1 = "2407ec97bdb872ed0d569ff8e592c7a5d60675bc"
 uuid = "f67ccb44-e63f-5c2f-98bd-6dc0ccc4ba2f"
-version = "0.9.4"
+version = "0.10.0"
 
 [[HTTPClient]]
 deps = ["Compat", "LibCURL"]
@@ -174,9 +174,9 @@ version = "0.3.1"
 
 [[JLD2]]
 deps = ["CodecZlib", "DataStructures", "FileIO", "LinearAlgebra", "Mmap", "Printf", "Random", "Test"]
-git-tree-sha1 = "6dad82183badddcaa078f5ad2e3c3634939afca1"
+git-tree-sha1 = "8f0b471c05fd5c256932bd08bb71729cbb7b966f"
 uuid = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
-version = "0.1.0"
+version = "0.1.1"
 
 [[JSON]]
 deps = ["Dates", "Distributed", "Mmap", "Pkg", "Sockets", "Test", "Unicode"]
@@ -186,15 +186,15 @@ version = "0.19.0"
 
 [[LibCURL]]
 deps = ["BinaryProvider", "Compat", "Libdl", "Pkg"]
-git-tree-sha1 = "f7c4fd37291207ec6bd4b7b9abfc512d4bb8b88e"
+git-tree-sha1 = "13cace3a2a2e76de68024c0b2c1a1bf00ee81b88"
 uuid = "b27032c2-a3e7-50c8-80cd-2d36dbcbfd21"
-version = "0.3.1"
+version = "0.3.2"
 
 [[LibExpat]]
-deps = ["Compat"]
-git-tree-sha1 = "8ba2ca1635ec1755bcf1432c9a2aa6c91a3fb4fd"
+deps = ["Compat", "Pkg"]
+git-tree-sha1 = "fde352ec13479e2f90e57939da2440fb78c5e388"
 uuid = "522f3ed2-3f36-55e3-b6df-e94fee9b0c07"
-version = "0.4.2"
+version = "0.5.0"
 
 [[LibGit2]]
 uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
@@ -210,9 +210,9 @@ version = "1.0.0"
 
 [[LightGraphs]]
 deps = ["Arpack", "Base64", "CodecZlib", "DataStructures", "DelimitedFiles", "Distributed", "LinearAlgebra", "Markdown", "Pkg", "Random", "SharedArrays", "SimpleTraits", "SparseArrays", "Statistics", "Test"]
-git-tree-sha1 = "84e93cd3d4982952ddb27d2ace9433a74b78705a"
+git-tree-sha1 = "fd35b52d1e347e71dfec1e2bf5dbc7d5a46db8ec"
 uuid = "093fc24a-ae57-5d10-9952-331d41423f4d"
-version = "1.0.0"
+version = "1.0.2"
 
 [[LineSearches]]
 deps = ["LinearAlgebra", "NLSolversBase", "NaNMath", "Parameters", "Printf", "Test"]
@@ -245,15 +245,15 @@ uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 
 [[MathProgBase]]
 deps = ["Compat"]
-git-tree-sha1 = "a3df6da48fcbdb56d7571b0c6f950b02dcea1754"
+git-tree-sha1 = "f0f7f184965f8c3d7eb10408fccdf546fa124725"
 uuid = "fdba3010-5040-5b88-9595-932c9decdf73"
-version = "0.7.2"
+version = "0.7.4"
 
 [[Missings]]
-deps = ["Compat"]
-git-tree-sha1 = "866fb034899be6055dcb6cb1a70fbda379bb0b55"
+deps = ["Dates", "InteractiveUtils", "SparseArrays", "Test"]
+git-tree-sha1 = "196528fa1df03df435025f52f9c1ff8356f94738"
 uuid = "e1d29d7a-bbdc-5cf2-9ac0-f12de2c33e28"
-version = "0.2.10"
+version = "0.3.0"
 
 [[Mmap]]
 uuid = "a63ad114-7e13-5084-954f-fe012c677804"
@@ -265,10 +265,10 @@ uuid = "d41bc354-129a-5804-8e4c-c37616107c6c"
 version = "7.1.0"
 
 [[NLopt]]
-deps = ["BinaryProvider", "CMakeWrapper", "Libdl", "MathProgBase", "Pkg", "Test"]
-git-tree-sha1 = "ecb65e788a6f51dd0c3036c9bc98537d14974329"
+deps = ["BinaryProvider", "CMakeWrapper", "Libdl", "MathProgBase", "Test"]
+git-tree-sha1 = "b46237debcacd4fed7bbeb31200667a75b90384f"
 uuid = "76087f3c-5699-56af-9a33-bf431cd00edd"
-version = "0.5.0"
+version = "0.5.1"
 
 [[NaNMath]]
 deps = ["Compat"]
@@ -278,21 +278,21 @@ version = "0.3.2"
 
 [[Nullables]]
 deps = ["Compat", "Pkg"]
-git-tree-sha1 = "7777136d2169f07b9674a9d8dbd550d99fd250b8"
+git-tree-sha1 = "ae1a63457e14554df2159b0b028f48536125092d"
 uuid = "4d1e1d77-625e-5b40-9113-a560ec7a8ecd"
-version = "0.0.7"
+version = "0.0.8"
 
 [[Optim]]
 deps = ["Calculus", "Compat", "DiffEqDiffTools", "ForwardDiff", "LineSearches", "LinearAlgebra", "NLSolversBase", "NaNMath", "Parameters", "Pkg", "PositiveFactorizations", "Printf", "Random", "SparseArrays", "StatsBase", "Test"]
-git-tree-sha1 = "0ed8809e72d3b595930c8ade539838a99f94dc8b"
+git-tree-sha1 = "4bf84a0d6f3e6dc472fc7a615503e84b510c74b5"
 uuid = "429524aa-4258-5aef-a3af-852621145aeb"
-version = "0.16.0"
+version = "0.17.0"
 
 [[PDMats]]
 deps = ["Arpack", "LinearAlgebra", "SparseArrays", "SuiteSparse", "Test"]
-git-tree-sha1 = "484f7fbb6c382ab6bcfff4d134f9b51fa29ee562"
+git-tree-sha1 = "9e3e7a5c9b8cfdba8c01a1bcae38fe0144936fda"
 uuid = "90014a1f-27ba-587c-ab20-58faa44d9150"
-version = "0.9.4"
+version = "0.9.5"
 
 [[Parameters]]
 deps = ["Compat", "DataStructures", "REPL"]
@@ -419,9 +419,9 @@ uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [[TranscodingStreams]]
 deps = ["DelimitedFiles", "Pkg", "Random", "Test"]
-git-tree-sha1 = "a27b3a1b9c1120ef67b4647b80c61a16c09b9218"
+git-tree-sha1 = "a34a2d588e2d2825602bf14a24216d5c8b0921ec"
 uuid = "3bb67fe8-82b1-5028-8e26-92a6c54297fa"
-version = "0.8.0"
+version = "0.8.1"
 
 [[URIParser]]
 deps = ["Test", "Unicode"]
@@ -444,6 +444,6 @@ version = "1.1.2"
 
 [[WinRPM]]
 deps = ["BinDeps", "Compat", "HTTPClient", "LibExpat", "Libdl", "Libz", "SHA", "URIParser"]
-git-tree-sha1 = "023faa2430b4ad3f9cf073c03cf100d80630fb6d"
+git-tree-sha1 = "3ff6d7ad07dc216d5fc8e70ac994a6d6bb46347c"
 uuid = "c17dfb99-b4f7-5aad-8812-456da1ad7187"
-version = "0.4.0"
+version = "0.4.1"

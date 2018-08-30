@@ -59,16 +59,6 @@
         end
     end
 
-    @testset "test moment iterator" begin
-        m = QuantEcon.LSSMoments(ss)
-
-        # never done
-        @test_broken !done(m, 1) # done is no longer on Julia > 0.6
-
-        # start should give us mu_0, Sigma_0
-        @test_broken start(m) == (ss.mu_0, ss.Sigma_0) # start is no longer on Julia > 0.6
-    end
-
     @testset "test positive semi-dfinite covariance" begin
 
         # set up

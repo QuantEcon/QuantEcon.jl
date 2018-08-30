@@ -141,7 +141,7 @@ computes log-likelihood of period ``t``
 function log_likelihood(k::Kalman, y::AbstractVector)
     eta = y - k.G*k.cur_x_hat # forecast error
     P = k.G*k.cur_sigma*k.G' + k.R # covariance matrix of forecast error
-    logL = - (length(y)*log(2pi) + logdet(P) + eta'/P*eta)[1]/2
+    logL = - (length(y)*log(2pi) + logdet(P) .+ eta'/P*eta)[1]/2
     return logL
 end
 

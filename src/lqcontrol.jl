@@ -103,9 +103,9 @@ transition equation.
   Must be symmetric and nonnegative definite
 - `A::ScalarOrArray` : `n x n` coefficient on state in state transition
 - `B::ScalarOrArray` : `n x k` coefficient on control in state transition
-- `;C::ScalarOrArray{zeros(size(R}(1)))` : `n x j` coefficient on random shock in
+- `;C::ScalarOrArray{zero(size(R}(1)))` : `n x j` coefficient on random shock in
   state transition
-- `;N::ScalarOrArray{zeros(size(B,1)}(size(A, 2)))` : `k x n` cross product in
+- `;N::ScalarOrArray{zero(size(B,1)}(size(A, 2)))` : `k x n` cross product in
   payoff equation
 - `;bet::Real(1.0)` : Discount factor in `[0, 1]`
 - `capT::Union{Int, Void}(Void)` : Terminal period in finite horizon
@@ -118,7 +118,7 @@ function LQ(Q::ScalarOrArray,
             R::ScalarOrArray,
             A::ScalarOrArray,
             B::ScalarOrArray,
-            C::ScalarOrArray=zeros(size(R, 1)),
+            C::ScalarOrArray=fill(zero(eltype(R)), size(R, 1)),
             N::ScalarOrArray=zero(B'A);
             bet::ScalarOrArray=1.0,
             capT::Union{Int,Nothing}=nothing,
@@ -126,7 +126,7 @@ function LQ(Q::ScalarOrArray,
 
     k = size(Q, 1)
     n = size(R, 1)
-    F = k==n==1 ? zero(Float64) : zeros(Float64, k, n)
+    F = k==n==1 ? zero(Float64) : fill(zero(Float64), k, n)
     P = copy(rf)
     d = 0.0
 
