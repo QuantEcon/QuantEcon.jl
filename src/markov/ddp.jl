@@ -23,7 +23,6 @@ Notes
 =#
 
 import Base: *
-using Nullables
 
 #------------------------#
 #-Types and Constructors-#
@@ -37,9 +36,9 @@ DiscreteDP type for specifying paramters for discrete dynamic programming model
 - `R::Array{T,NR}` : Reward Array
 - `Q::Array{T,NQ}` : Transition Probability Array
 - `beta::Float64`  : Discount Factor
-- `a_indices::Nullable{Vector{Tind}}`: Action Indices. Null unless using
+- `a_indices::Vector{Tind}`: Action Indices. Empty unless using
   SA formulation
-- `a_indptr::Nullable{Vector{Tind}}`: Action Index Pointers. Null unless using
+- `a_indptr::Vector{Tind}`: Action Index Pointers. Empty unless using
   SA formulation
 
 ##### Returns
@@ -51,8 +50,8 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
     R::Array{T,NR}                     # Reward Array
     Q::TQ                     # Transition Probability Array
     beta::Tbeta                        # Discount Factor
-    a_indices::Nullable{Vector{Tind}}  # Action Indices
-    a_indptr::Nullable{Vector{Tind}}   # Action Index Pointers
+    a_indices::Vector{Tind}  # Action Indices
+    a_indptr::Vector{Tind}   # Action Index Pointers
 
     function DiscreteDP{T,NQ,NR,Tbeta,Tind,TQ}(
             R::Array, Q::TQ, beta::Real
@@ -83,9 +82,9 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
                 some action: violated for state $s"))
         end
 
-        # here the indices and indptr are null.
-        _a_indices = Nullable{Vector{Int}}()
-        a_indptr = Nullable{Vector{Int}}()
+        # here the indices and indptr are empty.
+        _a_indices = Vector{Int}()
+        a_indptr = Vector{Int}()
 
         new{T,NQ,NR,Tbeta,Tind,typeof(Q)}(R, Q, beta, _a_indices, a_indptr)
     end
@@ -148,9 +147,9 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
                 must be available: violated for state $s"))
         end
 
-        # package into nullables before constructing type
-        _a_indices = Nullable{Vector{Tind}}(_a_indices)
-        a_indptr = Nullable{Vector{Tind}}(a_indptr)
+        # indices
+        _a_indices = Vector{Tind}(_a_indices)
+        a_indptr = Vector{Tind}(a_indptr)
 
         new{T,NQ,NR,Tbeta,Tind,typeof(Q)}(R, Q, beta, _a_indices, a_indptr)
     end
@@ -184,11 +183,11 @@ model State-Action Pair Formulation
 - `R::Array{T,NR}` : Reward Array
 - `Q::Array{T,NQ}` : Transition Probability Array
 - `beta::Float64`  : Discount Factor
-- `s_indices::Nullable{Vector{Tind}}`: State Indices. Null unless using
+- `s_indices::Vector{Tind}`: State Indices. Empty unless using
   SA formulation
-- `a_indices::Nullable{Vector{Tind}}`: Action Indices. Null unless using
+- `a_indices::Vector{Tind}`: Action Indices. Empty unless using
   SA formulation
-- `a_indptr::Nullable{Vector{Tind}}`: Action Index Pointers. Null unless using
+- `a_indptr::Vector{Tind}`: Action Index Pointers. Empty unless using
   SA formulation
 
 ##### Returns
@@ -555,7 +554,7 @@ end
 # TODO: express it in a similar way as above to exploit Julia's column major order
 function RQ_sigma(ddp::DDPsa, sigma::AbstractVector{T}) where T<:Integer
     sigma_indices = Array{T}(undef, num_states(ddp))
-    _find_indices!(get(ddp.a_indices), get(ddp.a_indptr), sigma, sigma_indices)
+    _find_indices!(ddp.a_indices, ddp.a_indptr, sigma, sigma_indices)
     R_sigma = ddp.R[sigma_indices]
     Q_sigma = ddp.Q[sigma_indices, :]
     return R_sigma, Q_sigma
@@ -622,7 +621,7 @@ end
 ## s_wise_max for DDPsa
 
 function s_wise_max(ddp::DDPsa, vals::AbstractVector)
-    s_wise_max!(get(ddp.a_indices), get(ddp.a_indptr), vals,
+    s_wise_max!(ddp.a_indices, ddp.a_indptr, vals,
                  Array{Float64}(undef, num_states(ddp)))
 end
 
@@ -630,7 +629,7 @@ function s_wise_max!(
         ddp::DDPsa, vals::AbstractVector, out::AbstractVector,
         out_argmax::AbstractVector
     )
-    s_wise_max!(get(ddp.a_indices), get(ddp.a_indptr), vals, out, out_argmax)
+    s_wise_max!(ddp.a_indices, ddp.a_indptr, vals, out, out_argmax)
 end
 
 """
