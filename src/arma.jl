@@ -15,7 +15,7 @@ https://lectures.quantecon.org/jl/arma.html
 
 =#
 
-doc"""
+@doc doc"""
 Represents a scalar ARMA(p, q) process
 
 If ``\phi`` and ``\theta`` are scalars, then the model is
@@ -91,7 +91,7 @@ function ARMA(phi::AbstractVector, theta::AbstractVector=[0.0], sigma::Real=1.0)
     return ARMA(phi, theta, p, q, sigma, ma_poly, ar_poly)
 end
 
-doc"""
+@doc doc"""
 Compute the spectral density function.
 
 The spectral density is the discrete time Fourier transform of the
@@ -122,7 +122,7 @@ the set of all integers.
 function spectral_density(arma::ARMA; res=1200, two_pi::Bool=true)
     # Compute the spectral density associated with ARMA process arma
     wmax = two_pi ? 2pi : pi
-    w = linspace(0, wmax, res)
+    w = range(0, stop=wmax, length=res)
     tf = TFFilter(reverse(arma.ma_poly), reverse(arma.ar_poly))
     h = freqz(tf, w)
     spect = arma.sigma.^2 .* abs.(h).^2
@@ -144,12 +144,12 @@ function autocovariance(arma::ARMA; num_autocov::Integer=16)
     # Compute the autocovariance function associated with ARMA process arma
     # Computation is via the spectral density and inverse FFT
     (w, spect) = spectral_density(arma)
-    acov = real(Base.ifft(spect))
+    acov = real(ifft(spect))
     # num_autocov should be <= len(acov) / 2
     return acov[1:num_autocov]
 end
 
-doc"""
+@doc doc"""
 Get the impulse response corresponding to our model.
 
 ##### Arguments
@@ -171,7 +171,7 @@ function impulse_response(arma::ARMA; impulse_length=30)
     # == Pad theta with zeros at the end == #
     theta = [arma.theta; zeros(impulse_length - arma.q)]
     psi_zero = 1.0
-    psi = Array{Float64}(impulse_length)
+    psi = Vector{Float64}(undef, impulse_length)
     for j = 1:impulse_length
         psi[j] = theta[j]
         for i = 1:min(j, arma.p)
@@ -202,7 +202,7 @@ function simulation(arma::ARMA; ts_length=90, impulse_length=30)
     T = ts_length
     psi = impulse_response(arma, impulse_length=impulse_length)
     epsilon = arma.sigma * randn(T + J)
-    X = Array{Float64}(T)
+    X = Vector{Float64}(undef, T)
     for t=1:T
         X[t] = dot(epsilon[t:J+t-1], psi)
     end

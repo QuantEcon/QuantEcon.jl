@@ -20,7 +20,7 @@
     rlq = -.25
     qlq = -.15
 
-    lq_obj = LQ(qlq, rlq, alq, blq, bet=1)
+    lq_obj = QuantEcon.LQ(qlq, rlq, alq, blq, bet=1)
 
     p_s, f, d = stationary_values(lq_obj)
 
@@ -91,7 +91,7 @@
 
         aaa = a - b1*f1 - b2*f2
         aa = aaa[1:2, 1:2]
-        tf = eye(2) - aa
+        tf = I - aa
         tfi = inv(tf)
         xbar = tfi*aaa[1:2, 3]
 

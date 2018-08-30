@@ -3,13 +3,8 @@
 =#
 
 import Base: ==
-import Compat.LinearAlgebra: BlasReal
-
-# For v0.6 compatibility
-@static if !isdefined(Compat.LinearAlgebra, :cholesky)
-    cholesky(A::AbstractMatrix, ::Val{true}; check::Bool=false) =
-        cholfact(A, Val{true})
-end
+import LinearAlgebra: BlasReal
+import Random
 
 struct MVNSampler{TM<:Real,TS<:Real,TQ<:BlasReal}
     mu::Vector{TM}
@@ -49,7 +44,7 @@ function MVNSampler(mu::Vector{TM}, Sigma::Matrix{TS}) where {TM<:Real,TS<:Real}
     end
 
     tril!(view(A, :, 1:r))
-    A[:, r+1:end] = 0
+    A[:, r+1:end] .= 0
     Q = A[p, p]
     isapprox(Q*Q', Sigma; rtol=RTOL2, atol=ATOL2) ||
         throw(ArgumentError(non_PSD_msg))

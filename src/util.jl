@@ -6,8 +6,8 @@ Utility functions used in the QuantEcon library
 @date: 2014-08-14
 
 =#
-meshgrid(x::AbstractVector, y::AbstractVector) = (repmat(x, 1, length(y))',
-                                                  repmat(y, 1, length(x)))
+meshgrid(x::AbstractVector, y::AbstractVector) = (repeat(x, 1, length(y))',
+                                                  repeat(y, 1, length(x)))
 
 fix(x::Real) = x >= 0 ? floor(Int, x) : ceil(Int, x)
 fix!(x::AbstractArray{T}, out::Array{Int}) where {T<:Real} = map!(fix, out, x)
@@ -35,7 +35,7 @@ ckron
 `gridmake!(out::AbstractMatrix, arrays::AbstractVector...)`
 
 Like `gridmake`, but fills a pre-populated array. `out` must have size
-`prod(map(length, arrays), length(arrays))`
+`prod(map(length, arrays), dims = length(arrays))`
 """
 function gridmake!(out, arrays::Union{AbstractVector,AbstractMatrix}...)
     lens = Int[size(e, 1) for e in arrays]
@@ -76,7 +76,7 @@ end
             l *= size(arr, 1)
             n += size(arr, 2)
         end
-        out = Array{$T}(l, n)
+        out = Matrix{$T}(undef, l, n)
         gridmake!(out, arrays...)
         out
     end
@@ -120,7 +120,7 @@ julia> gridmake(x, y, z)
 """
 gridmake
 
-doc"""
+@doc doc"""
 General function for testing for stability of matrix ``A``. Just
 checks that eigenvalues are less than 1 in absolute value.
 
@@ -165,7 +165,7 @@ function num_compositions(m, n)
 end
 
 
-doc"""
+@doc doc"""
 Construct an array consisting of the integer points in the
 (m-1)-dimensional simplex $\{x \mid x_0 + \cdots + x_{m-1} = n
 \}$, or equivalently, the m-part compositions of n, which are listed
@@ -206,13 +206,13 @@ A. Nijenhuis and H. S. Wilf, Combinatorial Algorithms, Chapter 5,
 function simplex_grid(m, n)
     # Get number of elements in array and allocate
     L = num_compositions(m, n)
-    out = Array{Int}(m, L)
+    out = Matrix{Int}(undef, m, L)
 
     x = zeros(Int, m)
     x[m] = n
 
     # Fill in first column
-    copy!(out, 1, x, 1, m)
+    copyto!(out, 1, x, 1, m)
 
     h = m
     for i in 2:L
@@ -223,7 +223,7 @@ function simplex_grid(m, n)
         x[m] = val - 1
         x[h] += 1
 
-        copy!(out, m*(i-1) + 1, x, 1, m)
+        copyto!(out, m*(i-1) + 1, x, 1, m)
 
         if val != 1
             h = m
@@ -234,7 +234,7 @@ function simplex_grid(m, n)
 end
 
 
-doc"""
+@doc doc"""
 Return the index of the point x in the lexicographic order of the
 integer points of the (m-1)-dimensional simplex $\{x \mid x_0
 + \cdots + x_{m-1} = n\}$.
@@ -356,6 +356,10 @@ array fits within the range of `T`; a sufficient condition for it is
 - `idx::T`: Ranking of `a`.
 """
 function k_array_rank(T::Type{<:Integer}, a::Vector{<:Integer})
+    if T != BigInt
+        binomial(BigInt(a[end]), BigInt(length(a))) ≤ typemax(T) ||
+        throw(InexactError(:Binomial, T, a[end]))
+    end
     k = length(a)
     idx = one(T)
     for i = 1:k

@@ -12,7 +12,7 @@ References
 https://lectures.quantecon.org/jl/robustness.html
 =#
 
-doc"""
+@doc doc"""
 Represents infinite horizon robust LQ control problems of the form
 
 ```math
@@ -67,7 +67,7 @@ function RBLQ(Q::ScalarOrArray, R::ScalarOrArray, A::ScalarOrArray,
     RBLQ(A, B, C, Q, R, k, n, j, bet, theta)
 end
 
-doc"""
+@doc doc"""
 The ``D`` operator, mapping ``P`` into
 
 ```math
@@ -85,14 +85,14 @@ The ``D`` operator, mapping ``P`` into
 
 """
 function d_operator(rlq::RBLQ, P::Matrix)
-    C, theta, I = rlq.C, rlq.theta, eye(rlq.j)
+    C, theta, Im = rlq.C, rlq.theta, Matrix(I, rlq.j, rlq.j)
     S1 = P*C
-    dP = P + S1*((theta.*I - C'*S1) \ (S1'))
+    dP = P + S1*((theta.*Im - C'*S1) \ (S1'))
 
     return dP
 end
 
-doc"""
+@doc doc"""
 The ``D`` operator, mapping ``P`` into
 
 ```math
@@ -129,7 +129,7 @@ function b_operator(rlq::RBLQ, P::Matrix)
     return F, new_P
 end
 
-doc"""
+@doc doc"""
 Solves the robust control problem.
 
 The algorithm here tricks the problem into a stacked LQ problem, as described in
@@ -159,12 +159,12 @@ function robust_rule(rlq::RBLQ)
     bet, theta, k, j = rlq.bet, rlq.theta, rlq.k, rlq.j
 
     # Set up LQ version
-    I = eye(j)
+    # I = eye(j)
     Z = zeros(k, j)
     Ba = [B C]
     Qa = [Q Z
           Z' -bet.*I.*theta]
-    lq = LQ(Qa, R, A, Ba, bet=bet)
+    lq = QuantEcon.LQ(Qa, R, A, Ba, bet=bet)
 
     # Solve and convert back to robust problem
     P, f, d = stationary_values(lq)
@@ -175,7 +175,7 @@ function robust_rule(rlq::RBLQ)
 end
 
 
-doc"""
+@doc doc"""
 Solve the robust LQ problem
 
 A simple algorithm for computing the robust policy ``F`` and the
@@ -215,20 +215,20 @@ function robust_rule_simple(rlq::RBLQ,
         F, new_P = b_operator(rlq, d_operator(rlq, P))
         e = sqrt(sum((new_P - P).^2))
         iterate += 1
-        copy!(P, new_P)
+        copyto!(P, new_P)
     end
 
     if iterate >= max_iter
-        warn("Maximum iterations in robust_rul_simple")
+        @warn("Maximum iterations in robust_rul_simple")
     end
 
-    I = eye(j)
+    # I = eye(j)
     K = (theta.*I - C'*P*C)\(C'*P)*(A - B*F)
 
     return F, K, P
 end
 
-doc"""
+@doc doc"""
 Compute agent 2's best cost-minimizing response ``K``, given ``F``.
 
 ##### Arguments
@@ -252,14 +252,14 @@ function F_to_K(rlq::RBLQ, F::Matrix)
     R2 = - R - F'*Q*F
     A2 = A - B*F
     B2 = C
-    lq = LQ(Q2, R2, A2, B2, bet=bet)
+    lq = QuantEcon.LQ(Q2, R2, A2, B2, bet=bet)
 
     neg_P, neg_K, d = stationary_values(lq)
 
     return -neg_K, -neg_P
 end
 
-doc"""
+@doc doc"""
 Compute agent 1's best cost-minimizing response ``K``, given ``F``.
 
 ##### Arguments
@@ -278,15 +278,15 @@ function K_to_F(rlq::RBLQ, K::Matrix)
     bet, theta = rlq.bet, rlq.theta
 
     A1, B1, Q1, R1 = A+C*K, B, Q, R-bet*theta.*K'*K
-    lq = LQ(Q1, R1, A1, B1, bet=bet)
+    lq = QuantEcon.LQ(Q1, R1, A1, B1, bet=bet)
 
     P, F, d = stationary_values(lq)
 
     return F, P
 end
 
-doc"""
-Given ``K`` and ``F``, compute the value of deterministic entropy, which is 
+@doc doc"""
+Given ``K`` and ``F``, compute the value of deterministic entropy, which is
 ``\sum_t \beta^t x_t' K'K x_t`` with ``x_{t+1} = (A - BF + CK) x_t``.
 
 ##### Arguments
@@ -309,7 +309,7 @@ function compute_deterministic_entropy(rlq::RBLQ, F, K, x0)
     return var_quadratic_sum(A0, C0, H0, bet, x0)
 end
 
-doc"""
+@doc doc"""
 Given a fixed policy ``F``, with the interpretation ``u = -F x``, this function
 computes the matrix ``P_F`` and constant ``d_F`` associated with discounted cost
 ``J_F(x) = x' P_F x + d_F``.
@@ -334,7 +334,7 @@ function evaluate_F(rlq::RBLQ, F::Matrix)
 
     # Solve for policies and costs using agent 2's problem
     K_F, P_F = F_to_K(rlq, F)
-    I = eye(j)
+    # I = eye(j)
     H = inv(I - C'*P_F*C./theta)
     d_F = log(det(H))
 
@@ -342,9 +342,9 @@ function evaluate_F(rlq::RBLQ, F::Matrix)
     sig = -1.0 / theta
     AO = sqrt(bet) .* (A - B*F + C*K_F)
     O_F = solve_discrete_lyapunov(AO', bet*K_F'*K_F)
-    ho = (trace(H - 1) - d_F) / 2.0
-    tr = trace(O_F*C*H*C')
-    o_F = (ho + bet*tr) / (1 - bet)
+    ho = (tr(H .- 1) - d_F) / 2.0
+    trace = tr(O_F*C*H*C')
+    o_F = (ho + bet*trace) / (1 - bet)
 
     return K_F, P_F, d_F, O_F, o_F
 end

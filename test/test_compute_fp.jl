@@ -1,5 +1,5 @@
 @testset "Testing compute_fp.jl" begin
-    
+
     # set up
     mu_1 = 0.2  # 0 is unique fixed point forall x_0 \in [0, 1]
 

@@ -6,7 +6,7 @@
         for d in mc_dicts
             P = d["P"]
             @test size(P) == (n, n)
-            @test all(x->(countnz(x)==d["k"]),
+            @test all(x->(count(!iszero, x)==d["k"]),
                       [P[i, :] for i in 1:size(P)[1]]) == true
         end
     end
@@ -59,7 +59,7 @@
         end
 
         # Check number of nonzero entries for each state-action pair
-        @test sum(ddp.Q .> 0, 3) ==
+        @test sum(ddp.Q .> 0, dims = 3) ==
             ones(Int, (num_states, num_actions, 1)) * k
     end
 end  # @testset

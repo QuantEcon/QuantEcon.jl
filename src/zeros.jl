@@ -121,7 +121,7 @@ This is `zbrack` from Numerical Recepies Recepies in C++
 function divide_bracket(f::Function, x1::T, x2::T, n::Int=50) where T<:Number
     x1 <= x2 || throw(ArgumentError("x1 must be less than x2"))
 
-    xs = linspace(x1, x2, n)
+    xs = range(x1, stop=x2, length=n)
     dx = xs[2] - xs[1]
 
     x1b = T[]

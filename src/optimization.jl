@@ -5,7 +5,7 @@ function golden_method(f::Function, a::AbstractVector, b::AbstractVector;
     d = b - a
     x1 = a + α1*d
     x2 = a + α2*d
-    s = ones(a)
+    s = fill!(similar(a), one(eltype(a)))
     f1 = f(x1)
     f2 = f(x2)
 
@@ -23,7 +23,7 @@ function golden_method(f::Function, a::AbstractVector, b::AbstractVector;
         f2 = f(x2)
     end
 
-    it >= maxit && warn("`golden_method`: maximum iterations exceeded")
+    it >= maxit && @warn("`golden_method`: maximum iterations exceeded")
 
     i = f2 .> f1
     x1[i] = x2[i]
@@ -82,7 +82,7 @@ function golden_method(f::Function, a::Real, b::Real; tol::Float64=10*eps(),
         f2 = f(x2)::Float64
     end
 
-    it >= maxit && warn("`golden_method`: maximum iterations exceeded")
+    it >= maxit && @warn("`golden_method`: maximum iterations exceeded")
 
     if f2 > f1
         x1 = x2

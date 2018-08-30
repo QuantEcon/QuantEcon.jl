@@ -1,26 +1,24 @@
-__precompile__()
-
 module QuantEcon
 
-import Base: mean, std, var, show, isapprox
+import Base: show, isapprox
+import Statistics: mean, std, var
+using Markdown
+using FFTW
+using SpecialFunctions: erfc, lgamma
 
 # 3rd party
 using Distributions
 import Distributions: pdf, skewness, BetaBinomial
 using DSP: TFFilter, freqz
 using Primes: primes
-using Compat: view, @compat
-using StatsBase:ecdf
+using StatsBase: ecdf
 
-@static if isdefined(Base, :Iterators)
-    using Base.Iterators: cycle, take
-end
+using Base.Iterators: cycle, take
+using LinearAlgebra
+using Random
+using SparseArrays
 
-# 0.6/0.7 compatibility
-using Compat
-using Compat.LinearAlgebra
-using Compat.Random
-using Compat.SparseArrays
+import DSP: periodogram
 
 # useful types
 ScalarOrArray{T} = Union{T,Array{T}}

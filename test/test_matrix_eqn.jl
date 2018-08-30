@@ -2,7 +2,7 @@
     rough_kwargs = Dict(:atol => 1e-7, :rtol => 1e-7)
 
     @testset "simple test where X is all zero" begin
-        A = eye(4) .* .95
+        A = Matrix(I, 4, 4) .* .95
         B = zeros(4, 4)
 
         X = solve_discrete_lyapunov(A, B)
@@ -83,15 +83,17 @@
 
     @testset "test tjm 3" begin
         r = 0.5
-        I = eye(2)
+        # I = eye(2)
+        Im = Matrix{Float64}(I, 2, 2)
         A = [2.0+r^2 0.0
              0.0     0.0]
-        B = I
+        B = Im
         R = [1.0 r
              r   r*r]
-        Q = I - A' * A + A' * ((R + I) \ A)
+        Q = Im - A' * A + A' * ((R + Im) \ A)
         X = solve_discrete_riccati(A, B, Q, R)
-        Y = eye(2)
+        # Y = eye(2)
+        Y = Im
         @test isapprox(X, Y; rough_kwargs...)
     end
 

@@ -11,16 +11,16 @@
         d = s * x.^α
 
         pdf_arg = clamp.((y .- (1 .- δ) .* x) ./ d, eps(), Inf)
-        return pdf.(ϕ, pdf_arg) ./ d
+        return pdf.(Ref(ϕ), pdf_arg) ./ d
     end
 
 
     # other data
     n_a, n_b, n_y = 50, (5, 5), 20
-    a = rand(n_a) + 0.01
-    b = rand(n_b...) + 0.01
+    a = rand(n_a) .+ 0.01
+    b = rand(n_b...) .+ 0.01
 
-    y = linspace(0, 10, 20)
+    y = range(0, stop=10, length=20)
 
     lae_a = LAE(p, a)
     lae_b = LAE(p, b)

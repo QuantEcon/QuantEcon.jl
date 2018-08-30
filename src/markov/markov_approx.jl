@@ -18,7 +18,7 @@ import Distributions: pdf, Normal, quantile
 std_norm_cdf(x::T) where {T <: Real} = 0.5 * erfc(-x/sqrt(2))
 std_norm_cdf(x::Array{T}) where {T <: Real} = 0.5 .* erfc(-x./sqrt(2))
 
-doc"""
+@doc doc"""
 Tauchen's (1996) method for approximating AR(1) process with finite markov chain
 
 The process follows
@@ -46,7 +46,7 @@ where ``\epsilon_t \sim N (0, \sigma^2)``
 function tauchen(N::Integer, ρ::Real, σ::Real, μ::Real=0.0, n_std::Integer=3)
     # Get discretized space
     a_bar = n_std * sqrt(σ^2 / (1 - ρ^2))
-    y = linspace(-a_bar, a_bar, N)
+    y = range(-a_bar, stop=a_bar, length=N)
     d = y[2] - y[1]
 
     # Get transition probabilities
@@ -82,13 +82,13 @@ function tauchen(N::Integer, ρ::Real, σ::Real, μ::Real=0.0, n_std::Integer=3)
 
     # renormalize. In some test cases the rows sum to something that is 2e-15
     # away from 1.0, which caused problems in the MarkovChain constructor
-    Π = Π./sum(Π, 2)
+    Π = Π./sum(Π, dims = 2)
 
     MarkovChain(Π, yy)
 end
 
 
-doc"""
+@doc doc"""
 Rouwenhorst's method to approximate AR(1) processes.
 
 The process follows
@@ -133,16 +133,16 @@ function _rouwenhorst(p::Real, q::Real, m::Real, Δ::Real, n::Integer)
 
         θN[2:end-1, :] ./= 2
 
-        return linspace(m-Δ, m+Δ, n), θN
+        return range(m-Δ, stop=m+Δ, length=n), θN
     end
 end
 
 
 # These are to help me order types other than vectors
 @inline _emcd_lt(a::T, b::T) where {T} = isless(a, b)
-@inline _emcd_lt(a::Vector{T}, b::Vector{T}) where {T} = Base.lt(Base.Order.Lexicographic, a, b)
+# @inline _emcd_lt(a::Vector{T}, b::Vector{T}) where {T} = Base.lt(Base.Order.Lexicographic, a, b)
 
-doc"""
+@doc doc"""
 Accepts the simulation of a discrete state Markov chain and estimates
 the transition probabilities
 
@@ -212,7 +212,7 @@ function estimate_mc_discrete(X::Vector{T}, states::Vector{T}) where T
     end
 
     # Compute probabilities using counted elements
-    P = cm ./ sum(cm, 2)
+    P = cm ./ sum(cm, dims = 2)
 
     return MarkovChain(P, states)
 end
@@ -224,7 +224,7 @@ function estimate_mc_discrete(X::Vector{T}) where T
     return estimate_mc_discrete(X, states)
 end
 
-doc"""
+@doc doc"""
 
 types specifying the method for `discrete_var`
 
@@ -235,7 +235,7 @@ struct Quantile <: VAREstimationMethod end
 struct Quadrature <: VAREstimationMethod end
 
 
-doc"""
+@doc doc"""
 
 Compute a finite-state Markov chain approximation to a VAR(1) process of the form
 
@@ -303,7 +303,13 @@ function discrete_var(b::Union{Real, AbstractVector},
                       n_moments::Integer=2,
                       method::VAREstimationMethod=Even(),
                       n_sigmas::Real=sqrt(Nm-1))
-
+    # b = zeros(2)
+    # A = [0.9809 0.0028; 0.041 0.9648]
+    # Sigma = [7.569e-5 0.0; 0.0 0.00068644]
+    # N = 9
+    # n_moments = nMoments
+    # method = Quantile()
+    # b, B, Psi, Nm = (zeros(2), A, Sigma, N, nMoments, Quantile())
     M, M_ = size(B, 1), size(B, 2)
 
     # Check size restrictions on matrices
@@ -349,7 +355,7 @@ function discrete_var(b::Union{Real, AbstractVector},
     # normalizing constant for maximum entropy computations
     scaling_factor = y1D[:, end]
     # used to store some intermediate calculations
-    temp = Array{Float64}(Nm, M)
+    temp = Matrix{Float64}(undef, Nm, M)
     # store optimized values of lambda (2 moments) to improve initial guesses
     lambda_bar = zeros(2*M, Nm^M)
     # small positive constant for numerical stability
@@ -361,7 +367,7 @@ function discrete_var(b::Union{Real, AbstractVector},
         q = construct_prior_guess(cond_mean[:, ii], Nm, y1D, y1Dhelper, method)
 
         # Make sure all elements of the prior are stricly positive
-        q[q.<kappa] = kappa
+        q[q.<kappa] .= kappa
 
         for jj = 1:M
             # Try to use intelligent initial guesses
@@ -374,16 +380,16 @@ function discrete_var(b::Union{Real, AbstractVector},
             # Maximum entropy optimization
             if n_moments == 1 # match only 1 moment
                 temp[:, jj], _, _ = discrete_approximation(y1D[jj, :],
-                    X -> (X'-cond_mean[jj, ii])/scaling_factor[jj],
+                    X -> (X'.-cond_mean[jj, ii])/scaling_factor[jj],
                     [0.0], q[jj, :], [0.0])
             else # match 2 moments first
                 p, lambda, moment_error = discrete_approximation(y1D[jj, :],
                     X -> polynomial_moment(X, cond_mean[jj, ii], scaling_factor[jj], 2),
                     [0; 1]./(scaling_factor[jj].^(1:2)), q[jj, :], lambda_guess)
                 if !(norm(moment_error) < 1e-5) # if 2 moments fail, just match 1 moment
-                    warn("Failed to match first 2 moments. Just matching 1.")
+                    @warn("Failed to match first 2 moments. Just matching 1.")
                     temp[:, jj], _, _ = discrete_approximation(y1D[jj, :],
-                    X -> (X'-cond_mean[jj, ii])/scaling_factor[jj],
+                    X -> (X'.-cond_mean[jj, ii])/scaling_factor[jj],
                         [0.0], q[jj, :], [0.0])
                     lambda_bar[(jj-1)*2+1:jj*2, ii] = zeros(2,1)
                 elseif n_moments == 2
@@ -399,7 +405,7 @@ function discrete_var(b::Union{Real, AbstractVector},
                             gaussian_moment[1:mm]./(scaling_factor[jj].^(1:mm)),
                             q[jj, :], lambda_guess)
                         if !(norm(moment_error) < 1e-5)
-                            warn(
+                            @warn(
                             "Failed to match first $mm moments.  Just matching $(mm-2).")
                             break
                         else
@@ -410,7 +416,7 @@ function discrete_var(b::Union{Real, AbstractVector},
                 end
             end
         end
-        P[ii, :] .= vec(prod(allcomb3(temp), 2))
+        P[ii, :] .= vec(prod(allcomb3(temp), dims = 2))
     end
 
     X = C*D .+ mu # map grids back to original space
@@ -431,8 +437,8 @@ check persistency when `method` is `Quadrature` and give warning if needed
 
 """
 function warn_persistency(B::AbstractMatrix, ::Quadrature)
-    if any(eig(B)[1] .> 0.9)
-        warn("The quadrature method may perform poorly for highly persistent processes.")
+    if any(eigen(B).values .> 0.9)
+        @warn("The quadrature method may perform poorly for highly persistent processes.")
     end
     return nothing
 end
@@ -488,11 +494,11 @@ return standerdized VAR(1) representation
 """
 function standardize_var(b::AbstractVector, B::AbstractMatrix,
                          Psi::AbstractMatrix, M::Integer)
-    C1 = cholfact(Psi)[:L]
-    mu = ((eye(M)-B)\eye(M))*b
+    C1 = cholesky(Psi).L
+    mu = ((I - B)\ I)*b
     A1 = C1\(B*C1)
     # unconditional variance
-    Sigma1 = reshape(((eye(M^2)-kron(A1,A1))\eye(M^2))*vec(eye(M)),M,M)
+    Sigma1 = reshape(((I-kron(A1,A1))\I)*vec(Matrix(I, M, M)),M,M)
     U, _ = min_var_trace(Sigma1)
     A = U'*A1*U
     Sigma = U'*Sigma1*U
@@ -513,8 +519,8 @@ construct prior guess for evenly spaced grid method
 
 """
 construct_prior_guess(cond_mean::AbstractVector, Nm::Integer,
-                      y1D::AbstractMatrix, ::Void, method::Even) =
-    pdf.(Normal.(repmat(cond_mean, 1, Nm), 1), y1D)
+                      y1D::AbstractMatrix, ::Nothing, method::Even) =
+    pdf.(Normal.(repeat(cond_mean, 1, Nm), 1), y1D)
 
 """
 construct prior guess for quantile grid method
@@ -530,8 +536,8 @@ construct prior guess for quantile grid method
 """
 construct_prior_guess(cond_mean::AbstractVector, Nm::Integer,
                       ::AbstractMatrix, y1Dbounds::AbstractMatrix, method::Quantile) =
-    cdf.(Normal.(repmat(cond_mean, 1, Nm), 1), y1Dbounds[:, 2:end]) -
-           cdf.(Normal.(repmat(cond_mean, 1, Nm), 1), y1Dbounds[:, 1:end-1])
+    cdf.(Normal.(repeat(cond_mean, 1, Nm), 1), y1Dbounds[:, 2:end]) -
+           cdf.(Normal.(repeat(cond_mean, 1, Nm), 1), y1Dbounds[:, 1:end-1])
 
 """
 construct prior guess for quadrature grid method
@@ -547,7 +553,7 @@ construct prior guess for quadrature grid method
 """
 construct_prior_guess(cond_mean::AbstractVector, Nm::Integer,
                       y1D::AbstractMatrix, weights::AbstractVector, method::Quadrature) =
-    (pdf.(Normal.(repmat(cond_mean, 1, Nm), 1), y1D) ./ pdf.(Normal(0, 1), y1D)).*weights'
+    (pdf.(Normal.(repeat(cond_mean, 1, Nm), 1), y1D) ./ pdf.(Ref(Normal()), y1D)).*weights'
 """
 
 construct one-dimensional evenly spaced grid of states
@@ -568,9 +574,9 @@ construct one-dimensional evenly spaced grid of states
 """
 function construct_1D_grid(Sigma::Union{Real, AbstractMatrix}, Nm::Integer,
                            M::Integer, n_sigmas::Real, method::Even)
-    min_sigmas = sqrt(minimum(eigfact(Sigma).values))
-    y1Drow = collect(linspace(-min_sigmas*n_sigmas, min_sigmas*n_sigmas, Nm))'
-    y1D = repmat(y1Drow, M, 1)
+    min_sigmas = sqrt(minimum(eigen(Sigma).values))
+    y1Drow = collect(range(-min_sigmas*n_sigmas, stop=min_sigmas*n_sigmas, length=Nm))'
+    y1D = repeat(y1Drow, M, 1)
     return y1D, nothing
 end
 
@@ -595,7 +601,7 @@ construct one-dimensional quantile grid of states
 function construct_1D_grid(Sigma::AbstractMatrix, Nm::Integer,
                            M::Integer, n_sigmas::Real, method::Quantile)
     sigmas = sqrt.(diag(Sigma))
-    y1D = quantile.(Normal.(0, sigmas), (2*(1:Nm)'-1)/(2*Nm))
+    y1D = quantile.(Normal.(0, sigmas), (2*(1:Nm)'.-1)/(2*Nm))
     y1Dbounds = hcat(fill(-Inf, M, 1),
                      quantile.(Normal.(0, sigmas), ((1:(Nm-1))')/Nm),
                      fill(Inf, M, 1))
@@ -626,7 +632,7 @@ construct one-dimensional quadrature grid of states
 function construct_1D_grid(::ScalarOrArray, Nm::Integer,
                            M::Integer, ::Real, method::Quadrature)
     nodes, weights = qnwnorm(Nm, 0, 1)
-    y1D = repmat(nodes', M, 1)
+    y1D = repeat(nodes', M, 1)
     return y1D, weights
 end
 
@@ -673,8 +679,8 @@ julia> allcomb3([1 4 7;
 ```
 
 """
-allcomb3(A::Matrix) =
-    flipdim(gridmake(flipdim([A[:, i] for i in 1:size(A, 2)], 1)...) , 2)
+allcomb3(A::AbstractMatrix) =
+    reverse(gridmake(reverse([A[:, i] for i in 1:size(A, 2)], dims = 1)...), dims = 2)
 
 """
 Compute a discrete state approximation to a distribution with known moments,
@@ -736,7 +742,7 @@ function discrete_approximation(D::AbstractVector, T::Function, TBar::AbstractVe
     # away from the truth. If this occurs, the program tries an initial guess
     # of all zeros.
     if !Optim.converged(res) && all(lambda0 .!= 0.0)
-        warn("Failed to find a solution from provided initial guess. Trying new initial guess.")
+        @warn("Failed to find a solution from provided initial guess. Trying new initial guess.")
         res = Optim.optimize(obj, grad!, hess!, zeros(lambda0), Optim.Newton(), options)
         # check convergence
         Optim.converged(res) || error("Failed to find a solution.")
@@ -781,7 +787,7 @@ function polynomial_moment(X::AbstractVector, mu::Real,
                            scaling_factor::Real, n_moments::Integer)
     # Check that scaling factor is positive
     scaling_factor>0 || error("scaling_factor must be a positive number")
-    Y = (X-mu)/scaling_factor # standardized grid
+    Y = (X.-mu)/scaling_factor # standardized grid
     T = Y'.^collect(1:n_moments)
 end
 
@@ -829,7 +835,7 @@ function entropy_grad!(grad::AbstractVector, lambda::AbstractVector,
     Tdiff = Tx .- TBar
     temp = q'.*exp.(lambda'*Tdiff)
     temp2 = temp.*Tdiff
-    grad .= vec(sum(temp2, 2))
+    grad .= vec(sum(temp2, dims = 2))
 end
 
 """
@@ -848,7 +854,7 @@ function entropy_hess!(hess::AbstractMatrix, lambda::AbstractVector,
     hess .= temp2*Tdiff'
 end
 
-doc"""
+@doc doc"""
 
 find a unitary matrix `U` such that the diagonal components of `U'AU` is as
 close to a multiple of identity matrix as possible
@@ -864,23 +870,24 @@ close to a multiple of identity matrix as possible
 
 """
 function min_var_trace(A::AbstractMatrix)
+
     ==(size(A)...) || throw(ArgumentError("input matrix must be square"))
 
     K = size(A, 1) # size of A
-    d = trace(A)/K # diagonal of U'*A*U should be closest to d
+    d = tr(A)/K # diagonal of U'*A*U should be closest to d
     function obj(X, grad)
         X = reshape(X, K, K)
-        return (norm(diag(X'*A*X)-d))
+        return (norm(diag(X'*A*X) .- d))
     end
     function unitary_constraint(res, X, grad)
         X = reshape(X, K, K)
-        res .= vec(X'*X - eye(K))
+        res .= vec(X'*X - Matrix(I, K, K))
     end
 
     opt = NLopt.Opt(:LN_COBYLA, K^2)
     NLopt.min_objective!(opt, obj)
     NLopt.equality_constraint!(opt, unitary_constraint, zeros(K^2))
-    fval, U_vec, ret = NLopt.optimize(opt, vec(eye(K)))
+    fval, U_vec, ret = NLopt.optimize(opt, vec(Matrix(I, K, K)))
 
     return reshape(U_vec, K, K), fval
 end

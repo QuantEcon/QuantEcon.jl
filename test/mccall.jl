@@ -1,5 +1,3 @@
-using PyPlot
-
 function McCall_ddp(beta, b, w, rho)
 
     N = length(w)
@@ -13,8 +11,8 @@ function McCall_ddp(beta, b, w, rho)
 
     #  Construct state transition probability matrix P(s'|s,x)
     P = zeros(2, N, N)
-    P[REJECT, :, :] = (rho-(1-rho)/(N-1))*eye(N,N) + (1-rho)/(N-1)*ones(N,N)
-    P[ACCEPT, :, :] = eye(N)
+    P[REJECT, :, :] .= (rho-(1-rho)/(N-1))*I + (1-rho)/(N-1)*ones(N,N)
+    P[ACCEPT, :, :] .= Matrix(I, N, N)
 
     #  Pack model structure
     model = Dict()
@@ -35,7 +33,7 @@ w_min = 0
 w_max = 200
 b =  [0 20 50]
 rho=  [1/N .2 .5]
-w = linspace(w_min, w_max, N)
+w = range(w_min, stop=w_max, length=N)
 
 Vb = zeros(N, 3)
 Vrho = zeros(N, 3)
