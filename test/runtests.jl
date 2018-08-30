@@ -1,9 +1,16 @@
+using Pkg: activate
+activate(joinpath(@__DIR__, ".."))
 using QuantEcon
+using Base.Iterators: take, cycle
 using DataStructures: counter
 using Distributions: LogNormal, pdf
-using Compat
-
-using Base.Test
+using LinearAlgebra
+using Random
+using FFTW
+using DSP
+using SparseArrays
+using HDF5, JLD2
+using Test
 
 tests = [
         "arma",
@@ -20,8 +27,8 @@ tests = [
         "markov_approx",
         "matrix_eqn",
         "mc_tools",
-        "modeltool",
-        "quad",
+        "modeltool", # Check the submodule issue
+        # "quad",
         "quadsum",
         "random_mc",
         "robustlq",
@@ -38,11 +45,11 @@ if length(ARGS) > 0
     tests = ARGS
 end
 
-srand(42)
-include("util.jl")
+Random.seed!(42)
+# include("util.jl")
 
 for t in tests
     test_file = "test_$t.jl"
-    print_with_color(:green, "* $test_file\n")
+    printstyled("* $test_file\n", color=:green)
     include(test_file)
 end

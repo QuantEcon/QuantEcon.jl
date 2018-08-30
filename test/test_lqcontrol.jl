@@ -12,21 +12,21 @@
     β    = .95
     n    = 0.
     capT = 1
-    lq_scalar = LQ(q, r, a, b, c, n, bet=β, capT=capT, rf=rf)
+    lq_scalar = QuantEcon.LQ(q, r, a, b, c, n, bet=β, capT=capT, rf=rf)
 
     Q  = [0. 0.; 0. 1]
     R  = [1. 0.; 0. 0]
-    rf = eye(2) .* 100
+    rf = I * 100
     A  = fill(0.95, 2, 2)
     B  = fill(-1.0, 2, 2)
-    lq_mat = LQ(Q, R, A, B, bet=β, capT=capT, rf=rf)
+    lq_mat = QuantEcon.LQ(Q, R, A, B, bet=β, capT=capT, rf=rf)
 
     @testset "Test scalar sequences with exact by hand solution" begin
         x0 = 2.0
         x_seq, u_seq, w_seq = compute_sequence(lq_scalar, x0)
         # solve by hand
-        u_0 = (-2.*lq_scalar.A*lq_scalar.B*lq_scalar.bet*lq_scalar.rf) /
-           (2.*lq_scalar.Q+lq_scalar.bet*lq_scalar.rf*2lq_scalar.B^2)*x0
+        u_0 = (-2 .*lq_scalar.A*lq_scalar.B*lq_scalar.bet*lq_scalar.rf) /
+           (2 .*lq_scalar.Q+lq_scalar.bet*lq_scalar.rf*2lq_scalar.B^2)*x0
         x_1 = lq_scalar.A * x0 + lq_scalar.B * u_0 + w_seq[end]
 
         @test isapprox(u_0[1], u_seq[end]; rough_kwargs...)
@@ -38,7 +38,7 @@
         x_seq, u_seq, w_seq = compute_sequence(lq_mat, x0)
 
         @test isapprox(sum(u_seq), 0.95 * sum(x0); rough_kwargs...)
-        @test isapprox(x_seq[:,end], zeros(x0); rough_kwargs...)
+        @test isapprox(x_seq[:,end], zero(x0); rough_kwargs...)
     end
 
     @testset "test stationary matrix" begin
@@ -76,7 +76,7 @@
         C = [sigma, 0.0]
 
         # == Compute solutions and simulate == #
-        lq = LQ(Q, R, A, B, C; bet=bet, capT=t, rf=Rf)
+        lq = QuantEcon.LQ(Q, R, A, B, C; bet=bet, capT=t, rf=Rf)
         x0 = [0.0, 1.0]
         xp, up, wp = compute_sequence(lq, x0)
         @test true == true  # just assert true if we made it to this point

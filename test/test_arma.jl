@@ -5,7 +5,7 @@
     theta = zeros(3)
     sigma = .15
     lp = ARMA(phi, theta, sigma)
-    
+
     # test simulate
     sim = simulation(lp, ts_length=250)
     @test length(sim) == 250
@@ -23,7 +23,7 @@
         a2 = ARMA([phi;], theta, sigma)
         a3 = ARMA(phi, [theta;], sigma)
 
-        for nm in fieldnames(a1)
+        for nm in fieldnames(typeof(a1))
             @test getfield(a1, nm) == getfield(a2, nm)
             @test getfield(a1, nm) == getfield(a3, nm)
         end
@@ -42,7 +42,7 @@
         @test isapprox(ac[2], θ*σ^2; atol=1e-3)
 
         # all others should be 0
-        @test isapprox(ac[3:end], zeros(ac[3:end]); atol=1e-3)
+        @test isapprox(ac[3:end], fill!(similar(ac[3:end]), zero(eltype(ac[3:end]))); atol=1e-3)
     end
 
 end  # testset

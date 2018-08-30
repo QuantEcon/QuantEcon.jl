@@ -43,7 +43,7 @@ struct LinInterp{TV<:AbstractArray,TB<:AbstractVector}
 end
 
 function Base.:(==)(li1::LinInterp, li2::LinInterp)
-    all(getfield(li1, f) == getfield(li2, f) for f in fieldnames(li1))
+    all(getfield(li1, f) == getfield(li2, f) for f in fieldnames(typeof(li1)))
 end
 
 function LinInterp(b::TB, v::TV) where {TV<:AbstractArray,TB<:AbstractVector}
@@ -101,7 +101,7 @@ function (li::LinInterp{<:AbstractMatrix})(
         end
     end
 
-    out = Array{_out_eltype(li)}(length(cols))
+    out = Vector{_out_eltype(li)}(undef, length(cols))
 
     @inbounds begin
         # handle corner cases

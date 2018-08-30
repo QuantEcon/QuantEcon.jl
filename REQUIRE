@@ -1,11 +1,8 @@
-julia 0.6
+julia 0.7
 DSP
-Distributions 0.8.9
+Distributions
 LightGraphs
 Primes
-Compat 0.18.0
 StatsBase
-Optim 0.9.0
-NLopt 0.3.4
-Nullables
-Compat 0.48.0
+Optim
+NLopt

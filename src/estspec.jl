@@ -11,7 +11,7 @@ References
 https://lectures.quantecon.org/jl/estspec.html
 
 =#
-import DSP
+using DSP
 
 """
 Smooth the data in x using convolution with a window of requested size and type.
@@ -20,7 +20,7 @@ Smooth the data in x using convolution with a window of requested size and type.
 
 - `x::Array`: An array containing the data to smooth
 - `window_len::Int(7)`: An odd integer giving the length of the window
-- `window::AbstractString("hanning")`: A string giving the window type. 
+- `window::AbstractString("hanning")`: A string giving the window type.
   Possible values are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`
 
 ##### Returns
@@ -90,7 +90,7 @@ function periodogram(x::Vector, window::AbstractString, window_len::Int=7)
     return w, I_w
 end
 
-doc"""
+@doc doc"""
 Computes the periodogram
 
 ```math
@@ -138,10 +138,11 @@ coefficients are then used for recoloring.
 function ar_periodogram(x::Array, window::AbstractString="hanning", window_len::Int=7)
     # run regression
     x_current, x_lagged = x[2:end], x[1:end-1]  # x_t and x_{t-1}
-    coefs = collect(linreg(x_lagged, x_current))
+    coefs = hcat(ones(size(x_lagged, 1)), x_lagged) \ x_current
+
 
     # get estimated values and compute residual
-    est = [ones(x_lagged) x_lagged] * coefs
+    est = [fill!(similar(x_lagged), one(eltype(x_lagged))) x_lagged] * coefs
     e_hat = x_current - est
 
     phi = coefs[2]

@@ -109,7 +109,7 @@ macro def_sim(sim_name, default_type_params, obs_typedef)
     obs_fields = ex.args[3].args
     sim_fields = Expr(:block)
     for field in obs_fields
-        field.head == :line && continue
+        isa(field, LineNumberNode) && continue
 
         if field.head == :(::)
             name = field.args[1]
@@ -125,7 +125,7 @@ macro def_sim(sim_name, default_type_params, obs_typedef)
     else
         type_params = []
     end
-    sim_type = Expr(:type, ex.args[1], sim_typename, sim_fields)
+    sim_type = Expr(:struct, ex.args[1], sim_typename, sim_fields)
     # sim_type = quote
     #     struct $(sim_name){N,$(type_params...)}
     #         $sim_fields
@@ -136,10 +136,10 @@ macro def_sim(sim_name, default_type_params, obs_typedef)
         tp_name = expr.args[2].args[2]
         _eltype = get(tp_map, tp_name, tp_name)
         arr_type = :(Array{$_eltype,$N_sym})
-        Expr(:(=), expr.args[1], Expr(:call, arr_type, :sz))
+        Expr(:(=), expr.args[1], Expr(:call, arr_type, :undef, :sz))
     end..., :($(sim_name)($([i.args[1] for i in sim_fields.args]...))))
 
-    sim_constructor = :(function $(sim_name){$N_sym}(sz::NTuple{$N_sym,Int})
+    sim_constructor = :(function $(sim_name)(sz::NTuple{$N_sym,Int}) where $N_sym
     $body
     end)
 
@@ -150,11 +150,6 @@ macro def_sim(sim_name, default_type_params, obs_typedef)
 
 
     others = quote
-        Base.endof(sim::$(sim_name)) = length(sim.$(sim_fields.args[1].args[1]))
-        Base.length(sim::$(sim_name)) = endof(sim)
-        Base.start(sim::$(sim_name)) = 1
-        Base.next(sim::$(sim_name), ix::Int) = (sim[ix], ix+1)
-        Base.done(sim::$(sim_name), ix::Int) = ix >= length(sim)
         function Base.getindex(sim::$(sim_name), ix::Int)
             @boundscheck begin
                 if ix > length(sim)
@@ -164,6 +159,11 @@ macro def_sim(sim_name, default_type_params, obs_typedef)
             @inbounds out = $getindex_out_expr
             return out
         end
+        function Base.iterate(sim::$(sim_name), ix::Int=1)
+            ix >= length(sim) && return nothing
+            (sim[ix], ix+1)
+        end
+        Base.length(sim::$(sim_name)) = length(sim.$(sim_fields.args[1].args[1]))
     end
     out = esc(Expr(:block, sim_type, sim_constructor, obs_typedef, others))
 end

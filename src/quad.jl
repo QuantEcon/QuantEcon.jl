@@ -60,7 +60,7 @@ function qnwlege(n::Int, a::Real, b::Real)
     weights = copy(nodes)
     i = 1:m
 
-    z = cos.(pi * (i - 0.25) ./ (n + 0.5))
+    z = cos.(pi * (i .- 0.25) ./ (n + 0.5))
 
     # allocate memory for loop arrays
     p3 = similar(z)
@@ -68,8 +68,8 @@ function qnwlege(n::Int, a::Real, b::Real)
 
     its = 0
     for its=1:maxit
-        p1 = ones(z)
-        p2 = zeros(z)
+        p1 = fill!(similar(z), one(eltype(z)))
+        p2 = fill!(similar(z), one(eltype(z)))
         for j=1:n
             p3 = p2
             p2 = p1
@@ -78,7 +78,7 @@ function qnwlege(n::Int, a::Real, b::Real)
 
         # p1 is now a vector of Legendre polynomials of degree 1..n
         # pp will be the deriative of each p1 at the nth zero of each
-        pp = n*(z.*p1-p2)./(z.*z-1)
+        pp = n*(z.*p1-p2)./(z.*z .- 1)
         z1 = z
         z = z1 - p1./pp  # newton's method
 
@@ -92,11 +92,11 @@ function qnwlege(n::Int, a::Real, b::Real)
         error("Maximum iterations in _qnwlege1")
     end
 
-    nodes[i] = xm - xl * z
-    nodes[n+1-i] = xm + xl * z
+    nodes[i] = xm .- xl * z
+    nodes[n + 1 .- i] = xm .+ xl * z
 
-    weights[i] = 2*xl./((1-z.*z).*pp.*pp)
-    weights[n+1-i] = weights[i]
+    weights[i] = 2*xl./((1 .- z.*z).*pp.*pp)
+    weights[n + 1 .- i] = weights[i]
 
     return nodes, weights
 end
@@ -118,9 +118,9 @@ $(qnw_func_notes)
 $(qnw_refs)
 """
 function qnwcheb(n::Int, a::Real, b::Real)
-    nodes = (b+a)/2 - (b-a)/2 .* cos.(pi/n .* (0.5:(n-0.5)))
-    weights = ((b-a)/n) .* (cos.(pi/n .* ((1:n)-0.5)*(2:2:n-1)') *
-                            (-2.0 ./ ((1:2:n-2).*(3:2:n))) + 1)
+    nodes = (b+a)/2 .- (b-a)/2 .* cos.(pi/n .* (0.5:(n-0.5)))
+    weights = ((b-a)/n) .* (cos.(pi/n .* ((1:n).-0.5)*(2:2:n-1)') *
+                            (-2.0 ./ ((1:2:n-2).*(3:2:n))) .+ 1)
     return nodes, weights
 end
 
@@ -240,13 +240,13 @@ function qnwsimp(n::Int, a::Real, b::Real)
     end
 
     if n % 2 ==0
-        warn("In qnwsimp: n must be odd integer - increasing by 1.")
+        @warn("In qnwsimp: n must be odd integer - increasing by 1.")
         n += 1
     end
 
     dx = (b - a) / (n - 1)
     nodes = collect(a:dx:b)
-    weights = repmat([2.0, 4.0], Int((n + 1) / 2))
+    weights = repeat([2.0, 4.0], Int((n + 1) / 2))
     weights = weights[1:n]
     weights[1] = 1
     weights[end] = 1
@@ -378,7 +378,7 @@ function qnwbeta(n::Int, a::Real, b::Real)
         w[i] = temp / (pp * p2)
     end
 
-    x = (1 - x) ./ 2
+    x = (1 .- x) ./ 2
     w = w * exp(lgamma(a + n) +
                 lgamma(b + n) -
                 lgamma(n + 1) -
@@ -535,15 +535,15 @@ for f in [:qnwlege, :qnwcheb, :qnwsimp, :qnwtrap, :qnwbeta, :qnwgamma]
 end
 
 ## Multidim version for qnworm
-function qnwnorm(n::Vector{Int}, mu::Vector, sig2::Matrix=eye(length(n)))
+function qnwnorm(n::Vector{Int}, mu::Vector, sig2::Matrix=Matrix(I, length(n), length(n)))
     n_n, n_mu = length(n), length(mu)
 
     if !(n_n == n_mu)
         error("n and mu must have same number of elements")
     end
 
-    _nodes = Array{Vector{Float64}}(n_n)
-    _weights = Array{Vector{Float64}}(n_n)
+    _nodes = Array{Vector{Float64}}(undef, n_n)
+    _weights = Array{Vector{Float64}}(undef, n_n)
 
     for i in 1:n_n
         _nodes[i], _weights[i] = qnwnorm(n[i])
@@ -552,9 +552,9 @@ function qnwnorm(n::Vector{Int}, mu::Vector, sig2::Matrix=eye(length(n)))
     weights = ckron(_weights[end:-1:1]...)
     nodes = gridmake(_nodes...)::Matrix{Float64}
 
-    new_sig2 = chol(sig2)
+    new_sig2 = cholesky(sig2).U
 
-    A_mul_B!(nodes, nodes, new_sig2)
+    mul!(nodes, nodes, new_sig2)
     broadcast!(+, nodes, nodes, mu')
 
     return nodes, weights
@@ -562,19 +562,19 @@ end
 
 # other types of args
 qnwnorm(n::Vector{Int}, mu::Vector, sig2::Real) =
-    qnwnorm(n, mu, diagm(fill(convert(Float64, sig2), length(n))))
+    qnwnorm(n, mu, Matrix(Diagonal(fill(convert(Float64, sig2), length(n)))))
 
-qnwnorm(n::Vector{Int}, mu::Real, sig2::Matrix=eye(length(n))) =
+qnwnorm(n::Vector{Int}, mu::Real, sig2::Matrix=Matrix{eltype(n)}(I, length(n), length(n))) =
     qnwnorm(n, fill(mu, length(n)), sig2)
 
 qnwnorm(n::Vector{Int}, mu::Real, sig2::Real) =
-    qnwnorm(n, fill(mu, length(n)), diagm(fill(convert(Float64, sig2), length(n))))
+    qnwnorm(n, fill(mu, length(n)), Matrix(Diagonal(fill(convert(Float64, sig2), length(n)))))
 
 qnwnorm(n::Int, mu::Vector, sig2::Matrix=eye(length(mu))) =
     qnwnorm(fill(n, length(mu)), mu, sig2)
 
 qnwnorm(n::Int, mu::Vector, sig2::Real) =
-    qnwnorm(fill(n, length(mu)), mu, diagm(fill(convert(Float64, sig2), length(mu))))
+    qnwnorm(fill(n, length(mu)), mu, Matrix(Diagonal(fill(convert(Float64, sig2), length(mu)))))
 
 qnwnorm(n::Int, mu::Real, sig2::Matrix=eye(length(mu))) =
     qnwnorm(fill(n, size(sig2, 1)), fill(mu, size(sig2, 1)), sig2)
@@ -586,16 +586,16 @@ function qnwnorm(n::Int, mu::Real, sig2::Real)
 end
 
 qnwnorm(n::Vector{Int}, mu::Vector, sig2::Vector) =
-    qnwnorm(n, mu, diagm(convert(Array{Float64}, sig2)))
+    qnwnorm(n, mu, Matrix(Diagonal(convert(Vector{Float64}, sig2))))
 
 qnwnorm(n::Vector{Int}, mu::Real, sig2::Vector) =
-    qnwnorm(n, fill(mu, length(n)), diagm(convert(Array{Float64}, sig2)))
+    qnwnorm(n, fill(mu, length(n)), Matrix(Diagonal(convert(Array{Float64}, sig2))))
 
 qnwnorm(n::Int, mu::Vector, sig2::Vector) =
     qnwnorm(fill(n, length(mu)), mu, diagm(convert(Array{Float64}, sig2)))
 
 qnwnorm(n::Int, mu::Real, sig2::Vector) =
-    qnwnorm(fill(n, length(sig2)), fill(mu, length(sig2)), diagm(convert(Array{Float64}, sig2)))
+    qnwnorm(fill(n, length(sig2)), fill(mu, length(sig2)), Matrix(Diagonal(convert(Array{Float64}, sig2))))
 
 
 """
@@ -615,7 +615,7 @@ $(qnw_refs)
 """
 function qnwunif(n, a, b)
     nodes, weights = qnwlege(n, a, b)
-    weights ./= prod(b - a)
+    weights ./= prod(b .- a)
     return nodes, weights
 end
 
@@ -681,7 +681,7 @@ function qnwequi(n::Int, a::Vector, b::Vector, kind::AbstractString="N")
     d = n_a
     i = reshape(1:n, n, 1)
     if kind == "N"
-        j = 2.^((1:d)/(d+1))
+        j = 2 .^((1:d)/(d+1))
         nodes = i*j'
         nodes -= fix(nodes)
 
@@ -692,7 +692,7 @@ function qnwequi(n::Int, a::Vector, b::Vector, kind::AbstractString="N")
 
     elseif kind == "H"
         j = equidist_pp[1:d]
-        nodes = (i.*(i+1)./2)*j'
+        nodes = (i.*(i .+ 1)./2)*j'
         nodes -= fix(nodes)
 
     elseif kind == "R"
@@ -877,14 +877,14 @@ function _quadnodes(
         d::Distributions.ContinuousUnivariateDistribution, N::Int,
         q0::Real, qN::Real, ::Union{Even,Type{Even}}
     )
-    collect(linspace(quantile(d, q0), quantile(d, qN), N))
+    collect(range(quantile(d, q0), stop=quantile(d, qN), length=N))
 end
 
 function _quadnodes(
         d::Distributions.ContinuousUnivariateDistribution, N::Int,
         q0::Real, qN::Real, ::Union{Quantile,Type{Quantile}}
     )
-    quantiles = linspace(q0, qN, N)
+    quantiles = range(q0, stop=qN, length=N)
     z = quantile.(d, quantiles)
 end
 

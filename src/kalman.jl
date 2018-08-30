@@ -39,10 +39,10 @@ end
 function set_state!(k::Kalman, x_hat, Sigma)
     k.cur_x_hat = x_hat
     k.cur_sigma = Sigma
-    Void
+    Nothing
 end
 
-doc"""
+@doc doc"""
 Updates the moments (`cur_x_hat`, `cur_sigma`) of the time ``t`` prior to the
 time ``t`` filtering distribution, using current measurement ``y_t``.
 The updates are according to
@@ -50,7 +50,7 @@ The updates are according to
 ```math
     \hat{x}^F = \hat{x} + \Sigma G' (G \Sigma G' + R)^{-1}
                     (y - G \hat{x}) \\
-                    
+
     \Sigma^F = \Sigma - \Sigma G' (G \Sigma G' + R)^{-1} G
                \Sigma
 ```
@@ -75,7 +75,7 @@ function prior_to_filtered!(k::Kalman, y)
     M = A / B
     k.cur_x_hat = x_hat + M * (y - G * x_hat)
     k.cur_sigma = Sigma - M * G * Sigma
-    Void
+    Nothing
 end
 
 """
@@ -95,7 +95,7 @@ function filtered_to_forecast!(k::Kalman)
     # and then update
     k.cur_x_hat = A * x_hat
     k.cur_sigma = A * Sigma * A' + Q
-    Void
+    Nothing
 end
 
 """
@@ -111,12 +111,13 @@ update, from one period to the next
 function update!(k::Kalman, y)
     prior_to_filtered!(k, y)
     filtered_to_forecast!(k)
-    Void
+    Nothing
 end
 
 
 function stationary_values(k::Kalman)
     # simplify notation
+
     A, Q, G, R = k.A, k.Q, k.G, k.R
 
     # solve Riccati equation, obtain Kalman gain
@@ -129,7 +130,7 @@ end
 computes log-likelihood of period ``t``
 
 ##### Arguments
-- `kn::Kalman`: `Kalman` specifying the model. Current values must be the 
+- `kn::Kalman`: `Kalman` specifying the model. Current values must be the
                 forecast for period ``t`` observation conditional on ``t-1``
                 observation.
 - `y::AbstractVector`: Respondentbservations at period ``t``
@@ -140,7 +141,7 @@ computes log-likelihood of period ``t``
 function log_likelihood(k::Kalman, y::AbstractVector)
     eta = y - k.G*k.cur_x_hat # forecast error
     P = k.G*k.cur_sigma*k.G' + k.R # covariance matrix of forecast error
-    logL = - (length(y)*log(2pi) + logdet(P) + eta'/P*eta)[1]/2
+    logL = - (length(y)*log(2pi) + logdet(P) .+ eta'/P*eta)[1]/2
     return logL
 end
 
@@ -148,16 +149,16 @@ end
 computes log-likelihood of entire observations
 
 ##### Arguments
-- `kn::Kalman`: `Kalman` specifying the model. Initial value must be the prior 
+- `kn::Kalman`: `Kalman` specifying the model. Initial value must be the prior
                 for t=1 period observation, i.e. ``x_{1|0}``.
-- `y::AbstractMatrix`: `n x T` matrix of observed data. 
+- `y::AbstractMatrix`: `n x T` matrix of observed data.
                        `n` is the number of observed variables in one period.
-                       Each column is a vector of observations at each period. 
+                       Each column is a vector of observations at each period.
 
 ##### Returns
 - `logL::Real`: log-likelihood of all observations
 """
-function compute_loglikelihood(kn::Kalman, y::AbstractMatrix)    
+function compute_loglikelihood(kn::Kalman, y::AbstractMatrix)
     T = size(y, 2)
     logL = 0
     # forecast and update
@@ -170,11 +171,11 @@ end
 
 """
 ##### Arguments
-- `kn::Kalman`: `Kalman` specifying the model. Initial value must be the prior 
+- `kn::Kalman`: `Kalman` specifying the model. Initial value must be the prior
                 for t=1 period observation, i.e. ``x_{1|0}``.
-- `y::AbstractMatrix`: `n x T` matrix of observed data. 
+- `y::AbstractMatrix`: `n x T` matrix of observed data.
                        `n` is the number of observed variables in one period.
-                       Each column is a vector of observations at each period. 
+                       Each column is a vector of observations at each period.
 
 ##### Returns
 - `x_smoothed::AbstractMatrix`: `k x T` matrix of smoothed mean of states.
@@ -184,11 +185,11 @@ end
 """
 function smooth(kn::Kalman, y::AbstractMatrix)
     G, R = kn.G, kn.R
-    
+
     n, T = size(y)
-    x_filtered = Matrix{Float64}(n, T)
-    sigma_filtered = Array{Float64}(n, n, T)
-    sigma_forecast = Array{Float64}(n, n, T)
+    x_filtered = Matrix{Float64}(undef, n, T)
+    sigma_filtered = Array{Float64}(undef, n, n, T)
+    sigma_forecast = Array{Float64}(undef, n, n, T)
     logL = 0
     # forecast and update
     for t in 1:T
@@ -226,7 +227,7 @@ end
 - `sigma_s1::Matrix`: smoothed covariance of state for period ``t``
 """
 function go_backward(k::Kalman, x_fi::Vector,
-                     sigma_fi::Matrix, sigma_fo::Matrix, 
+                     sigma_fi::Matrix, sigma_fo::Matrix,
                      x_s1::Vector, sigma_s1::Matrix)
     A = k.A
     temp = sigma_fi*A'/sigma_fo

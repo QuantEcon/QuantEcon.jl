@@ -13,7 +13,7 @@ https://lectures.quantecon.org/jl/optgrowth.html
 =#
 
 
-doc"""
+@doc doc"""
 Repeatedly apply a function to search for a fixed point
 
 Approximates ``T^∞ v``, where ``T`` is an operator (function) and ``v`` is an initial
@@ -48,11 +48,11 @@ x_star = compute_fixed_point(x->T(x, 0.3), 0.4)  # (4μ - 1)/(4μ)
 ```
 
 """
-function compute_fixed_point(T::Function, 
-                            v::TV; 
+function compute_fixed_point(T::Function,
+                            v::TV;
                             err_tol=1e-4,
-                            max_iter=100, 
-                            verbose=2, 
+                            max_iter=100,
+                            verbose=2,
                             print_skip=10) where TV
 
     if !(verbose in (0, 1, 2))
@@ -75,7 +75,7 @@ function compute_fixed_point(T::Function,
 
     if verbose >= 1
         if err > err_tol
-            warn("max_iter attained in compute_fixed_point")
+            @warn("max_iter attained in compute_fixed_point")
         elseif verbose == 2
             println("Converged in $iterate steps")
         end

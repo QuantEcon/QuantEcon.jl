@@ -14,7 +14,7 @@ https://lectures.quantecon.org/jl/finite_markov.html
 import LightGraphs: DiGraph, period, attracting_components,
                     strongly_connected_components, is_strongly_connected
 
-@inline check_stochastic_matrix(P) = maximum(abs, sum(P, 2) - 1) < 5e-15 ? true : false
+@inline check_stochastic_matrix(P) = maximum(abs, sum(P, dims = 2) .- 1) < 5e-15 ? true : false
 
 """
 Finite-state discrete-time Markov chain.
@@ -66,7 +66,7 @@ function Base.show(io::IO, mc::MarkovChain{T,TM}) where {T,TM}
     print(io, mc.p)
 end
 
-doc"""
+@doc doc"""
 This routine computes the stationary distribution of an irreducible Markov
 transition matrix (stochastic matrix) or transition rate matrix (generator
 matrix) ``A``.
@@ -236,7 +236,7 @@ for (S, ex_T, ex_gth) in ((Real, :(T), :(gth_solve!)),
         n = n_states(mc)
         rec_classes = recurrent_classes(mc)
         T1 = $ex_T
-        stationary_dists = Array{Vector{T1}}(length(rec_classes))
+        stationary_dists = Vector{Vector{T1}}(undef, length(rec_classes))
 
         for (i, rec_class) in enumerate(rec_classes)
             dist = zeros(T1, n)
@@ -253,7 +253,7 @@ for (S, ex_T, ex_gth) in ((Real, :(T), :(gth_solve!)),
     end
 end
 
-@doc """
+@doc doc"""
 Compute stationary distributions of the Markov chain `mc`, one for each
 recurrent class.
 
@@ -267,11 +267,11 @@ recurrent class.
   stationary distributions, where the element type `T1` is `Rational` if `T` is
   `Int` (and equal to `T` otherwise).
 
-""" stationary_distributions
+"""
+stationary_distributions
 
-
-"""Custom version of `full`, which allows convertion to type `T`"""
 # From base/sparse/sparsematrix.jl
+"""Custom version of `full`, which allows convertion to type `T`"""
 function todense(T::Type, S::SparseMatrixCSC)
     A = zeros(T, S.m, S.n)
     for Sj in 1:S.n
@@ -298,22 +298,30 @@ end
 function MCIndSimulator(mc::MarkovChain, len::Int, init::Int)
     # NOTE: ensure dense array and transpose before slicing the array. Then
     #       when passing to DiscreteRV use `sub` to avoid allocating again
-    p = full(mc.p)'
+    p = Matrix(mc.p)'
     drvs = [DiscreteRV(view(p, :, i)) for i in 1:size(mc.p, 1)]
     MCIndSimulator(mc, len, init, drvs)
 end
 
+# Base.start(mcis::MCIndSimulator) = (mcis.init, 0)
+# function Base.next(mcis::MCIndSimulator, state::Tuple{Int,Int})
+#     ix, t = state
+#     (ix, (rand(mcis.drvs[ix]), t+1))
+# end
+# Base.done(mcis::MCIndSimulator, s::Tuple{Int,Int}) = s[2] >= mcis.len
 
-Base.start(mcis::MCIndSimulator) = (mcis.init, 0)
-
-function Base.next(mcis::MCIndSimulator, state::Tuple{Int,Int})
+function Base.iterate(mcis::MCIndSimulator, state::Tuple{Int,Int}=(mcis.init, 0))
     ix, t = state
+    if t >= mcis.len
+        return nothing
+    end
     (ix, (rand(mcis.drvs[ix]), t+1))
 end
 
-Base.done(mcis::MCIndSimulator, s::Tuple{Int,Int}) = s[2] >= mcis.len
 Base.length(mcis::MCIndSimulator) = mcis.len
 Base.eltype(mcis::MCIndSimulator) = Int
+Base.IteratorSize(mcis::MCIndSimulator) = Base.HasLength()
+
 
 mutable struct MCSimulator{T<:MCIndSimulator}
     mcis::T
@@ -324,21 +332,19 @@ function MCSimulator(mc::MarkovChain, len::Int, init::Int)
 end
 
 # only need to implement next and eltype differently...
-function Base.next(mcs::MCSimulator, state::Tuple{Int,Int})
-    ix, new_state = next(mcs.mcis, state)
+function Base.iterate(mcs::MCSimulator, state::Tuple{Int,Int}=(mcs.mcis.init, 0))
+    output = iterate(mcs.mcis, state)
+    if output === nothing
+        return output
+    end
+    ix, new_state = output
     (mcs.mcis.mc.state_values[ix], new_state)
 end
 Base.eltype(mcs::MCSimulator) = eltype(mcs.mcis.mc)
 
 # ...the rest of the interface can derive from mcis
-Base.start(mcs::MCSimulator) = start(mcs.mcis)
-Base.done(mcs::MCSimulator, state::Tuple{Int,Int}) = done(mcs.mcis, state)
 Base.length(mcs::MCSimulator) = length(mcs.mcis)
-
-if isdefined(Base, :iteratorsize)
-    Base.iteratorsize(mcis::MCIndSimulator) = Base.HasLength()
-    Base.iteratorsize(mcs::MCSimulator) = Base.iteratorsize(mcs.mcis)
-end
+Base.IteratorSize(mcs::MCSimulator) = Base.IteratorSize(mcs.mcis)
 
 """
 Simulate one sample path of the Markov chain `mc`.
@@ -357,7 +363,7 @@ The resulting vector has the state values of `mc` as elements.
 """
 function simulate(mc::MarkovChain, ts_length::Int;
                   init::Int=rand(1:n_states(mc)))
-    X = Array{eltype(mc)}(ts_length)
+    X = Vector{eltype(mc)}(undef, ts_length)
     simulate!(X, mc; init=init)
 end
 
@@ -379,14 +385,13 @@ same as the type of the state values of `mc`
       initial condition until all columns have an initial condition
       (allows for more columns than initial conditions)
 """
-
 function simulate!(X::Union{AbstractVector,AbstractMatrix},
                    mc::MarkovChain; init=rand(1:n_states(mc), size(X, 2)))
     mcs = MCSimulator(mc, size(X, 1), init[1])
 
     for (i, init) in enumerate(take(cycle(init), size(X, 2)))
         mcs.mcis.init = init
-        copy!(view(X, :, i), mcs)
+        copyto!(view(X, :, i), mcs)
     end
     X
 end
@@ -412,7 +417,7 @@ The resulting vector has the indices of the state values of `mc` as elements.
 """
 function simulate_indices(mc::MarkovChain, ts_length::Int;
                           init::Int=rand(1:n_states(mc)))
-    X = Array{Int}(ts_length)
+    X = Vector{Int}(undef, ts_length)
     simulate_indices!(X, mc; init=init)
 end
 
@@ -439,7 +444,7 @@ function simulate_indices!(X::Union{AbstractVector{T},AbstractMatrix{T}},
 
     for (i, init) in enumerate(take(cycle(init), size(X, 2)))
         mcis.init = init
-        copy!(view(X, :, i), mcis)
+        copyto!(view(X, :, i), mcis)
     end
     X
 end

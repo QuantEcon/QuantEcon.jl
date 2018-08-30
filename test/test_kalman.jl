@@ -2,9 +2,9 @@
 
     # set up
     A = [.95 0; 0. .95]
-    Q = eye(2) .* 0.5
-    G = eye(2) .* .5
-    R = eye(2) .* 0.2
+    Q = Matrix(I, 2, 2) .* 0.5
+    G = Matrix(I, 2, 2) .* 0.5
+    R = Matrix(I, 2, 2) .* 0.2
     kf = Kalman(A, G, Q, R)
 
     rough_kwargs = Dict(:atol => 1e-2, :rtol => 1e-4)
@@ -28,7 +28,7 @@
     @test isapprox(kf.cur_x_hat, [0.0 0.0]'; rough_kwargs...)
 
     # test update nonstationary
-    curr_x, curr_sigma = ones(2, 1), eye(2) .* .75
+    curr_x, curr_sigma = fill(one(Float64), 2, 1), Matrix(I, 2, 2) .* .75
     y_observed = fill(0.75, 2, 1)
     set_state!(kf, curr_x, curr_sigma)
     update!(kf, y_observed)

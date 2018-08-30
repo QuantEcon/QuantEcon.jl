@@ -5,8 +5,6 @@ Utilities for testing QuantEcon
 
 @date: 2014-08-26
 =#
-using HDF5, JLD2, MAT
-
 const test_path = dirname(@__FILE__())
 const data_path = joinpath(test_path, "data")
 
@@ -22,6 +20,6 @@ if !(isfile(quad_data_file_name))
         right now. Try again when you have an internet connection
         """
 
-        warn(m)
+        @warn(m)
     end
 end

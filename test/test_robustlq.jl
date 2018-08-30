@@ -26,7 +26,7 @@
     C = [0.0 0.0 sigma_d]'
 
     rblq = RBLQ(Q, R, A, B, C, β, θ)
-    lq = LQ(Q, R, A, B, C, β)
+    lq = QuantEcon.LQ(Q, R, A, B, C, β)
 
     Fr, Kr, Pr = robust_rule(rblq)
 
@@ -58,6 +58,6 @@
 
     @testset "test no run-time error in robust_rule_simple" begin
         # this will just print out a warning
-        robust_rule_simple(rblq, ones(Pr); tol=eps(), max_iter=1)
+        robust_rule_simple(rblq, fill!(similar(Pr), 1.0); tol=eps(), max_iter=1)
     end
 end  # @testset

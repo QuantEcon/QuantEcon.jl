@@ -19,7 +19,7 @@ Tests for markov/ddp.jl
     # Formulation with Dense Matrices R: n x m, Q: n x m x n
     n, m = 2, 2  # number of states, number of actions
     R = [5.0 10.0; -1.0 -Inf]
-    Q = Array{Float64}(n, m, n)
+    Q = Array{Float64}(undef, n, m, n)
     Q[:, :, 1] = [0.5 0.0; 0.0 0.0]
     Q[:, :, 2] = [0.5 1.0; 1.0 1.0]
 
@@ -125,9 +125,9 @@ Tests for markov/ddp.jl
 
     @testset "compute_greedy! changes ddpr.v" begin
         res = solve(ddp0, VFI)
-        res.Tv[:] = 500.0
+        res.Tv[:] .= 500.0
         compute_greedy!(ddp0, res)
-        @test maximum(abs, res.Tv - 500.0) > 0
+        @test maximum(abs, res.Tv .- 500.0) > 0
     end
 
     @testset "value_iteration" begin
@@ -268,7 +268,7 @@ Tests for markov/ddp.jl
             n, m = 2, 2
             _R = [-Inf -Inf; 1.0 2.0]
 
-            _Q = Array{Float64}(n, m, n)
+            _Q = Array{Float64}(undef, n, m, n)
             _Q[:, :, 1] = [0.5 0.0; 0.0 0.0]
             _Q[:, :, 2] = [0.5 1.0; 1.0 1.0]
             _beta = 0.95

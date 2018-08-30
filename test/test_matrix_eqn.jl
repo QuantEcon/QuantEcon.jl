@@ -2,7 +2,7 @@
     rough_kwargs = Dict(:atol => 1e-7, :rtol => 1e-7)
 
     @testset "simple test where X is all zero" begin
-        A = eye(4) .* .95
+        A = Matrix(I, 4, 4) .* .95
         B = zeros(4, 4)
 
         X = solve_discrete_lyapunov(A, B)
@@ -42,8 +42,9 @@
     end
 
     @testset "testing ricatti golden_num_2d" begin
-        A, B, R, Q = eye(2), eye(2), eye(2), eye(2)
-        gold_diag = eye(2) .* (1 + sqrt(5)) ./ 2.
+        If64 = Matrix{Float64}(I, 2, 2)
+        A, B, R, Q = If64, If64, If64, If64
+        gold_diag = If64 .* (1 + sqrt(5)) ./ 2.
         val = solve_discrete_riccati(A, B, Q, R)
         @test isapprox(val, gold_diag; rough_kwargs...)
     end
@@ -61,7 +62,7 @@
         R = [0.0 0.0
              0.0 1.0]
         X = solve_discrete_riccati(A, B, Q, R)
-        Y = diagm([1e5, 1e3, 0.0])
+        Y = diagm(0 => [1e5, 1e3, 0.0])
 
         @test isapprox(X, Y; rough_kwargs...)
     end
@@ -83,15 +84,15 @@
 
     @testset "test tjm 3" begin
         r = 0.5
-        I = eye(2)
+        Im = Matrix{Float64}(I, 2, 2)
         A = [2.0+r^2 0.0
              0.0     0.0]
-        B = I
+        B = Im
         R = [1.0 r
              r   r*r]
-        Q = I - A' * A + A' * ((R + I) \ A)
+        Q = Im - A' * A + A' * ((R + Im) \ A)
         X = solve_discrete_riccati(A, B, Q, R)
-        Y = eye(2)
+        Y = Im
         @test isapprox(X, Y; rough_kwargs...)
     end
 

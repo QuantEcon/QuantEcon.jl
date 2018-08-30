@@ -21,13 +21,13 @@ https://lectures.quantecon.org/jl/kalman.html
 
 =#
 
-doc"""
+@doc doc"""
 A type that describes the Gaussian Linear State Space Model
 of the form:
 
 ```math
     x_{t+1} = A x_t + C w_{t+1} \\
-    
+
     y_t = G x_t + H v_t
 ```
 
@@ -95,7 +95,7 @@ end
 
 
 function simulate(lss::LSS, ts_length=100)
-    x = Array{Float64}(lss.n, ts_length)
+    x = Matrix{Float64}(undef, lss.n, ts_length)
     x[:, 1] = rand(lss.dist)
     w = randn(lss.m, ts_length - 1)
     v = randn(lss.l, ts_length)
@@ -107,7 +107,7 @@ function simulate(lss::LSS, ts_length=100)
     return x, y
 end
 
-doc"""
+@doc doc"""
 Simulate `num_reps` observations of ``x_T`` and ``y_T`` given ``x_0 \sim N(\mu_0, \Sigma_0)``.
 
 #### Arguments
@@ -125,7 +125,7 @@ Simulate `num_reps` observations of ``x_T`` and ``y_T`` given ``x_0 \sim N(\mu_0
 
 """
 function replicate(lss::LSS, t::Integer, num_reps::Integer=100)
-    x = Array{Float64}(lss.n, num_reps)
+    x = Matrix{Float64}(undef, lss.n, num_reps)
     v = randn(lss.l, num_reps)
     for j=1:num_reps
         x_t, _ = simulate(lss, t+1)
@@ -143,11 +143,10 @@ struct LSSMoments
     lss::LSS
 end
 
-Base.start(L::LSSMoments) = (copy(L.lss.mu_0), copy(L.lss.Sigma_0))
-Base.done(L::LSSMoments, x) = false
-function Base.next(L::LSSMoments, moms)
+function Base.iterate(L::LSSMoments, state=(copy(L.lss.mu_0),
+                                            copy(L.lss.Sigma_0)))
     A, C, G, H = L.lss.A, L.lss.C, L.lss.G, L.lss.H
-    mu_x, Sigma_x = moms
+    mu_x, Sigma_x = state
 
     mu_y, Sigma_y = G * mu_x, G * Sigma_x * G' + H * H'
 
@@ -155,10 +154,11 @@ function Base.next(L::LSSMoments, moms)
     mu_x2 = A * mu_x
     Sigma_x2 = A * Sigma_x * A' + C * C'
 
-    (mu_x, mu_y, Sigma_x, Sigma_y), (mu_x2, Sigma_x2)
+    return ((mu_x, mu_y, Sigma_x, Sigma_y), (mu_x2, Sigma_x2))
 end
 
-doc"""
+
+@doc doc"""
 Create an iterator to calculate the population mean and
 variance-convariance matrix for both ``x_t`` and ``y_t``, starting at
 the initial condition `(self.mu_0, self.Sigma_0)`.  Each iteration
@@ -173,7 +173,7 @@ the next period.
 moment_sequence(lss::LSS) = LSSMoments(lss)
 
 
-doc"""
+@doc doc"""
 Compute the moments of the stationary distributions of ``x_t`` and
 ``y_t`` if possible.  Computation is by iteration, starting from the
 initial conditions `lss.mu_0` and `lss.Sigma_0`
@@ -211,22 +211,21 @@ function stationary_distributions(lss::LSS; max_iter=200, tol=1e-5)
         mu_x, Sigma_x = mu_x1, Sigma_x1
 
         if err < tol && i > 1
-            break
+            # return here because of how scoping works in loops.
+            return mu_x1, mu_y, Sigma_x1, Sigma_y
         end
     end
-
-    return mu_x, mu_y, Sigma_x, Sigma_y
 end
 
 function geometric_sums(lss::LSS, bet, x_t)
     !is_stable(lss) ? error("Cannot compute geometric sum because the system is not stable.") : nothing
-    I = eye(lss.n)
+    # I = eye(lss.n)
     S_x = (I - bet .* lss.A) \ x_t
     S_y = lss.G * S_x
     return S_x, S_y
 end
 
-doc"""
+@doc doc"""
 Test for stability of linear state space system.
 First removes the constant row and column.
 
@@ -250,9 +249,9 @@ function is_stable(lss::LSS)
 
 end
 
-doc"""
-Finds the row and column, if any,  that correspond to the constant 
-term in a `LSS` system and removes them to get the matrix that needs 
+@doc doc"""
+Finds the row and column, if any,  that correspond to the constant
+term in a `LSS` system and removes them to get the matrix that needs
 to be checked for stability.
 
 #### Arguments
@@ -272,7 +271,7 @@ function remove_constants(lss::LSS)
 
     # Sum the absolute values of each row -> Do this because we
     # want to find rows that the sum of the absolute values is 1
-    row_sums_to_one = (vec(sum(abs, A, 2) - 1.0)) .< 1e-14
+    row_sums_to_one = (vec(sum(abs, A, dims = 2) .- 1.0)) .< 1e-14
     is_ii_one = map(i->abs(A[i, i] - 1.0) < 1e-14, 1:n)
     not_constant_index = .!(row_sums_to_one .& is_ii_one)
 

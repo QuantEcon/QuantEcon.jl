@@ -9,7 +9,7 @@ problems.
 
 =#
 
-doc"""
+@doc doc"""
 Compute the limit of a Nash linear quadratic dynamic game.
 
 Player `i` minimizes
@@ -74,8 +74,8 @@ function nnash(a, b1, b2, r1, r2, q1, q2, s1, s2, w1, w2, m1, m2;
     k_2 = size(b2, 2)
 
     # initial values
-    v1 = eye(k_1)
-    v2 = eye(k_2)
+    v1 = Matrix(I, k_1, k_1)
+    v2 = Matrix(I, k_2, k_2)
     p1 = zeros(n, n)
     p2 = zeros(n, n)
     f1 = randn(k_1, n)
@@ -88,8 +88,8 @@ function nnash(a, b1, b2, r1, r2, q1, q2, s1, s2, w1, w2, m1, m2;
 
         g2 = (b2'*p2*b2 .+ q2)\v2
         g1 = (b1'*p1*b1 .+ q1)\v1
-        h2 = g2*b2'*p2
-        h1 = g1*b1'*p1
+        h2 = Matrix(g2) * Matrix(b2') * p2
+        h1 = Matrix(g1) * Matrix(b1') * p1
 
         # Break up computation of f1 and f2
         f_1_left = v1 .- (h1*b2 .+ g1*m1')*(h2*b1 .+ g2*m2')

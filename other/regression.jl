@@ -31,7 +31,7 @@ function de_normalize(X, Y, beta)
     B[2:end, :] = (1.0 ./ std(X[:, 2:n], 1)') * std(Y) .* beta
 
     # Infer intercept from others.
-    B[1, :] = mean(Y) - mean(X[:, 2:n], 1) * B[2:end, :]
+    B[1, :] .= mean(Y) .- mean(X[:, 2:n], 1) * B[2:end, :]
 
     return B
 end
@@ -59,7 +59,7 @@ function LS_SVD(X, Y, normalize=true)
     if normalize
         X1, Y1 = normalize_data(X, Y)
         U, S, V = svd(X1, thin=true)
-        S_inv = diagm(1.0 ./ S)
+        S_inv = diagm(0 => 1.0 ./ S)
         B1 = V*S_inv * U' * Y1
         B = de_normalize(X, Y, B1)
     else
@@ -88,7 +88,7 @@ function LAD_PP(X, Y, normalize=true)
     UB = [zeros(n1)+100; fill(Inf, 2T)]
 
     f = [zeros(n1); ones(2*T)]
-    Aeq =  [X1 eye(T,T) -eye(T,T)]
+    Aeq =  [X1 Matrix(I, T, T) -Matrix(I, T, T)]
     B1 = zeros(size(X1, 2), N)
 
     for j = 1:N
@@ -124,7 +124,7 @@ function LAD_DP(X, Y, normalize=true)
     for j=1:N
         f = - Y1[:, j]
         sol = linprog(f, Aeq, '=', beq, LB, UB)
-        B1[:, j] = - sol.attrs[:lambda][1:n1]
+        B1[:, j] .= -sol.attrs[:lambda][1:n1]
     end
 
     B = normalize ? de_normalize(X, Y, B1) : B1
@@ -138,7 +138,8 @@ function RLS_T(X, Y, penalty=-7)
     T, n = size(X)
     n1 = n - 1
     X1, Y1 = normalize_data(X, Y)
-    B1 = inv(X1'*X1+T/n1*eye(n1)*10.0^penalty)*X1'*Y1
+    # B1 = inv(X1' * X1 + T / n1 * eye(n1) * 10.0^ penalty) * X1' * Y1
+    B1 = inv(X1' * X1 + T / n1 * I * 10.0^ penalty) * X1' * Y1
     B = de_normalize(X, Y, B1)
     return B
 end
@@ -172,7 +173,8 @@ function RLAD_PP(X, Y, penalty=7)
     UB =  Inf  # no upper bound
 
     f = [10.0^penalty*ones(n1*2)*T/n1; ones(2*T)]
-    Aeq =  [X1 -X1 eye(T, T) -eye(T,T)]
+    # Aeq =  [X1 -X1 eye(T, T) -eye(T,T)]
+    Aeq =  [X1 -X1 I -I]
 
     B1 = zeros(size(X1, 2), N)
 

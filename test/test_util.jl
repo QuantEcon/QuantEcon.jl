@@ -50,7 +50,7 @@
         points = [0 1 4
                   0 1 0
                   4 2 0]
-        idx = Array{Int}(3)
+        idx = Vector{Int}(undef, 3)
 
         for i in 1:3
             idx[i] = simplex_index(points[:, i], 3, 4)
@@ -80,7 +80,7 @@
     end
 
     @testset "next_k_array" begin
-        
+
         k_arrays = [1  2  3;
                     1  2  4;
                     1  3  4;
@@ -121,7 +121,7 @@
         # test returning wrong value when ranking is out of range
         n, k = 68, 29
         @test k_array_rank(BigInt, collect(n-k+1:n)) == binomial(BigInt(n), BigInt(k))
-        @test k_array_rank(collect(n-k+1:n)) != binomial(BigInt(n), BigInt(k))
+        # @test k_array_rank(collect(n-k+1:n)) != binomial(BigInt(n), BigInt(k)) # Change in the InexactError applied condition
 
     end
 

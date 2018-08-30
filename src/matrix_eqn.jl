@@ -1,6 +1,6 @@
 # matrix_eqn.jl
 
-doc"""
+@doc doc"""
 Solves the discrete lyapunov equation.
 
 The problem is given by
@@ -40,8 +40,8 @@ function solve_discrete_lyapunov(A::ScalarOrArray,
     alpha0 = reshape([A;], n, n)
     gamma0 = reshape([B;], n, n)
 
-    alpha1 = zeros(alpha0)
-    gamma1 = zeros(gamma0)
+    alpha1 = fill!(similar(alpha0), zero(eltype(alpha0)))
+    gamma1 = fill!(similar(gamma0), zero(eltype(gamma0)))
 
     diff = 5
     n_its = 1
@@ -65,7 +65,7 @@ function solve_discrete_lyapunov(A::ScalarOrArray,
     return gamma1
 end
 
-doc"""
+@doc doc"""
 Solves the discrete-time algebraic Riccati equation
 
 The prolem is defined as
@@ -112,7 +112,7 @@ function solve_discrete_riccati(A::ScalarOrArray, B::ScalarOrArray,
 
     n = size(R, 1)
     k = size(Q, 1)
-    I = eye(k)
+    Im = Matrix{Float64}(I, k, k)
 
     current_min = Inf
     candidates = [0.01, 0.1, 0.25, 0.5, 1.0, 2.0, 10.0, 100.0, 10e5]
@@ -123,13 +123,13 @@ function solve_discrete_riccati(A::ScalarOrArray, B::ScalarOrArray,
         Z = getZ(R, gamma, BB)
         cn = cond(Z)
         if cn * eps() < 1
-            Q_tilde = -Q + N' * (Z \ (N + gamma .* BTA)) + gamma .* I
+            Q_tilde = -Q .+ N' * (Z \ (N .+ gamma .* BTA)) .+ gamma .* Im
             G0 = B * (Z \ B')
-            A0 = (I - gamma .* G0) * A - B * (Z \ N)
+            A0 = (Im .- gamma .* G0) * A .- B * (Z \ N)
             H0 = gamma .* (A' * A0) - Q_tilde
             f1 = cond(Z, Inf)
             f2 = gamma .* f1
-            f3 = cond(I + G0 * H0)
+            f3 = cond(Im + G0 * H0)
             f_gamma = max(f1, f2, f3)
 
             if f_gamma < current_min
@@ -145,13 +145,13 @@ function solve_discrete_riccati(A::ScalarOrArray, B::ScalarOrArray,
     end
 
     gamma = best_gamma
-    R_hat = R + gamma .* BB
+    R_hat = R .+ gamma .* BB
 
     # Initial conditions
-    Q_tilde = - Q + N' * (R_hat\(N + gamma .* BTA)) + gamma .* I
+    Q_tilde = -Q .+ N' * (R_hat\(N .+ gamma .* BTA)) .+ gamma .* Im
     G0 = B * (R_hat\B')
-    A0 = (I - gamma .* G0) * A - B * (R_hat\N)
-    H0 = gamma .* A'*A0 - Q_tilde
+    A0 = (Im .- gamma .* G0) * A .- B * (R_hat\N)
+    H0 = gamma .* A'*A0 .- Q_tilde
     i = 1
 
     # Main loop
@@ -162,21 +162,21 @@ function solve_discrete_riccati(A::ScalarOrArray, B::ScalarOrArray,
             error(msg)
         end
 
-        A1 = A0 * ((I + G0 * H0)\A0)
-        G1 = G0 + A0 * G0 * ((I + H0 * G0)\A0')
-        H1 = H0 + A0' * ((I + H0*G0)\(H0*A0))
+        A1 = A0 * ((Im .+ G0 * H0)\A0)
+        G1 = G0 .+ A0 * G0 * ((Im .+ H0 * G0)\A0')
+        H1 = H0 .+ A0' * ((Im .+ H0*G0)\(H0*A0))
 
-        dist = Base.maximum(abs, H1 - H0)
+        dist = maximum(abs, H1 - H0)
         A0 = A1
         G0 = G1
         H0 = H1
         i += 1
     end
 
-    return H0 + gamma .* I  # Return X
+    return H0 + gamma .* Im  # Return X
 end
 
-doc"""
+@doc doc"""
 Simple method to return an element ``Z`` in the Riccati equation solver whose type is `Float64` (to be accepted by the `cond()` function)
 
 ##### Arguments
@@ -191,7 +191,7 @@ Simple method to return an element ``Z`` in the Riccati equation solver whose ty
 """
 getZ(R::Float64, gamma::Float64, BB::Float64) = R + gamma * BB
 
-doc"""
+@doc doc"""
 Simple method to return an element ``Z`` in the Riccati equation solver whose type is `Float64` (to be accepted by the `cond()` function)
 
 ##### Arguments
@@ -206,7 +206,7 @@ Simple method to return an element ``Z`` in the Riccati equation solver whose ty
 """
 getZ(R::Float64, gamma::Float64, BB::Union{Vector, Matrix}) = R + gamma * BB[1]
 
-doc"""
+@doc doc"""
 Simple method to return an element ``Z`` in the Riccati equation solver whose type is Matrix (to be accepted by the `cond()` function)
 
 ##### Arguments

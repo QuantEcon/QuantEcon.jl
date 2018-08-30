@@ -1,7 +1,7 @@
 @testset "Testing interp.jl" begin
 
     # uniform interpolation
-    breaks = linspace(-3, 3, 100)
+    breaks = range(-3, stop=3, length=100)
     vals = exp.(breaks)
     vals2 = [vals sin.(breaks)]
 
@@ -34,7 +34,7 @@
     end
 
     # off grid is close
-    for x in linspace(-3, 3, 300)
+    for x in range(-3, stop=3, length=300)
         @test abs(li(x) - exp(x)) < 1e-2
         @test all(abs.(li_mat(x) .- [exp(x), sin(x)]) .< 1e-2)
         @test li(x) ≈ li_mat(x, 1)
@@ -51,7 +51,7 @@
     breaks = cumsum(0.1 .* rand(20))
     vals = 0.1 .* map(sin, breaks)
     li = interp(breaks, vals)
-    li_mat = interp(breaks, [vals vals+1])
+    li_mat = interp(breaks, [vals vals .+ 1])
 
     # on grid is exact
     for i in 1:length(breaks)
@@ -60,7 +60,7 @@
     end
 
     # off grid is close
-    for x in linspace(extrema(breaks)..., 30)
+    for x in range(minimum(breaks), stop = maximum(breaks), length = 30)
         @test abs(li(x) - 0.1*sin(x)) < 1e-2
         @test all(abs.(li_mat(x) - [0.1*sin(x), 0.1*sin(x)+1]) .< 1e-2)
 
@@ -71,9 +71,9 @@
     vals = map(sin, breaks)
 
     @inferred interp(breaks, vals)
-    @inferred interp(breaks, [vals vals+1])
+    @inferred interp(breaks, [vals vals .+ 1])
     @test_throws ArgumentError LinInterp(breaks, vals)
-    @test_throws ArgumentError LinInterp(breaks, [vals vals+1])
+    @test_throws ArgumentError LinInterp(breaks, [vals vals .+ 1])
 
     # dimension mismatch
     breaks = cumsum(rand(10))
@@ -82,7 +82,7 @@
     @test_throws DimensionMismatch interp(breaks, vals)
     @test_throws DimensionMismatch LinInterp(breaks, vals)
 
-    @test_throws DimensionMismatch interp(breaks, [vals vals+1])
-    @test_throws DimensionMismatch LinInterp(breaks, [vals vals+1])
+    @test_throws DimensionMismatch interp(breaks, [vals vals .+ 1])
+    @test_throws DimensionMismatch LinInterp(breaks, [vals vals .+ 1])
 
 end  # @testset

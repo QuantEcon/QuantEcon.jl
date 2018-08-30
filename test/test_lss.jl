@@ -22,7 +22,7 @@
         @test isapprox(ssmux, ssmuy; rough_kwargs...)
         @test isapprox(sssigx, sssigy; rough_kwargs...)
         @test isapprox(ssmux, [0.0]; rough_kwargs...)
-        @test isapprox(sssigx, ss.C.^2 ./ (1 - ss.A .^2); rough_kwargs...)
+        @test isapprox(sssigx, ss.C.^2 ./ (1 .- ss.A .^2); rough_kwargs...)
     end
 
     @testset "test replicate" begin
@@ -54,19 +54,9 @@
     @testset "test constructors" begin
         # kwarg version
         other_ss = LSS(A, C, G; H=H, mu_0=[mu_0;])
-        for nm in fieldnames(ss)
+        for nm in fieldnames(typeof(ss))
             @test getfield(ss, nm) == getfield(other_ss, nm)
         end
-    end
-    
-    @testset "test moment iterator" begin
-        m = QuantEcon.LSSMoments(ss)
-
-        # never done
-        @test !done(m, 1)
-
-        # start should give us mu_0, Sigma_0
-        @test start(m) == (ss.mu_0, ss.Sigma_0)
     end
 
     @testset "test positive semi-dfinite covariance" begin
@@ -82,7 +72,7 @@
              0.0]
         G = [0.0     1.0       0.0  0.0;
              65.5172 0.344828  0.0  -0.05]
-        H = [0.6     1.3; 
+        H = [0.6     1.3;
              -5.8    0.1]
         mu_0 = [1.0;
                 99.9999;

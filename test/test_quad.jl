@@ -50,24 +50,13 @@ x_gamm_3, w_gamm_3 = qnwgamma(n_3, b_3, ones(3))
     @testset "Testing method resolution" begin
 
         for f in qnwfuncs
-            if VERSION >= v"0.5-"
-                m1 = @inferred f(11, 1, 3)
-                m2 = @inferred f([11], 1, 3)
-                m3 = @inferred f(11, [1], 3)
-                m4 = @inferred f(11, 1, [3])
-                m5 = @inferred f([11], [1], 3)
-                m6 = @inferred f([11], 1, [3])
-                m7 = @inferred f([11], [1], [3])
-            else
-                # type inference doesn't get this right on 0.4...
-                m1 = f(11, 1, 3)
-                m2 = f([11], 1, 3)
-                m3 = f(11, [1], 3)
-                m4 = f(11, 1, [3])
-                m5 = f([11], [1], 3)
-                m6 = f([11], 1, [3])
-                m7 = f([11], [1], [3])
-            end
+            m1 = @inferred f(11, 1, 3)
+            m2 = @inferred f([11], 1, 3)
+            m3 = @inferred f(11, [1], 3)
+            m4 = @inferred f(11, 1, [3])
+            m5 = @inferred f([11], [1], 3)
+            m6 = @inferred f([11], 1, [3])
+            m7 = @inferred f([11], [1], [3])
 
             # Stack nodes/weights in columns
             @test isapprox([m1[1] m1[2]], [m2[1] m2[2]])
@@ -88,9 +77,9 @@ x_gamm_3, w_gamm_3 = qnwgamma(n_3, b_3, ones(3))
                 w_str_name = "w_$(name)_$(d)"
                 jl_x, jl_w = eval(Symbol(x_str_name)), eval(Symbol(w_str_name))
                 ml_x, ml_w = m[x_str_name],  m[w_str_name]
-                ml_x = d == 3 ? ml_x : squeeze(ml_x, 2)
+                ml_x = d == 3 ? ml_x : dropdims(ml_x, dims = 2)
                 @test isapprox(jl_x, ml_x; atol=1e-5)
-                @test isapprox(jl_w, squeeze(ml_w, 2); atol=1e-5)
+                @test isapprox(jl_w, dropdims(ml_w, dims = 2); atol=1e-5)
             end
         end
     end
@@ -101,7 +90,7 @@ x_gamm_3, w_gamm_3 = qnwgamma(n_3, b_3, ones(3))
         f3(x) = abs.(x).^0.5
 
         # dim 1: num nodes, dim2: method, dim3:func
-        data1d = Array{Float64}(6, 6, 3)
+        data1d = Array{Float64}(undef, 6, 6, 3)
         kinds = ["trap", "simp", "lege", "N", "W", "H"]
         n_nodes = [5, 11, 21, 51, 101, 401]  # number of nodes
         a, b = -1, 1
@@ -135,7 +124,7 @@ x_gamm_3, w_gamm_3 = qnwgamma(n_3, b_3, ones(3))
         b = ([1.0, 2.0], [1.0, 1.0])
 
         # dim 1: num nodes, dim2: method
-        data2d1 = Array{Float64}(6, 6)
+        data2d1 = Matrix{Float64}(undef, 6, 6)
         kinds = ["lege", "trap", "simp", "N", "W", "H"]
         n_nodes = [5, 11, 21, 51, 101, 401]  # number of nodes
 
