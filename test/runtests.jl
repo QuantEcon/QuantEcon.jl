@@ -9,7 +9,6 @@ using Random
 using FFTW
 using DSP
 using SparseArrays
-using HDF5, JLD2
 using Test
 
 tests = [
