@@ -1,6 +1,10 @@
 name = "QuantEcon"
 uuid = "fcd29c91-0bd7-5a09-975d-7ac3f643a60c"
 repo = "https://github.com/QuantEcon/QuantEcon.jl.git"
+description = "Julia implementation of QuantEcon routines"
+license = "BSD-3-Clause"
+version = "0.15.0"
+maintainer = "Spencer Lyon"
 
 [deps]
 Compat = "34da2185-b29b-5c13-b0c7-acf172513d20"
