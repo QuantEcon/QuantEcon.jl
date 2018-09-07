@@ -9,9 +9,9 @@ Library Website: [http://quantecon.org](http://quantecon.org)
 
 This repository includes the Julia package `QuantEcon`
 
-To install the package, open a Julia session and type
+To install the package, open the Julia package manager (Pkg) and type
 
-	Pkg.add("QuantEcon")
+	add QuantEcon
 
 Documentation for the library: [quantecon.github.io/QuantEcon.jl/](http://quantecon.github.io/QuantEcon.jl/)
 
