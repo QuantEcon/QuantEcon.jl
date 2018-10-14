@@ -17,4 +17,4 @@ The `Julia` [style guide](http://julia.readthedocs.org/en/latest/manual/style-gu
 
 ## Writing Tests
 
-One prerequisite for contributions to QuantEcon is that all functions and methods should be paired with tests verifying that they are functioning correctly. This type of [unit testing](https://en.wikipedia.org/wiki/Unit_testing) is almost universal across a quality software projects. A guide to writing tests in `Julia` is currently in work.
+One prerequisite for contributions to QuantEcon is that all functions and methods should be paired with tests verifying that they are functioning correctly. This type of [unit testing](https://en.wikipedia.org/wiki/Unit_testing) is almost universal across a quality software projects. A guide to writing tests in `Julia` is available [here](http://nbviewer.jupyter.org/github/QuantEcon/QuantEcon.jl/blob/master/docs/src/man/Tests.ipynb).
