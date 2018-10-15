@@ -186,7 +186,8 @@ end
 function smooth(kn::Kalman, y::AbstractMatrix)
     G, R = kn.G, kn.R
 
-    n, T = size(y)
+    T = size(y, 2)
+    n = kn.n
     x_filtered = Matrix{Float64}(undef, n, T)
     sigma_filtered = Array{Float64}(undef, n, n, T)
     sigma_forecast = Array{Float64}(undef, n, n, T)

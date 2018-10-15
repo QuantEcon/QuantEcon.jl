@@ -62,4 +62,35 @@
 
     set_state!(kn, zeros(2,1), cov_init)
     @test isapprox(-12.7076583170714, compute_loglikelihood(kn, y))
+
+    # test a case where the number of state is larger than the number of observation
+    # ```matlab
+    # A= [0.5 0.4;
+    #     0.3 0.2];
+    # B_sigma=[0.5 0.3;
+    #          0.1 0.4];
+    # C=[0.5 0.4];
+    # D = 0.05;
+    # y=[1; 2; 3; 4];
+    # Mdl = ssm(A,B_sigma,C,D);
+    # [x_matlab, logL_matlab] = smooth(Mdl, y)
+    # ```
+    A = [.5 .4;
+         .3 .2]
+    Q = [.34 .17;
+         .17 .17]
+    G = [.5 .4]
+    R = [.05^2]
+    y = [1. 2. 3. 4.]
+    k = Kalman(A, G, Q, R)
+    cov_init = [0.722222222222222   0.386904761904762;
+                0.386904761904762   0.293154761904762]
+    set_state!(k, zeros(2), cov_init)
+    x_smoothed, logL, P_smoothed = smooth(k, y)
+    x_matlab = [1.36158275104493    2.68312458668362    4.04291315305382    5.36947053521018;
+                0.813542618042249   1.64113106904578    2.43805629027213    3.22585113133984]
+    logL_matlab = -22.1434290195012
+    @test isapprox(x_smoothed, x_matlab)
+    @test isapprox(logL, logL_matlab)
+
 end  # @testset
