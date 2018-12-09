@@ -237,6 +237,42 @@ Tests for markov/ddp.jl
         end
     end
 
+    @testset "Backward induction" begin
+        # From Puterman 2005, Section 3.2, Section 4.6.1
+        # "single-product stochastic inventory control"
+        
+        #set up DDP constructor
+        s_indices = [1, 1, 1, 1, 2, 2, 2, 3, 3, 4]
+        a_indices = [1, 2, 3, 4, 1, 2, 3, 1, 2, 1]
+        R = [ 0., -1., -2., -5.,  5.,  0., -3.,  6., -1.,  5.]
+        Q = [ 1.    0.    0.    0.  ;
+              0.75  0.25  0.    0.  ;
+              0.25  0.5   0.25  0.  ;
+              0.    0.25  0.5   0.25;
+              0.75  0.25  0.    0.  ;
+              0.25  0.5   0.25  0.  ;
+              0.    0.25  0.5   0.25;
+              0.25  0.5   0.25  0.  ;
+              0.    0.25  0.5   0.25;
+              0.    0.25  0.5   0.25]
+        beta = 1
+        ddp = DiscreteDP(R, Q, beta, s_indices, a_indices)
+
+        # test for backward induction
+        T = 3
+        # expected results
+        vs_expected = [67/16 129/16 194/16 227/16;
+                       2     25/4   10     21/2;
+                       0     5      6      5;
+                       0     0      0      0]
+        sigmas_expected = [4  1  1  1;
+                           3  1  1  1;
+                           1  1  1  1]
+        vs, sigmas = backward_induction(ddp, T)
+        @test isapprox(vs_expected,vs)
+        @test sigmas == sigmas_expected
+    end
+
     @testset "DDPsa constructor" begin
         @testset "feasbile action pair" begin
             _R = [1.0, 0.0, 0.0, 1.0]
