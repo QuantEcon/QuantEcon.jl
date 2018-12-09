@@ -65,7 +65,7 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
             msg = "R must be 2-dimensional without s-a formulation"
             throw(ArgumentError(msg))
       	end
-        (beta < 0 || beta >= 1) &&  throw(ArgumentError("beta must be [0, 1)"))
+        (beta < 0 || beta > 1) &&  throw(ArgumentError("beta must be [0, 1]"))
 
         # verify input integrity 2
  	num_states, num_actions = size(R)
@@ -103,7 +103,7 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
         if NR != 1
             throw(ArgumentError("R must be 1-dimensional with s-a formulation"))
         end
-        (beta < 0 || beta >= 1) && throw(ArgumentError("beta must be [0, 1)"))
+        (beta < 0 || beta > 1) && throw(ArgumentError("beta must be [0, 1]"))
 
         # verify input integrity (same length)
         num_sa_pairs, num_states = size(Q)
@@ -453,6 +453,10 @@ Compute the value of a policy.
 
 """
 function evaluate_policy(ddp::DiscreteDP, sigma::AbstractVector{T}) where T<:Integer
+    if ddp.beta == 1.0
+        throw(ArgumentError("method invalid for beta = 1"))
+    end
+    
     R_sigma, Q_sigma = RQ_sigma(ddp, sigma)
     b = R_sigma
     A = I - ddp.beta * Q_sigma
@@ -499,6 +503,40 @@ function solve(ddp::DiscreteDP{T}, v_init::AbstractVector{T},
     _solve!(ddp, ddpr, max_iter, epsilon, k)
     ddpr.mc = MarkovChain(ddp, ddpr)
     ddpr
+end
+
+"""
+Solve a finite horizon discrete dynamic program by backward induction with
+stationary reward and transition probability functions and discount factor.
+
+##### Parameters
+
+- `ddp::DiscreteDP{T}` : Object that contains the Model Parameters
+- `J::Integer`: Number of decision periods
+- `v_term::AbstractVector{T}=zeros(num_states(ddp))`: Terminal value function,
+  of length equal to n (the number of states)  
+
+##### Returns
+
+- `vs::Array{Float64,2}`: Matrix that contains the optimal value function 
+  at each period
+- `sigmas::Array{Int,2}`: Matrix that contains the optimal policy function
+  at each period
+"""
+function backward_induction(ddp::DiscreteDP{T}, J::Integer,
+                            v_term::AbstractVector{T}=
+                            zeros(num_states(ddp))) where {T}
+    n = num_states(ddp)
+    vs = zeros(J+1,n)
+    vs[end,:] = v_term
+    v_temp = v_term
+    sigmas = zeros(Int, J, n)
+    sigma_temp = sigmas[end,:]
+    @inbounds for j in J+1: -1: 2
+        v_temp, sigma_temp = bellman_operator!(ddp, v_temp, sigma_temp)
+        vs[j-1,:], sigmas[j-1,:] = v_temp, sigma_temp
+    end
+    return vs, sigmas
 end
 
 # --------- #
@@ -777,6 +815,8 @@ function _solve!(
     )
     if ddp.beta == 0.0
         tol = Inf
+    elseif ddp.beta == 1.0
+        throw(ArgumentError("method invalid for beta = 1"))
     else
         tol = epsilon * (1-ddp.beta) / (2*ddp.beta)
     end
@@ -811,6 +851,10 @@ function _solve!(
     )
     old_sigma = copy(ddpr.sigma)
 
+    if ddp.beta == 1.0
+        throw(ArgumentError("method invalid for beta = 1"))
+    end
+
     for i in 1:max_iter
        ddpr.v = evaluate_policy(ddp, ddpr)
        compute_greedy!(ddp, ddpr)
@@ -836,6 +880,10 @@ function _solve!(
         ddp::DiscreteDP, ddpr::DPSolveResult{MPFI}, max_iter::Integer,
         epsilon::Real, k::Integer
     )
+    if ddp.beta == 1.0
+        throw(ArgumentError("method invalid for beta = 1"))
+    end
+
     beta = ddp.beta
     fill!(ddpr.v, minimum(ddp.R[ddp.R .> -Inf]) / (1.0 - beta))
     old_sigma = copy(ddpr.sigma)
