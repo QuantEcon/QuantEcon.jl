@@ -518,23 +518,21 @@ stationary reward and transition probability functions and discount factor.
 
 ##### Returns
 
-- `vs::Array{Float64,2}`: Matrix that contains the optimal value function 
+- `vs::Array{Float64,2}`: Array of shape (n, J+1) that contains the optimal value function 
   at each period
-- `sigmas::Array{Int,2}`: Matrix that contains the optimal policy function
+- `sigmas::Array{Int,2}`: Array of shape (n, J) that contains the optimal policy function
   at each period
 """
 function backward_induction(ddp::DiscreteDP{T}, J::Integer,
                             v_term::AbstractVector{T}=
                             zeros(num_states(ddp))) where {T}
     n = num_states(ddp)
-    vs = zeros(J+1,n)
-    vs[end,:] = v_term
-    v_temp = v_term
-    sigmas = zeros(Int, J, n)
-    sigma_temp = sigmas[end,:]
+    S = typeof(zero(T)/one(T))
+    vs = Matrix{S}(undef, n, J+1)
+    vs[:,end] = v_term
+    sigmas = Matrix{Int}(undef, n, J)
     @inbounds for j in J+1: -1: 2
-        v_temp, sigma_temp = bellman_operator!(ddp, v_temp, sigma_temp)
-        vs[j-1,:], sigmas[j-1,:] = v_temp, sigma_temp
+        @views bellman_operator!(ddp,vs[:,j],vs[:,j-1],sigmas[:,j-1])
     end
     return vs, sigmas
 end
