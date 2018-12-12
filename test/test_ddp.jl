@@ -261,13 +261,14 @@ Tests for markov/ddp.jl
         # test for backward induction
         T = 3
         # expected results
-        vs_expected = [67/16 129/16 194/16 227/16;
-                       2     25/4   10     21/2;
-                       0     5      6      5;
-                       0     0      0      0]
-        sigmas_expected = [4  1  1  1;
-                           3  1  1  1;
-                           1  1  1  1]
+        vs_expected = [67/16  2     0  0;
+                       129/16 25/4  5  0;
+                       194/16 10    6  0;
+                       227/16 21/2  5  0]
+        sigmas_expected = [4  3  1;
+                           1  1  1;
+                           1  1  1;
+                           1  1  1]
         vs, sigmas = backward_induction(ddp, T)
         @test isapprox(vs_expected,vs)
         @test sigmas == sigmas_expected
