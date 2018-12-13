@@ -523,7 +523,7 @@ stationary reward and transition probability functions and discount factor.
 - `sigmas::Array{Int,2}`: Array of shape (n, J) that contains the optimal policy function
   at each period
 """
-function backward_induction(ddp::DiscreteDP{T}, J::Integer,
+function backward_induction(ddp::DiscreteDP, J::Integer,
                             v_term::AbstractVector{T}=
                             zeros(num_states(ddp))) where {T}
     n = num_states(ddp)
