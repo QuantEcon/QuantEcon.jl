@@ -244,19 +244,23 @@ Tests for markov/ddp.jl
         #set up DDP constructor
         s_indices = [1, 1, 1, 1, 2, 2, 2, 3, 3, 4]
         a_indices = [1, 2, 3, 4, 1, 2, 3, 1, 2, 1]
-        R = [ 0., -1., -2., -5.,  5.,  0., -3.,  6., -1.,  5.]
-        Q = [ 1.    0.    0.    0.  ;
-              0.75  0.25  0.    0.  ;
-              0.25  0.5   0.25  0.  ;
-              0.    0.25  0.5   0.25;
-              0.75  0.25  0.    0.  ;
-              0.25  0.5   0.25  0.  ;
-              0.    0.25  0.5   0.25;
-              0.25  0.5   0.25  0.  ;
-              0.    0.25  0.5   0.25;
-              0.    0.25  0.5   0.25]
+        R = [ 0//1, -1//1, -2//1, -5//1,  5//1,  0//1, -3//1,  6//1, -1//1,  5//1]
+        Q =  [ 1//1 0//1 0//1 0//1;
+               3//4 1//4 0//1 0//1;
+               1//4 1//2 1//4 0//1;
+               0//1 1//4 1//2 1//4;
+               3//4 1//4 0//1 0//1;
+               1//4 1//2 1//4 0//1;
+               0//1 1//4 1//2 1//4;
+               1//4 1//2 1//4 0//1;
+               0//1 1//4 1//2 1//4;
+               0//1 1//4 1//2 1//4]
         beta = 1
-        ddp = DiscreteDP(R, Q, beta, s_indices, a_indices)
+        ddp_rational = DiscreteDP(R, Q, beta, s_indices, a_indices)
+        R = convert.(Float64,R)
+        Q = convert.(Float64,Q)
+        ddp_float = DiscreteDP(R, Q, beta, s_indices, a_indices)
+        ddp_collection = (ddp_rational, ddp_float)
 
         # test for backward induction
         T = 3
@@ -269,9 +273,11 @@ Tests for markov/ddp.jl
                            1  1  1;
                            1  1  1;
                            1  1  1]
-        vs, sigmas = backward_induction(ddp, T)
-        @test isapprox(vs_expected,vs)
-        @test sigmas == sigmas_expected
+        for ddp in ddp_collection
+            vs, sigmas = backward_induction(ddp, T)
+            @test isapprox(vs_expected,vs)
+            @test sigmas == sigmas_expected
+        end
     end
 
     @testset "DDPsa constructor" begin
