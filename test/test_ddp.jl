@@ -260,24 +260,27 @@ Tests for markov/ddp.jl
         R = convert.(Float64,R)
         Q = convert.(Float64,Q)
         ddp_float = DiscreteDP(R, Q, beta, s_indices, a_indices)
-        ddp_collection = (ddp_rational, ddp_float)
-
+        
         # test for backward induction
-        T = 3
+        J = 3
         # expected results
-        vs_expected = [67/16  2     0  0;
-                       129/16 25/4  5  0;
-                       194/16 10    6  0;
-                       227/16 21/2  5  0]
+        vs_expected = [67//16  2     0  0;
+                       129//16 25//4 5  0;
+                       194//16 10    6  0;
+                       227//16 21//2 5  0]
         sigmas_expected = [4  3  1;
                            1  1  1;
                            1  1  1;
                            1  1  1]
-        for ddp in ddp_collection
-            vs, sigmas = backward_induction(ddp, T)
-            @test isapprox(vs_expected,vs)
-            @test sigmas == sigmas_expected
-        end
+
+        vs, sigmas = backward_induction(ddp_rational, J)
+        @test vs == vs_expected
+        @test sigmas == sigmas_expected
+
+        vs, sigmas = backward_induction(ddp_float, J)
+        @test isapprox(vs, vs_expected)
+        @test sigmas == sigmas_expected
+        
     end
 
     @testset "DDPsa constructor" begin
