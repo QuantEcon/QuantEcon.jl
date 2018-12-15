@@ -554,7 +554,7 @@ function backward_induction(ddp::DiscreteDP{T}, J::Integer,
     vs[:,end] = v_term
     sigmas = Matrix{Int}(undef, n, J)
     @inbounds for j in J+1: -1: 2
-        @views bellman_operator!(ddp,vs[:,j],vs[:,j-1],sigmas[:,j-1])
+        @views bellman_operator!(ddp, vs[:,j], vs[:,j-1], sigmas[:,j-1])
     end
     return vs, sigmas
 end
