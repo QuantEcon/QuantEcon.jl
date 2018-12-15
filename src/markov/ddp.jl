@@ -8,7 +8,7 @@ Discrete Decision Processes
 References
 ----------
 
-https://lectures.quantecon.org/py/discrete_dp.html
+https://lectures.quantecon.org/jl/discrete_dp.html
 
 Notes
 -----
@@ -104,7 +104,9 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
             throw(ArgumentError("R must be 1-dimensional with s-a formulation"))
         end
         (beta < 0 || beta > 1) && throw(ArgumentError("beta must be [0, 1]"))
-
+        if beta == 1
+            @warn("infinite horizon solution methods are disabled with beta=1")
+        end
         # verify input integrity (same length)
         num_sa_pairs, num_states = size(Q)
         if length(R) != num_sa_pairs
@@ -224,7 +226,7 @@ This refers to the Value Iteration solution algorithm.
 References
 ----------
 
-https://lectures.quantecon.org/py/discrete_dp.html
+https://lectures.quantecon.org/jl/discrete_dp.html
 
 """
 struct VFI <: DDPAlgorithm end
@@ -235,9 +237,9 @@ This refers to the Policy Iteration solution algorithm.
 References
 ----------
 
-https://lectures.quantecon.org/py/discrete_dp.html
+https://lectures.quantecon.org/jl/discrete_dp.html
 
-"""
+"""  
 struct PFI <: DDPAlgorithm end
 
 """
@@ -246,7 +248,7 @@ This refers to the Modified Policy Iteration solution algorithm.
 References
 ----------
 
-https://lectures.quantecon.org/py/discrete_dp.html
+https://lectures.quantecon.org/jl/discrete_dp.html
 
 """
 struct MPFI <: DDPAlgorithm end
@@ -506,25 +508,45 @@ function solve(ddp::DiscreteDP{T}, v_init::AbstractVector{T},
 end
 
 """
-Solve a finite horizon discrete dynamic program by backward induction with
-stationary reward and transition probability functions and discount factor.
+Solve by backward induction a ``J`` -period finite horizon discrete dynamic 
+program with stationary reward ``r`` and transition probability functions ``q``
+and discount factor ``\\beta \\in [0, 1]``.
 
-##### Parameters
+The optimal value functions ``v^{\\ast}_0, \\ldots, v^{\\ast}_J`` and policy
+functions ``\\sigma^{\\ast}_0, \\ldots, \\sigma^{\\ast}_{J-1}`` are obtained by 
+``v^{\\ast}_J = v_J``, and
+
+```math
+v^{\\ast}_{j-1}(s) = \\max_{a \\in A(s)} r(s, a) +
+\\beta \\sum_{s' \\in S} q(s'|s, a) v^{\\ast}_j(s')
+\\quad (s \\in S)
+```
+and
+```math 
+\\sigma^{\\ast}_{j-1}(s) \\in \\operatorname*{arg\\,max}_{a \\in A(s)}
+            r(s, a) + \\beta \\sum_{s' \\in S} q(s'|s, a) v^*_j(s')
+            \\quad (s \\in S)
+```
+
+for ``j= J, \\ldots, 1``, where the terminal value function ``v_J`` is 
+exogenously given.
+
+# Parameters
 
 - `ddp::DiscreteDP{T}` : Object that contains the Model Parameters
 - `J::Integer`: Number of decision periods
-- `v_term::AbstractVector{T}=zeros(num_states(ddp))`: Terminal value function,
-  of length equal to n (the number of states)  
+- `v_term::AbstractVector{<:Real}=zeros(num_states(ddp))`: Terminal value 
+  function of length equal to n (the number of states)  
 
-##### Returns
+# Returns
 
-- `vs::Array{Float64,2}`: Array of shape (n, J+1) that contains the optimal value function 
-  at each period
-- `sigmas::Array{Int,2}`: Array of shape (n, J) that contains the optimal policy function
-  at each period
+- `vs::Matrix{S}`: Array of shape (n, J+1) where `vs[:,j]`  contains the 
+  optimal value function at period j = 1, ..., J+1.
+- `sigmas::Matrix{Int}`: Array of shape (n, J) where `sigmas[:,j]` contains the
+  optimal policy function at period j = 1, ..., J.
 """
-function backward_induction(ddp::DiscreteDP, J::Integer,
-                            v_term::AbstractVector{T}=
+function backward_induction(ddp::DiscreteDP{T}, J::Integer,
+                            v_term::AbstractVector{<:Real}=
                             zeros(num_states(ddp))) where {T}
     n = num_states(ddp)
     S = typeof(zero(T)/one(T))
