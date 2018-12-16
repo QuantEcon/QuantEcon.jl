@@ -508,12 +508,14 @@ function solve(ddp::DiscreteDP{T}, v_init::AbstractVector{T},
 end
 
 """
-Solve by backward induction a ``J`` -period finite horizon discrete dynamic 
+    backward_induction(ddp, J[, v_term=zeros(num_states(ddp))])
+
+Solve by backward induction a ``J``-period finite horizon discrete dynamic 
 program with stationary reward ``r`` and transition probability functions ``q``
 and discount factor ``\\beta \\in [0, 1]``.
 
-The optimal value functions ``v^{\\ast}_0, \\ldots, v^{\\ast}_J`` and policy
-functions ``\\sigma^{\\ast}_0, \\ldots, \\sigma^{\\ast}_{J-1}`` are obtained by 
+The optimal value functions ``v^{\\ast}_1, \\ldots, v^{\\ast}_{J+1}`` and policy
+functions ``\\sigma^{\\ast}_1, \\ldots, \\sigma^{\\ast}_J`` are obtained by 
 ``v^{\\ast}_J = v_J``, and
 
 ```math
