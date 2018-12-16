@@ -514,24 +514,24 @@ Solve by backward induction a ``J``-period finite horizon discrete dynamic
 program with stationary reward ``r`` and transition probability functions ``q``
 and discount factor ``\\beta \\in [0, 1]``.
 
-The optimal value functions ``v^{\\ast}_1, \\ldots, v^{\\ast}_{J+1}`` and policy
-functions ``\\sigma^{\\ast}_1, \\ldots, \\sigma^{\\ast}_J`` are obtained by 
-``v^{\\ast}_J = v_J``, and
+The optimal value functions ``v^{\\ast}_1, \\ldots, v^{\\ast}_{J+1}`` and 
+policy functions ``\\sigma^{\\ast}_1, \\ldots, \\sigma^{\\ast}_J`` are obtained
+by ``v^{\\ast}_{J+1} = v_{J+1}``, and
 
 ```math
-v^{\\ast}_{j-1}(s) = \\max_{a \\in A(s)} r(s, a) +
-\\beta \\sum_{s' \\in S} q(s'|s, a) v^{\\ast}_j(s')
+v^{\\ast}_j(s) = \\max_{a \\in A(s)} r(s, a) +
+\\beta \\sum_{s' \\in S} q(s'|s, a) v^{\\ast}_{j+1}(s')
 \\quad (s \\in S)
 ```
 and
 ```math 
-\\sigma^{\\ast}_{j-1}(s) \\in \\operatorname*{arg\\,max}_{a \\in A(s)}
-            r(s, a) + \\beta \\sum_{s' \\in S} q(s'|s, a) v^*_j(s')
+\\sigma^{\\ast}_j(s) \\in \\operatorname*{arg\\,max}_{a \\in A(s)}
+            r(s, a) + \\beta \\sum_{s' \\in S} q(s'|s, a) v^*_{j+1}(s')
             \\quad (s \\in S)
 ```
 
-for ``j= J, \\ldots, 1``, where the terminal value function ``v_J`` is 
-exogenously given.
+for ``j= J, \\ldots, 1``, where the terminal value function ``v_{J+1}`` is 
+exogenously given by `v_term`.
 
 # Parameters
 
