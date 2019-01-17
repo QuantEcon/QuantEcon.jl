@@ -592,7 +592,7 @@ qnwnorm(n::Vector{Int}, mu::Real, sig2::Vector) =
     qnwnorm(n, fill(mu, length(n)), Matrix(Diagonal(convert(Array{Float64}, sig2))))
 
 qnwnorm(n::Int, mu::Vector, sig2::Vector) =
-    qnwnorm(fill(n, length(mu)), mu, diagm(convert(Array{Float64}, sig2)))
+    qnwnorm(fill(n, length(mu)), mu, Matrix(Diagonal(convert(Array{Float64}, sig2))))
 
 qnwnorm(n::Int, mu::Real, sig2::Vector) =
     qnwnorm(fill(n, length(sig2)), fill(mu, length(sig2)), Matrix(Diagonal(convert(Array{Float64}, sig2))))
