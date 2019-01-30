@@ -73,7 +73,7 @@ function prior_to_filtered!(k::Kalman, y)
     A = Sigma * G'
     B = G * Sigma * G' + R
     M = A / B
-    k.cur_x_hat = x_hat + M * (y - G * x_hat)
+    k.cur_x_hat = x_hat + M * (y .- G * x_hat)
     k.cur_sigma = Sigma - M * G * Sigma
     Nothing
 end
@@ -122,7 +122,7 @@ function stationary_values(k::Kalman)
 
     # solve Riccati equation, obtain Kalman gain
     Sigma_inf = solve_discrete_riccati(A', G', Q, R)
-    K_inf = A * Sigma_inf * G' * inv(G * Sigma_inf * G' + R)
+    K_inf = A * Sigma_inf * G' * inv(G * Sigma_inf * G' .+ R)
     return Sigma_inf, K_inf
 end
 
