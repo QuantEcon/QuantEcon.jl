@@ -187,7 +187,7 @@ end
 - `sigma_filtered::AbstractArray` `n x n x T` array of filtered covariance matrix of states.
 - `sigma_forecast::AbstractArray` `n x n x T` array of predictive covariance matrix of states.
 """
-function kalman_filter(kn::Kalman, y::AbstractMatrix)
+function filter(kn::Kalman, y::AbstractMatrix)
     T = size(y, 2)
     k, n = size(kn.G)
     @assert n == kn.n
@@ -219,9 +219,9 @@ end
 - `logL::Real`: log-likelihood of all observations
 - `sigma_smoothed::AbstractArray` `n x n x T` array of smoothed covariance matrix of states.
 """
-function kalman_smoother(kn::Kalman, y::AbstractMatrix)
+function smooth(kn::Kalman, y::AbstractMatrix)
     T = size(y, 2)
-    x_filtered, logL, sigma_filtered, sigma_forecast = kalman_filter(kn, y)
+    x_filtered, logL, sigma_filtered, sigma_forecast = filter(kn, y)
     x_smoothed = copy(x_filtered)
     sigma_smoothed = copy(sigma_filtered)
     for t in (T-1):-1:1
@@ -260,13 +260,13 @@ end
 """
 ##### Arguments
 - `kn::Kalman`: `Kalman` specifying the model.
-- `T`: number of samples to draw
+- `T`: number of time steps to sample for
 
 ##### Returns
-- `xs::Matrix`: `xs[:,t]` is sampled hidden  state for period ``t``
-- `ys::Matrix`: `ys[:,t]` is observation for period ``t``
+- `xs::Matrix`: `xs[:,t]` is sampled hidden  state for period t
+- `ys::Matrix`: `ys[:,t]` is sampled observation for period `t`
 """
-function kalman_sample(kn::Kalman, T::Int)
+function sample(kn::Kalman, T::Int)
     nobs, nhidden = size(kn.G)
     xs = Array{Float64}(undef, nhidden, T)
     ys = Array{Float64}(undef, nobs, T)
