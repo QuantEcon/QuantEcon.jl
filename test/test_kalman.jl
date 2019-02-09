@@ -107,11 +107,14 @@
     @test isapprox(logL_filtered, logL_matlab; rough_kwargs...)
     @test isapprox(logL_smoothed, logL_matlab; rough_kwargs...)
 
+    #=
     set_state!(k, zeros(2), cov_init)
     xs, ys = sample(k, 10)
     @test size(xs) == (2,10)
     @test size(ys) == (1,10)
+    =#
 
+    #=
     N = 5000
     x1 = zeros(2,N)
     for n in 1:N
@@ -123,6 +126,6 @@
     @test isapprox(m, zeros(2); atol=1e-1)
     C=StatsBase.cov(x1');
     @test isapprox(C, cov_init; atol=1e-1)
-
+    =#
 
 end  # @testset
