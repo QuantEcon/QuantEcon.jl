@@ -115,7 +115,7 @@
     N = 5000
     x1 = zeros(2,N)
     for n in 1:N
-        global x1
+        #global x1 # only need 'global' when running in REPL
         xs, ys = sample(k, 2)
         x1[:,n] = xs[:,1]
     end
