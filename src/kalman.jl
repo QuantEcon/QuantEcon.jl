@@ -14,6 +14,8 @@ https://lectures.quantecon.org/jl/kalman.html
 TODO: Do docstrings here after implementing LinerStateSpace
 =#
 
+import Distributions
+
 mutable struct Kalman
     A
     G
@@ -42,25 +44,26 @@ function set_state!(k::Kalman, x_hat, Sigma)
     Nothing
 end
 
-@doc doc"""
+#=
+"""
 Updates the moments (`cur_x_hat`, `cur_sigma`) of the time ``t`` prior to the
 time ``t`` filtering distribution, using current measurement ``y_t``.
 The updates are according to
 
-```math
+`math
     \hat{x}^F = \hat{x} + \Sigma G' (G \Sigma G' + R)^{-1}
                     (y - G \hat{x}) \\
 
     \Sigma^F = \Sigma - \Sigma G' (G \Sigma G' + R)^{-1} G
                \Sigma
-```
+`
 
 #### Arguments
 
 - `k::Kalman` An instance of the Kalman filter
 - `y` The current measurement
-
 """
+=#
 function prior_to_filtered!(k::Kalman, y)
     # simplify notation
     G, R = k.G, k.R
@@ -173,26 +176,25 @@ end
 ##### Arguments
 - `kn::Kalman`: `Kalman` specifying the model. Initial value must be the prior
                 for t=1 period observation, i.e. ``x_{1|0}``.
-- `y::AbstractMatrix`: `n x T` matrix of observed data.
-                       `n` is the number of observed variables in one period.
+- `y::AbstractMatrix`: `k x T` matrix of observed data.
+                       `k` is the number of observed variables in one period.
                        Each column is a vector of observations at each period.
 
 ##### Returns
-- `x_smoothed::AbstractMatrix`: `k x T` matrix of smoothed mean of states.
-                                `k` is the number of states.
+- `x_filtered::AbstractMatrix`: `n x T` matrix of filtered mean of states.
+                                `n` is the number of states.
 - `logL::Real`: log-likelihood of all observations
-- `sigma_smoothed::AbstractArray` `k x k x T` array of smoothed covariance matrix of states.
+- `sigma_filtered::AbstractArray` `n x n x T` array of filtered covariance matrix of states.
+- `sigma_forecast::AbstractArray` `n x n x T` array of predictive covariance matrix of states.
 """
-function smooth(kn::Kalman, y::AbstractMatrix)
-    G, R = kn.G, kn.R
-
+function kalman_filter(kn::Kalman, y::AbstractMatrix)
     T = size(y, 2)
-    n = kn.n
+    k, n = size(kn.G)
+    @assert n == kn.n
     x_filtered = Matrix{Float64}(undef, n, T)
     sigma_filtered = Array{Float64}(undef, n, n, T)
     sigma_forecast = Array{Float64}(undef, n, n, T)
     logL = 0
-    # forecast and update
     for t in 1:T
         logL = logL + log_likelihood(kn, y[:, t])
         prior_to_filtered!(kn, y[:, t])
@@ -200,7 +202,26 @@ function smooth(kn::Kalman, y::AbstractMatrix)
         filtered_to_forecast!(kn)
         sigma_forecast[:, :, t] = kn.cur_sigma
     end
-    # smoothing
+    return x_filtered, logL, sigma_filtered, sigma_forecast
+end
+
+"""
+##### Arguments
+- `kn::Kalman`: `Kalman` specifying the model. Initial value must be the prior
+                for t=1 period observation, i.e. ``x_{1|0}``.
+- `y::AbstractMatrix`: `k x T` matrix of observed data.
+                       `k` is the number of observed variables in one period.
+                       Each column is a vector of observations at each period.
+
+##### Returns
+- `x_smoothed::AbstractMatrix`: `n x T` matrix of smoothed mean of states.
+                                `n` is the number of states.
+- `logL::Real`: log-likelihood of all observations
+- `sigma_smoothed::AbstractArray` `n x n x T` array of smoothed covariance matrix of states.
+"""
+function kalman_smoother(kn::Kalman, y::AbstractMatrix)
+    T = size(y, 2)
+    x_filtered, logL, sigma_filtered, sigma_forecast = kalman_filter(kn, y)
     x_smoothed = copy(x_filtered)
     sigma_smoothed = copy(sigma_filtered)
     for t in (T-1):-1:1
@@ -209,7 +230,6 @@ function smooth(kn::Kalman, y::AbstractMatrix)
                         sigma_forecast[:, :, t], x_smoothed[:, t+1],
                         sigma_smoothed[:, :, t+1])
     end
-
     return x_smoothed, logL, sigma_smoothed
 end
 
@@ -235,4 +255,31 @@ function go_backward(k::Kalman, x_fi::Vector,
     x_s = x_fi + temp*(x_s1-A*x_fi)
     sigma_s = sigma_fi + temp*(sigma_s1-sigma_fo)*temp'
     return x_s, sigma_s
+end
+
+"""
+##### Arguments
+- `kn::Kalman`: `Kalman` specifying the model.
+- `T`: number of samples to draw
+
+##### Returns
+- `xs::Matrix`: `xs[:,t]` is sampled hidden  state for period ``t``
+- `ys::Matrix`: `ys[:,t]` is observation for period ``t``
+"""
+function kalman_sample(kn::Kalman, T::Int)
+    nobs, nhidden = size(kn.G)
+    xs = Array{Float64}(undef, nhidden, T)
+    ys = Array{Float64}(undef, nobs, T)
+    mu0 = kn.cur_x_hat
+    V0 = kn.cur_sigma
+    prior_z = Distributions.MvNormal(mu0, V0)
+    process_noise_dist = Distributions.MvNormal(kn.Q)
+    obs_noise_dist = Distributions.MvNormal(kn.R)
+    xs[:,1] = rand(prior_z)
+    ys[:,1] = kn.G*xs[:,1] + rand(obs_noise_dist)
+    for t=2:T
+        xs[:,t] = kn.A*xs[:,t-1] + rand(process_noise_dist)
+        ys[:,t] = kn.G*xs[:,t] + rand(obs_noise_dist)
+    end
+    return xs, ys
 end
