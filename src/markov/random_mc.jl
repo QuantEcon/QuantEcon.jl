@@ -36,12 +36,13 @@ stochastic matrix:
 ```
 
 """
-function random_markov_chain(n::Integer)
-    p = random_stochastic_matrix(n)
+function random_markov_chain(rng::AbstractRNG, n::Integer)
+    p = random_stochastic_matrix(rng, n)
     mc = MarkovChain(p)
     return mc
 end
 
+random_markov_chain(n::Integer) = random_markov_chain(Random.GLOBAL_RNG, n)
 
 """
 Return a randomly sampled MarkovChain instance with `n` states, where each state
@@ -71,11 +72,14 @@ stochastic matrix:
 ```
 
 """
-function random_markov_chain(n::Integer, k::Integer)
-    p = random_stochastic_matrix(n, k)
+function random_markov_chain(rng::AbstractRNG, n::Integer, k::Integer)
+    p = random_stochastic_matrix(rng, n, k)
     mc = MarkovChain(p)
     return mc
 end
+
+random_markov_chain(n::Integer, k::Integer) =
+    random_markov_chain(Random.GLOBAL_RNG, n, k)
 
 
 # random_stochastic_matrix
@@ -95,7 +99,7 @@ each row.
 - `p::Array` : Stochastic matrix.
 
 """
-function random_stochastic_matrix(n::Integer, k::Union{Integer, Nothing}=nothing)
+function random_stochastic_matrix(rng::AbstractRNG, n::Integer, k::Union{Integer, Nothing}=nothing)
     if !(n > 0)
         throw(ArgumentError("n must be a positive integer"))
     end
@@ -103,10 +107,13 @@ function random_stochastic_matrix(n::Integer, k::Union{Integer, Nothing}=nothing
         throw(ArgumentError("k must be an integer with 0 < k <= n"))
     end
 
-    p = _random_stochastic_matrix(n, n, k=k)
+    p = _random_stochastic_matrix(rng, n, n, k=k)
 
     return transpose(p)
 end
+
+random_stochastic_matrix(n::Integer, k::Union{Integer, Nothing}=nothing) =
+    random_stochastic_matrix(Random.GLOBAL_RNG, n, k)
 
 
 """
@@ -126,12 +133,12 @@ as columns `m` probability vectors of length `n` with `k` nonzero entries.
   `n` as columns.
 
 """
-function _random_stochastic_matrix(n::Integer, m::Integer;
+function _random_stochastic_matrix(rng::AbstractRNG, n::Integer, m::Integer;
                                    k::Union{Integer, Nothing}=nothing)
     if k == nothing
         k = n
     end
-    probvecs = random_probvec(k, m)
+    probvecs = random_probvec(rng, k, m)
 
     k == n && return probvecs
 
@@ -139,7 +146,7 @@ function _random_stochastic_matrix(n::Integer, m::Integer;
     # Randomly sample row indices for each column for nonzero values
     row_indices = Vector{Int}(undef, k*m)
     for j in 1:m
-        row_indices[(j-1)*k+1:j*k] = sample(1:n, k, replace=false)
+        row_indices[(j-1)*k+1:j*k] = sample(rng, 1:n, k, replace=false)
     end
 
     p = zeros(n, m)
@@ -151,6 +158,10 @@ function _random_stochastic_matrix(n::Integer, m::Integer;
 
     return p
 end
+
+_random_stochastic_matrix(n::Integer, m::Integer;
+                          k::Union{Integer, Nothing}=nothing) =
+    _random_stochastic_matrix(Random.GLOBAL_RNG, n, m, k=k)
 
 
 # random_discrete_dp
@@ -175,16 +186,17 @@ distribution with mean 0 and standard deviation `scale`.
 - `ddp::DiscreteDP` : An instance of DiscreteDP.
 
 """
-function random_discrete_dp(num_states::Integer,
+function random_discrete_dp(rng::AbstractRNG,
+                            num_states::Integer,
                             num_actions::Integer,
                             beta::Union{Real, Nothing}=nothing;
                             k::Union{Integer, Nothing}=nothing,
                             scale::Real=1)
     L = num_states * num_actions
-    R = scale * randn(L)
-    Q = _random_stochastic_matrix(num_states, L; k=k)
+    R = scale * randn(rng, L)
+    Q = _random_stochastic_matrix(rng, num_states, L; k=k)
     if beta == nothing
-        beta = rand()
+        beta = rand(rng)
     end
 
     R = reshape(R, num_states, num_actions)
@@ -193,6 +205,11 @@ function random_discrete_dp(num_states::Integer,
     ddp = DiscreteDP(R, Q, beta)
     return ddp
 end
+
+random_discrete_dp(num_states::Integer, num_actions::Integer,
+                   beta::Union{Real, Nothing}=nothing;
+                   k::Union{Integer, Nothing}=nothing, scale::Real=1) =
+    random_discrete_dp(Random.GLOBAL_RNG, num_actions, beta, k=k, scale=scale)
 
 
 # random_probvec
@@ -210,13 +227,13 @@ Return `m` randomly sampled probability vectors of size `k`.
 - `a::Array` : Array of shape `(k, m)` containing probability vectors as columns.
 
 """
-function random_probvec(k::Integer, m::Integer)
+function random_probvec(rng::AbstractRNG, k::Integer, m::Integer)
     k == 1 && return ones((k, m))
 
     # if k >= 2
     x = Matrix{Float64}(undef, k, m)
 
-    r = rand(k-1, m)
+    r = rand(rng, k-1, m)
     x[1:end .- 1, :] = sort(r, dims = 1)
 
     for j in 1:m
@@ -228,3 +245,5 @@ function random_probvec(k::Integer, m::Integer)
 
     return x
 end
+
+random_probvec(k::Integer, m::Integer) = random_probvec(Random.GLOBAL_RNG, k, m)

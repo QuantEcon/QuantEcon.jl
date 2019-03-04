@@ -1,3 +1,5 @@
+using Random
+
 @testset "Testing random_mc.jl" begin
     @testset "Test random_markov_chain" begin
         n, k = 5, 3
@@ -9,6 +11,11 @@
             @test all(x->(count(!iszero, x)==d["k"]),
                       [P[i, :] for i in 1:size(P)[1]]) == true
         end
+
+        seed = 1234
+        rngs = [MersenneTwister(seed) for i in 1:2]
+        mcs = random_markov_chain.(rngs, n, k)
+        @test mcs[2].p == mcs[1].p
     end
 
     @testset "Test random_stochastic_matrix" begin
@@ -19,6 +26,11 @@
             @test all(x->isapprox(sum(x), 1),
                       [P[i, :] for i in 1:size(P)[1]]) == true
         end
+
+        seed = 1234
+        rngs = [MersenneTwister(seed) for i in 1:2]
+        Ps = random_stochastic_matrix.(rngs, n, k)
+        @test Ps[2] == Ps[1]
     end
 
     @testset "Test random_stochastic_matrix with k=1" begin
@@ -61,5 +73,12 @@
         # Check number of nonzero entries for each state-action pair
         @test sum(ddp.Q .> 0, dims = 3) ==
             ones(Int, (num_states, num_actions, 1)) * k
+
+        seed = 1234
+        rngs = [MersenneTwister(seed) for i in 1:2]
+        ddps = random_discrete_dp.(rngs, num_states, num_actions; k=k)
+        @test ddps[2].R == ddps[1].R
+        @test ddps[2].Q == ddps[1].Q
+        @test ddps[2].beta == ddps[1].beta
     end
 end  # @testset
