@@ -8,34 +8,46 @@ import StatsBase: sample
 import QuantEcon: MarkovChain, DiscreteDP
 
 # random_markov_chain
-
 """
+    random_markov_chain([rng], n[, k])
+
 Return a randomly sampled MarkovChain instance with `n` states, where each state
 has `k` states with positive transition probability.
 
-##### Arguments
+# Arguments
 
+- `rng::AbstractRNG=GLOBAL_RNG` : Random number generator.
 - `n::Integer` : Number of states.
+- `k::Integer=n` : Number of nonzero entries in each column of the matrix. Set
+  to `n` if none specified.
 
-##### Returns
+# Returns
 
 - `mc::MarkovChain` : MarkovChain instance.
 
-##### Examples
+# Examples
 
 ```julia
-julia> using QuantEcon
+julia> using QuantEcon, Random
 
-julia> mc = random_markov_chain(3, 2)
-Discrete Markov Chain
-stochastic matrix:
-3x3 Array{Float64,2}:
- 0.369124  0.0       0.630876
- 0.519035  0.480965  0.0
- 0.0       0.744614  0.255386
+julia> rng = MersenneTwister(1234);
 
+julia> mc = random_markov_chain(rng, 3);
+
+julia> mc.p
+3×3 LinearAlgebra.Transpose{Float64,Array{Float64,2}}:
+ 0.590845  0.175952   0.233203
+ 0.460085  0.106152   0.433763
+ 0.794026  0.0601209  0.145853
+
+julia> mc = random_markov_chain(rng, 3, 2);
+
+julia> mc.p
+3×3 LinearAlgebra.Transpose{Float64,Array{Float64,2}}:
+ 0.0       0.200586  0.799414
+ 0.701386  0.0       0.298614
+ 0.753163  0.246837  0.0
 ```
-
 """
 function random_markov_chain(rng::AbstractRNG, n::Integer, k::Integer=n)
     p = random_stochastic_matrix(rng, n, k)
@@ -50,19 +62,21 @@ random_markov_chain(n::Integer, k::Integer=n) =
 # random_stochastic_matrix
 
 """
+    random_stochastic_matrix([rng], n[, k])
+
 Return a randomly sampled `n x n` stochastic matrix with `k` nonzero entries for
 each row.
 
-##### Arguments
+# Arguments
 
+- `rng::AbstractRNG=GLOBAL_RNG` : Random number generator.
 - `n::Integer` : Number of states.
-- `k::Union{Integer, Void}(nothing)` : Number of nonzero entries in each
-  column of the matrix. Set to `n` if none specified.
+- `k::Integer=n` : Number of nonzero entries in each column of the matrix. Set
+  to `n` if none specified.
 
-##### Returns
+# Returns
 
 - `p::Array` : Stochastic matrix.
-
 """
 function random_stochastic_matrix(rng::AbstractRNG, n::Integer, k::Integer=n)
     if !(n > 0)
@@ -82,21 +96,23 @@ random_stochastic_matrix(n::Integer, k::Integer=n) =
 
 
 """
+    _random_stochastic_matrix([rng], n, m; k=n)
+
 Generate a "non-square column stochstic matrix" of shape `(n, m)`, which contains
 as columns `m` probability vectors of length `n` with `k` nonzero entries.
 
-##### Arguments
+# Arguments
 
+- `rng::AbstractRNG=GLOBAL_RNG` : Random number generator.
 - `n::Integer` : Number of states.
 - `m::Integer` : Number of probability vectors.
-- `;k::Union{Integer, Void}(nothing)` : Number of nonzero entries in each
-  column of the matrix. Set to `n` if none specified.
+- `;k::Integer(n)` : Number of nonzero entries in each column of the matrix. Set
+  to `n` if none specified.
 
-##### Returns
+# Returns
 
-- `p::Array` : Array of shape `(n, m)` containing `m` probability vectors of length
-  `n` as columns.
-
+- `p::Array` : Array of shape `(n, m)` containing `m` probability vectors of
+  length `n` as columns.
 """
 function _random_stochastic_matrix(rng::AbstractRNG, n::Integer, m::Integer;
                                    k::Integer=n)
@@ -128,24 +144,27 @@ _random_stochastic_matrix(n::Integer, m::Integer; k::Integer=n) =
 # random_discrete_dp
 
 """
+    random_discrete_dp([rng], num_states, num_actions[, beta];
+                       k=num_states, scale=1)
+
 Generate a DiscreteDP randomly. The reward values are drawn from the normal
 distribution with mean 0 and standard deviation `scale`.
 
-##### Arguments
+# Arguments
 
+- `rng::AbstractRNG=GLOBAL_RNG` : Random number generator.
 - `num_states::Integer` : Number of states.
 - `num_actions::Integer` : Number of actions.
-- `beta::Union{Float64, Void}(nothing)` : Discount factor. Randomly chosen from
+- `beta::Real=rand(rng)` : Discount factor. Randomly chosen from
   `[0, 1)` if not specified.
-- `;k::Union{Integer, Void}(nothing)` : Number of possible next states for each
+- `;k::Integer(num_states)` : Number of possible next states for each
   state-action pair. Equal to `num_states` if not specified.
 - `scale::Real(1)` : Standard deviation of the normal distribution for the
   reward values.
 
-##### Returns
+# Returns
 
 - `ddp::DiscreteDP` : An instance of DiscreteDP.
-
 """
 function random_discrete_dp(rng::AbstractRNG,
                             num_states::Integer,
@@ -173,17 +192,20 @@ random_discrete_dp(num_states::Integer, num_actions::Integer,
 # random_probvec
 
 """
+    random_probvec([rng], k[, m])
+
 Return `m` randomly sampled probability vectors of size `k`.
 
-##### Arguments
+# Arguments
 
+- `rng::AbstractRNG=GLOBAL_RNG` : Random number generator.
 - `k::Integer` : Size of each probability vector.
 - `m::Integer` : Number of probability vectors.
 
-##### Returns
+# Returns
 
-- `a::Array` : Array of shape `(k, m)` containing probability vectors as columns.
-
+- `a::Array` : Matrix of shape `(k, m)`, or Vector of shape `(k,)` if `m` is not
+  specified, containing probability vector(s) as column(s).
 """
 function random_probvec(rng::AbstractRNG, k::Integer, m::Integer)
     k == 1 && return ones((k, m))
