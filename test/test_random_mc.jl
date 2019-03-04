@@ -76,7 +76,7 @@ using Random
 
         seed = 1234
         rngs = [MersenneTwister(seed) for i in 1:2]
-        ddps = random_discrete_dp.(rngs, num_states, num_actions; k=k)
+        ddps = random_discrete_dp.(rngs, num_states, num_actions)
         @test ddps[2].R == ddps[1].R
         @test ddps[2].Q == ddps[1].Q
         @test ddps[2].beta == ddps[1].beta

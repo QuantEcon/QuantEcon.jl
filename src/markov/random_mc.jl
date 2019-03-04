@@ -10,41 +10,6 @@ import QuantEcon: MarkovChain, DiscreteDP
 # random_markov_chain
 
 """
-Return a randomly sampled MarkovChain instance with `n` states.
-
-##### Arguments
-
-- `n::Integer` : Number of states.
-
-##### Returns
-
-- `mc::MarkovChain` : MarkovChain instance.
-
-##### Examples
-
-```julia
-julia> using QuantEcon
-
-julia> mc = random_markov_chain(3)
-Discrete Markov Chain
-stochastic matrix:
-3x3 Array{Float64,2}:
- 0.281188  0.61799   0.100822
- 0.144461  0.848179  0.0073594
- 0.360115  0.323973  0.315912
-
-```
-
-"""
-function random_markov_chain(rng::AbstractRNG, n::Integer)
-    p = random_stochastic_matrix(rng, n)
-    mc = MarkovChain(p)
-    return mc
-end
-
-random_markov_chain(n::Integer) = random_markov_chain(Random.GLOBAL_RNG, n)
-
-"""
 Return a randomly sampled MarkovChain instance with `n` states, where each state
 has `k` states with positive transition probability.
 
@@ -72,13 +37,13 @@ stochastic matrix:
 ```
 
 """
-function random_markov_chain(rng::AbstractRNG, n::Integer, k::Integer)
+function random_markov_chain(rng::AbstractRNG, n::Integer, k::Integer=n)
     p = random_stochastic_matrix(rng, n, k)
     mc = MarkovChain(p)
     return mc
 end
 
-random_markov_chain(n::Integer, k::Integer) =
+random_markov_chain(n::Integer, k::Integer=n) =
     random_markov_chain(Random.GLOBAL_RNG, n, k)
 
 
@@ -99,11 +64,11 @@ each row.
 - `p::Array` : Stochastic matrix.
 
 """
-function random_stochastic_matrix(rng::AbstractRNG, n::Integer, k::Union{Integer, Nothing}=nothing)
+function random_stochastic_matrix(rng::AbstractRNG, n::Integer, k::Integer=n)
     if !(n > 0)
         throw(ArgumentError("n must be a positive integer"))
     end
-    if k != nothing && !(k > 0 && k <= n)
+    if !(k > 0 && k <= n)
         throw(ArgumentError("k must be an integer with 0 < k <= n"))
     end
 
@@ -112,7 +77,7 @@ function random_stochastic_matrix(rng::AbstractRNG, n::Integer, k::Union{Integer
     return transpose(p)
 end
 
-random_stochastic_matrix(n::Integer, k::Union{Integer, Nothing}=nothing) =
+random_stochastic_matrix(n::Integer, k::Integer=n) =
     random_stochastic_matrix(Random.GLOBAL_RNG, n, k)
 
 
@@ -134,10 +99,7 @@ as columns `m` probability vectors of length `n` with `k` nonzero entries.
 
 """
 function _random_stochastic_matrix(rng::AbstractRNG, n::Integer, m::Integer;
-                                   k::Union{Integer, Nothing}=nothing)
-    if k == nothing
-        k = n
-    end
+                                   k::Integer=n)
     probvecs = random_probvec(rng, k, m)
 
     k == n && return probvecs
@@ -159,8 +121,7 @@ function _random_stochastic_matrix(rng::AbstractRNG, n::Integer, m::Integer;
     return p
 end
 
-_random_stochastic_matrix(n::Integer, m::Integer;
-                          k::Union{Integer, Nothing}=nothing) =
+_random_stochastic_matrix(n::Integer, m::Integer; k::Integer=n) =
     _random_stochastic_matrix(Random.GLOBAL_RNG, n, m, k=k)
 
 
@@ -189,15 +150,12 @@ distribution with mean 0 and standard deviation `scale`.
 function random_discrete_dp(rng::AbstractRNG,
                             num_states::Integer,
                             num_actions::Integer,
-                            beta::Union{Real, Nothing}=nothing;
-                            k::Union{Integer, Nothing}=nothing,
+                            beta::Real=rand(rng);
+                            k::Integer=num_states,
                             scale::Real=1)
     L = num_states * num_actions
     R = scale * randn(rng, L)
     Q = _random_stochastic_matrix(rng, num_states, L; k=k)
-    if beta == nothing
-        beta = rand(rng)
-    end
 
     R = reshape(R, num_states, num_actions)
     Q = reshape(transpose(Q), num_states, num_actions, num_states)
@@ -207,9 +165,9 @@ function random_discrete_dp(rng::AbstractRNG,
 end
 
 random_discrete_dp(num_states::Integer, num_actions::Integer,
-                   beta::Union{Real, Nothing}=nothing;
-                   k::Union{Integer, Nothing}=nothing, scale::Real=1) =
-    random_discrete_dp(Random.GLOBAL_RNG, num_actions, beta, k=k, scale=scale)
+                   beta::Real=rand(); k::Integer=k, scale::Real=1) =
+    random_discrete_dp(Random.GLOBAL_RNG, num_states, num_actions, beta,
+                       k=k, scale=scale)
 
 
 # random_probvec
@@ -247,3 +205,6 @@ function random_probvec(rng::AbstractRNG, k::Integer, m::Integer)
 end
 
 random_probvec(k::Integer, m::Integer) = random_probvec(Random.GLOBAL_RNG, k, m)
+
+random_probvec(rng::AbstractRNG, k::Integer) = vec(random_probvec(rng, k, 1))
+random_probvec(k::Integer) = random_probvec(rng, k)
