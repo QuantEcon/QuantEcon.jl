@@ -236,8 +236,8 @@ end
 
 @doc doc"""
 Return the index of the point x in the lexicographic order of the
-integer points of the (m-1)-dimensional simplex $\{x \mid x_0
-+ \cdots + x_{m-1} = n\}$.
+integer points of the (m-1)-dimensional simplex $\{x \mid x_0 + 
+\cdots + x_{m-1} = n\}$.
 
 ##### Arguments
 

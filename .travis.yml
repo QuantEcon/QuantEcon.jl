@@ -14,8 +14,14 @@ matrix:
 notifications:
     email: false
 #script: # use the default script setting which is equivalent to the following
+jobs:
+    include:
+        - stage: "Documentation"
+          script:
+            - julia -e 'using Pkg; Pkg.add("Documenter"); using Documenter'
+            - julia -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd()))'
+            - julia -e 'using Pkg; import QuantEcon; cd(joinpath(dirname(pathof(QuantEcon)), "..")); include(joinpath("docs", "make.jl"))'
+          after_success: skip
 after_success:
     - echo $TRAVIS_JULIA_VERSION
     - julia -e 'using Pkg; import QuantEcon; cd(joinpath(dirname(pathof(QuantEcon)), "..")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
-    - julia -e 'using Pkg; Pkg.add("Documenter")'
-    - julia -e 'using Pkg; import QuantEcon; cd(joinpath(dirname(pathof(QuantEcon)), "..")); include(joinpath("docs", "make.jl"))'
