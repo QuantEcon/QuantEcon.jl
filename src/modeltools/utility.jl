@@ -15,6 +15,16 @@ Additionally, this code assumes that if c < 1e-10 then
 
 u(c) = log(1e-10) + 1e10*(c - 1e-10)
 
+##### Examples
+
+```julia
+u1 = LogUtility()
+u1(10.)
+u1.([1.e-15, 1.e15])
+u2 = LogUtility(10)
+u2.([10., 1.e-15])
+```
+
 """
 struct LogUtility <: AbstractUtility
     ξ::Float64

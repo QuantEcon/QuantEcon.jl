@@ -27,6 +27,19 @@ state transitions.
 
 - `p::AbstractMatrix` : The transition matrix. Must be square, all elements must be nonnegative, and all rows must sum to unity.
 - `state_values::AbstractVector` : Vector containing the values associated with the states.
+
+##### Examples
+
+```julia
+# Without labelling states
+p1 = [1 0 0; 0 1 0; 0 0 1]
+mc1 = MarkovChain(p1)
+
+#Including labels for states
+p2 = [0.3 0.7; 0.25 0.75]
+states = ["unemployed", "employed"]
+mc2 = MarkovChain(p2, states)
+```
 """
 mutable struct MarkovChain{T, TM<:AbstractMatrix{T}, TV<:AbstractVector}
     p::TM # valid stochastic matrix
