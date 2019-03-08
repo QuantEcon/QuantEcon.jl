@@ -2,7 +2,7 @@ using Documenter, QuantEcon
 
 makedocs(
     modules = [QuantEcon],
-    format = :html,
+    format = Documenter.HTML(prettyurls = false),
     sitename = "QuantEcon.jl",
     pages = Any[ # Compat: `Any` for 0.4 compat
         "Home" => "index.md",
@@ -18,6 +18,5 @@ deploydocs(
     repo = "github.com/QuantEcon/QuantEcon.jl.git",
     branch = "gh-pages",
     target = "build",
-    julia  = "0.6",
     make = nothing,
 )
