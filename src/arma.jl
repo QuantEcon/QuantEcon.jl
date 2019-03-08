@@ -194,7 +194,7 @@ response1 = impulse_response(lp1)
 plot(1:length(response1),response1,color=:blue, lw=2, marker=:circle, markersize=3)
 
 lp2 = ARMA([0.8, 0.5], [0.7, 0.3], 0.5)
-response2 = impulse_response(lp2)
+response2 = impulse_response(lp2,impulse_length = 50)
 plot(1:length(response2),response2,color=:blue, lw=2, marker=:circle, markersize=3)
 
 ```

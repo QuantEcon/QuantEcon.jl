@@ -17,12 +17,23 @@ u(c) = log(1e-10) + 1e10*(c - 1e-10)
 
 ##### Examples
 
-```julia
-u1 = LogUtility()
-u1(10.)
-u1.([1.e-15, 1.e15])
-u2 = LogUtility(10)
-u2.([10., 1.e-15])
+```jlcon
+julia> u1 = LogUtility()
+
+julia> u1(10.)
+2.302585092994046
+
+julia> u1.([1.e-15, 1.e15])
+2-element Array{Float64,1}:
+ -24.025840929940458
+  34.538776394910684
+
+julia> u2 = LogUtility(10)
+
+julia> u2.([10., 1.e-15])
+2-element Array{Float64,1}:
+   23.02585092994046
+ -240.25840929940458
 ```
 
 """
