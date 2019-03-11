@@ -40,17 +40,17 @@ where ``\epsilon_t \sim N (0, \sigma^2)``
 
 ##### Returns
 
-- `mc::MarkovChain{Float64}` : Markov chain holding the state values and transition matrix
+- `mc::MarkovChain` : Markov chain holding the state values and transition matrix
 
 """
-function tauchen(N::Integer, ρ::T, σ::T, μ::T=zero(T), n_std::Integer=3) where T <: Real
+function tauchen(N::Integer, ρ::T1, σ::T2, μ=zero(promote_type(T1, T2)), n_std::Integer=3) where {T1 <: Real, T2 <: Real}
     # Get discretized space
     a_bar = n_std * sqrt(σ^2 / (1 - ρ^2))
     y = range(-a_bar, stop=a_bar, length=N)
     d = y[2] - y[1]
 
     # Get transition probabilities
-    Π = zeros(T, N, N)
+    Π = zeros(promote_type(T1, T2), N, N)
     for row = 1:N
         # Do end points first
         Π[row, 1] = std_norm_cdf((y[1] - ρ*y[row] + d/2) / σ)
