@@ -993,11 +993,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/QuantEcon.html#QuantEcon.tauchen-Union{Tuple{T}, Tuple{Integer,T,T}, Tuple{Integer,T,T,T}, Tuple{Integer,T,T,T,Integer}} where T<:Real",
+    "location": "api/QuantEcon.html#QuantEcon.tauchen-Union{Tuple{T2}, Tuple{T1}, Tuple{Integer,T1,T2}, Tuple{Integer,T1,T2,Any}, Tuple{Integer,T1,T2,Any,Integer}} where T2<:Real where T1<:Real",
     "page": "QuantEcon",
     "title": "QuantEcon.tauchen",
     "category": "method",
-    "text": "Tauchen\'s (1996) method for approximating AR(1) process with finite markov chain\n\nThe process follows\n\n    y_t = mu + rho y_t-1 + epsilon_t\n\nwhere epsilon_t sim N (0 sigma^2)\n\nArguments\n\nN::Integer: Number of points in markov process\nρ::Real : Persistence parameter in AR(1) process\nσ::Real : Standard deviation of random component of AR(1) process\nμ::Real(0.0) : Mean of AR(1) process\nn_std::Integer(3) : The number of standard deviations to each side the process should span\n\nReturns\n\nmc::MarkovChain{Float64} : Markov chain holding the state values and transition matrix\n\n\n\n"
+    "text": "Tauchen\'s (1996) method for approximating AR(1) process with finite markov chain\n\nThe process follows\n\n    y_t = mu + rho y_t-1 + epsilon_t\n\nwhere epsilon_t sim N (0 sigma^2)\n\nArguments\n\nN::Integer: Number of points in markov process\nρ::Real : Persistence parameter in AR(1) process\nσ::Real : Standard deviation of random component of AR(1) process\nμ::Real(0.0) : Mean of AR(1) process\nn_std::Integer(3) : The number of standard deviations to each side the process should span\n\nReturns\n\nmc::MarkovChain : Markov chain holding the state values and transition matrix\n\n\n\n"
 },
 
 {
