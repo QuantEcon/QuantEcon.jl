@@ -229,4 +229,4 @@ end
 random_probvec(k::Integer, m::Integer) = random_probvec(Random.GLOBAL_RNG, k, m)
 
 random_probvec(rng::AbstractRNG, k::Integer) = vec(random_probvec(rng, k, 1))
-random_probvec(k::Integer) = random_probvec(rng, k)
+random_probvec(k::Integer) = random_probvec(Random.GLOBAL_RNG, k)

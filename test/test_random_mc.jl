@@ -81,4 +81,10 @@ using Random
         @test ddps[2].Q == ddps[1].Q
         @test ddps[2].beta == ddps[1].beta
     end
+
+    @testset "Test random_probvec" begin
+        k = 5
+        x = random_probvec(k)
+        @test size(x) == (k,)
+    end
 end  # @testset
