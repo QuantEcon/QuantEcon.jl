@@ -84,7 +84,7 @@ using Random
 
     @testset "Test random_probvec" begin
         k = 5
-        x = random_probvec(k)
+        x = QuantEcon.random_probvec(k)
         @test size(x) == (k,)
     end
 end  # @testset

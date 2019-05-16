@@ -28,7 +28,7 @@ Documentation for the library: [quantecon.github.io/QuantEcon.jl/](http://quante
 ### License
 
 
-Copyright © 2013-2017 Spencer Lyon, Thomas J. Sargent, and John Stachurski: BSD-3
+Copyright © 2013-2019 Spencer Lyon, Thomas J. Sargent, and John Stachurski: BSD-3
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
