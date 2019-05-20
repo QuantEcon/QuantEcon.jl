@@ -24,6 +24,7 @@ Tests for markov/ddp.jl
     Q[:, :, 2] = [0.5 1.0; 1.0 1.0]
 
     ddp0 = DiscreteDP(R, Q, beta)
+    ddp0_b1 = DiscreteDP(R, Q, 1.0)
 
     # Formulation with state-action pairs
     L = 3  # Number of state-action pairs
@@ -35,11 +36,13 @@ Tests for markov/ddp.jl
     Q_sa[2, :] = Q[1, 2, :]
     Q_sa[3, :] = Q[2, 1, :]
     ddp0_sa = DiscreteDP(R_sa, Q_sa, beta, s_indices, a_indices)
+    ddp0_sa_b1 = DiscreteDP(R_sa, Q_sa, 1.0, s_indices, a_indices)
 
     @test issparse(ddp0_sa.Q)
 
     # List of ddp formulations
     ddp0_collection = (ddp0, ddp0_sa)
+    ddp0_b1_collection = (ddp0_b1, ddp0_sa_b1)
 
     # Maximum Iteration and Epsilon for Tests
     max_iter = 200
@@ -85,6 +88,10 @@ Tests for markov/ddp.jl
         # Check both Dense and State-Action Pair Formulation
         for ddp in ddp0_collection
         	@test isapprox(evaluate_policy(ddp, sigma_star), v_star)
+        end
+        # Check beta = 1.0 is not allowed
+        for ddp in ddp0_b1_collection
+            @test_throws ArgumentError evaluate_policy(ddp,sigma_star)
         end
     end
 
@@ -147,6 +154,10 @@ Tests for markov/ddp.jl
             @test res.sigma == sigma_star
             @test res_init.sigma == sigma_star
         end
+        # Check beta = 1.0 is not allowed
+        for ddp_item in ddp0_b1_collection
+            @test_throws ArgumentError solve(ddp_item, VFI)
+        end
     end
 
     @testset "policy_iteration" begin
@@ -163,6 +174,10 @@ Tests for markov/ddp.jl
             # Check sigma == sigma_star
             @test res.sigma == sigma_star
             @test res_init.sigma == sigma_star
+        end
+        # Check beta = 1.0 is not allowed
+        for ddp_item in ddp0_b1_collection
+            @test_throws ArgumentError solve(ddp_item, VFI)
         end
     end
 
@@ -216,6 +231,56 @@ Tests for markov/ddp.jl
             # Check sigma == sigma_star
             @test res.sigma == sigma_star
         end
+        # Check beta = 1.0 is not allowed
+        for ddp_item in ddp0_b1_collection
+            @test_throws ArgumentError solve(ddp_item, MPFI)
+        end
+    end
+
+    @testset "Backward induction" begin
+        # From Puterman 2005, Section 3.2, Section 4.6.1
+        # "single-product stochastic inventory control"
+        
+        #set up DDP constructor
+        s_indices = [1, 1, 1, 1, 2, 2, 2, 3, 3, 4]
+        a_indices = [1, 2, 3, 4, 1, 2, 3, 1, 2, 1]
+        R = [ 0//1, -1//1, -2//1, -5//1,  5//1,  0//1, -3//1,  6//1, -1//1,  5//1]
+        Q = [ 1//1 0//1 0//1 0//1;
+              3//4 1//4 0//1 0//1;
+              1//4 1//2 1//4 0//1;
+              0//1 1//4 1//2 1//4;
+              3//4 1//4 0//1 0//1;
+              1//4 1//2 1//4 0//1;
+              0//1 1//4 1//2 1//4;
+              1//4 1//2 1//4 0//1;
+              0//1 1//4 1//2 1//4;
+              0//1 1//4 1//2 1//4]
+        beta = 1
+        ddp_rational = DiscreteDP(R, Q, beta, s_indices, a_indices)
+        R = convert.(Float64, R)
+        Q = convert.(Float64, Q)
+        ddp_float = DiscreteDP(R, Q, beta, s_indices, a_indices)
+        
+        # test for backward induction
+        J = 3
+        # expected results
+        vs_expected = [67//16  2     0  0;
+                       129//16 25//4 5  0;
+                       194//16 10    6  0;
+                       227//16 21//2 5  0]
+        sigmas_expected = [4  3  1;
+                           1  1  1;
+                           1  1  1;
+                           1  1  1]
+
+        vs, sigmas = backward_induction(ddp_rational, J)
+        @test vs == vs_expected
+        @test sigmas == sigmas_expected
+
+        vs, sigmas = backward_induction(ddp_float, J)
+        @test isapprox(vs, vs_expected)
+        @test sigmas == sigmas_expected
+        
     end
 
     @testset "DDPsa constructor" begin
@@ -231,9 +296,8 @@ Tests for markov/ddp.jl
         _s_ind = [1, 1, 2]
         _a_ind = [1, 2, 1]
 
-        @testset "beta in [0, 1)" begin
+        @testset "beta in [0, 1]" begin
             @test_throws ArgumentError DiscreteDP(_R, _Q, -eps(), _s_ind, _a_ind)
-            @test_throws ArgumentError DiscreteDP(_R, _Q, 1.0, _s_ind, _a_ind)
             @test_throws ArgumentError DiscreteDP(_R, _Q, 1+eps(), _s_ind, _a_ind)
         end
 
@@ -257,9 +321,8 @@ Tests for markov/ddp.jl
     end
 
     @testset "DDP constructor" begin
-        @testset "beta in [0, 1)" begin
+        @testset "beta in [0, 1]" begin
             @test_throws ArgumentError DiscreteDP(R, Q, -eps())
-            @test_throws ArgumentError DiscreteDP(R, Q, 1.0)
             @test_throws ArgumentError DiscreteDP(R, Q, 1+eps())
         end
 

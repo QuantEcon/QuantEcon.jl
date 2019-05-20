@@ -8,7 +8,7 @@ Discrete Decision Processes
 References
 ----------
 
-https://lectures.quantecon.org/py/discrete_dp.html
+https://lectures.quantecon.org/jl/discrete_dp.html
 
 Notes
 -----
@@ -65,7 +65,7 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
             msg = "R must be 2-dimensional without s-a formulation"
             throw(ArgumentError(msg))
       	end
-        (beta < 0 || beta >= 1) &&  throw(ArgumentError("beta must be [0, 1)"))
+        (beta < 0 || beta > 1) &&  throw(ArgumentError("beta must be [0, 1]"))
 
         # verify input integrity 2
  	num_states, num_actions = size(R)
@@ -103,8 +103,10 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
         if NR != 1
             throw(ArgumentError("R must be 1-dimensional with s-a formulation"))
         end
-        (beta < 0 || beta >= 1) && throw(ArgumentError("beta must be [0, 1)"))
-
+        (beta < 0 || beta > 1) && throw(ArgumentError("beta must be [0, 1]"))
+        if beta == 1
+            @warn("infinite horizon solution methods are disabled with beta=1")
+        end
         # verify input integrity (same length)
         num_sa_pairs, num_states = size(Q)
         if length(R) != num_sa_pairs
@@ -224,7 +226,7 @@ This refers to the Value Iteration solution algorithm.
 References
 ----------
 
-https://lectures.quantecon.org/py/discrete_dp.html
+https://lectures.quantecon.org/jl/discrete_dp.html
 
 """
 struct VFI <: DDPAlgorithm end
@@ -235,9 +237,9 @@ This refers to the Policy Iteration solution algorithm.
 References
 ----------
 
-https://lectures.quantecon.org/py/discrete_dp.html
+https://lectures.quantecon.org/jl/discrete_dp.html
 
-"""
+"""  
 struct PFI <: DDPAlgorithm end
 
 """
@@ -246,7 +248,7 @@ This refers to the Modified Policy Iteration solution algorithm.
 References
 ----------
 
-https://lectures.quantecon.org/py/discrete_dp.html
+https://lectures.quantecon.org/jl/discrete_dp.html
 
 """
 struct MPFI <: DDPAlgorithm end
@@ -453,6 +455,10 @@ Compute the value of a policy.
 
 """
 function evaluate_policy(ddp::DiscreteDP, sigma::AbstractVector{T}) where T<:Integer
+    if ddp.beta == 1.0
+        throw(ArgumentError("method invalid for beta = 1"))
+    end
+    
     R_sigma, Q_sigma = RQ_sigma(ddp, sigma)
     b = R_sigma
     A = I - ddp.beta * Q_sigma
@@ -499,6 +505,60 @@ function solve(ddp::DiscreteDP{T}, v_init::AbstractVector{T},
     _solve!(ddp, ddpr, max_iter, epsilon, k)
     ddpr.mc = MarkovChain(ddp, ddpr)
     ddpr
+end
+
+"""
+    backward_induction(ddp, J[, v_term=zeros(num_states(ddp))])
+
+Solve by backward induction a ``J``-period finite horizon discrete dynamic 
+program with stationary reward ``r`` and transition probability functions ``q``
+and discount factor ``\\beta \\in [0, 1]``.
+
+The optimal value functions ``v^{\\ast}_1, \\ldots, v^{\\ast}_{J+1}`` and 
+policy functions ``\\sigma^{\\ast}_1, \\ldots, \\sigma^{\\ast}_J`` are obtained
+by ``v^{\\ast}_{J+1} = v_{J+1}``, and
+
+```math
+v^{\\ast}_j(s) = \\max_{a \\in A(s)} r(s, a) +
+\\beta \\sum_{s' \\in S} q(s'|s, a) v^{\\ast}_{j+1}(s')
+\\quad (s \\in S)
+```
+and
+```math 
+\\sigma^{\\ast}_j(s) \\in \\operatorname*{arg\\,max}_{a \\in A(s)}
+            r(s, a) + \\beta \\sum_{s' \\in S} q(s'|s, a) v^*_{j+1}(s')
+            \\quad (s \\in S)
+```
+
+for ``j= J, \\ldots, 1``, where the terminal value function ``v_{J+1}`` is 
+exogenously given by `v_term`.
+
+# Parameters
+
+- `ddp::DiscreteDP{T}` : Object that contains the Model Parameters
+- `J::Integer`: Number of decision periods
+- `v_term::AbstractVector{<:Real}=zeros(num_states(ddp))`: Terminal value 
+  function of length equal to n (the number of states)  
+
+# Returns
+
+- `vs::Matrix{S}`: Array of shape (n, J+1) where `vs[:,j]`  contains the 
+  optimal value function at period j = 1, ..., J+1.
+- `sigmas::Matrix{Int}`: Array of shape (n, J) where `sigmas[:,j]` contains the
+  optimal policy function at period j = 1, ..., J.
+"""
+function backward_induction(ddp::DiscreteDP{T}, J::Integer,
+                            v_term::AbstractVector{<:Real}=
+                            zeros(num_states(ddp))) where {T}
+    n = num_states(ddp)
+    S = typeof(zero(T)/one(T))
+    vs = Matrix{S}(undef, n, J+1)
+    vs[:,end] = v_term
+    sigmas = Matrix{Int}(undef, n, J)
+    @inbounds for j in J+1: -1: 2
+        @views bellman_operator!(ddp, vs[:,j], vs[:,j-1], sigmas[:,j-1])
+    end
+    return vs, sigmas
 end
 
 # --------- #
@@ -777,6 +837,8 @@ function _solve!(
     )
     if ddp.beta == 0.0
         tol = Inf
+    elseif ddp.beta == 1.0
+        throw(ArgumentError("method invalid for beta = 1"))
     else
         tol = epsilon * (1-ddp.beta) / (2*ddp.beta)
     end
@@ -811,6 +873,10 @@ function _solve!(
     )
     old_sigma = copy(ddpr.sigma)
 
+    if ddp.beta == 1.0
+        throw(ArgumentError("method invalid for beta = 1"))
+    end
+
     for i in 1:max_iter
        ddpr.v = evaluate_policy(ddp, ddpr)
        compute_greedy!(ddp, ddpr)
@@ -836,6 +902,10 @@ function _solve!(
         ddp::DiscreteDP, ddpr::DPSolveResult{MPFI}, max_iter::Integer,
         epsilon::Real, k::Integer
     )
+    if ddp.beta == 1.0
+        throw(ArgumentError("method invalid for beta = 1"))
+    end
+
     beta = ddp.beta
     fill!(ddpr.v, minimum(ddp.R[ddp.R .> -Inf]) / (1.0 - beta))
     old_sigma = copy(ddpr.sigma)
