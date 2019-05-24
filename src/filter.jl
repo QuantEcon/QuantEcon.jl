@@ -121,74 +121,74 @@ mutable struct RegimeSwitchingModel{TD <: AbstractArray, TP <: AbstractMatrix}
     M::Int
 end
 RegimeSwitchingModel(g::Function, y::AbstractArray, parameter, P::AbstractMatrix) =
-    RegimeSwitchingModel(g, y, parameter, P, size(P, M))
+    RegimeSwitchingModel(g, y, parameter, P, size(P, 1))
 
 """
 ##### Arguments
 - `rsm::RegimeSwitchingModel`: `RegimeSwitchingModel`
-- `zeta_hat_update_pre::AbstractArray`: Probability distribution of state at period 0 conditional on the information up to
+- `p_s_update_pre::AbstractArray`: Probability distribution of state at period 0 conditional on the information up to
                                         period 0.
 """
-function filter(rsm::RegimeSwitchingModel, zeta_hat_update_pre::AbstractArray)
+function filter(rsm::RegimeSwitchingModel, p_s_update_pre::AbstractArray)
     T = size(rsm.y, 1)
-    zeta_hat_forecast = Matrix{Float64}(undef, T, rsm.M)
-    zeta_hat_update = Matrix{Float64}(undef, T, rsm.M)
-    logL, ps = filter!(zeta_hat_update, zeta_hat_forecast, rsm, zeta_hat_update_pre)
-    return logL, ps, zeta_hat_update, zeta_hat_forecast
+    p_s_forecast = Matrix{Float64}(undef, T, rsm.M)
+    p_s_update = Matrix{Float64}(undef, T, rsm.M)
+    logL, p = filter!(p_s_update, p_s_forecast, rsm, p_s_update_pre)
+    return logL, p, p_s_update, p_s_forecast
 end
-function filter!(zeta_hat_update::Matrix, zeta_hat_forecast::Matrix,
-                 rsm::RegimeSwitchingModel, zeta_hat_update_pre::AbstractArray)
+function filter!(p_s_update::Matrix, p_s_forecast::Matrix,
+                 rsm::RegimeSwitchingModel, p_s_update_pre::AbstractArray)
     g, y = rsm.g, rsm.y
     T = size(y, 1)
-    ps = Vector{Float64}(undef, T)
+    p = Vector{Float64}(undef, T)
     logL = 0
     for t in 1:T
-        zeta_hat_forecast[t, :] = forecast(zeta_hat_update_pre, rsm.P)
-        zeta_hat_update[t, :], ps[t] = update(rsm, zeta_hat_forecast[t, :], t)
-        logL += log(ps[t])
-        zeta_hat_update_pre .= zeta_hat_update[t, :]
+        p_s_forecast[t, :] = forecast(p_s_update_pre, rsm.P)
+        p_s_update[t, :], p[t] = update(rsm, p_s_forecast[t, :], t)
+        logL += log(p[t])
+        p_s_update_pre .= p_s_update[t, :]
     end
-    return logL, ps
+    return logL, p
 end
 
-function forecast(zeta_hat_update_pre::AbstractArray, P::AbstractMatrix)
-    zeta_hat_forecast = P' * zeta_hat_update_pre
-    return zeta_hat_forecast
+function forecast(p_s_update_pre::AbstractArray, P::AbstractMatrix)
+    p_s_forecast = P' * p_s_update_pre
+    return p_s_forecast
 end
 
-function update(rsm::RegimeSwitchingModel, zeta_hat_pre::Array, t::Integer)
+function update(rsm::RegimeSwitchingModel, p_s::Array, t::Integer)
     y_at_period_t = get_y_at_period_t(rsm.y, t)
     eta = [max(0, rsm.g(y_at_period_t, s, rsm.parameter)) for s in 1:rsm.M]
-    tmp = eta .* zeta_hat_pre
+    tmp = eta .* p_s
     p = sum(tmp)
-    zeta_hat = tmp./p
-    return zeta_hat, p
+    p_s = tmp./p
+    return p_s, p
 end
 get_y_at_period_t(y::AbstractMatrix, t::Union{Integer, AbstractVector}) = y[t, :]
 get_y_at_period_t(y::AbstractVector, t::Union{Integer, AbstractVector}) = y[t]
 
 function smooth(rsm::RegimeSwitchingModel,
-                zeta_hat_update_pre::AbstractArray = stationary_distributions(MarkovChain(P))[1])
-    zeta_smoothed = Matrix{Float64}(undef, size(rsm.y, 1), size(rsm.P, 1))
-    smooth!(zeta_smoothed, rsm, zeta_hat_update_pre)
-    return zeta_smoothed
+                p_s_update_pre::AbstractArray = stationary_distributions(MarkovChain(P))[1])
+    p_s_smoothed = Matrix{Float64}(undef, size(rsm.y, 1), size(rsm.P, 1))
+    smooth!(p_s_smoothed, rsm, p_s_update_pre)
+    return p_s_smoothed
 end
-function smooth!(zeta_smoothed::Matrix, rsm::RegimeSwitchingModel,
-                 zeta_hat_update_pre::AbstractArray = stationary_distributions(MarkovChain(P))[1])
+function smooth!(p_s_smoothed::Matrix, rsm::RegimeSwitchingModel,
+                 p_s_update_pre::AbstractArray = stationary_distributions(MarkovChain(P))[1])
     T = size(y, 1)
     rsm_tmp = copy(rsm)
-    _, zeta_hat_update, _, ps = hamilton_filter(rsm_tmp, zeta_hat_update_pre)
-    zeta_init = Vector{Float64}(undef, M)
+    _, p_s_update, _, ps = hamilton_filter(rsm_tmp, p_s_update_pre)
+    p_s_init = Vector{Float64}(undef, M)
     for s_hat = 1:M
         for tau = 1:T-1
-            zeta_init .= 0
-            zeta_init[s_hat] = 1
+            p_s_init .= 0
+            p_s_init[s_hat] = 1
             y_used = get_y_at_period_t(y, tau+1:T)
             rsm_tmp.y = y_used
-            _, _, _, ps_cond = hamilton_filter(rsm_tmp, zeta_init)
-            zeta_smoothed[tau, s_hat] = zeta_hat_update[tau, s_hat] * prod(ps_cond./ps[tau+1:end])
+            _, _, _, ps_cond = hamilton_filter(rsm_tmp, p_s_init)
+            p_s_smoothed[tau, s_hat] = p_s_update[tau, s_hat] * prod(ps_cond./ps[tau+1:end])
         end
-        zeta_smoothed[T, s_hat] = zeta_hat_update[T, s_hat]
+        p_s_smoothed[T, s_hat] = p_s_update[T, s_hat]
     end
     return nothing
 end
