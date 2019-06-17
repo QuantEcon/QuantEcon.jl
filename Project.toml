@@ -1,6 +1,6 @@
 name = "QuantEcon"
 uuid = "fcd29c91-0bd7-5a09-975d-7ac3f643a60c"
-version = "0.16.0"
+version = "0.16.1"
 
 [deps]
 DSP = "717857b8-e6f2-59f4-9121-6e50c889abd2"
