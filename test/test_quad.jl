@@ -27,7 +27,7 @@ x_logn_1, w_logn_1 = qnwlogn(n, a, b)
 x_simp_1, w_simp_1 = qnwsimp(n, a, b)
 x_trap_1, w_trap_1 = qnwtrap(n, a, b)
 x_unif_1, w_unif_1 = qnwunif(n, a, b)
-x_beta_1, w_beta_1 = qnwbeta(n, b, b+1)
+x_beta_1, w_beta_1 = qnwbeta(n, b, b + 1)
 x_gamm_1, w_gamm_1 = qnwgamma(n, b)
 
 # 3-d nodes and weights
@@ -42,7 +42,7 @@ x_logn_3, w_logn_3 = qnwlogn(n_3, mu_3d, sigma2_3d)
 x_simp_3, w_simp_3 = qnwsimp(n_3, a_3, b_3)
 x_trap_3, w_trap_3 = qnwtrap(n_3, a_3, b_3)
 x_unif_3, w_unif_3 = qnwunif(n_3, a_3, b_3)
-x_beta_3, w_beta_3 = qnwbeta(n_3, b_3, b_3+1.0)
+x_beta_3, w_beta_3 = qnwbeta(n_3, b_3, b_3 + 1.0)
 x_gamm_3, w_gamm_3 = qnwgamma(n_3, b_3, ones(3))
 
 @testset "Testing quad.jl" begin
@@ -78,15 +78,15 @@ x_gamm_3, w_gamm_3 = qnwgamma(n_3, b_3, ones(3))
                 jl_x, jl_w = eval(Symbol(x_str_name)), eval(Symbol(w_str_name))
                 ml_x, ml_w = m[x_str_name],  m[w_str_name]
                 ml_x = d == 3 ? ml_x : dropdims(ml_x, dims = 2)
-                @test isapprox(jl_x, ml_x; atol=1e-5)
-                @test isapprox(jl_w, dropdims(ml_w, dims = 2); atol=1e-5)
+                @test isapprox(jl_x, ml_x; atol = 1e-5)
+                @test isapprox(jl_w, dropdims(ml_w, dims = 2); atol = 1e-5)
             end
         end
     end
 
     @testset "testing quadrect 1d against Matlab" begin
         f1(x) = exp.(-x)
-        f2(x) = 1.0 ./ (1.0 .+ 25.0 .* x .^ 2.0)
+        f2(x) = 1.0 ./ (1.0 .+ 25.0 .* x.^2.0)
         f3(x) = abs.(x).^0.5
 
         # dim 1: num nodes, dim2: method, dim3:func
@@ -139,12 +139,30 @@ x_gamm_3, w_gamm_3 = qnwgamma(n_3, b_3, ones(3))
         #       random numbers than Matlab.
         ml_data_2d1 = m["int_2d1"][:, 1:6]
 
-        @test isapprox(data2d1[:, 1],ml_data_2d1[:, 1])  # trap
+        @test isapprox(data2d1[:, 1], ml_data_2d1[:, 1])  # trap
         @test isapprox(data2d1[:, 2], ml_data_2d1[:, 2])  # simp
         @test isapprox(data2d1[:, 3], ml_data_2d1[:, 3])  # lege
         @test isapprox(data2d1[:, 4], ml_data_2d1[:, 4])  # N
         @test isapprox(data2d1[:, 5], ml_data_2d1[:, 5])  # W
         @test isapprox(data2d1[:, 6], ml_data_2d1[:, 6])  # H
+    end
+
+    @testset "Test qnwmonomial1" begin
+        x = [1.2 0.0; 0.0 1.2]
+        n1, w1 = qnwmonomial1(x)
+
+        wantn1 = [1.54919 0.0; -1.54919 0.0; 0.0 1.54919; 0.0 -1.54919]
+        wantw1 = [0.25, 0.25, 0.25, 0.25]
+
+        @test isapprox(n1, wantn1, atol = 1e-5)
+        @test isapprox(w1, wantw1, atol = 1e-5)
+
+        n2, w2 = qnwmonomial2(x)
+        wantn2 = [0.0 0.0; 2.19089 0.0; -2.19089 0.0; 0.0 2.19089; 0.0 -2.19089; 1.54919 1.54919; -1.54919 1.54919; 1.54919 -1.54919; -1.54919 -1.54919]
+        wantw2 = [0.5, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625]
+
+        @test isapprox(n2, wantn2, atol = 1e-5)
+        @test isapprox(w2, wantw2, atol = 1e-5)
     end
 
 

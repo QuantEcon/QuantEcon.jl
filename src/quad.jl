@@ -53,8 +53,8 @@ $(qnw_refs)
 function qnwlege(n::Int, a::Real, b::Real)
     maxit = 10000
     m = fix((n + 1) / 2.0)
-    xm = 0.5 * (b+a)
-    xl = 0.5 * (b-a)
+    xm = 0.5 * (b + a)
+    xl = 0.5 * (b - a)
     nodes = zeros(n)
 
     weights = copy(nodes)
@@ -67,20 +67,20 @@ function qnwlege(n::Int, a::Real, b::Real)
     pp = similar(z)
 
     its = 0
-    for its=1:maxit
+    for its = 1:maxit
         p1 = fill!(similar(z), one(eltype(z)))
         p2 = fill!(similar(z), one(eltype(z)))
-        for j=1:n
+        for j = 1:n
             p3 = p2
             p2 = p1
-            p1 = ((2*j-1)*z.*p2-(j-1)*p3)./j
+            p1 = ((2 * j - 1) * z .* p2 - (j - 1) * p3) ./ j
         end
 
         # p1 is now a vector of Legendre polynomials of degree 1..n
         # pp will be the deriative of each p1 at the nth zero of each
-        pp = n*(z.*p1-p2)./(z.*z .- 1)
+        pp = n * (z .* p1 - p2) ./ (z .* z .- 1)
         z1 = z
-        z = z1 - p1./pp  # newton's method
+        z = z1 - p1 ./ pp  # newton's method
 
         err = maximum(abs, z - z1)
         if err < 1e-14
@@ -95,7 +95,7 @@ function qnwlege(n::Int, a::Real, b::Real)
     nodes[i] = xm .- xl * z
     nodes[n + 1 .- i] = xm .+ xl * z
 
-    weights[i] = 2*xl./((1 .- z.*z).*pp.*pp)
+    weights[i] = 2 * xl ./ ((1 .- z .* z) .* pp .* pp)
     weights[n + 1 .- i] = weights[i]
 
     return nodes, weights
@@ -118,9 +118,9 @@ $(qnw_func_notes)
 $(qnw_refs)
 """
 function qnwcheb(n::Int, a::Real, b::Real)
-    nodes = (b+a)/2 .- (b-a)/2 .* cos.(pi/n .* (0.5:(n-0.5)))
-    weights = ((b-a)/n) .* (cos.(pi/n .* ((1:n).-0.5)*(2:2:n-1)') *
-                            (-2.0 ./ ((1:2:n-2).*(3:2:n))) .+ 1)
+    nodes = (b + a) / 2 .- (b - a) / 2 .* cos.(pi / n .* (0.5:(n - 0.5)))
+    weights = ((b - a) / n) .* (cos.(pi / n .* ((1:n) .- 0.5) * (2:2:n - 1)') *
+                            (-2.0 ./ ((1:2:n - 2) .* (3:2:n))) .+ 1)
     return nodes, weights
 end
 
@@ -162,20 +162,20 @@ function qnwnorm(n::Int)
     nodes = zeros(n)
     weights = zeros(n)
 
-    z = sqrt(2n+1) - 1.85575 * ((2n+1).^(-1/6))
+    z = sqrt(2n + 1) - 1.85575 * ((2n + 1).^(-1 / 6))
 
-    for i=1:m
+    for i = 1:m
         # Reasonable starting values for root finding
         if i == 1
-            z = sqrt(2n+1) - 1.85575 * ((2n+1).^(-1/6))
+            z = sqrt(2n + 1) - 1.85575 * ((2n + 1).^(-1 / 6))
         elseif i == 2
-            z = z - 1.14 * (n.^0.426)./z
+            z = z - 1.14 * (n.^0.426) ./ z
         elseif i == 3
             z = 1.86z + 0.86nodes[1]
         elseif i == 4
             z = 1.91z + 0.91nodes[2]
         else
-            z = 2z + nodes[i-2]
+            z = 2z + nodes[i - 2]
         end
 
         # root finding iterations
@@ -186,17 +186,17 @@ function qnwnorm(n::Int)
             p1 = pim4
             p2 = 0.0
 
-            for j=1:n
+            for j = 1:n
                 p3 = p2
                 p2 = p1
-                p1 = z .* sqrt(2/j) .*p2 - sqrt((j-1)/j).*p3
+                p1 = z .* sqrt(2 / j) .* p2 - sqrt((j - 1) / j) .* p3
             end
 
             # p1 now contains degree n Hermite polynomial
             # pp is derivative of p1 at the n'th zero of p1
-            pp = sqrt(2n).*p2
+            pp = sqrt(2n) .* p2
             z1 = z
-            z = z1 - p1./pp  # newton step
+            z = z1 - p1 ./ pp  # newton step
 
             if abs(z - z1) < 1e-14
                 break
@@ -207,10 +207,10 @@ function qnwnorm(n::Int)
             error("Failed to converge in qnwnorm")
         end
 
-        nodes[n+1-i] = z
+        nodes[n + 1 - i] = z
         nodes[i] = -z
-        weights[i] = 2 ./ (pp.*pp)
-        weights[n+1-i] = weights[i]
+        weights[i] = 2 ./ (pp .* pp)
+        weights[n + 1 - i] = weights[i]
     end
 
     weights = weights ./ sqrt(pi)
@@ -235,11 +235,11 @@ $(qnw_func_notes)
 $(qnw_refs)
 """
 function qnwsimp(n::Int, a::Real, b::Real)
-    if n<=1
+    if n <= 1
         error("In qnwsimp: n must be integer greater than one.")
     end
 
-    if n % 2 ==0
+    if n % 2 == 0
         @warn("In qnwsimp: n must be odd integer - increasing by 1.")
         n += 1
     end
@@ -310,12 +310,12 @@ function qnwbeta(n::Int, a::Real, b::Real)
 
     z::Float64 = 0.0
 
-    for i=1:n
+    for i = 1:n
         if i == 1
             an = a / n
             bn = b / n
             r1 = (1 + a) * (2.78 / (4 + n * n) + 0.768an / n)
-            r2 = 1 + 1.48 * an + 0.96bn + 0.452an*an + 0.83an*bn
+            r2 = 1 + 1.48 * an + 0.96bn + 0.452an * an + 0.83an * bn
             z = 1 - r1 / r2
 
         elseif i == 2
@@ -333,17 +333,17 @@ function qnwbeta(n::Int, a::Real, b::Real)
         elseif i == n - 1
             r1 = (1 + 0.235b) / (0.766 + 0.119b)
             r2 = 1 / (1 + 0.639 * (n - 4) / (1 + 0.71 * (n - 4)))
-            r3 = 1 / (1 + 20a / ((7.5+ a ) * n * n))
-            z = z + (z - x[n-3]) * r1 * r2 * r3
+            r3 = 1 / (1 + 20a / ((7.5 + a ) * n * n))
+            z = z + (z - x[n - 3]) * r1 * r2 * r3
 
         elseif i == n
             r1 = (1 + 0.37b) / (1.67 + 0.28b)
             r2 = 1 / (1 + 0.22 * (n - 8) / n)
-            r3 = 1 / (1 + 8 * a / ((6.28+ a ) * n * n))
-            z = z + (z - x[n-2]) * r1 * r2 * r3
+            r3 = 1 / (1 + 8 * a / ((6.28 + a ) * n * n))
+            z = z + (z - x[n - 2]) * r1 * r2 * r3
 
         else
-            z = 3 * x[i-1] - 3 * x[i-2] + x[i-3]
+            z = 3 * x[i - 1] - 3 * x[i - 2] + x[i - 3]
         end
 
         its = 1
@@ -354,7 +354,7 @@ function qnwbeta(n::Int, a::Real, b::Real)
             temp = 2 + ab
             p1 = (a - b + temp * z) / 2
             p2 = 1
-            for j=2:n
+            for j = 2:n
                 p3 = p2
                 p2 = p1
                 temp = 2 * j + ab
@@ -407,27 +407,27 @@ $(qnw_func_notes)
 
 $(qnw_refs)
 """
-function qnwgamma(n::Int, a::Real=1.0, b::Real=1.0)
+function qnwgamma(n::Int, a::Real = 1.0, b::Real = 1.0)
     a < 0 && error("shape parameter must be positive")
     b < 0 && error("scale parameter must be positive")
 
     a -= 1
     maxit = 25
-    fact = -exp(lgamma(a+n)-lgamma(n)-lgamma(a+1))
+    fact = -exp(lgamma(a + n) - lgamma(n) - lgamma(a + 1))
     nodes = zeros(n)
     weights = zeros(n)
 
-    z = (1+a)*(3 + 0.92a)/(1 + 2.4n + 1.8a)
+    z = (1 + a) * (3 + 0.92a) / (1 + 2.4n + 1.8a)
 
-    for i=1:n
+    for i = 1:n
         # get starting values
-        if i==1
-            z = (1+a)*(3 + 0.92a)/(1 + 2.4n + 1.8a)
-        elseif i==2
-            z += (15 + 6.25a)./(1 + 0.9a + 2.5n)
+        if i == 1
+            z = (1 + a) * (3 + 0.92a) / (1 + 2.4n + 1.8a)
+        elseif i == 2
+            z += (15 + 6.25a) ./ (1 + 0.9a + 2.5n)
         else
-            j = i-2
-            z += ((1+2.55j)./(1.9j) + 1.26j*a./(1+3.5j)) * (z-nodes[j])./(1+0.3a)
+            j = i - 2
+            z += ((1 + 2.55j) ./ (1.9j) + 1.26j * a ./ (1 + 3.5j)) * (z - nodes[j]) ./ (1 + 0.3a)
         end
 
         # rootfinding iterations
@@ -443,9 +443,9 @@ function qnwgamma(n::Int, a::Real=1.0, b::Real=1.0)
                 p2 = p1
                 p1 = ((2j - 1 + a - z) * p2 - (j - 1 + a) * p3) ./ j
             end
-            pp = (n*p1-(n+a)*p2)./z
+            pp = (n * p1 - (n + a) * p2) ./ z
             z1 = z
-            z = z1-p1 ./ pp
+            z = z1 - p1 ./ pp
             err = abs(z - z1)
             if err < 3e-14
                 break
@@ -522,7 +522,7 @@ for f in [:qnwlege, :qnwcheb, :qnwsimp, :qnwtrap, :qnwbeta, :qnwgamma]
             nodes = Vector{Float64}[]
             weights = Vector{Float64}[]
 
-            for i=1:n_n
+            for i = 1:n_n
                 _1d = $f(n[i], a[i], b[i])
                 push!(nodes, _1d[1])
                 push!(weights, _1d[2])
@@ -535,7 +535,7 @@ for f in [:qnwlege, :qnwcheb, :qnwsimp, :qnwtrap, :qnwbeta, :qnwgamma]
 end
 
 ## Multidim version for qnworm
-function qnwnorm(n::Vector{Int}, mu::Vector, sig2::Matrix=Matrix(I, length(n), length(n)))
+function qnwnorm(n::Vector{Int}, mu::Vector, sig2::Matrix = Matrix(I, length(n), length(n)))
     n_n, n_mu = length(n), length(mu)
 
     if !(n_n == n_mu)
@@ -564,19 +564,19 @@ end
 qnwnorm(n::Vector{Int}, mu::Vector, sig2::Real) =
     qnwnorm(n, mu, Matrix(Diagonal(fill(convert(Float64, sig2), length(n)))))
 
-qnwnorm(n::Vector{Int}, mu::Real, sig2::Matrix=Matrix{eltype(n)}(I, length(n), length(n))) =
+qnwnorm(n::Vector{Int}, mu::Real, sig2::Matrix = Matrix{eltype(n)}(I, length(n), length(n))) =
     qnwnorm(n, fill(mu, length(n)), sig2)
 
 qnwnorm(n::Vector{Int}, mu::Real, sig2::Real) =
     qnwnorm(n, fill(mu, length(n)), Matrix(Diagonal(fill(convert(Float64, sig2), length(n)))))
 
-qnwnorm(n::Int, mu::Vector, sig2::Matrix=eye(length(mu))) =
+qnwnorm(n::Int, mu::Vector, sig2::Matrix = eye(length(mu))) =
     qnwnorm(fill(n, length(mu)), mu, sig2)
 
 qnwnorm(n::Int, mu::Vector, sig2::Real) =
     qnwnorm(fill(n, length(mu)), mu, Matrix(Diagonal(fill(convert(Float64, sig2), length(mu)))))
 
-qnwnorm(n::Int, mu::Real, sig2::Matrix=eye(length(mu))) =
+qnwnorm(n::Int, mu::Real, sig2::Matrix = eye(length(mu))) =
     qnwnorm(fill(n, size(sig2, 1)), fill(mu, size(sig2, 1)), sig2)
 
 function qnwnorm(n::Int, mu::Real, sig2::Real)
@@ -669,9 +669,8 @@ $(qnw_returns)
 $(qnw_func_notes)
 
 $(qnw_refs)
-
 """
-function qnwequi(n::Int, a::Vector, b::Vector, kind::AbstractString="N")
+function qnwequi(n::Int, a::Vector, b::Vector, kind::AbstractString = "N")
     # error checking
     n_a, n_b = length(a), length(b)
     if !(n_a == n_b)
@@ -681,18 +680,18 @@ function qnwequi(n::Int, a::Vector, b::Vector, kind::AbstractString="N")
     d = n_a
     i = reshape(1:n, n, 1)
     if kind == "N"
-        j = 2 .^((1:d)/(d+1))
-        nodes = i*j'
+        j = 2.0.^((1:d) / (d + 1))
+        nodes = i * j'
         nodes -= fix(nodes)
 
     elseif kind == "W"
         j = equidist_pp[1:d]
-        nodes = i*j'
+        nodes = i * j'
         nodes -= fix(nodes)
 
     elseif kind == "H"
         j = equidist_pp[1:d]
-        nodes = (i.*(i .+ 1)./2)*j'
+        nodes = (i .* (i .+ 1) ./ 2) * j'
         nodes -= fix(nodes)
 
     elseif kind == "R"
@@ -710,25 +709,25 @@ function qnwequi(n::Int, a::Vector, b::Vector, kind::AbstractString="N")
 end
 
 # Other argument types
-qnwequi(n::Vector{Int}, a::Vector, b::Vector, kind::AbstractString="N") =
+qnwequi(n::Vector{Int}, a::Vector, b::Vector, kind::AbstractString = "N") =
     qnwequi(prod(n), a, b, kind)
 
-qnwequi(n::Vector{Int}, a::Real, b::Vector, kind::AbstractString="N") =
+qnwequi(n::Vector{Int}, a::Real, b::Vector, kind::AbstractString = "N") =
     qnwequi(prod(n), fill(a, length(b)), b, kind)
 
-qnwequi(n::Vector{Int}, a::Vector, b::Real, kind::AbstractString="N") =
+qnwequi(n::Vector{Int}, a::Vector, b::Real, kind::AbstractString = "N") =
     qnwequi(prod(n), a, fill(b, length(a)), kind)
 
-qnwequi(n::Vector{Int}, a::Real, b::Real, kind::AbstractString="N") =
+qnwequi(n::Vector{Int}, a::Real, b::Real, kind::AbstractString = "N") =
     qnwequi(prod(n), fill(a, length(n)), fill(b, length(n)), kind)
 
-qnwequi(n::Int, a::Real, b::Vector, kind::AbstractString="N") =
+qnwequi(n::Int, a::Real, b::Vector, kind::AbstractString = "N") =
     qnwequi(n, fill(a, length(b)), b, kind)
 
-qnwequi(n::Int, a::Vector, b::Real, kind::AbstractString="N") =
+qnwequi(n::Int, a::Vector, b::Real, kind::AbstractString = "N") =
     qnwequi(n, a, fill(b, length(a)), kind)
 
-function qnwequi(n::Int, a::Real, b::Real, kind::AbstractString="N")
+function qnwequi(n::Int, a::Real, b::Real, kind::AbstractString = "N")
     n, w = qnwequi(n, [a], [b], kind)
     @assert size(n, 2) == 1
     n[:, 1], w
@@ -753,7 +752,6 @@ Approximate the integral of `f`, given quadrature `nodes` and `weights`
 
 - `out::Float64` : The scalar that approximates integral of `f` on the hypercube
   formed by `[a, b]`
-
 """
 function do_quad(f::Function, nodes::Array, weights::Vector, args...;
                  kwargs...)
@@ -793,9 +791,8 @@ for dimension i defined by `a[i]` and `b[i]`, respectively; using `n[i]` points.
   formed by `[a, b]`
 
 $(qnw_refs)
-
 """
-function quadrect(f::Function, n, a, b, kind="lege", args...; kwargs...)
+function quadrect(f::Function, n, a, b, kind = "lege", args...; kwargs...)
     if lowercase(kind)[1] == 'l'
         nodes, weights = qnwlege(n, a, b)
     elseif lowercase(kind)[1] == 'c'
@@ -822,13 +819,13 @@ function qnwmonomial1(vcv::AbstractMatrix)
     # In each node, random variable i takes value either 1 or -1, and
     # all other variables take value 0. For example, for N = 2,
     # z1 = [1 0; -1 0; 0 1; 0 -1]
-    for i=1:n
-        z1[2*(i-1)+1:2*i, i] = [1, -1]
+    for i = 1:n
+        z1[2 * (i - 1) + 1:2 * i, i] = [1, -1]
     end
 
-    sqrt_vcv = chol(vcv)
-    R = sqrt(n)*sqrt_vcv
-    ϵj = z1*R
+    sqrt_vcv = cholesky(vcv).U
+    R = sqrt(n) .* sqrt_vcv
+    ϵj = z1 * R
     ωj = ones(n_nodes) ./ n_nodes
     ϵj, ωj
 end
@@ -844,47 +841,43 @@ function qnwmonomial2(vcv::AbstractMatrix)
     # In each node, random variable i takes value either 1 or -1, and
     # all other variables take value 0. For example, for N = 2,
     # z1 = [1 0; -1 0; 0 1; 0 -1]
-    for i=1:n
-        z1[2*(i-1)+1:2*i, i] = [1, -1]
+    for i = 1:n
+        z1[2 * (i - 1) + 1:2 * i, i] = [1, -1]
     end
 
-    z2 = zeros(2n*(n-1), n)
+    z2 = zeros(2n * (n - 1), n)
     i = 0
 
     # In each node, a pair of random variables (p,q) takes either values
     # (1,1) or (1,-1) or (-1,1) or (-1,-1), and all other variables take
     # value 0. For example, for N = 2, `z2 = [1 1; 1 -1; -1 1; -1 1]`
-    for p=1:n-1
-        for q=p+1:n
+    for p = 1:n - 1
+        for q = p + 1:n
             i += 1
-            z2[4*(i-1)+1:4*i, p] = [1, -1, 1, -1]
-            z2[4*(i-1)+1:4*i, q] = [1, 1, -1, -1]
+            z2[4 * (i - 1) + 1:4 * i, p] = [1, -1, 1, -1]
+            z2[4 * (i - 1) + 1:4 * i, q] = [1, 1, -1, -1]
         end
     end
 
-    sqrt_vcv = chol(vcv)
-    R = sqrt(n+2)*sqrt_vcv
-    S = sqrt((n+2)/2)*sqrt_vcv
-    ϵj = [z0; z1*R; z2*S]
-    ωj = vcat(2/(n+2) * ones(size(z0, 1)),
-              (4-n)/(2*(n+2)^2) * ones(size(z1, 1)),
-               1/(n+2)^2 * ones(size(z2, 1)))
+    sqrt_vcv = cholesky(vcv).U
+    R = sqrt(n + 2) .* sqrt_vcv
+    S = sqrt((n + 2) / 2) * sqrt_vcv
+    ϵj = [z0; z1 * R; z2 * S]
+    ωj = vcat(2 / (n + 2) * ones(size(z0, 1)),
+              (4 - n) / (2 * (n + 2)^2) * ones(size(z1, 1)),
+               1 / (n + 2)^2 * ones(size(z2, 1)))
     return ϵj, ωj
 end
 
 
-function _quadnodes(
-        d::Distributions.ContinuousUnivariateDistribution, N::Int,
-        q0::Real, qN::Real, ::Union{Even,Type{Even}}
-    )
-    collect(range(quantile(d, q0), stop=quantile(d, qN), length=N))
+function _quadnodes(d::Distributions.ContinuousUnivariateDistribution, N::Int,
+        q0::Real, qN::Real, ::Union{Even,Type{Even}})
+    collect(range(quantile(d, q0), stop = quantile(d, qN), length = N))
 end
 
-function _quadnodes(
-        d::Distributions.ContinuousUnivariateDistribution, N::Int,
-        q0::Real, qN::Real, ::Union{Quantile,Type{Quantile}}
-    )
-    quantiles = range(q0, stop=qN, length=N)
+function _quadnodes(d::Distributions.ContinuousUnivariateDistribution, N::Int,
+        q0::Real, qN::Real, ::Union{Quantile,Type{Quantile}})
+    quantiles = range(q0, stop = qN, length = N)
     z = quantile.(d, quantiles)
 end
 
@@ -915,18 +908,16 @@ random variable occuring within the node `i`s cell.
 The weights always sum to 1, so they can be used as a proper probability
 distribution. This means that `E[f(x) | x ~ d] ≈ dot(f.(nodes), weights)`.
 """
-function qnwdist(
-        d::Distributions.ContinuousUnivariateDistribution, N::Int,
-        q0::Real=0.001, qN::Real=0.999, method::Union{T,Type{T}}=Quantile
-    ) where T
+function qnwdist(d::Distributions.ContinuousUnivariateDistribution, N::Int,
+        q0::Real = 0.001, qN::Real = 0.999, method::Union{T,Type{T}} = Quantile) where T
 
     z = _quadnodes(d, N, q0, qN, method)
     zprob = zeros(N)
 
-    for i in 2:N-1
-        zprob[i] = cdf(d, (z[i] + z[i+1])/2) - cdf(d, (z[i] + z[i-1])/2)
+    for i in 2:N - 1
+        zprob[i] = cdf(d, (z[i] + z[i + 1]) / 2) - cdf(d, (z[i] + z[i - 1]) / 2)
     end
-    zprob[1] = cdf(d, (z[1] + z[2])/2)
-    zprob[end] = 1 - cdf(d, (z[end-1] + z[end])/2)
+    zprob[1] = cdf(d, (z[1] + z[2]) / 2)
+    zprob[end] = 1 - cdf(d, (z[end - 1] + z[end]) / 2)
     return z, zprob
 end
