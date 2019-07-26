@@ -124,10 +124,18 @@ RegimeSwitchingModel(g::Function, y::AbstractArray, parameter, P::AbstractMatrix
     RegimeSwitchingModel(g, y, parameter, P, size(P, 1))
 
 """
+Apply the filter developed by Hamilton (1989, Econometrica) to a regime switching model.
+
 ##### Arguments
 - `rsm::RegimeSwitchingModel`: `RegimeSwitchingModel`
 - `p_s_update_pre::AbstractArray`: Probability distribution of state at period 0 conditional on the information up to
-                                        period 0.
+                                   period 0.
+
+##### Returns
+- `logL`: log likelihood 
+- `p`: likelihood at each period
+- `p_s_update`: Probability of period `t` data conditional on the information up to period `t`.
+- `p_s_forecast`: Probability of period `t` data conditional on the information up to period `t-1`.
 """
 function filter(rsm::RegimeSwitchingModel, p_s_update_pre::AbstractArray)
     T = size(rsm.y, 1)
@@ -136,6 +144,23 @@ function filter(rsm::RegimeSwitchingModel, p_s_update_pre::AbstractArray)
     logL, p = filter!(p_s_update, p_s_forecast, rsm, p_s_update_pre)
     return logL, p, p_s_update, p_s_forecast
 end
+
+"""
+Apply the filter developed by Hamilton (1989, Econometrica) to a regime switching model.
+
+Same as `filter` except that the results are stored in the perallocated first and second arguments.
+
+##### Arguments
+- `p_s_update`: Probability of period `t` data conditional on the information up to period `t`.
+- `p_s_forecast`: Probability of period `t` data conditional on the information up to period `t-1`.
+- `rsm::RegimeSwitchingModel`: `RegimeSwitchingModel` specifying the model
+- `p_s_update_pre::AbstractArray`: Probability distribution of state at period 0 conditional on the information up to
+                                   period 0.
+
+##### Returns
+- `logL`: Log likelihood 
+- `p`: Likelihood at each period.
+"""
 function filter!(p_s_update::Matrix, p_s_forecast::Matrix,
                  rsm::RegimeSwitchingModel, p_s_update_pre::AbstractArray)
     g, y = rsm.g, rsm.y
@@ -151,11 +176,39 @@ function filter!(p_s_update::Matrix, p_s_forecast::Matrix,
     return logL, p
 end
 
+"""
+Given the state distribution of period `t-1` conditional on the information up to period `t-1`, 
+forecast the distribution of period `t`.
+
+##### Arguments
+- `p_s_update_pre::AbstractArray`: Probability distribution of state at period `t-1` conditional on the 
+                                   information up to period `t-1`.
+- `P::AbstractMatrix`: Transition matrix of state.
+
+#### Return
+- `p_s_forecast`: Probability distribution of state at period `t` conditional on the 
+                  information up to period `t-1`.
+"""
 function forecast(p_s_update_pre::AbstractArray, P::AbstractMatrix)
     p_s_forecast = P' * p_s_update_pre
     return p_s_forecast
 end
 
+"""
+Given the state distribution of period `t` conditional on the information up to period `t-1`, 
+update the distribution using the infomration at period `t`.
+
+##### Arguments
+- `rsm::RegimeSwitchingModel`: `RegimeSwitchingModel` that specifies the model.
+- `p_s::Array`: Probability distribution of state at period `t` conditional on the 
+                information up to period `t-1`.
+- `t::Integer`: Period.
+
+#### Returns
+- `p_s`: Probability distribution of state at period `t` conditional on the 
+         information up to period `t`.
+- `p`: Likelihood of data at period `t`.
+"""
 function update(rsm::RegimeSwitchingModel, p_s::Array, t::Integer)
     y_at_period_t = get_y_at_period_t(rsm.y, t)
     eta = [max(0, rsm.g(y_at_period_t, s, rsm.parameter)) for s in 1:rsm.M]
@@ -167,12 +220,38 @@ end
 get_y_at_period_t(y::AbstractMatrix, t::Union{Integer, AbstractVector}) = y[t, :]
 get_y_at_period_t(y::AbstractVector, t::Union{Integer, AbstractVector}) = y[t]
 
+"""
+Apply the smoother developed by Hamilton (1989, Econometrica) to a regime switching model.
+
+##### Arguments
+- `rsm::RegimeSwitchingModel`: `RegimeSwitchingModel` specifying the model.
+- `p_s_update_pre::AbstractArray`: Probability distribution of state at period 0 conditional on the information up to
+                                   period 0.
+
+##### Returns
+- `p_s_smoothed`: Probability of period `t` data conditional on the all information.
+"""
 function smooth(rsm::RegimeSwitchingModel,
                 p_s_update_pre::AbstractArray = stationary_distributions(MarkovChain(P))[1])
     p_s_smoothed = Matrix{Float64}(undef, size(rsm.y, 1), rsm.M)
     smooth!(p_s_smoothed, rsm, p_s_update_pre)
     return p_s_smoothed
 end
+
+"""
+Apply the smoother developed by Hamilton (1989, Econometrica) to a regime switching model.
+
+Same as `smooth` except that the result is stored in the perallocated first argument.
+
+##### Arguments
+- `p_s_smoothed`: Probability of period `t` data conditional on the all information.
+- `rsm::RegimeSwitchingModel`: `RegimeSwitchingModel` specifying the model.
+- `p_s_update_pre::AbstractArray`: Probability distribution of state at period 0 conditional on the information up to
+                                   period 0.
+
+##### Returns
+- Nothing
+"""
 function smooth!(p_s_smoothed::Matrix, rsm::RegimeSwitchingModel,
                  p_s_update_pre::AbstractArray = stationary_distributions(MarkovChain(P))[1])
     y = rsm.y
