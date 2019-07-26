@@ -119,6 +119,15 @@ mutable struct RegimeSwitchingModel{TD <: AbstractArray, TP <: AbstractMatrix}
     parameter
     P::TP
     M::Int
+    function RegimeSwitchingModel(g, y, parameter, P, M)
+        if size(P, 1) != size(P, 2)
+            error("P must be square")
+        end
+        if size(P, 1) != M
+            error("the number of rows and columns of P must be equal to M")
+        end
+        return new{typeof(y), typeof(P)}(g, y, parameter, P, M)
+    end
 end
 RegimeSwitchingModel(g::Function, y::AbstractArray, parameter, P::AbstractMatrix) =
     RegimeSwitchingModel(g, y, parameter, P, size(P, 1))
