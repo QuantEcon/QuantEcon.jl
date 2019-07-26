@@ -85,5 +85,16 @@
                                   0.3001242653346210 0.6998757346653780]
         @test all(isapprox.(p_s_forecast[:, 1]+p_s_forecast[:, 2], forecasted_probability[:, 1]))
         @test all(isapprox.(p_s_forecast[:, 3]+p_s_forecast[:, 4], forecasted_probability[:, 2]))
+
+        # test smoothing
+        # smooth_res_hamilton = mod_hamilton.smooth(para)
+        # `smoothed_probability` is obtained by smooth_res_hamilton.smoothed_marginal_probabilities
+        smoothed_probability = [0.0127846430957809	0.9872153569042180;
+                                0.0000237981350077	0.9999762018649920;
+                                0.0001944102709486	0.9998055897290510;
+                                0.0001598680201190	0.9998401319798810]
+        p_s_smoothed = QuantEcon.smooth(rsm, ss[1, :])
+        @test all(isapprox.(p_s_smoothed[:, 1]+p_s_smoothed[:, 2], smoothed_probability[:, 1]))
+        @test all(isapprox.(p_s_smoothed[:, 3]+p_s_smoothed[:, 4], smoothed_probability[:, 2]))
     end
 end

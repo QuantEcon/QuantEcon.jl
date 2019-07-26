@@ -169,15 +169,17 @@ get_y_at_period_t(y::AbstractVector, t::Union{Integer, AbstractVector}) = y[t]
 
 function smooth(rsm::RegimeSwitchingModel,
                 p_s_update_pre::AbstractArray = stationary_distributions(MarkovChain(P))[1])
-    p_s_smoothed = Matrix{Float64}(undef, size(rsm.y, 1), size(rsm.P, 1))
+    p_s_smoothed = Matrix{Float64}(undef, size(rsm.y, 1), rsm.M)
     smooth!(p_s_smoothed, rsm, p_s_update_pre)
     return p_s_smoothed
 end
 function smooth!(p_s_smoothed::Matrix, rsm::RegimeSwitchingModel,
                  p_s_update_pre::AbstractArray = stationary_distributions(MarkovChain(P))[1])
+    y = rsm.y
+    M = rsm.M
     T = size(y, 1)
-    rsm_tmp = copy(rsm)
-    _, p_s_update, _, ps = hamilton_filter(rsm_tmp, p_s_update_pre)
+    rsm_tmp = RegimeSwitchingModel(rsm.g, y, rsm.parameter, rsm.P, M)
+    _, ps, p_s_update, _ = filter(rsm_tmp, p_s_update_pre)
     p_s_init = Vector{Float64}(undef, M)
     for s_hat = 1:M
         for tau = 1:T-1
@@ -185,7 +187,7 @@ function smooth!(p_s_smoothed::Matrix, rsm::RegimeSwitchingModel,
             p_s_init[s_hat] = 1
             y_used = get_y_at_period_t(y, tau+1:T)
             rsm_tmp.y = y_used
-            _, _, _, ps_cond = hamilton_filter(rsm_tmp, p_s_init)
+            _, ps_cond, _, _ = filter(rsm_tmp, p_s_init)
             p_s_smoothed[tau, s_hat] = p_s_update[tau, s_hat] * prod(ps_cond./ps[tau+1:end])
         end
         p_s_smoothed[T, s_hat] = p_s_update[T, s_hat]
