@@ -31,13 +31,15 @@
         data = [1.5, 2.4, 3.1, 2.9, 3.0]
         a1 = 1.0
         a2 = 3.0
+        sigma1 = 0.5
+        sigma2 = 0.6
         rho1 = 0.1
         rho2 = 0.2
         p1 = 0.6
         p2 = 0.3
         parameter = (mu = [a1-rho1*a1, a1-rho1*a2, a2-rho2*a1, a2-rho2*a2], 
-                     sigma=[0.5, 0.5, 0.6, 0.6],
-                     rho=[0.1, 0.1, 0.2, 0.2])
+                     sigma=[sigma1, sigma1, sigma2, sigma2],
+                     rho=[rho1, rho1, rho2, rho2])
         P = [p1  0   (1-p1)   0;
              p1  0   (1-p1)   0;
              0   p2  0        (1-p2);
@@ -63,6 +65,8 @@
         # para['ar.L1[0]'] = 0.1
         # para['ar.L1[1]'] = 0.2
         # fil_res_hamilton = model.filter(para)
+        #
+        # values used in the test are obtained as follows
         # log_likelihood: fil_res_hamilton.llf
         # filtered_probability: fil_res_hamilton.filtered_marginal_probabilities
         # forecasted_probability: fil_res_hamilton.predicted_marginal_probabilities
