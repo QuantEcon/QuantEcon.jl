@@ -13,7 +13,7 @@ If you are new to open source development please consider reading [*this page*](
 
 As a programming language, `Julia` is still new and thus some aspects of the language are still evolving as it matures. As a result there may be some changes from time to time in styles and conventions. The upside is that it is fast and quickly being adopted by the broader scientific computing community.
 
-The `Julia` [style guide](http://julia.readthedocs.org/en/latest/manual/style-guide/) is a good starting point for some `Julia` programming conventions.
+The `Julia` [style guide](https://docs.julialang.org/en/v1/manual/style-guide/index.html) is a good starting point for some `Julia` programming conventions.
 
 ## Writing Tests
 
