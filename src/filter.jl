@@ -262,7 +262,7 @@ Same as `smooth` except that the result is stored in the perallocated first argu
 - Nothing
 """
 function smooth!(p_s_smoothed::Matrix, rsm::RegimeSwitchingModel,
-                 p_s_update_pre::AbstractArray = stationary_distributions(MarkovChain(P))[1])
+                 p_s_update_pre::AbstractArray = stationary_distributions(MarkovChain(rsm.P))[1])
     y = rsm.y
     M = rsm.M
     T = size(y, 1)
