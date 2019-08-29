@@ -240,17 +240,17 @@ Apply the smoother developed by Hamilton (1989, Econometrica) to a regime switch
 ##### Returns
 - `p_s_smoothed`: Probability of period `t` data conditional on the all information.
 """
-function smooth(rsm::RegimeSwitchingModel,
+function smooth_original(rsm::RegimeSwitchingModel,
                 p_s_update_pre::AbstractArray = stationary_distributions(MarkovChain(P))[1])
     p_s_smoothed = Matrix{Float64}(undef, size(rsm.y, 1), rsm.M)
-    smooth!(p_s_smoothed, rsm, p_s_update_pre)
+    smooth_original!(p_s_smoothed, rsm, p_s_update_pre)
     return p_s_smoothed
 end
 
 """
 Apply the smoother developed by Hamilton (1989, Econometrica) to a regime switching model.
 
-Same as `smooth` except that the result is stored in the perallocated first argument.
+Same as `smooth_original` except that the result is stored in the perallocated first argument.
 
 ##### Arguments
 - `p_s_smoothed`: Probability of period `t` data conditional on the all information.
@@ -261,7 +261,7 @@ Same as `smooth` except that the result is stored in the perallocated first argu
 ##### Returns
 - Nothing
 """
-function smooth!(p_s_smoothed::Matrix, rsm::RegimeSwitchingModel,
+function smooth_original!(p_s_smoothed::Matrix, rsm::RegimeSwitchingModel,
                  p_s_update_pre::AbstractArray = stationary_distributions(MarkovChain(rsm.P))[1])
     y = rsm.y
     M = rsm.M
@@ -279,6 +279,60 @@ function smooth!(p_s_smoothed::Matrix, rsm::RegimeSwitchingModel,
             p_s_smoothed[tau, s_hat] = p_s_update[tau, s_hat] * prod(ps_cond./ps[tau+1:end])
         end
         p_s_smoothed[T, s_hat] = p_s_update[T, s_hat]
+    end
+    return nothing
+end
+"""
+Apply the backward smoother developed by Kim to a regime switching model.
+
+##### Arguments
+- `rsm::RegimeSwitchingModel`: `RegimeSwitchingModel` specifying the model.
+- `p_s_update_pre::AbstractArray`: Probability distribution of state at period 0 conditional on the information up to
+                                   period 0.
+
+##### Returns
+- `p_s_smoothed`: Probability of period `t` data conditional on the all information.
+"""
+function smooth(rsm::RegimeSwitchingModel,
+                p_s_update_pre::AbstractArray = stationary_distributions(MarkovChain(P))[1])
+    p_s_smoothed = Matrix{Float64}(undef, size(rsm.y, 1), rsm.M)
+    p_s_joint_smoothed = Array{Float64, 3}(undef, size(rsm.y, 1), rsm.M, rsm.M)
+    smooth!(p_s_smoothed, p_s_joint_smoothed, rsm, p_s_update_pre)
+    return p_s_smoothed
+end
+
+"""
+Apply the backward smoother developed by Kim to a regime switching model.
+
+Same as `smooth` except that the result is stored in the perallocated first argument.
+
+##### Arguments
+- `p_s_smoothed`: Probability of period `t` data conditional on the all information.
+- `p_s_joint_smoothed`: `T x n_state x n_state`
+- `rsm::RegimeSwitchingModel`: `RegimeSwitchingModel` specifying the model.
+- `p_s_update_pre::AbstractArray`: Probability distribution of state at period 0 conditional on the information up to
+                                   period 0.
+
+##### Returns
+- Nothing
+"""
+function smooth!(p_s_smoothed::Matrix, p_s_joint_smoothed, 
+                 rsm::RegimeSwitchingModel,
+                 p_s_update_pre::AbstractArray = stationary_distributions(MarkovChain(rsm.P))[1])
+    y = rsm.y
+    M = rsm.M
+    T = size(y, 1)
+    rsm_tmp = RegimeSwitchingModel(rsm.g, y, rsm.parameter, rsm.P, M)
+    _, ps, p_s_update, p_s_forecast = filter(rsm_tmp, p_s_update_pre)
+    p_s_init = Vector{Float64}(undef, M)
+    p_s_smoothed[T, :] = p_s_update[T, :]
+    for t = T-1:-1:1
+        for s in 1:M
+            for sp in 1:M
+                p_s_joint_smoothed[t, s, sp] = p_s_smoothed[t+1, sp] * p_s_update[t, s] * rsm.P[s, sp]/p_s_forecast[t+1, sp]
+            end
+            p_s_smoothed[t, s] = sum(p_s_joint_smoothed[t, s, :])
+        end
     end
     return nothing
 end
