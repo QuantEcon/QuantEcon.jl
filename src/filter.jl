@@ -294,11 +294,12 @@ Apply the backward smoother developed by Kim to a regime switching model.
 - `p_s_smoothed`: Probability of period `t` data conditional on the all information.
 """
 function smooth(rsm::RegimeSwitchingModel,
-                p_s_update_pre::AbstractArray = stationary_distributions(MarkovChain(P))[1])
+                p_s_update_pre::AbstractArray = stationary_distributions(MarkovChain(P))[1],
+                verbose::Bool=false)
     p_s_smoothed = Matrix{Float64}(undef, size(rsm.y, 1), rsm.M)
     p_s_joint_smoothed = Array{Float64, 3}(undef, size(rsm.y, 1), rsm.M, rsm.M)
     smooth!(p_s_smoothed, p_s_joint_smoothed, rsm, p_s_update_pre)
-    return p_s_smoothed
+    verbose ? (return p_s_smoothed, p_s_joint_smoothed) : (return p_s_smoothed) 
 end
 
 """
