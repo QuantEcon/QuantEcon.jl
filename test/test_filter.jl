@@ -96,5 +96,9 @@
         p_s_smoothed = QuantEcon.smooth(rsm, ss[1, :])
         @test all(isapprox.(p_s_smoothed[:, 1]+p_s_smoothed[:, 2], smoothed_probability[:, 1]))
         @test all(isapprox.(p_s_smoothed[:, 3]+p_s_smoothed[:, 4], smoothed_probability[:, 2]))
+
+        p_s_smoothed_original = QuantEcon.smooth_original(rsm, ss[1, :])
+        @test all(isapprox.(p_s_smoothed_original[:, 1]+p_s_smoothed_original[:, 2], smoothed_probability[:, 1]))
+        @test all(isapprox.(p_s_smoothed_original[:, 3]+p_s_smoothed_original[:, 4], smoothed_probability[:, 2]))
     end
 end
