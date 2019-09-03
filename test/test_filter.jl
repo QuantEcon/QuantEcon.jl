@@ -44,12 +44,11 @@
              p1  0   (1-p1)   0;
              0   p2  0        (1-p2);
              0   p2  0        (1-p2)]
-        M = 4
         ss = P^100000
         g(x, s, parameter) = pdf(Normal(parameter.rho[s]*x[2], parameter.sigma[s]), x[1]-parameter.mu[s])
         y = hcat(data[2:end], data[1:end-1])
-        rsm = RegimeSwitchingModel(g, y, parameter, P, M)
-        logL, ps, p_s_update, p_s_forecast = QuantEcon.filter(rsm, ss[1, :])
+        rsm = RegimeSwitchingModel(g, y, parameter, P)
+        ps, p_s_update, p_s_forecast = QuantEcon.filter!(rsm, ss[1, :])
 
         # compare results with the following python code
         # data = pd.DataFrame(data=[1.5, 2.4, 3.1, 2.9, 3.0], index=[1,2,3,4,5])
@@ -72,7 +71,7 @@
         # forecasted_probability: fil_res_hamilton.predicted_marginal_probabilities
 
         log_likelihood = -3.5984510703365626
-        @test isapprox(logL, log_likelihood)
+        @test isapprox(rsm.logL, log_likelihood)
         filtered_probability = [0.0216771960143715 0.9783228039856280;
                                 0.0000591976220513 0.9999408023779480;
                                 0.0004142177820710 0.9995857822179280;
@@ -93,12 +92,9 @@
                                 0.0000237981350077	0.9999762018649920;
                                 0.0001944102709486	0.9998055897290510;
                                 0.0001598680201190	0.9998401319798810]
-        p_s_smoothed = QuantEcon.smooth(rsm, ss[1, :])
-        @test all(isapprox.(p_s_smoothed[:, 1]+p_s_smoothed[:, 2], smoothed_probability[:, 1]))
-        @test all(isapprox.(p_s_smoothed[:, 3]+p_s_smoothed[:, 4], smoothed_probability[:, 2]))
+        QuantEcon.smooth!(rsm, prob_update_pre = ss[1, :])
+        @test all(isapprox.(rsm.prob_smoothed[:, 1]+rsm.prob_smoothed[:, 2], smoothed_probability[:, 1]))
+        @test all(isapprox.(rsm.prob_smoothed[:, 3]+rsm.prob_smoothed[:, 4], smoothed_probability[:, 2]))
 
-        p_s_smoothed_original = QuantEcon.smooth_original(rsm, ss[1, :])
-        @test all(isapprox.(p_s_smoothed_original[:, 1]+p_s_smoothed_original[:, 2], smoothed_probability[:, 1]))
-        @test all(isapprox.(p_s_smoothed_original[:, 3]+p_s_smoothed_original[:, 4], smoothed_probability[:, 2]))
     end
 end

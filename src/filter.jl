@@ -113,24 +113,26 @@ end
 - `M::Integer`: Number of states. It must be same as the number of rows and columns of `P`. If `M` is not passed, 
                 number of rows of `P` is set as `M`.
 """
-mutable struct RegimeSwitchingModel{TD <: AbstractArray, TP <: AbstractMatrix}
+mutable struct RegimeSwitchingModel{TD <: AbstractArray, TP <: AbstractMatrix, TPS <: AbstractMatrix}
     g::Function
     y::TD
     parameter
     P::TP
     M::Int
-    function RegimeSwitchingModel(g, y, parameter, P, M)
+    prob_smoothed::TPS
+    logL::Float64
+    function RegimeSwitchingModel(g, y, parameter, P, M, prob_smoothed, logL)
         if size(P, 1) != size(P, 2)
             error("P must be square")
         end
         if size(P, 1) != M
             error("the number of rows and columns of P must be equal to M")
         end
-        return new{typeof(y), typeof(P)}(g, y, parameter, P, M)
+        return new{typeof(y), typeof(P), typeof(prob_smoothed)}(g, y, parameter, P, M, prob_smoothed, logL)
     end
 end
 RegimeSwitchingModel(g::Function, y::AbstractArray, parameter, P::AbstractMatrix) =
-    RegimeSwitchingModel(g, y, parameter, P, size(P, 1))
+    RegimeSwitchingModel(g, y, parameter, P, size(P, 1), fill(NaN, size(y, 1), size(P, 1)), NaN)
 
 """
 Apply the filter developed by Hamilton (1989, Econometrica) to a regime switching model.
@@ -141,37 +143,36 @@ Apply the filter developed by Hamilton (1989, Econometrica) to a regime switchin
                                    period 0.
 
 ##### Returns
-- `logL`: log likelihood 
 - `p`: likelihood at each period
 - `p_s_update`: Probability of period `t` data conditional on the information up to period `t`.
 - `p_s_forecast`: Probability of period `t` data conditional on the information up to period `t-1`.
 """
-function filter(rsm::RegimeSwitchingModel, p_s_update_pre::AbstractArray)
+function filter!(rsm::RegimeSwitchingModel, p_s_update_pre::AbstractArray)
     T = size(rsm.y, 1)
     p_s_forecast = Matrix{Float64}(undef, T, rsm.M)
     p_s_update = Matrix{Float64}(undef, T, rsm.M)
-    logL, p = filter!(p_s_update, p_s_forecast, rsm, p_s_update_pre)
-    return logL, p, p_s_update, p_s_forecast
+    p, _, _ = filter!(rsm, p_s_update, p_s_forecast, p_s_update_pre)
+    return p, p_s_update, p_s_forecast
 end
 
 """
 Apply the filter developed by Hamilton (1989, Econometrica) to a regime switching model.
 
-Same as `filter` except that the results are stored in the perallocated first and second arguments.
-
 ##### Arguments
+- `rsm::RegimeSwitchingModel`: `RegimeSwitchingModel` specifying the model
 - `p_s_update`: Probability of period `t` data conditional on the information up to period `t`.
 - `p_s_forecast`: Probability of period `t` data conditional on the information up to period `t-1`.
-- `rsm::RegimeSwitchingModel`: `RegimeSwitchingModel` specifying the model
 - `p_s_update_pre::AbstractArray`: Probability distribution of state at period 0 conditional on the information up to
                                    period 0.
 
 ##### Returns
-- `logL`: Log likelihood 
 - `p`: Likelihood at each period.
+- `p_s_update`: Probability of period `t` data conditional on the information up to period `t`.
+- `p_s_forecast`: Probability of period `t` data conditional on the information up to period `t-1`.
 """
-function filter!(p_s_update::Matrix, p_s_forecast::Matrix,
-                 rsm::RegimeSwitchingModel, p_s_update_pre::AbstractArray)
+function filter!(rsm::RegimeSwitchingModel, 
+                 p_s_update::Matrix, p_s_forecast::Matrix,
+                 p_s_update_pre::AbstractArray)
     g, y = rsm.g, rsm.y
     T = size(y, 1)
     p = Vector{Float64}(undef, T)
@@ -182,7 +183,8 @@ function filter!(p_s_update::Matrix, p_s_forecast::Matrix,
         logL += log(p[t])
         p_s_update_pre .= p_s_update[t, :]
     end
-    return logL, p
+    rsm.logL = logL
+    return p, p_s_update, p_s_forecast
 end
 
 """
@@ -230,76 +232,23 @@ get_y_at_period_t(y::AbstractMatrix, t::Union{Integer, AbstractVector}) = y[t, :
 get_y_at_period_t(y::AbstractVector, t::Union{Integer, AbstractVector}) = y[t]
 
 """
-Apply the smoother developed by Hamilton (1989, Econometrica) to a regime switching model.
-
-##### Arguments
-- `rsm::RegimeSwitchingModel`: `RegimeSwitchingModel` specifying the model.
-- `p_s_update_pre::AbstractArray`: Probability distribution of state at period 0 conditional on the information up to
-                                   period 0.
-
-##### Returns
-- `p_s_smoothed`: Probability of period `t` data conditional on the all information.
-"""
-function smooth_original(rsm::RegimeSwitchingModel,
-                p_s_update_pre::AbstractArray = stationary_distributions(MarkovChain(P))[1])
-    p_s_smoothed = Matrix{Float64}(undef, size(rsm.y, 1), rsm.M)
-    smooth_original!(p_s_smoothed, rsm, p_s_update_pre)
-    return p_s_smoothed
-end
-
-"""
-Apply the smoother developed by Hamilton (1989, Econometrica) to a regime switching model.
-
-Same as `smooth_original` except that the result is stored in the perallocated first argument.
-
-##### Arguments
-- `p_s_smoothed`: Probability of period `t` data conditional on the all information.
-- `rsm::RegimeSwitchingModel`: `RegimeSwitchingModel` specifying the model.
-- `p_s_update_pre::AbstractArray`: Probability distribution of state at period 0 conditional on the information up to
-                                   period 0.
-
-##### Returns
-- Nothing
-"""
-function smooth_original!(p_s_smoothed::Matrix, rsm::RegimeSwitchingModel,
-                 p_s_update_pre::AbstractArray = stationary_distributions(MarkovChain(rsm.P))[1])
-    y = rsm.y
-    M = rsm.M
-    T = size(y, 1)
-    rsm_tmp = RegimeSwitchingModel(rsm.g, y, rsm.parameter, rsm.P, M)
-    _, ps, p_s_update, _ = filter(rsm_tmp, p_s_update_pre)
-    p_s_init = Vector{Float64}(undef, M)
-    for s_hat = 1:M
-        for tau = 1:T-1
-            p_s_init .= 0
-            p_s_init[s_hat] = 1
-            y_used = get_y_at_period_t(y, tau+1:T)
-            rsm_tmp.y = y_used
-            _, ps_cond, _, _ = filter(rsm_tmp, p_s_init)
-            p_s_smoothed[tau, s_hat] = p_s_update[tau, s_hat] * prod(ps_cond./ps[tau+1:end])
-        end
-        p_s_smoothed[T, s_hat] = p_s_update[T, s_hat]
-    end
-    return nothing
-end
-"""
 Apply the backward smoother developed by Kim to a regime switching model.
 
 ##### Arguments
 - `rsm::RegimeSwitchingModel`: `RegimeSwitchingModel` specifying the model.
-- `p_s_update_pre::AbstractArray`: Probability distribution of state at period 0 conditional on the information up to
+- `prob_update_pre::AbstractArray`: Probability distribution of state at period 0 conditional on the information up to
                                    period 0.
+- `verbose::Bool`: If `true`, the funciton returns joint distribution. If `false`, `nothing` is returned.
 
-##### Returns
-- `p_s_smoothed`: Probability of period `t` data conditional on the all information.
+##### Returns (only when `verbose` is `true`)
+- `p_s_joint_smoothed`: Joint distribution of state at period `t` and `t+1` data conditional on the all information.
 """
-function smooth(rsm::RegimeSwitchingModel,
-                p_s_update_pre::AbstractArray = stationary_distributions(MarkovChain(rsm.P))[1];
-                verbose::Bool=false)
-    p_s_smoothed = Matrix{Float64}(undef, size(rsm.y, 1), rsm.M)
+function smooth!(rsm::RegimeSwitchingModel;
+                 prob_update_pre::AbstractArray = stationary_distributions(MarkovChain(rsm.P))[1],
+                 verbose::Bool=false)
     p_s_joint_smoothed = Array{Float64, 3}(undef, size(rsm.y, 1), rsm.M, rsm.M)
-    smooth!(p_s_smoothed, p_s_joint_smoothed, rsm, p_s_update_pre)
-    verbose ? (return p_s_smoothed, p_s_joint_smoothed) : (return p_s_smoothed) 
+    smooth!(rsm, p_s_joint_smoothed, prob_update_pre = prob_update_pre)
+    verbose ? (return p_s_joint_smoothed) : (return nothing) 
 end
 
 """
@@ -308,32 +257,32 @@ Apply the backward smoother developed by Kim to a regime switching model.
 Same as `smooth` except that the result is stored in the perallocated first argument.
 
 ##### Arguments
-- `p_s_smoothed`: Probability of period `t` data conditional on the all information.
-- `p_s_joint_smoothed`: `T x n_state x n_state`
 - `rsm::RegimeSwitchingModel`: `RegimeSwitchingModel` specifying the model.
-- `p_s_update_pre::AbstractArray`: Probability distribution of state at period 0 conditional on the information up to
+- `p_s_joint_smoothed`: `T x n_state x n_state`
+- `prob_update_pre::AbstractArray`: Probability distribution of state at period 0 conditional on the information up to
                                    period 0.
 
 ##### Returns
-- Nothing
+- `nothing`
 """
-function smooth!(p_s_smoothed::Matrix, p_s_joint_smoothed::AbstractArray, 
-                 rsm::RegimeSwitchingModel,
-                 p_s_update_pre::AbstractArray = stationary_distributions(MarkovChain(rsm.P))[1])
+function smooth!(rsm::RegimeSwitchingModel,
+                 p_s_joint_smoothed::AbstractArray;
+                 prob_update_pre::AbstractArray = stationary_distributions(MarkovChain(rsm.P))[1],
+                 verbose::Bool=false)
     y = rsm.y
     M = rsm.M
     T = size(y, 1)
-    rsm_tmp = RegimeSwitchingModel(rsm.g, y, rsm.parameter, rsm.P, M)
-    _, ps, p_s_update, p_s_forecast = filter(rsm_tmp, p_s_update_pre)
+    rsm_tmp = RegimeSwitchingModel(rsm.g, y, rsm.parameter, rsm.P)
+    ps, p_s_update, p_s_forecast = filter!(rsm_tmp, prob_update_pre)
     p_s_init = Vector{Float64}(undef, M)
-    p_s_smoothed[T, :] = p_s_update[T, :]
+    rsm.prob_smoothed[T, :] = p_s_update[T, :]
     for t = T-1:-1:1
         for s in 1:M
             for sp in 1:M
-                p_s_joint_smoothed[t, s, sp] = p_s_smoothed[t+1, sp] * p_s_update[t, s] * rsm.P[s, sp]/p_s_forecast[t+1, sp]
+                p_s_joint_smoothed[t, s, sp] = rsm.prob_smoothed[t+1, sp] * p_s_update[t, s] * rsm.P[s, sp]/p_s_forecast[t+1, sp]
             end
-            p_s_smoothed[t, s] = sum(p_s_joint_smoothed[t, s, :])
+            rsm.prob_smoothed[t, s] = sum(p_s_joint_smoothed[t, s, :])
         end
     end
-    return nothing
+    verbose ? (return p_s_joint_smoothed) : (return nothing) 
 end
