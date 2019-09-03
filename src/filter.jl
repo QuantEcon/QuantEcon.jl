@@ -139,7 +139,7 @@ Apply the filter developed by Hamilton (1989, Econometrica) to a regime switchin
 
 ##### Arguments
 - `rsm::RegimeSwitchingModel`: `RegimeSwitchingModel`
-- `p_s_update_pre::AbstractArray`: Probability distribution of state at period 0 conditional on the information up to
+- `prob_update_pre::AbstractArray`: Probability distribution of state at period 0 conditional on the information up to
                                    period 0.
 
 ##### Returns
@@ -147,11 +147,12 @@ Apply the filter developed by Hamilton (1989, Econometrica) to a regime switchin
 - `p_s_update`: Probability of period `t` data conditional on the information up to period `t`.
 - `p_s_forecast`: Probability of period `t` data conditional on the information up to period `t-1`.
 """
-function filter!(rsm::RegimeSwitchingModel, p_s_update_pre::AbstractArray)
+function filter!(rsm::RegimeSwitchingModel;
+                 prob_update_pre::AbstractArray = stationary_distributions(MarkovChain(rsm.P))[1])
     T = size(rsm.y, 1)
     p_s_forecast = Matrix{Float64}(undef, T, rsm.M)
     p_s_update = Matrix{Float64}(undef, T, rsm.M)
-    p, _, _ = filter!(rsm, p_s_update, p_s_forecast, p_s_update_pre)
+    p, _, _ = filter!(rsm, p_s_update, p_s_forecast, prob_update_pre = prob_update_pre)
     return p, p_s_update, p_s_forecast
 end
 
@@ -162,7 +163,7 @@ Apply the filter developed by Hamilton (1989, Econometrica) to a regime switchin
 - `rsm::RegimeSwitchingModel`: `RegimeSwitchingModel` specifying the model
 - `p_s_update`: Probability of period `t` data conditional on the information up to period `t`.
 - `p_s_forecast`: Probability of period `t` data conditional on the information up to period `t-1`.
-- `p_s_update_pre::AbstractArray`: Probability distribution of state at period 0 conditional on the information up to
+- `prob_update_pre::AbstractArray`: Probability distribution of state at period 0 conditional on the information up to
                                    period 0.
 
 ##### Returns
@@ -171,17 +172,17 @@ Apply the filter developed by Hamilton (1989, Econometrica) to a regime switchin
 - `p_s_forecast`: Probability of period `t` data conditional on the information up to period `t-1`.
 """
 function filter!(rsm::RegimeSwitchingModel, 
-                 p_s_update::Matrix, p_s_forecast::Matrix,
-                 p_s_update_pre::AbstractArray)
+                 p_s_update::Matrix, p_s_forecast::Matrix;
+                 prob_update_pre::AbstractArray = stationary_distributions(MarkovChain(rsm.P))[1])
     g, y = rsm.g, rsm.y
     T = size(y, 1)
     p = Vector{Float64}(undef, T)
     logL = 0
     for t in 1:T
-        p_s_forecast[t, :] = forecast(p_s_update_pre, rsm.P)
+        p_s_forecast[t, :] = forecast(prob_update_pre, rsm.P)
         p_s_update[t, :], p[t] = update(rsm, p_s_forecast[t, :], t)
         logL += log(p[t])
-        p_s_update_pre .= p_s_update[t, :]
+        prob_update_pre .= p_s_update[t, :]
     end
     rsm.logL = logL
     return p, p_s_update, p_s_forecast
@@ -273,7 +274,7 @@ function smooth!(rsm::RegimeSwitchingModel,
     M = rsm.M
     T = size(y, 1)
     rsm_tmp = RegimeSwitchingModel(rsm.g, y, rsm.parameter, rsm.P)
-    ps, p_s_update, p_s_forecast = filter!(rsm_tmp, prob_update_pre)
+    ps, p_s_update, p_s_forecast = filter!(rsm_tmp, prob_update_pre = prob_update_pre)
     p_s_init = Vector{Float64}(undef, M)
     rsm.prob_smoothed[T, :] = p_s_update[T, :]
     for t = T-1:-1:1

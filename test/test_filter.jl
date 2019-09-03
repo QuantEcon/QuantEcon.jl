@@ -48,7 +48,7 @@
         g(x, s, parameter) = pdf(Normal(parameter.rho[s]*x[2], parameter.sigma[s]), x[1]-parameter.mu[s])
         y = hcat(data[2:end], data[1:end-1])
         rsm = RegimeSwitchingModel(g, y, parameter, P)
-        ps, p_s_update, p_s_forecast = QuantEcon.filter!(rsm, ss[1, :])
+        ps, p_s_update, p_s_forecast = QuantEcon.filter!(rsm, prob_update_pre = ss[1, :])
 
         # compare results with the following python code
         # data = pd.DataFrame(data=[1.5, 2.4, 3.1, 2.9, 3.0], index=[1,2,3,4,5])
