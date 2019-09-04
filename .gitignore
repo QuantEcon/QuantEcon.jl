@@ -7,3 +7,4 @@ site/
 
 docs/build
 docs/serve
+./Mainfest.toml
