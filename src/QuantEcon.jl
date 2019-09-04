@@ -9,7 +9,7 @@ using SpecialFunctions: erfc, lgamma
 # 3rd party
 using Distributions
 import Distributions: pdf, skewness, BetaBinomial
-using DSP: TFFilter, freqz
+using DSP: PolynomialRatio, freqz
 using Primes: primes
 using StatsBase: ecdf
 
