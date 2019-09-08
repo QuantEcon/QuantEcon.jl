@@ -161,8 +161,8 @@ Apply the filter developed by Hamilton (1989, Econometrica) to a regime switchin
 
 ##### Arguments
 - `rsm::RegimeSwitchingModel`: `RegimeSwitchingModel` specifying the model
-- `p_s_update`: Probability of period `t` data conditional on the information up to period `t`.
-- `p_s_forecast`: Probability of period `t` data conditional on the information up to period `t-1`.
+- `p_s_update::AbstractMatrix`: Probability of period `t` data conditional on the information up to period `t`.
+- `p_s_forecast::AbstractMatrix`: Probability of period `t` data conditional on the information up to period `t-1`.
 - `prob_update_pre::AbstractArray`: Probability distribution of state at period 0 conditional on the information up to
                                    period 0.
 
@@ -172,15 +172,15 @@ Apply the filter developed by Hamilton (1989, Econometrica) to a regime switchin
 - `p_s_forecast`: Probability of period `t` data conditional on the information up to period `t-1`.
 """
 function filter!(rsm::RegimeSwitchingModel, 
-                 p_s_update::Matrix, p_s_forecast::Matrix;
+                 p_s_update::AbstractMatrix, p_s_forecast::AbstractMatrix;
                  prob_update_pre::AbstractArray = stationary_distributions(MarkovChain(rsm.P))[1])
     g, y = rsm.g, rsm.y
     T = size(y, 1)
     p = Vector{Float64}(undef, T)
     logL = 0
     for t in 1:T
-        p_s_forecast[t, :] = forecast(prob_update_pre, rsm.P)
-        p_s_update[t, :], p[t] = update(rsm, p_s_forecast[t, :], t)
+        forecast!(view(p_s_forecast, t, :), prob_update_pre, rsm.P)
+        p[t] = update!(view(p_s_update, t, :), rsm, p_s_forecast[t, :], t)
         logL += log(p[t])
         prob_update_pre .= p_s_update[t, :]
     end
@@ -193,17 +193,18 @@ Given the state distribution of period `t-1` conditional on the information up t
 forecast the distribution of period `t`.
 
 ##### Arguments
+- `p_s_forecast::AbstractVector`: Probability distribution of state at period `t` conditional on the 
+                                  information up to period `t-1`.
 - `p_s_update_pre::AbstractArray`: Probability distribution of state at period `t-1` conditional on the 
                                    information up to period `t-1`.
 - `P::AbstractMatrix`: Transition matrix of state.
 
 #### Return
-- `p_s_forecast`: Probability distribution of state at period `t` conditional on the 
-                  information up to period `t-1`.
+- `nothing`
 """
-function forecast(p_s_update_pre::AbstractArray, P::AbstractMatrix)
-    p_s_forecast = P' * p_s_update_pre
-    return p_s_forecast
+function forecast!(p_s_forecast::AbstractVector, p_s_update_pre::AbstractArray, P::AbstractMatrix)
+    p_s_forecast .= P' * p_s_update_pre
+    return nothing
 end
 
 """
@@ -211,23 +212,23 @@ Given the state distribution of period `t` conditional on the information up to 
 update the distribution using the infomration at period `t`.
 
 ##### Arguments
+- `p_s_update::AbstractVector`: Probability distribution of state at period `t` conditional on the 
+                         information up to period `t`.
 - `rsm::RegimeSwitchingModel`: `RegimeSwitchingModel` that specifies the model.
-- `p_s::Array`: Probability distribution of state at period `t` conditional on the 
+- `p_s_forecast::Array`: Probability distribution of state at period `t` conditional on the 
                 information up to period `t-1`.
 - `t::Integer`: Period.
 
 #### Returns
-- `p_s`: Probability distribution of state at period `t` conditional on the 
-         information up to period `t`.
 - `p`: Likelihood of data at period `t`.
 """
-function update(rsm::RegimeSwitchingModel, p_s::Array, t::Integer)
+function update!(p_s_update::AbstractVector, rsm::RegimeSwitchingModel, p_s_forecast::AbstractArray, t::Integer)
     y_at_period_t = get_y_at_period_t(rsm.y, t)
     eta = [max(0, rsm.g(y_at_period_t, s, rsm.parameter)) for s in 1:rsm.M]
-    tmp = eta .* p_s
+    tmp = eta .* p_s_forecast
     p = sum(tmp)
-    p_s = tmp./p
-    return p_s, p
+    p_s_update .= tmp./p
+    return p
 end
 get_y_at_period_t(y::AbstractMatrix, t::Union{Integer, AbstractVector}) = y[t, :]
 get_y_at_period_t(y::AbstractVector, t::Union{Integer, AbstractVector}) = y[t]
