@@ -8,7 +8,7 @@ Implements the Kalman filter for a linear Gaussian state space model.
 References
 ----------
 
-https://lectures.quantecon.org/jl/kalman.html
+https://julia.quantecon.org/tools_and_techniques/kalman.html
 
 
 TODO: Do docstrings here after implementing LinerStateSpace
