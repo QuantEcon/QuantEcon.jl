@@ -3,7 +3,7 @@
 
 This repository collects code for quantitative economic modeling in Julia
 
-Library Website: [http://quantecon.org](http://quantecon.org)
+Library Website: [https://quantecon.org/quantecon-jl/](https://quantecon.org/quantecon-jl/)
 
 ### The QuantEcon package
 
@@ -22,8 +22,8 @@ Documentation for the library: [quantecon.github.io/QuantEcon.jl/](http://quante
 
 ## Additional Links
 
-1. [Developer Info](http://quantecon.org/get_involved.html)
-2. [QuantEcon Course Website](http://quant-econ.net)
+1. [Developer Info](https://quantecon.org/julia-developers/)
+2. [QuantEcon Course Website](https://lectures.quantecon.org/)
 
 ### License
 
