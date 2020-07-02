@@ -4,7 +4,7 @@ import Base: show, isapprox
 import Statistics: mean, std, var
 using Markdown
 using FFTW
-using SpecialFunctions: erfc, lgamma
+using SpecialFunctions: erfc, logabsgamma
 
 # 3rd party
 using Distributions
