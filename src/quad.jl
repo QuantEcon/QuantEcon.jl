@@ -379,13 +379,13 @@ function qnwbeta(n::Int, a::Real, b::Real)
     end
 
     x = (1 .- x) ./ 2
-    w = w * exp(lgamma(a + n) +
-                lgamma(b + n) -
-                lgamma(n + 1) -
-                lgamma(n + ab + 1))
-    w = w / (2 * exp(lgamma(a + 1) +
-                     lgamma(b + 1) -
-                     lgamma(ab + 2)))
+    w = w * exp((logabsgamma(a + n))[1] +
+                (logabsgamma(b + n))[1] -
+                (logabsgamma(n + 1))[1] -
+                (logabsgamma(n + ab + 1))[1] )
+    w = w / (2 * exp( (logabsgamma(a + 1))[1] +
+                     (logabsgamma(b + 1))[1] -
+                     (logabsgamma(ab + 2))[1] ))
 
     return x, w
 end
@@ -413,7 +413,7 @@ function qnwgamma(n::Int, a::Real = 1.0, b::Real = 1.0)
 
     a -= 1
     maxit = 25
-    fact = -exp(lgamma(a + n) - lgamma(n) - lgamma(a + 1))
+    fact = -exp((logabsgamma(a + n))[1] - (logabsgamma(n))[1] - (logabsgamma(a + 1))[1] )
     nodes = zeros(n)
     weights = zeros(n)
 
