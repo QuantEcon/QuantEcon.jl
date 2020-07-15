@@ -114,6 +114,18 @@ sequentially with any bracketing pairs that are found.
 - `x1b::Vector{T}`: `Vector` of lower borders of bracketing intervals
 - `x2b::Vector{T}`: `Vector` of upper borders of bracketing intervals
 
+##### Examples
+
+```julia
+x1a, x2a = divide_bracket(sin, -100., 100.)
+
+function poly(x)
+    return x^2 - 2x + 1
+end
+x1b, x2b = divide_bracket(poly, -1., 1., 100)
+
+```
+
 ##### References
 
 This is `zbrack` from Numerical Recepies Recepies in C++

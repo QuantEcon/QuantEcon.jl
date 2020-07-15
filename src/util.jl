@@ -28,6 +28,33 @@ ckron(arrays::AbstractArray...) = reduce(kron, arrays)
 
 Repeatedly apply kronecker products to the arrays. Equilvalent to
 `reduce(kron, arrays)`
+
+##### Example
+
+```jlcon
+julia> A = [10 16 11; 5 3 7]
+
+julia> B = B = [0.25 0.5; 0.15 0.4]
+
+julia> C = [120 100; 375 240; 540 650]
+
+julia> ckron(A,B,C)
+12×12 Array{Float64,2}:
+  300.0    250.0   600.0   500.0   480.0   …   330.0    275.0   660.0   550.0
+  937.5    600.0  1875.0  1200.0  1500.0      1031.25   660.0  2062.5  1320.0
+ 1350.0   1625.0  2700.0  3250.0  2160.0      1485.0   1787.5  2970.0  3575.0
+  180.0    150.0   480.0   400.0   288.0       198.0    165.0   528.0   440.0
+  562.5    360.0  1500.0   960.0   900.0       618.75   396.0  1650.0  1056.0
+  810.0    975.0  2160.0  2600.0  1296.0   …   891.0   1072.5  2376.0  2860.0
+  150.0    125.0   300.0   250.0    90.0       210.0    175.0   420.0   350.0
+  468.75   300.0   937.5   600.0   281.25      656.25   420.0  1312.5   840.0
+  675.0    812.5  1350.0  1625.0   405.0       945.0   1137.5  1890.0  2275.0
+   90.0     75.0   240.0   200.0    54.0       126.0    105.0   336.0   280.0
+  281.25   180.0   750.0   480.0   168.75  …   393.75   252.0  1050.0   672.0
+  405.0    487.5  1080.0  1300.0   243.0       567.0    682.5  1512.0  1820.0
+
+```
+
 """
 ckron
 
@@ -191,12 +218,13 @@ along each dimension can be obtained by `simplex_grid(m, n) / n`.
 
 ##### Examples
 
->>> simplex_grid(3, 4)
-
+```jlcon
+julia> simplex_grid(3,4)
 3×15 Array{Int64,2}:
  0  0  0  0  0  1  1  1  1  2  2  2  3  3  4
  0  1  2  3  4  0  1  2  3  0  1  2  0  1  0
  4  3  2  1  0  3  2  1  0  2  1  0  1  0  0
+```
 
 ##### References
 
@@ -354,6 +382,23 @@ array fits within the range of `T`; a sufficient condition for it is
 # Returns
 
 - `idx::T`: Ranking of `a`.
+
+##### Examples
+
+```jlcon
+julia> k_array_rank([2,3,5,8])
+42
+
+julia> typeof(k_array_rank([2,3,5,8]))
+Int64
+
+julia> typeof(k_array_rank(Int128,[2,3,5,8]))
+Int128
+
+julia> typeof(k_array_rank(BigInt,[2,3,5,8]))
+BigInt
+```
+
 """
 function k_array_rank(T::Type{<:Integer}, a::Vector{<:Integer})
     if T != BigInt

@@ -27,6 +27,19 @@ state transitions.
 
 - `p::AbstractMatrix` : The transition matrix. Must be square, all elements must be nonnegative, and all rows must sum to unity.
 - `state_values::AbstractVector` : Vector containing the values associated with the states.
+
+##### Examples
+
+```julia
+# Without labelling states
+p1 = [1 0 0; 0 1 0; 0 0 1]
+mc1 = MarkovChain(p1)
+
+#Including labels for states
+p2 = [0.3 0.7; 0.25 0.75]
+states = ["unemployed", "employed"]
+mc2 = MarkovChain(p2, states)
+```
 """
 mutable struct MarkovChain{T, TM<:AbstractMatrix{T}, TV<:AbstractVector}
     p::TM # valid stochastic matrix
@@ -187,6 +200,20 @@ Indicate whether the Markov chain `mc` is irreducible.
 
 - `::Bool`
 
+##### Examples
+
+```jlcon
+julia> P1 = [0 0.5 0.5; 0.3 0 0.7; 0 0 1]
+
+julia> is_irreducible(MarkovChain(P1))
+false
+
+julia> P2 = [0 1 0; 0 0 1; 1 0 0]
+
+julia> is_irreducible(MarkovChain(P2))
+true
+```
+
 """
 is_irreducible(mc::MarkovChain) =  is_strongly_connected(DiGraph(mc.p))
 
@@ -200,6 +227,20 @@ Indicate whether the Markov chain `mc` is aperiodic.
 ##### Returns
 
 - `::Bool`
+
+##### Examples
+
+```jlcon
+julia> P1 = [1 0; 0 1]
+
+julia> is_aperiodic(MarkovChain(P1))
+true
+
+julia> P1 = [0 1 0 0; 1 0 0 0; 0 0 0 1; 0 0 1 0]
+
+julia> is_aperiodic(MarkovChain(P1))
+false
+```
 
 """
 is_aperiodic(mc::MarkovChain) = period(mc) == 1
@@ -360,6 +401,23 @@ The resulting vector has the state values of `mc` as elements.
 
 - `X::Vector` : Vector containing the sample path, with length
   ts_length
+
+### Examples
+
+```jlcon
+julia> P = [0.3 0.7; 0.75 0.25];
+
+julia> mc = MarkovChain(P,["Umemployed", "Employed"]);
+
+julia> simulate(mc,5,init=2)
+5-element Array{String,1}:
+ "Employed"
+ "Umemployed"
+ "Employed"
+ "Umemployed"
+ "Employed"
+```
+
 """
 function simulate(mc::MarkovChain, ts_length::Int;
                   init::Int=rand(1:n_states(mc)))
@@ -384,6 +442,26 @@ same as the type of the state values of `mc`
     - vector: cycle through the elements, applying each as an
       initial condition until all columns have an initial condition
       (allows for more columns than initial conditions)
+
+### Examples
+
+```jlcon
+julia> using Plots
+
+julia> P = [0 0.5 0.5; 0.5 0 0.5; 0.5 0.5 0];
+
+julia> mc = MarkovChain(P);
+
+julia> X = zeros(15,4);
+
+julia> simulate!(X,mc,init = 1);
+
+julia> series = plot(1:15, X[:,1], lw=2, ylim = (0,4), label = "Sample path 1", size=(800,550))
+
+julia> for i in 2:4
+           plot!(1:15,X[:,i], lw=2, label = "Sample path \$i")
+       end
+```
 """
 function simulate!(X::Union{AbstractVector,AbstractMatrix},
                    mc::MarkovChain; init=rand(1:n_states(mc), size(X, 2)))
@@ -414,6 +492,19 @@ The resulting vector has the indices of the state values of `mc` as elements.
 
 - `X::Vector{Int}` : Vector containing the sample path, with length
   ts_length
+
+### Examples
+
+```jlcon
+julia> P = [0.3 0.7; 0.75 0.25];
+
+julia> mc = MarkovChain(P,["Umemployed", "Employed"]);
+
+julia> X = simulate_indices(mc,10,init=1);
+
+julia> plot(1:10,X,lw=2,label="Sample Path",ylim=[1,2])
+```
+
 """
 function simulate_indices(mc::MarkovChain, ts_length::Int;
                           init::Int=rand(1:n_states(mc)))
