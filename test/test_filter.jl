@@ -20,4 +20,81 @@
         @test isapprox(data["ham_c"], data["ham_c_mat"], nans=true, rtol=1e-7, atol=1e-7)
         @test isapprox(data["ham_rw_c"], data["ham_rw_c_mat"], nans=true)
     end
+
+    @testset "test hamilton regime switching filter" begin
+        # The model here is
+        # $y_t=a_{S_t}+\rho_{S_t}(y_{t−1}−a_{S_{t−1}})+\epsilon_t$
+        # where $\epsilon_t \sim i.i.d. N(0, \sigma_{S_t})$.
+        # Although this model has a history dependent observation equation,
+        # it can be written in the form of i.i.d. observation equation with Markov state transition
+        # by defining state and parameters appropriately.
+        data = [1.5, 2.4, 3.1, 2.9, 3.0]
+        a1 = 1.0
+        a2 = 3.0
+        sigma1 = 0.5
+        sigma2 = 0.6
+        rho1 = 0.1
+        rho2 = 0.2
+        p1 = 0.6
+        p2 = 0.3
+        parameter = (mu = [a1-rho1*a1, a1-rho1*a2, a2-rho2*a1, a2-rho2*a2], 
+                     sigma=[sigma1, sigma1, sigma2, sigma2],
+                     rho=[rho1, rho1, rho2, rho2])
+        P = [p1  0   (1-p1)   0;
+             p1  0   (1-p1)   0;
+             0   p2  0        (1-p2);
+             0   p2  0        (1-p2)]
+        ss = P^100000
+        g(x, s, parameter) = pdf(Normal(parameter.rho[s]*x[2], parameter.sigma[s]), x[1]-parameter.mu[s])
+        y = hcat(data[2:end], data[1:end-1])
+        rsm = RegimeSwitchingModel(g, y, parameter, P)
+        ps, p_s_update, p_s_forecast = QuantEcon.filter!(rsm, prob_update_pre = ss[1, :])
+
+        # compare results with the following python code
+        # data = pd.DataFrame(data=[1.5, 2.4, 3.1, 2.9, 3.0], index=[1,2,3,4,5])
+        # model = sm.tsa.MarkovAutoregression(data, k_regimes=2, order=1, 
+        #                                     switching_ar=True, switching_variance=True)
+        # para = pd.Series()
+        # para['p[0->0]'] = 0.6
+        # para['p[1->0]'] = 0.3
+        # para['const[0]'] = 1
+        # para['const[1]'] = 3
+        # para['sigma2[0]'] = 0.25
+        # para['sigma2[1]'] = 0.36
+        # para['ar.L1[0]'] = 0.1
+        # para['ar.L1[1]'] = 0.2
+        # fil_res_hamilton = model.filter(para)
+        #
+        # values used in the test are obtained as follows
+        # log_likelihood: fil_res_hamilton.llf
+        # filtered_probability: fil_res_hamilton.filtered_marginal_probabilities
+        # forecasted_probability: fil_res_hamilton.predicted_marginal_probabilities
+
+        log_likelihood = -3.5984510703365626
+        @test isapprox(rsm.logL, log_likelihood)
+        filtered_probability = [0.0216771960143715 0.9783228039856280;
+                                0.0000591976220513 0.9999408023779480;
+                                0.0004142177820710 0.9995857822179280;
+                                0.0001598680201190 0.9998401319798810]
+        @test all(isapprox.(p_s_update[:, 1]+p_s_update[:, 2], filtered_probability[:, 1]))
+        @test all(isapprox.(p_s_update[:, 3]+p_s_update[:, 4], filtered_probability[:, 2]))
+        forecasted_probability = [0.4285714285714280 0.5714285714285710;
+                                  0.3065031588043110 0.6934968411956880;
+                                  0.3000177592866150 0.6999822407133840;
+                                  0.3001242653346210 0.6998757346653780]
+        @test all(isapprox.(p_s_forecast[:, 1]+p_s_forecast[:, 2], forecasted_probability[:, 1]))
+        @test all(isapprox.(p_s_forecast[:, 3]+p_s_forecast[:, 4], forecasted_probability[:, 2]))
+
+        # test smoothing
+        # smooth_res_hamilton = mod_hamilton.smooth(para)
+        # `smoothed_probability` is obtained by smooth_res_hamilton.smoothed_marginal_probabilities
+        smoothed_probability = [0.0127846430957809	0.9872153569042180;
+                                0.0000237981350077	0.9999762018649920;
+                                0.0001944102709486	0.9998055897290510;
+                                0.0001598680201190	0.9998401319798810]
+        QuantEcon.smooth!(rsm, prob_update_pre = ss[1, :])
+        @test all(isapprox.(rsm.prob_smoothed[:, 1]+rsm.prob_smoothed[:, 2], smoothed_probability[:, 1]))
+        @test all(isapprox.(rsm.prob_smoothed[:, 3]+rsm.prob_smoothed[:, 4], smoothed_probability[:, 2]))
+
+    end
 end
