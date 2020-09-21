@@ -75,6 +75,9 @@
     # Mdl = ssm(A,B_sigma,C,D);
     # [x_matlab, logL_matlab] = smooth(Mdl, y)
     # ```
+
+
+
     A = [.5 .4;
          .3 .2]
     Q = [.34 .17;
@@ -85,12 +88,44 @@
     k = Kalman(A, G, Q, R)
     cov_init = [0.722222222222222   0.386904761904762;
                 0.386904761904762   0.293154761904762]
+    #set_state!(k, zeros(2), cov_init)
+    #x_filtered, logL_filtered, P_filtered, P_predictive = filter(k, y)
     set_state!(k, zeros(2), cov_init)
-    x_smoothed, logL, P_smoothed = smooth(k, y)
-    x_matlab = [1.36158275104493    2.68312458668362    4.04291315305382    5.36947053521018;
-                0.813542618042249   1.64113106904578    2.43805629027213    3.22585113133984]
+    x_smoothed, logL_smoothed, P_smoothed = smooth(k, y)
+
+    # We verify the Julia results match the Matlab code below
+    #https://github.com/probml/pmtk3/blob/master/demos/kalman_test.m
+    xfilt_matlab =
+        [1.3409    2.6585    4.0142    5.3695;
+        0.8076    1.6334    2.4293    3.2259];
+    xsmooth_matlab =
+        [1.3616    2.6831    4.0429    5.3695;
+        0.8135    1.6411    2.4381    3.2259];
     logL_matlab = -22.1434290195012
-    @test isapprox(x_smoothed, x_matlab)
-    @test isapprox(logL, logL_matlab)
+    #@test isapprox(x_filtered, xfilt_matlab; rough_kwargs...)
+    @test isapprox(x_smoothed, xsmooth_matlab; rough_kwargs...)
+    #@test isapprox(logL_filtered, logL_matlab; rough_kwargs...)
+    @test isapprox(logL_smoothed, logL_matlab; rough_kwargs...)
+
+    #=
+    set_state!(k, zeros(2), cov_init)
+    xs, ys = sample(k, 10)
+    @test size(xs) == (2,10)
+    @test size(ys) == (1,10)
+    =#
+
+    #=
+    N = 5000
+    x1 = zeros(2,N)
+    for n in 1:N
+        #global x1 # only need 'global' when running in REPL
+        xs, ys = sample(k, 2)
+        x1[:,n] = xs[:,1]
+    end
+    m=StatsBase.mean(x1, dims=2);
+    @test isapprox(m, zeros(2); atol=1e-1)
+    C=StatsBase.cov(x1');
+    @test isapprox(C, cov_init; atol=1e-1)
+    =#
 
 end  # @testset
