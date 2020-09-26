@@ -95,7 +95,7 @@ Reference: https://www.mitpressjournals.org/doi/abs/10.1162/003465399558454?casa
 - `y::AbstractVector` : data to be filtered
 - `wu::Real` : upper cutoff frequencies
 - `wl::Real` : lower cutoff frequencies
-- `K::Integer` : number of lead and lag of the moving average
+- `K::Integer` : number of leads and lags of the moving average
 
 ##### Returns
 - `y_cycle::Vector` : cyclical component
