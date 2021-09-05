@@ -35,7 +35,7 @@ where ``\epsilon_t \sim N (0, \sigma^2)``
 - `ρ::Real` : Persistence parameter in AR(1) process
 - `σ::Real` : Standard deviation of random component of AR(1) process
 - `μ::Real(0.0)` : Mean of AR(1) process
-- `n_std::Integer(3)` : The number of standard deviations to each side the process
+- `n_std::Real(3)` : The number of standard deviations to each side the process
   should span
 
 ##### Returns
@@ -43,7 +43,7 @@ where ``\epsilon_t \sim N (0, \sigma^2)``
 - `mc::MarkovChain` : Markov chain holding the state values and transition matrix
 
 """
-function tauchen(N::Integer, ρ::T1, σ::T2, μ=zero(promote_type(T1, T2)), n_std::Integer=3) where {T1 <: Real, T2 <: Real}
+function tauchen(N::Integer, ρ::T1, σ::T2, μ=zero(promote_type(T1, T2)), n_std::T3=3) where {T1 <: Real, T2 <: Real, T3 <: Real}
     # Get discretized space
     a_bar = n_std * sqrt(σ^2 / (1 - ρ^2))
     y = range(-a_bar, stop=a_bar, length=N)
