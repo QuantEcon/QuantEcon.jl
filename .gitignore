@@ -8,3 +8,5 @@ site/
 docs/build
 docs/serve
 ./Manifest.toml
+
+Manifest.toml
