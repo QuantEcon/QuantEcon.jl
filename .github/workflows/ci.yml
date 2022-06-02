@@ -4,10 +4,12 @@ on:
   push:
     branches:
       - master
+      - main
     tags: '*'
   pull_request:
     branches:
       - master
+      - main
 jobs:
   test:
     name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
@@ -17,7 +19,6 @@ jobs:
       matrix: 
         version:
           - '1.6' # LTS
-          - '1' # expands to latest 1.x release
         os:
           - ubuntu-latest
           - macOS-latest
