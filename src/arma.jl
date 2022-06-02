@@ -124,7 +124,7 @@ function spectral_density(arma::ARMA; res=1200, two_pi::Bool=true)
     wmax = two_pi ? 2pi : pi
     w = range(0, stop=wmax, length=res)
     tf = PolynomialRatio(reverse(arma.ma_poly), reverse(arma.ar_poly))
-    h = freqz(tf, w)
+    h = freqresp(tf, w)
     spect = arma.sigma.^2 .* abs.(h).^2
     return w, spect
 end
