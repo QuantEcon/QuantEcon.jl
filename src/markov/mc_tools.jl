@@ -11,7 +11,7 @@ References
 https://lectures.quantecon.org/jl/finite_markov.html
 
 =#
-import LightGraphs: DiGraph, period, attracting_components,
+import Graphs: DiGraph, period, attracting_components,
                     strongly_connected_components, is_strongly_connected
 
 @inline check_stochastic_matrix(P) = maximum(abs, sum(P, dims = 2) .- 1) < 5e-15 ? true : false
