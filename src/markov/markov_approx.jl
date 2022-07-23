@@ -687,7 +687,7 @@ Compute a discrete state approximation to a distribution with known moments,
 using the maximum entropy procedure proposed in Tanaka and Toda (2013)
 
 ```julia
-p, lambda_bar, moment_error = discrete_approximation(D, T, TBar, q, lambda0)
+p, lambda_bar, moment_error = discrete_approximation(D, T, Tbar, q, lambda0)
 ```
 
 ##### Arguments
@@ -699,7 +699,7 @@ p, lambda_bar, moment_error = discrete_approximation(D, T, TBar, q, lambda0)
                   and returns an `L x N` matrix of moments evaluated
                   at each grid point, where L is the number of moments to be
                   matched.
-- `TBar::AbstractVector` : length `L` vector of moments of the underlying distribution
+- `Tbar::AbstractVector` : length `L` vector of moments of the underlying distribution
                            which should be matched
 
 ##### Optional
@@ -718,8 +718,8 @@ p, lambda_bar, moment_error = discrete_approximation(D, T, TBar, q, lambda0)
                   discretization minus actual moments) of length `L`
 
 """
-function discrete_approximation(D::AbstractVector, T::Function, TBar::AbstractVector,
-                                  q::AbstractVector=ones(N)/N, # Default prior weights
+function discrete_approximation(D::AbstractVector, T::Function, Tbar::AbstractVector,
+                                  q::AbstractVector=ones(length(D))/length(D), # Default prior weights
                                   lambda0::AbstractVector=zeros(Tbar))
 
     # Input error checking
@@ -728,15 +728,15 @@ function discrete_approximation(D::AbstractVector, T::Function, TBar::AbstractVe
     Tx = T(D)
     L, N2 = size(Tx)
 
-    if N2 != N || length(TBar) != L || length(lambda0) != L || length(q) != N2
+    if N2 != N || length(Tbar) != L || length(lambda0) != L || length(q) != N2
         error("Dimension mismatch")
     end
 
     # Compute maximum entropy discrete distribution
     options = Optim.Options(f_tol=1e-16, x_tol=1e-16)
-    obj(lambda) = entropy_obj(lambda, Tx, TBar, q)
-    grad!(grad, lambda) = entropy_grad!(grad, lambda, Tx, TBar, q)
-    hess!(hess, lambda) = entropy_hess!(hess, lambda, Tx, TBar, q)
+    obj(lambda) = entropy_obj(lambda, Tx, Tbar, q)
+    grad!(grad, lambda) = entropy_grad!(grad, lambda, Tx, Tbar, q)
+    hess!(hess, lambda) = entropy_hess!(hess, lambda, Tx, Tbar, q)
     res = Optim.optimize(obj, grad!, hess!, lambda0, Optim.Newton(), options)
     # Sometimes the algorithm fails to converge if the initial guess is too far
     # away from the truth. If this occurs, the program tries an initial guess
@@ -751,16 +751,16 @@ function discrete_approximation(D::AbstractVector, T::Function, TBar::AbstractVe
     lambda_bar = Optim.minimizer(res)
     minimum_value = Optim.minimum(res)
 
-    Tdiff = Tx .- TBar
+    Tdiff = Tx .- Tbar
     p = (q'.*exp.(lambda_bar'*Tdiff))/minimum_value
     grad = similar(lambda0)
     grad!(grad, Optim.minimizer(res))
     moment_error = grad/minimum_value
     return p, lambda_bar, moment_error
 end
-# discrete_approximation(D::AbstractVector, T::Function, TBar::Real,
+# discrete_approximation(D::AbstractVector, T::Function, Tbar::Real,
 #                        q::AbstractVector=ones(N)/N, lambda0::Real=0) =
-#     discrete_approximation(D, T, [TBar], q, [lambda0])
+#     discrete_approximation(D, T, [Tbar], q, [lambda0])
 
 """
 
@@ -796,7 +796,7 @@ end
 Compute the maximum entropy objective function used in `discrete_approximation`
 
 ```julia
-obj = entropy_obj(lambda, Tx, TBar, q)
+obj = entropy_obj(lambda, Tx, Tbar, q)
 ```
 
 ##### Arguments
@@ -804,7 +804,7 @@ obj = entropy_obj(lambda, Tx, TBar, q)
 - `lambda::AbstractVector` : length `L` vector of values of the dual problem variables
 - `Tx::AbstractMatrix` : `L x N` matrix of moments evaluated at the grid points
                          specified in discrete_approximation
-- `TBar::AbstractVector` : length `L` vector of moments of the underlying distribution
+- `Tbar::AbstractVector` : length `L` vector of moments of the underlying distribution
                            which should be matched
 - `q::AbstractVector` : length `N` vector of prior weights for each point in the grid.
 
@@ -814,9 +814,9 @@ obj = entropy_obj(lambda, Tx, TBar, q)
 
 """
 function entropy_obj(lambda::AbstractVector, Tx::AbstractMatrix,
-                     TBar::AbstractVector, q::AbstractVector)
+                     Tbar::AbstractVector, q::AbstractVector)
     # Compute objective function
-    Tdiff = Tx .- TBar
+    Tdiff = Tx .- Tbar
     temp = q' .* exp.(lambda'*Tdiff)
     obj = sum(temp)
     return obj
@@ -831,8 +831,8 @@ Compute gradient of objective function
 
 """
 function entropy_grad!(grad::AbstractVector, lambda::AbstractVector,
-                       Tx::AbstractMatrix, TBar::AbstractVector, q::AbstractVector)
-    Tdiff = Tx .- TBar
+                       Tx::AbstractMatrix, Tbar::AbstractVector, q::AbstractVector)
+    Tdiff = Tx .- Tbar
     temp = q'.*exp.(lambda'*Tdiff)
     temp2 = temp.*Tdiff
     grad .= vec(sum(temp2, dims = 2))
@@ -847,8 +847,8 @@ Compute hessian of objective function
 
 """
 function entropy_hess!(hess::AbstractMatrix, lambda::AbstractVector,
-                       Tx::AbstractMatrix, TBar::AbstractVector, q::AbstractVector)
-    Tdiff = Tx .- TBar
+                       Tx::AbstractMatrix, Tbar::AbstractVector, q::AbstractVector)
+    Tdiff = Tx .- Tbar
     temp = q'.*exp.(lambda'*Tdiff)
     temp2 = temp.*Tdiff
     hess .= temp2*Tdiff'
