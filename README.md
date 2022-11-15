@@ -13,13 +13,14 @@ To install the package, open the Julia package manager (Pkg) and type
 
 	add QuantEcon
 
-Documentation for the library: [quantecon.github.io/QuantEcon.jl/](http://quantecon.github.io/QuantEcon.jl/)
+#### Documentation for the library:
+
+[![](https://img.shields.io/badge/docs-latest-blue.svg)](https://QuantEcon.github.io//QuantEcon.jl/latest)
 
 #### Current Build and Coverage Status:
 
 [![Build Status](https://github.com/QuantEcon/QuantEcon.jl/workflows/CI/badge.svg)](https://github.com/QuantEcon/QuantEcon.jl/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/QuantEcon/QuantEcon.jl/badge.svg?branch=master&service=github)](https://coveralls.io/github/QuantEcon/QuantEcon.jl?branch=master)
-[![](https://img.shields.io/badge/docs-latest-blue.svg)](https://QuantEcon.github.io//QuantEcon.jl/latest)
 
 ## Additional Links
 
