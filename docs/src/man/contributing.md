@@ -6,7 +6,7 @@ Less experienced developers who wish to get involved can help improve documentat
 
 A good place to start is by visiting the [project issue tracker](https://github.com/QuantEcon/QuantEcon.jl/issues).
 
-If you are new to open source development please consider reading [*this page*](http://quantecon.org/developer_resources.html) first.
+If you are new to open source development please consider reading [*this page*](https://quantecon.org/contribute/) first.
 
 
 ## General Information
