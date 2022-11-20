@@ -139,6 +139,27 @@ and the inverse Fourier transform.
 - `arma::ARMA`: Instance of `ARMA` type
 - `;num_autocov::Integer(16)` : The number of autocovariances to calculate
 
+##### Returns
+
+- `acov::Vector{Float64}`: `acov[j]` is the autocovariance between two elements with a lag j.
+
+##### Examples
+
+```julia
+using Plots
+
+# AR(2) process
+ar = ARMA([0.8 , 0.5], Vector{Float64}(),1)
+ar_acov = autocovariance(ar)
+plot(1:length(ar_acov),ar_acov,color=:blue, lw=2, marker=:circle, markersize=3, label = "autocovariance")
+
+# ARMA(2,2) process
+lp = ARMA([0.8, 0.5], [0.7, 0.3], 0.5)
+lp_acov = autocovariance(lp, num_autocov = 50)
+plot(1:length(lp_acov),lp_acov,color=:blue, lw=2, marker=:circle, markersize=3, label = "autocovariance")
+
+```
+
 """
 function autocovariance(arma::ARMA; num_autocov::Integer=16)
     # Compute the autocovariance function associated with ARMA process arma
@@ -162,6 +183,21 @@ Get the impulse response corresponding to our model.
 
 - `psi::Vector{Float64}`: `psi[j]` is the response at lag j of the impulse
   response. We take `psi[1]` as unity.
+
+##### Examples
+
+```julia
+using Plots
+
+lp1 = ARMA([0.5],[0.5],1)
+response1 = impulse_response(lp1)
+plot(1:length(response1),response1,color=:blue, lw=2, marker=:circle, markersize=3)
+
+lp2 = ARMA([0.8, 0.5], [0.7, 0.3], 0.5)
+response2 = impulse_response(lp2,impulse_length = 50)
+plot(1:length(response2),response2,color=:blue, lw=2, marker=:circle, markersize=3)
+
+```
 
 """
 function impulse_response(arma::ARMA; impulse_length=30)
