@@ -26,7 +26,7 @@ function MVNSampler(mu::Vector{TM}, Sigma::Matrix{TS}) where {TM<:Real,TS<:Real}
 
     issymmetric(Sigma) || throw(ArgumentError("Sigma must be symmetric"))
 
-    C = cholesky(Symmetric(Sigma, :L), Val(true), check=false)
+    C = cholesky(Symmetric(Sigma, :L), RowMaximum(), check=false)
     A = C.factors
     r = C.rank
     p = invperm(C.piv)
