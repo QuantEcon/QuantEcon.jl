@@ -22,16 +22,15 @@ To install the package, open the Julia package manager (Pkg) and type
 [![Build Status](https://github.com/QuantEcon/QuantEcon.jl/workflows/CI/badge.svg)](https://github.com/QuantEcon/QuantEcon.jl/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/QuantEcon/QuantEcon.jl/badge.svg?branch=master&service=github)](https://coveralls.io/github/QuantEcon/QuantEcon.jl?branch=master)
 
-## Additional Links
+## Related Links
 
-1. [Developer Info](https://quantecon.org/julia-developers/)
-2. [QuantEcon Course Website](https://lectures.quantecon.org/)
+The [QuantEcon lecture site](https://lectures.quantecon.org/) contains
+many examples of this library in action.
 
 ### License
 
 
-Copyright © 2013-2019 Spencer Lyon, Thomas J. Sargent, and John Stachurski: BSD-3
-All rights reserved.
+BSD-3 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
