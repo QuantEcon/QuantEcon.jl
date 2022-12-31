@@ -169,10 +169,84 @@ end
 
 
 @doc raw"""
+    SimplexGrid
+
+Iterator version of `simplex_grid`, i.e., iterator that iterates over the
+integer points in the (m-1)-dimensional simplex ``\{x \mid x_1 + \cdots + x_m =
+n, x_i \geq 0\}``, or equivalently, the m-part compositions of n, in
+lexicographic order.
+
+# Fields
+
+- `m::Int` : Dimension of each point. Must be a positive integer.
+- `n::Int` : Number which the coordinates of each point sum to. Must
+             be a nonnegative integer.
+
+# Examples
+
+```julia
+julia> sg = SimplexGrid(3, 4);
+
+julia> for x in sg
+           @show x
+       end
+x = [0, 0, 4]
+x = [0, 1, 3]
+x = [0, 2, 2]
+x = [0, 3, 1]
+x = [0, 4, 0]
+x = [1, 0, 3]
+x = [1, 1, 2]
+x = [1, 2, 1]
+x = [1, 3, 0]
+x = [2, 0, 2]
+x = [2, 1, 1]
+x = [2, 2, 0]
+x = [3, 0, 1]
+x = [3, 1, 0]
+x = [4, 0, 0]
+```
+"""
+struct SimplexGrid
+    m::Int
+    n::Int
+end
+
+Base.eltype(sg::SimplexGrid) = Vector{Int}
+
+function Base.iterate(sg::SimplexGrid)
+    x = zeros(Int, sg.m)
+    x[end] = sg.n
+    h = sg.m
+    return x, (x, h)
+end
+
+function Base.iterate(sg::SimplexGrid, state)
+    m = sg.m
+    x, h = state
+
+    x[1] >= sg.n && return nothing
+
+    h -= 1
+
+    val = x[h+1]
+    x[h+1] = 0
+    x[m] = val - 1
+    x[h] += 1
+
+    if val != 1
+        h = m
+    end
+
+    return x, (x, h)
+end
+
+
+@doc raw"""
     simplex_grid(m, n)
 
 Construct an array consisting of the integer points in the
-(m-1)-dimensional simplex ``\{x \mid x_0 + \cdots + x_{m-1} = n\}``,
+(m-1)-dimensional simplex ``\{x \mid x_1 + \cdots + x_m = n, x_i \geq 0\}``,
 or equivalently, the m-part compositions of n, which are listed
 in lexicographic order. The total number of the points (hence the
 length of the output array) is L = (n+m-1)!/(n!*(m-1)!) (i.e.,
@@ -185,6 +259,7 @@ length of the output array) is L = (n+m-1)!/(n!*(m-1)!) (i.e.,
              be a nonnegative integer.
 
 # Returns
+
 - `out::Matrix{Int}` : Array of shape (m, L) containing the integer
                        points in the simplex, aligned in lexicographic
                        order.
@@ -214,26 +289,9 @@ function simplex_grid(m, n)
     L = num_compositions(m, n)
     out = Matrix{Int}(undef, m, L)
 
-    x = zeros(Int, m)
-    x[m] = n
-
-    # Fill in first column
-    copyto!(out, 1, x, 1, m)
-
-    h = m
-    for i in 2:L
-        h -= 1
-
-        val = x[h+1]
-        x[h+1] = 0
-        x[m] = val - 1
-        x[h] += 1
-
+    sg = SimplexGrid(m, n)
+    for (i, x) in enumerate(sg)
         copyto!(out, m*(i-1) + 1, x, 1, m)
-
-        if val != 1
-            h = m
-        end
     end
 
     return out
@@ -256,6 +314,7 @@ integer points of the (m-1)-dimensional simplex ``\{x \mid x_0 +
              nonnegative integer.
 
 # Returns
+
 - `idx::Int` : Index of x.
 """
 function simplex_index(x, m, n)

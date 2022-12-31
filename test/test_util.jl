@@ -53,12 +53,19 @@
         idx = Vector{Int}(undef, 3)
 
         for i in 1:3
-            idx[i] = simplex_index(points[:, i], 3, 4)
+            idx[i] = @inferred simplex_index(points[:, i], 3, 4)
         end
 
-        @test all(simplex_grid(3, 4) .== grid_3_4)
+        @test all(@inferred simplex_grid(3, 4) .== grid_3_4)
         @test all(grid_3_4[:, idx] .== points)
         @test size(grid_3_4, 2) == num_compositions(3, 4)
+
+        sg = SimplexGrid(3, 4)
+        for (i, x) in enumerate(sg)
+            if i in idx
+                @test x == grid_3_4[:, i]
+            end
+        end
 
         # Output from QuantEcon.py
         grid_5_4 =
