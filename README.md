@@ -20,7 +20,7 @@ To install the package, open the Julia package manager (Pkg) and type
 #### Current Build and Coverage Status:
 
 [![Build Status](https://github.com/QuantEcon/QuantEcon.jl/workflows/CI/badge.svg)](https://github.com/QuantEcon/QuantEcon.jl/actions/workflows/ci.yml)
-[![Coverage Status](https://coveralls.io/repos/QuantEcon/QuantEcon.jl/badge.svg?branch=master&service=github)](https://coveralls.io/github/QuantEcon/QuantEcon.jl?branch=master)
+[![codecov](https://codecov.io/gh/QuantEcon/QuantEcon.jl/branch/master/graph/badge.svg?token=NuciqAGfOw)](https://codecov.io/gh/QuantEcon/QuantEcon.jl)
 
 ## Related Links
 
