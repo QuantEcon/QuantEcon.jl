@@ -113,7 +113,6 @@ where ``\epsilon_t \sim N (0, \sigma^2)``
 function rouwenhorst(N::Integer, ρ::Real, σ::Real, μ::Real=0.0)
     σ_y = σ / sqrt(1-ρ^2)
     p  = (1+ρ)/2
-    Θ = [p 1-p; 1-p p]
     ψ = sqrt(N-1) * σ_y
     m = μ / (1 - ρ)
 
