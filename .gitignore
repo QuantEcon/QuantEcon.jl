@@ -10,3 +10,4 @@ docs/serve
 ./Manifest.toml
 
 Manifest.toml
+.vscode
