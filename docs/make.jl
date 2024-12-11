@@ -12,6 +12,7 @@ makedocs(
         ],
         "Contributing" => "man/contributing.md"
     ]
+    HTMLWriter = HTMLWriter(size_threshold = nothing)
 )
 
 deploydocs(
