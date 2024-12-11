@@ -2,7 +2,7 @@ using Documenter, QuantEcon
 
 makedocs(
     modules = [QuantEcon],
-    format = Documenter.HTML(prettyurls = false),
+    format = Documenter.HTML(prettyurls = false, size_threshold = nothing),
     sitename = "QuantEcon.jl",
     pages = Any[ # Compat: `Any` for 0.4 compat
         "Home" => "index.md",
@@ -11,8 +11,7 @@ makedocs(
             "QuantEcon" => "api/QuantEcon.md"
         ],
         "Contributing" => "man/contributing.md"
-    ],
-    HTMLWriter = HTMLWriter(size_threshold = nothing)
+    ]
 )
 
 deploydocs(
