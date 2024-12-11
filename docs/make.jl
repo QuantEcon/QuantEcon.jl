@@ -11,7 +11,7 @@ makedocs(
             "QuantEcon" => "api/QuantEcon.md"
         ],
         "Contributing" => "man/contributing.md"
-    ]
+    ],
     HTMLWriter = HTMLWriter(size_threshold = nothing)
 )
 
