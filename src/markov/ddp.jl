@@ -817,7 +817,7 @@ Define Matrix Multiplication between 3-dimensional matrix and a vector
 Matrix multiplication over the last dimension of ``A``
 
 """
-function *(A::Array{T,3}, v::AbstractVector) where T
+function *(A::AbstractArray{T,3}, v::AbstractVector) where T
     shape = size(A)
     size(v, 1) == shape[end] || error("wrong dimensions")
 
