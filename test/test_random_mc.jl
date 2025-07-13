@@ -80,6 +80,11 @@ using Random
         @test ddps[2].R == ddps[1].R
         @test ddps[2].Q == ddps[1].Q
         @test ddps[2].beta == ddps[1].beta
+
+        @testset "Issue #296" begin
+            ddp = random_discrete_dp(5, 2)
+            @test ddp isa DiscreteDP
+        end
     end
 
     @testset "Test random_probvec" begin

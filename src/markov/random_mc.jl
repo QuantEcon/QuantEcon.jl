@@ -184,7 +184,7 @@ function random_discrete_dp(rng::AbstractRNG,
 end
 
 random_discrete_dp(num_states::Integer, num_actions::Integer,
-                   beta::Real=rand(); k::Integer=k, scale::Real=1) =
+                   beta::Real=rand(); k::Integer=num_states, scale::Real=1) =
     random_discrete_dp(Random.GLOBAL_RNG, num_states, num_actions, beta,
                        k=k, scale=scale)
 
