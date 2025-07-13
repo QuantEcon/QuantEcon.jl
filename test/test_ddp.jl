@@ -352,6 +352,15 @@ Tests for markov/ddp.jl
         end
     end
 
+    @testset "Issue #297" begin
+        seed = 123
+        rng = MersenneTwister(seed)
+        n, m = 5, 2
+        ddp = random_discrete_dp(rng, n, m)
+        res = solve(ddp, PFI)
+        isapprox(bellman_operator(ddp, res.v), res.v)
+    end
+
     @testset "ddp_negative_inf_error()" begin
         # Dense Matrix
         n, m = 3, 2
