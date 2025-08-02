@@ -23,7 +23,7 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 DSP = "0.6, 0.7, 0.8"
-DataStructures = "0.18"
+DataStructures = "0.18, 0.19"
 Distributions = "0.23, 0.24, 0.25"
 FFTW = "1"
 Graphs = "1.6, 1.7, 1.8, 1.9"
