@@ -151,7 +151,6 @@ When working on this codebase, developers frequently need to:
 
 ### Common issues:
 - Network connectivity required for first-time dependency installation
-- Some tests include warnings about deprecated Optim.jl parameters (expected)
 - Documentation warnings about network issues or missing git remotes are normal in CI
 - MKL dependency download warnings during first install are normal
 
