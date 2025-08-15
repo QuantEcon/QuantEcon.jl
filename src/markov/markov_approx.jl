@@ -732,7 +732,7 @@ function discrete_approximation(D::AbstractVector, T::Function, Tbar::AbstractVe
     end
 
     # Compute maximum entropy discrete distribution
-    options = Optim.Options(f_tol=1e-16, x_tol=1e-16)
+    options = Optim.Options(f_reltol=1e-16, x_abstol=1e-16)
     obj(lambda) = entropy_obj(lambda, Tx, Tbar, q)
     grad!(grad, lambda) = entropy_grad!(grad, lambda, Tx, Tbar, q)
     hess!(hess, lambda) = entropy_hess!(hess, lambda, Tx, Tbar, q)
