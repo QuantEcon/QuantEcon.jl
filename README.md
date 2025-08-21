@@ -15,7 +15,8 @@ To install the package, open the Julia package manager (Pkg) and type
 
 #### Documentation for the library:
 
-[![](https://img.shields.io/badge/docs-latest-blue.svg)](https://QuantEcon.github.io//QuantEcon.jl/latest)
+[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://quantecon.github.io/QuantEcon.jl/stable/)
+[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://quantecon.github.io/QuantEcon.jl/dev/)
 
 #### Current Build and Coverage Status:
 
