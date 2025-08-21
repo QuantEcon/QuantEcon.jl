@@ -19,4 +19,6 @@ deploydocs(
     branch = "gh-pages",
     target = "build",
     make = nothing,
+    devbranch = "master",
+    versions = ["stable" => "v^", "v#.#", "dev" => "dev"],
 )
