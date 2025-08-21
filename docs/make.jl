@@ -20,5 +20,5 @@ deploydocs(
     target = "build",
     make = nothing,
     devbranch = "master",
-    versions = ["stable" => "v^", "v#.#", "dev" => "dev"],
+    versions = ["stable" => "v^", "v#.#", "v#.#.#", "dev" => "dev"],
 )
