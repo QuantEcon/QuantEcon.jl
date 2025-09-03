@@ -19,6 +19,54 @@ Always reference these instructions first and fallback to search or bash command
 ### No linting or formatting tools are configured
 Julia packages typically do not use external linters or formatters like other language ecosystems. Code style follows the Julia community conventions in the [Julia Style Guide](https://docs.julialang.org/en/v1/manual/style-guide/).
 
+### Docstring Style Guide
+When writing or updating docstrings in this codebase, follow these conventions:
+
+#### For Functions:
+1. Start with a four-space indented function signature showing the function name and key parameters
+2. Use single `#` for section headers (not `#####`)
+3. Add a blank line between section headers and their content
+4. Always include both `# Arguments` and `# Returns` sections for functions
+5. Use consistent formatting for parameter descriptions
+
+Example:
+```julia
+"""
+    function_name(arg1, arg2; keyword=default)
+
+Brief description of what the function does.
+
+# Arguments
+
+- `arg1::Type` : Description of first argument
+- `arg2::Type` : Description of second argument  
+- `;keyword::Type(default)` : Description of keyword argument
+
+# Returns
+
+- `result::Type` : Description of what is returned
+"""
+```
+
+#### For Types/Structs:
+1. Start with a four-space indented type signature
+2. Use `# Fields` instead of `# Arguments` for struct fields
+3. Follow the same header and spacing conventions as functions
+
+Example:
+```julia
+"""
+    TypeName(field1, field2)
+
+Brief description of the type.
+
+# Fields
+
+- `field1::Type` : Description of first field
+- `field2::Type` : Description of second field
+"""
+```
+
 ## Validation
 
 ### Always manually validate changes by running complete scenarios:
