@@ -47,13 +47,13 @@ where
 
 # Fields
 
-- `phi::Vector`: AR parameters ``\phi_1, \ldots, \phi_p``
-- `theta::Vector`: MA parameters ``\theta_1, \ldots, \theta_q``
-- `p::Integer`: Number of AR coefficients
-- `q::Integer`: Number of MA coefficients
-- `sigma::Real`: Standard deviation of white noise
-- `ma_poly::Vector`: MA polynomial --- filtering representatoin
-- `ar_poly::Vector`: AR polynomial --- filtering representation
+- `phi::Vector`: AR parameters ``\phi_1, \ldots, \phi_p``.
+- `theta::Vector`: MA parameters ``\theta_1, \ldots, \theta_q``.
+- `p::Integer`: Number of AR coefficients.
+- `q::Integer`: Number of MA coefficients.
+- `sigma::Real`: Standard deviation of white noise.
+- `ma_poly::Vector`: MA polynomial --- filtering representation.
+- `ar_poly::Vector`: AR polynomial --- filtering representation.
 
 # Examples
 
@@ -74,7 +74,7 @@ mutable struct ARMA
     p::Integer       # Number of AR coefficients
     q::Integer       # Number of MA coefficients
     sigma::Real      # Variance of white noise
-    ma_poly::Vector  # MA polynomial --- filtering representatoin
+    ma_poly::Vector  # MA polynomial --- filtering representation
     ar_poly::Vector  # AR polynomial --- filtering representation
 end
 
@@ -167,7 +167,7 @@ Get the impulse response corresponding to our model.
 # Arguments
 
 - `arma::ARMA`: Instance of `ARMA` type
-- `;impulse_length::Integer(30)`: Length of horizon for calcluating impulse reponse. Must be at least as long as the `p` fields of `arma`
+- `;impulse_length::Integer(30)`: Length of horizon for calculating impulse response. Must be at least as long as the `p` fields of `arma`.
 
 # Returns
 

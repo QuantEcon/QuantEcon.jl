@@ -102,6 +102,11 @@ julia> result = my_function(x, y)
 ```
 ```
 
+#### Quality Control Procedures:
+1. **Ensure all docstring descriptions end with periods:** Every parameter, field, return value, and general description in a docstring must end with a period for consistency
+2. **Check for typos in docstrings:** Always proofread docstrings for spelling errors, especially in technical terms and commonly misspelled words like "representation," "calculating," "response"
+3. **Apply these checks systematically:** When updating any docstring, review the entire file for similar formatting inconsistencies and typos
+
 ## Validation
 
 ### Always manually validate changes by running complete scenarios:
