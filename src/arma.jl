@@ -58,13 +58,14 @@ where
 # Examples
 
 ```julia
-using QuantEcon
-phi = 0.5
-theta = [0.0, -0.8]
-sigma = 1.0
-lp = ARMA(phi, theta, sigma)
-require(joinpath(dirname(@__FILE__),"..", "examples", "arma_plots.jl"))
-quad_plot(lp)
+julia> phi = 0.5;
+
+julia> theta = [0.0, -0.8];
+
+julia> sigma = 1.0;
+
+julia> lp = ARMA(phi, theta, sigma)
+ARMA([0.5], [0.0, -0.8], 1, 2, 1.0, [1.0, 0.0, -0.8], [1.0, -0.5])
 ```
 """
 mutable struct ARMA

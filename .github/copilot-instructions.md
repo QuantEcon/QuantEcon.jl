@@ -22,6 +22,13 @@ Always test documentation builds when making docstring changes to ensure no pars
 - Watch for warnings about docstring formatting or parsing issues in the build output
 - Documentation builds must pass before committing docstring changes
 
+### Examples Section Testing:
+Always test Examples sections in docstrings to ensure they execute without error:
+- Execute each code block in the Examples section manually using `julia --project=.`
+- Ensure all examples run without errors and produce the expected output shown in the docstring
+- For REPL-style examples, verify the actual output matches what is documented
+- Test Examples sections before committing any docstring changes that include or modify Examples
+
 ### No linting or formatting tools are configured
 Julia packages typically do not use external linters or formatters like other language ecosystems. Code style follows the Julia community conventions in the [Julia Style Guide](https://docs.julialang.org/en/v1/manual/style-guide/).
 
@@ -72,6 +79,26 @@ Brief description of the type.
 - `field1::Type` : Description of first field
 - `field2::Type` : Description of second field
 """
+```
+
+#### For Examples Sections:
+1. Use REPL-style format showing `julia>` prompts and expected output
+2. Always test Examples sections to ensure they execute without error
+3. Keep examples simple and focused on basic usage
+4. Do not include complex plotting or external file dependencies in Examples
+
+Example:
+```julia
+# Examples
+
+```julia
+julia> x = 1;
+
+julia> y = 2;
+
+julia> result = my_function(x, y)
+3
+```
 ```
 
 ## Validation
