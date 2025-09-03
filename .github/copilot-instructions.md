@@ -40,7 +40,7 @@ When writing or updating docstrings in this codebase, follow these conventions:
 2. Use single `#` for section headers (not `#####`)
 3. Add a blank line between section headers and their content
 4. Always include both `# Arguments` and `# Returns` sections for functions
-5. Use consistent formatting for parameter descriptions
+5. Use consistent formatting for parameter descriptions: no space before colon and end with period
 
 Example:
 ```julia
@@ -51,13 +51,13 @@ Brief description of what the function does.
 
 # Arguments
 
-- `arg1::Type` : Description of first argument
-- `arg2::Type` : Description of second argument  
-- `;keyword::Type(default)` : Description of keyword argument
+- `arg1::Type`: Description of first argument.
+- `arg2::Type`: Description of second argument.
+- `;keyword::Type(default)`: Description of keyword argument.
 
 # Returns
 
-- `result::Type` : Description of what is returned
+- `result::Type`: Description of what is returned.
 """
 ```
 
@@ -66,6 +66,7 @@ Brief description of what the function does.
 2. If a struct has type parameters, show them; for example: `LinInterp{TV,TB}`
 3. Use `# Fields` instead of `# Arguments` for struct fields
 4. Follow the same header and spacing conventions as functions
+5. Use consistent formatting for field descriptions: no space before colon and end with period
 
 Example:
 ```julia
@@ -76,8 +77,8 @@ Brief description of the type.
 
 # Fields
 
-- `field1::Type` : Description of first field
-- `field2::Type` : Description of second field
+- `field1::Type`: Description of first field.
+- `field2::Type`: Description of second field.
 """
 ```
 

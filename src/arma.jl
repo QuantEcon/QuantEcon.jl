@@ -47,13 +47,13 @@ where
 
 # Fields
 
-- `phi::Vector` : AR parameters ``\phi_1, \ldots, \phi_p``
-- `theta::Vector` : MA parameters ``\theta_1, \ldots, \theta_q``
-- `p::Integer` : Number of AR coefficients
-- `q::Integer` : Number of MA coefficients
-- `sigma::Real` : Standard deviation of white noise
-- `ma_poly::Vector` : MA polynomial --- filtering representatoin
-- `ar_poly::Vector` : AR polynomial --- filtering representation
+- `phi::Vector`: AR parameters ``\phi_1, \ldots, \phi_p``
+- `theta::Vector`: MA parameters ``\theta_1, \ldots, \theta_q``
+- `p::Integer`: Number of AR coefficients
+- `q::Integer`: Number of MA coefficients
+- `sigma::Real`: Standard deviation of white noise
+- `ma_poly::Vector`: MA polynomial --- filtering representatoin
+- `ar_poly::Vector`: AR polynomial --- filtering representation
 
 # Examples
 
@@ -114,15 +114,15 @@ the set of all integers.
 - `arma::ARMA`: Instance of `ARMA` type
 - `;two_pi::Bool(true)`: Compute the spectral density function over ``[0, \pi]``
   if false and ``[0, 2 \pi]`` otherwise.
-- `;res(1200)` : If `res` is a scalar then the spectral density is computed at
+- `;res(1200)`: If `res` is a scalar then the spectral density is computed at
   `res` frequencies evenly spaced around the unit circle, but if `res` is an array
-  then the function computes the response at the frequencies given by the array
+  then the function computes the response at the frequencies given by the array.
 
 # Returns
 
 - `w::Vector{Float64}`: The normalized frequencies at which h was computed, in
   radians/sample
-- `spect::Vector{Float64}` : The frequency response
+- `spect::Vector{Float64}`: The frequency response.
 """
 function spectral_density(arma::ARMA; res=1200, two_pi::Bool=true)
     # Compute the spectral density associated with ARMA process arma
@@ -144,11 +144,11 @@ and the inverse Fourier transform.
 # Arguments
 
 - `arma::ARMA`: Instance of `ARMA` type
-- `;num_autocov::Integer(16)` : The number of autocovariances to calculate
+- `;num_autocov::Integer(16)`: The number of autocovariances to calculate.
 
 # Returns
 
-- `::Vector{Float64}` : The autocovariance function
+- `::Vector{Float64}`: The autocovariance function.
 """
 function autocovariance(arma::ARMA; num_autocov::Integer=16)
     # Compute the autocovariance function associated with ARMA process arma
