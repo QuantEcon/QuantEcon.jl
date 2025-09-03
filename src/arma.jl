@@ -18,7 +18,7 @@ https://lectures.quantecon.org/jl/arma.html
 @doc doc"""
     ARMA
 
-Represents a scalar ARMA(p, q) process
+Represents a scalar ARMA(p, q) process.
 
 If ``\phi`` and ``\theta`` are scalars, then the model is
 understood to be
@@ -111,7 +111,7 @@ the set of all integers.
 
 # Arguments
 
-- `arma::ARMA`: Instance of `ARMA` type
+- `arma::ARMA`: Instance of `ARMA` type.
 - `;two_pi::Bool(true)`: Compute the spectral density function over ``[0, \pi]``
   if false and ``[0, 2 \pi]`` otherwise.
 - `;res(1200)`: If `res` is a scalar then the spectral density is computed at
@@ -121,7 +121,7 @@ the set of all integers.
 # Returns
 
 - `w::Vector{Float64}`: The normalized frequencies at which h was computed, in
-  radians/sample
+  radians/sample.
 - `spect::Vector{Float64}`: The frequency response.
 """
 function spectral_density(arma::ARMA; res=1200, two_pi::Bool=true)
@@ -143,7 +143,7 @@ and the inverse Fourier transform.
 
 # Arguments
 
-- `arma::ARMA`: Instance of `ARMA` type
+- `arma::ARMA`: Instance of `ARMA` type.
 - `;num_autocov::Integer(16)`: The number of autocovariances to calculate.
 
 # Returns
@@ -166,7 +166,7 @@ Get the impulse response corresponding to our model.
 
 # Arguments
 
-- `arma::ARMA`: Instance of `ARMA` type
+- `arma::ARMA`: Instance of `ARMA` type.
 - `;impulse_length::Integer(30)`: Length of horizon for calculating impulse response. Must be at least as long as the `p` fields of `arma`.
 
 # Returns
@@ -198,14 +198,14 @@ Compute a simulated sample path assuming Gaussian shocks.
 
 # Arguments
 
-- `arma::ARMA`: Instance of `ARMA` type
-- `;ts_length::Integer(90)`: Length of simulation
+- `arma::ARMA`: Instance of `ARMA` type.
+- `;ts_length::Integer(90)`: Length of simulation.
 - `;impulse_length::Integer(30)`: Horizon for calculating impulse response
   (see also docstring for `impulse_response`)
 
 # Returns
 
-- `X::Vector{Float64}`: Simulation of the ARMA model `arma`
+- `X::Vector{Float64}`: Simulation of the ARMA model `arma`.
 """
 function simulation(arma::ARMA; ts_length=90, impulse_length=30)
     # Simulate the ARMA process arma assuming Gaussian shocks
