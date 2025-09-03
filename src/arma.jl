@@ -16,7 +16,7 @@ https://lectures.quantecon.org/jl/arma.html
 =#
 
 @doc doc"""
-    ARMA(phi, theta, sigma)
+    ARMA
 
 Represents a scalar ARMA(p, q) process
 

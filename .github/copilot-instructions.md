@@ -16,6 +16,12 @@ Always reference these instructions first and fallback to search or bash command
 - Build documentation: `julia --project=docs docs/make.jl` -- takes ~30 seconds. 
 - Serve documentation locally: `cd docs && go run serve.go` (optional - serves on http://localhost:3000)
 
+### Documentation Build Testing:
+Always test documentation builds when making docstring changes to ensure no parsing errors are introduced:
+- Test documentation build: `julia --project=docs docs/make.jl` -- should complete without docstring parsing errors
+- Watch for warnings about docstring formatting or parsing issues in the build output
+- Documentation builds must pass before committing docstring changes
+
 ### No linting or formatting tools are configured
 Julia packages typically do not use external linters or formatters like other language ecosystems. Code style follows the Julia community conventions in the [Julia Style Guide](https://docs.julialang.org/en/v1/manual/style-guide/).
 
@@ -49,14 +55,15 @@ Brief description of what the function does.
 ```
 
 #### For Types/Structs:
-1. Start with a four-space indented type signature
-2. Use `# Fields` instead of `# Arguments` for struct fields
-3. Follow the same header and spacing conventions as functions
+1. Start with a four-space indented type signature showing just the type name (do not include constructor parameters)
+2. If a struct has type parameters, show them; for example: `LinInterp{TV,TB}`
+3. Use `# Fields` instead of `# Arguments` for struct fields
+4. Follow the same header and spacing conventions as functions
 
 Example:
 ```julia
 """
-    TypeName(field1, field2)
+    TypeName
 
 Brief description of the type.
 
