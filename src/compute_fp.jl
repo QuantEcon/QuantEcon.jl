@@ -19,7 +19,7 @@ https://lectures.quantecon.org/jl/optgrowth.html
 Repeatedly apply a function to search for a fixed point.
 
 Approximates ``T^∞ v``, where ``T`` is an operator (function) and ``v`` is an initial
-guess for the fixed point. Will terminate either when `|T^{k+1}(v) - T^k v| &lt;
+guess for the fixed point. Will terminate either when `|T^{k+1}(v) - T^k v| <
 err_tol` or `max_iter` iterations has been exceeded.
 
 Provided that ``T`` is a contraction mapping or similar, the return value will
