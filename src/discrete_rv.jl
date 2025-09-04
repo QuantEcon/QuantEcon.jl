@@ -27,8 +27,9 @@ vector of probabilities given by `q`.
 
 # Fields
 
-- `q::AbstractVector`: A vector of non-negative probabilities that sum to 1.
-- `Q::AbstractVector`: The cumulative sum of `q`.
+- `q::TV1`: A vector of non-negative probabilities that sum to 1, where
+  `TV1<:AbstractVector`.
+- `Q::TV2`: The cumulative sum of `q`, where `TV2<:AbstractVector`.
 """
 mutable struct DiscreteRV{TV1<:AbstractVector, TV2<:AbstractVector}
     q::TV1
