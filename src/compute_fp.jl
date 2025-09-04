@@ -14,37 +14,42 @@ https://lectures.quantecon.org/jl/optgrowth.html
 
 
 @doc doc"""
-Repeatedly apply a function to search for a fixed point
+    compute_fixed_point(T, v; err_tol=1e-4, max_iter=100, verbose=2, print_skip=10)
+
+Repeatedly apply a function to search for a fixed point.
 
 Approximates ``T^∞ v``, where ``T`` is an operator (function) and ``v`` is an initial
-guess for the fixed point. Will terminate either when `T^{k+1}(v) - T^k v <
+guess for the fixed point. Will terminate either when `|T^{k+1}(v) - T^k v| <
 err_tol` or `max_iter` iterations has been exceeded.
 
-Provided that ``T`` is a contraction mapping or similar,  the return value will
+Provided that ``T`` is a contraction mapping or similar, the return value will
 be an approximation to the fixed point of ``T``.
 
-##### Arguments
+# Arguments
 
-* `T`: A function representing the operator ``T``
-* `v::TV`: The initial condition. An object of type ``TV``
-* `;err_tol(1e-3)`: Stopping tolerance for iterations
-* `;max_iter(50)`: Maximum number of iterations
-* `;verbose(2)`: Level of feedback (0 for no output, 1 for warnings only, 2
-        for warning and convergence messages during iteration)
-* `;print_skip(10)` : if `verbose == 2`, how many iterations to apply between
-        print messages
+- `T::Function`: A function representing the operator ``T``.
+- `v::TV`: The initial condition. An object of type `TV`.
+- `err_tol::Real(1e-4)`: Stopping tolerance for iterations.
+- `max_iter::Integer(100)`: Maximum number of iterations.
+- `verbose::Integer(2)`: Level of feedback (0 for no output, 1 for warnings only, 2 for warning and convergence messages during iteration).
+- `print_skip::Integer(10)`: If `verbose == 2`, how many iterations to apply between print messages.
 
-##### Returns
----
+# Returns
 
-* '::TV': The fixed point of the operator ``T``. Has type ``TV``
+- `::TV`: The fixed point of the operator `T`. Has type `TV`.
 
-##### Example
+# Examples
 
 ```julia
-using QuantEcon
-T(x, μ) = 4.0 * μ * x * (1.0 - x)
-x_star = compute_fixed_point(x->T(x, 0.3), 0.4)  # (4μ - 1)/(4μ)
+julia> T(x, μ) = 4.0 * μ * x * (1.0 - x);
+
+julia> x_star = compute_fixed_point(x->T(x, 0.3), 0.4);  # (4μ - 1)/(4μ)
+Compute iterate 10 with error 0.0023564830444494367
+Compute iterate 20 with error 0.0002222571812867391
+Converged in 24 steps
+
+julia> x_star
+0.16702641162980347
 ```
 
 """
