@@ -16,7 +16,9 @@ https://lectures.quantecon.org/jl/arma.html
 =#
 
 @doc doc"""
-Represents a scalar ARMA(p, q) process
+    ARMA
+
+Represents a scalar ARMA(p, q) process.
 
 If ``\phi`` and ``\theta`` are scalars, then the model is
 understood to be
@@ -43,26 +45,27 @@ where
 * ``\theta = (\theta_1, \theta_2, \ldots , \theta_q)``
 * ``\sigma`` is a scalar, the standard deviation of the white noise
 
-##### Fields
+# Fields
 
- - `phi::Vector` : AR parameters ``\phi_1, \ldots, \phi_p``
- - `theta::Vector` : MA parameters ``\theta_1, \ldots, \theta_q``
- - `p::Integer` : Number of AR coefficients
- - `q::Integer` : Number of MA coefficients
- - `sigma::Real` : Standard deviation of white noise
- - `ma_poly::Vector` : MA polynomial --- filtering representatoin
- - `ar_poly::Vector` : AR polynomial --- filtering representation
+- `phi::Vector`: AR parameters ``\phi_1, \ldots, \phi_p``.
+- `theta::Vector`: MA parameters ``\theta_1, \ldots, \theta_q``.
+- `p::Integer`: Number of AR coefficients.
+- `q::Integer`: Number of MA coefficients.
+- `sigma::Real`: Standard deviation of white noise.
+- `ma_poly::Vector`: MA polynomial --- filtering representation.
+- `ar_poly::Vector`: AR polynomial --- filtering representation.
 
-##### Examples
+# Examples
 
 ```julia
-using QuantEcon
-phi = 0.5
-theta = [0.0, -0.8]
-sigma = 1.0
-lp = ARMA(phi, theta, sigma)
-require(joinpath(dirname(@__FILE__),"..", "examples", "arma_plots.jl"))
-quad_plot(lp)
+julia> phi = 0.5;
+
+julia> theta = [0.0, -0.8];
+
+julia> sigma = 1.0;
+
+julia> lp = ARMA(phi, theta, sigma)
+ARMA([0.5], [0.0, -0.8], 1, 2, 1.0, [1.0, 0.0, -0.8], [1.0, -0.5])
 ```
 """
 mutable struct ARMA
@@ -71,7 +74,7 @@ mutable struct ARMA
     p::Integer       # Number of AR coefficients
     q::Integer       # Number of MA coefficients
     sigma::Real      # Variance of white noise
-    ma_poly::Vector  # MA polynomial --- filtering representatoin
+    ma_poly::Vector  # MA polynomial --- filtering representation
     ar_poly::Vector  # AR polynomial --- filtering representation
 end
 
@@ -92,6 +95,8 @@ function ARMA(phi::AbstractVector, theta::AbstractVector=[0.0], sigma::Real=1.0)
 end
 
 @doc doc"""
+    spectral_density(arma; res=1200, two_pi=true)
+
 Compute the spectral density function.
 
 The spectral density is the discrete time Fourier transform of the
@@ -104,20 +109,20 @@ autocovariance function. In particular,
 where ``\gamma`` is the autocovariance function and the sum is over
 the set of all integers.
 
-##### Arguments
+# Arguments
 
-- `arma::ARMA`: Instance of `ARMA` type
+- `arma::ARMA`: Instance of `ARMA` type.
 - `;two_pi::Bool(true)`: Compute the spectral density function over ``[0, \pi]``
   if false and ``[0, 2 \pi]`` otherwise.
-- `;res(1200)` : If `res` is a scalar then the spectral density is computed at
+- `;res(1200)`: If `res` is a scalar then the spectral density is computed at
   `res` frequencies evenly spaced around the unit circle, but if `res` is an array
-  then the function computes the response at the frequencies given by the array
+  then the function computes the response at the frequencies given by the array.
 
+# Returns
 
-##### Returns
 - `w::Vector{Float64}`: The normalized frequencies at which h was computed, in
-  radians/sample
-- `spect::Vector{Float64}` : The frequency response
+  radians/sample.
+- `spect::Vector{Float64}`: The frequency response.
 """
 function spectral_density(arma::ARMA; res=1200, two_pi::Bool=true)
     # Compute the spectral density associated with ARMA process arma
@@ -130,15 +135,20 @@ function spectral_density(arma::ARMA; res=1200, two_pi::Bool=true)
 end
 
 """
+    autocovariance(arma; num_autocov=16)
+
 Compute the autocovariance function from the ARMA parameters
 over the integers range(`num_autocov`) using the spectral density
 and the inverse Fourier transform.
 
-##### Arguments
+# Arguments
 
-- `arma::ARMA`: Instance of `ARMA` type
-- `;num_autocov::Integer(16)` : The number of autocovariances to calculate
+- `arma::ARMA`: Instance of `ARMA` type.
+- `;num_autocov::Integer(16)`: The number of autocovariances to calculate.
 
+# Returns
+
+- `::Vector{Float64}`: The autocovariance function.
 """
 function autocovariance(arma::ARMA; num_autocov::Integer=16)
     # Compute the autocovariance function associated with ARMA process arma
@@ -150,19 +160,19 @@ function autocovariance(arma::ARMA; num_autocov::Integer=16)
 end
 
 @doc doc"""
+    impulse_response(arma; impulse_length=30)
+
 Get the impulse response corresponding to our model.
 
-##### Arguments
+# Arguments
 
-- `arma::ARMA`: Instance of `ARMA` type
-- `;impulse_length::Integer(30)`: Length of horizon for calcluating impulse reponse. Must be at least as long as the `p` fields of `arma`
+- `arma::ARMA`: Instance of `ARMA` type.
+- `;impulse_length::Integer(30)`: Length of horizon for calculating impulse response. Must be at least as long as the `p` fields of `arma`.
 
-
-##### Returns
+# Returns
 
 - `psi::Vector{Float64}`: `psi[j]` is the response at lag j of the impulse
   response. We take `psi[1]` as unity.
-
 """
 function impulse_response(arma::ARMA; impulse_length=30)
     # Compute the impulse response function associated with ARMA process arma
@@ -182,19 +192,20 @@ function impulse_response(arma::ARMA; impulse_length=30)
 end
 
 """
+    simulation(arma; ts_length=90, impulse_length=30)
+
 Compute a simulated sample path assuming Gaussian shocks.
 
-##### Arguments
+# Arguments
 
-- `arma::ARMA`: Instance of `ARMA` type
-- `;ts_length::Integer(90)`: Length of simulation
+- `arma::ARMA`: Instance of `ARMA` type.
+- `;ts_length::Integer(90)`: Length of simulation.
 - `;impulse_length::Integer(30)`: Horizon for calculating impulse response
   (see also docstring for `impulse_response`)
 
-##### Returns
+# Returns
 
-- `X::Vector{Float64}`: Simulation of the ARMA model `arma`
-
+- `X::Vector{Float64}`: Simulation of the ARMA model `arma`.
 """
 function simulation(arma::ARMA; ts_length=90, impulse_length=30)
     # Simulate the ARMA process arma assuming Gaussian shocks

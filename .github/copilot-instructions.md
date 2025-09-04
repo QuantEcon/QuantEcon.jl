@@ -16,8 +16,96 @@ Always reference these instructions first and fallback to search or bash command
 - Build documentation: `julia --project=docs docs/make.jl` -- takes ~30 seconds. 
 - Serve documentation locally: `cd docs && go run serve.go` (optional - serves on http://localhost:3000)
 
+### Documentation Build Testing:
+Always test documentation builds when making docstring changes to ensure no parsing errors are introduced:
+- Test documentation build: `julia --project=docs docs/make.jl` -- should complete without docstring parsing errors
+- Watch for warnings about docstring formatting or parsing issues in the build output
+- Documentation builds must pass before committing docstring changes
+
+### Examples Section Testing:
+Always test Examples sections in docstrings to ensure they execute without error:
+- Execute each code block in the Examples section manually using `julia --project=.`
+- Ensure all examples run without errors and produce the expected output shown in the docstring
+- For REPL-style examples, verify the actual output matches what is documented
+- Test Examples sections before committing any docstring changes that include or modify Examples
+
 ### No linting or formatting tools are configured
 Julia packages typically do not use external linters or formatters like other language ecosystems. Code style follows the Julia community conventions in the [Julia Style Guide](https://docs.julialang.org/en/v1/manual/style-guide/).
+
+### Docstring Style Guide
+When writing or updating docstrings in this codebase, follow these conventions:
+
+#### For Functions:
+1. Start with a four-space indented function signature showing the function name and key parameters
+2. Use single `#` for section headers (not `#####`)
+3. Add a blank line between section headers and their content
+4. Always include both `# Arguments` and `# Returns` sections for functions
+5. Use consistent formatting for parameter descriptions: no space before colon and end with period
+
+Example:
+```julia
+"""
+    function_name(arg1, arg2; keyword=default)
+
+Brief description of what the function does.
+
+# Arguments
+
+- `arg1::Type`: Description of first argument.
+- `arg2::Type`: Description of second argument.
+- `;keyword::Type(default)`: Description of keyword argument.
+
+# Returns
+
+- `result::Type`: Description of what is returned.
+"""
+```
+
+#### For Types/Structs:
+1. Start with a four-space indented type signature showing just the type name (do not include constructor parameters)
+2. If a struct has type parameters, show them; for example: `LinInterp{TV,TB}`
+3. Use `# Fields` instead of `# Arguments` for struct fields
+4. Follow the same header and spacing conventions as functions
+5. Use consistent formatting for field descriptions: no space before colon and end with period
+
+Example:
+```julia
+"""
+    TypeName
+
+Brief description of the type.
+
+# Fields
+
+- `field1::Type`: Description of first field.
+- `field2::Type`: Description of second field.
+"""
+```
+
+#### For Examples Sections:
+1. Use REPL-style format showing `julia>` prompts and expected output
+2. Always test Examples sections to ensure they execute without error
+3. Keep examples simple and focused on basic usage
+4. Do not include complex plotting or external file dependencies in Examples
+
+Example:
+```julia
+# Examples
+
+```julia
+julia> x = 1;
+
+julia> y = 2;
+
+julia> result = my_function(x, y)
+3
+```
+```
+
+#### Quality Control Procedures:
+1. **Ensure all docstring descriptions end with periods:** Every parameter, field, return value, and general description in a docstring must end with a period for consistency
+2. **Check for typos in docstrings:** Always proofread docstrings for spelling errors, especially in technical terms and commonly misspelled words like "representation," "calculating," "response"
+3. **Apply these checks systematically:** When updating any docstring, review the entire file for similar formatting inconsistencies and typos
 
 ## Validation
 
