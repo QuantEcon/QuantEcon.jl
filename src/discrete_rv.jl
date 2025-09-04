@@ -20,13 +20,15 @@ TODO: as of 07/10/2014 it is not possible to define the property
 =#
 
 """
+    DiscreteRV{TV1,TV2}
+
 Generates an array of draws from a discrete random variable with
 vector of probabilities given by `q`.
 
-##### Fields
+# Fields
 
-- `q::AbstractVector`: A vector of non-negative probabilities that sum to 1
-- `Q::AbstractVector`: The cumulative sum of `q`
+- `q::AbstractVector`: A vector of non-negative probabilities that sum to 1.
+- `Q::AbstractVector`: The cumulative sum of `q`.
 """
 mutable struct DiscreteRV{TV1<:AbstractVector, TV2<:AbstractVector}
     q::TV1
@@ -43,30 +45,34 @@ function DiscreteRV(q::TV) where TV<:AbstractVector
 end
 
 """
+    rand(d::DiscreteRV)
+
 Make a single draw from the discrete distribution.
 
-##### Arguments
+# Arguments
 
-- `d::DiscreteRV`: The `DiscreteRV` type represetning the distribution
+- `d::DiscreteRV`: The `DiscreteRV` type representing the distribution.
 
-##### Returns
+# Returns
 
-- `out::Int`: One draw from the discrete distribution
+- `out::Int`: One draw from the discrete distribution.
 """
 Random.rand(d::DiscreteRV) = searchsortedfirst(d.Q, rand())
 
 """
+    rand(d::DiscreteRV, k::Int)
+
 Make multiple draws from the discrete distribution represented by a
-`DiscreteRV` instance
+`DiscreteRV` instance.
 
-##### Arguments
+# Arguments
 
-- `d::DiscreteRV`: The `DiscreteRV` type representing the distribution
-- `k::Int`
+- `d::DiscreteRV`: The `DiscreteRV` type representing the distribution.
+- `k::Int`: Number of draws to make.
 
-##### Returns
+# Returns
 
-- `out::Vector{Int}`: `k` draws from `d`
+- `out::Vector{Int}`: `k` draws from `d`.
 """
 Random.rand(d::DiscreteRV, k::Int) = Int[rand(d) for i=1:k]
 
