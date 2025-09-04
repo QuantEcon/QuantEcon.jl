@@ -28,7 +28,7 @@ be an approximation to the fixed point of ``T``.
 # Arguments
 
 - `T::Function`: A function representing the operator ``T``.
-- `v::TV`: The initial condition. An object of type ``TV``.
+- `v::TV`: The initial condition. An object of type `TV`.
 - `err_tol::Real(1e-4)`: Stopping tolerance for iterations.
 - `max_iter::Integer(100)`: Maximum number of iterations.
 - `verbose::Integer(2)`: Level of feedback (0 for no output, 1 for warnings only, 2 for warning and convergence messages during iteration).
@@ -36,13 +36,11 @@ be an approximation to the fixed point of ``T``.
 
 # Returns
 
-- `::TV`: The fixed point of the operator ``T``. Has type ``TV``.
+- `::TV`: The fixed point of the operator `T`. Has type `TV`.
 
 # Examples
 
 ```julia
-julia> using QuantEcon;
-
 julia> T(x, μ) = 4.0 * μ * x * (1.0 - x);
 
 julia> x_star = compute_fixed_point(x->T(x, 0.3), 0.4);  # (4μ - 1)/(4μ)
