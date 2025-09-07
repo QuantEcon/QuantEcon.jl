@@ -89,7 +89,7 @@ Brief description of the type.
 4. Do not include complex plotting or external file dependencies in Examples
 
 Example:
-```julia
+````julia
 # Examples
 
 ```julia
@@ -100,7 +100,7 @@ julia> y = 2;
 julia> result = my_function(x, y)
 3
 ```
-```
+````
 
 #### Quality Control Procedures:
 1. **Ensure all docstring descriptions end with periods:** Every parameter, field, return value, and general description in a docstring must end with a period for consistency
