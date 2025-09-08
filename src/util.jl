@@ -16,7 +16,7 @@ fix(x::AbstractArray{T}) where {T<:Real} = fix!(x, similar(x, Int))
 """
     fix(x)
 
-Round `x` towards zero. For arrays there is a mutating version `fix!`
+Round `x` towards zero. For arrays there is a mutating version `fix!`.
 """
 fix
 
@@ -26,8 +26,8 @@ ckron(arrays::AbstractArray...) = reduce(kron, arrays)
 """
     ckron(arrays::AbstractArray...)
 
-Repeatedly apply kronecker products to the arrays. Equilvalent to
-`reduce(kron, arrays)`
+Repeatedly apply kronecker products to the arrays. Equivalent to
+`reduce(kron, arrays)`.
 """
 ckron
 
@@ -35,7 +35,7 @@ ckron
     gridmake!(out::AbstractMatrix, arrays::AbstractVector...)
 
 Like `gridmake`, but fills a pre-populated array. `out` must have size
-`prod(map(length, arrays), dims = length(arrays))`
+`prod(map(length, arrays), dims = length(arrays))`.
 """
 function gridmake!(out, arrays::Union{AbstractVector,AbstractMatrix}...)
     lens = Int[size(e, 1) for e in arrays]
@@ -95,9 +95,9 @@ end
 Expand one or more vectors (or matrices) into a matrix where rows span the
 cartesian product of combinations of the input arrays. Each column of the input
 arrays will correspond to one column of the output matrix. The first array
-varies the fastest (see example)
+varies the fastest (see example).
 
-# Example
+# Examples
 
 ```jlcon
 julia> x = [1, 2, 3]; y = [10, 20]; z = [100, 200];
@@ -128,11 +128,11 @@ checks that eigenvalues are less than 1 in absolute value.
 
 # Arguments
 
-- `A::Matrix` The matrix we want to check
+- `A::Matrix`: The matrix we want to check.
 
 # Returns
 
-- `stable::Bool` Whether or not the matrix is stable
+- `stable::Bool`: Whether or not the matrix is stable.
 
 """
 function is_stable(A::AbstractMatrix)
@@ -156,12 +156,12 @@ choose (m - 1).
 
 # Arguments
 
-- `m::Int` : Number of parts of composition
-- `n::Int` : Integer to decompose
+- `m::Int`: Number of parts of composition.
+- `n::Int`: Integer to decompose.
 
 # Returns
 
-- `::Int` : Total number of m-part compositions of n
+- `::Int`: Total number of m-part compositions of n.
 """
 function num_compositions(m, n)
     return binomial(n+m-1, m-1)
@@ -178,9 +178,9 @@ lexicographic order.
 
 # Fields
 
-- `m::Int` : Dimension of each point. Must be a positive integer.
-- `n::Int` : Number which the coordinates of each point sum to. Must
-             be a nonnegative integer.
+- `m::Int`: Dimension of each point. Must be a positive integer.
+- `n::Int`: Number which the coordinates of each point sum to. Must be a
+  nonnegative integer.
 
 # Examples
 
@@ -254,15 +254,14 @@ length of the output array) is L = (n+m-1)!/(n!*(m-1)!) (i.e.,
 
 # Arguments
 
-- `m::Int` : Dimension of each point. Must be a positive integer.
-- `n::Int` : Number which the coordinates of each point sum to. Must
-             be a nonnegative integer.
+- `m::Int`: Dimension of each point. Must be a positive integer.
+- `n::Int`: Number which the coordinates of each point sum to. Must be a
+  nonnegative integer.
 
 # Returns
 
-- `out::Matrix{Int}` : Array of shape (m, L) containing the integer
-                       points in the simplex, aligned in lexicographic
-                       order.
+- `out::Matrix{Int}`: Array of shape (m, L) containing the integer points in
+  the simplex, aligned in lexicographic order.
 
 # Notes
 
@@ -281,8 +280,8 @@ julia> simplex_grid(3, 4)
 
 # References
 
-A. Nijenhuis and H. S. Wilf, Combinatorial Algorithms, Chapter 5,
-   Academic Press, 1978.
+A. Nijenhuis and H. S. Wilf, Combinatorial Algorithms, Chapter 5, Academic
+Press, 1978.
 """
 function simplex_grid(m, n)
     # Get number of elements in array and allocate
@@ -307,15 +306,15 @@ integer points of the (m-1)-dimensional simplex ``\{x \mid x_0 +
 
 # Arguments
 
-- `x::Vector{Int}` : Integer point in the simplex, i.e., an array of
-                     m nonnegative integers that sum to n.
-- `m::Int` : Dimension of each point. Must be a positive integer.
-- `n::Int` : Number which the coordinates of each point sum to. Must be a
-             nonnegative integer.
+- `x::Vector{Int}`: Integer point in the simplex, i.e., an array of m
+  nonnegative integers that sum to n.
+- `m::Int`: Dimension of each point. Must be a positive integer.
+- `n::Int`: Number which the coordinates of each point sum to. Must be a
+  nonnegative integer.
 
 # Returns
 
-- `idx::Int` : Index of x.
+- `idx::Int`: Index of x.
 """
 function simplex_index(x, m, n)
     # If only one element then only one point in simplex
