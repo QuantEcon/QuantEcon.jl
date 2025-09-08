@@ -16,7 +16,7 @@ fix(x::AbstractArray{T}) where {T<:Real} = fix!(x, similar(x, Int))
 """
     fix(x)
 
-Round `x` towards zero. For arrays there is a mutating version `fix!`
+Round `x` towards zero. For arrays there is a mutating version `fix!`.
 """
 fix
 
@@ -95,9 +95,9 @@ end
 Expand one or more vectors (or matrices) into a matrix where rows span the
 cartesian product of combinations of the input arrays. Each column of the input
 arrays will correspond to one column of the output matrix. The first array
-varies the fastest (see example)
+varies the fastest (see example).
 
-# Example
+# Examples
 
 ```jlcon
 julia> x = [1, 2, 3]; y = [10, 20]; z = [100, 200];
@@ -179,8 +179,8 @@ lexicographic order.
 # Fields
 
 - `m::Int`: Dimension of each point. Must be a positive integer.
-- `n::Int`: Number which the coordinates of each point sum to. Must
-             be a nonnegative integer.
+- `n::Int`: Number which the coordinates of each point sum to. Must be a
+  nonnegative integer.
 
 # Examples
 
@@ -256,13 +256,12 @@ length of the output array) is L = (n+m-1)!/(n!*(m-1)!) (i.e.,
 
 - `m::Int`: Dimension of each point. Must be a positive integer.
 - `n::Int`: Number which the coordinates of each point sum to. Must be a
-             nonnegative integer.
+  nonnegative integer.
 
 # Returns
 
-- `out::Matrix{Int}`: Array of shape (m, L) containing the integer
-                       points in the simplex, aligned in lexicographic
-                       order.
+- `out::Matrix{Int}`: Array of shape (m, L) containing the integer points in
+  the simplex, aligned in lexicographic order.
 
 # Notes
 
@@ -281,8 +280,8 @@ julia> simplex_grid(3, 4)
 
 # References
 
-A. Nijenhuis and H. S. Wilf, Combinatorial Algorithms, Chapter 5,
-   Academic Press, 1978.
+A. Nijenhuis and H. S. Wilf, Combinatorial Algorithms, Chapter 5, Academic
+Press, 1978.
 """
 function simplex_grid(m, n)
     # Get number of elements in array and allocate
@@ -307,11 +306,11 @@ integer points of the (m-1)-dimensional simplex ``\{x \mid x_0 +
 
 # Arguments
 
-- `x::Vector{Int}`: Integer point in the simplex, i.e., an array of
-                     m nonnegative integers that sum to n.
+- `x::Vector{Int}`: Integer point in the simplex, i.e., an array of m
+  nonnegative integers that sum to n.
 - `m::Int`: Dimension of each point. Must be a positive integer.
 - `n::Int`: Number which the coordinates of each point sum to. Must be a
-             nonnegative integer.
+  nonnegative integer.
 
 # Returns
 
