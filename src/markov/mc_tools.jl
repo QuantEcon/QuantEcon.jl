@@ -73,6 +73,8 @@ function Base.show(io::IO, mc::MarkovChain{T,TM}) where {T,TM}
 end
 
 @doc doc"""
+    gth_solve(A)
+
 This routine computes the stationary distribution of an irreducible Markov
 transition matrix (stochastic matrix) or transition rate matrix (generator
 matrix) ``A``.
@@ -92,16 +94,15 @@ variant of Gaussian elimination, where only the off-diagonal entries of ``A`` ar
 used as the input data. For a nice exposition of the algorithm, see Stewart
 (2009), Chapter 10.
 
-##### Arguments
+# Arguments
 
-- `A::Matrix{T}` : Stochastic matrix or generator matrix. Must be of shape n x
-  n.
+- `A::Matrix{T}`: Stochastic matrix or generator matrix. Must be of shape n x n.
 
-##### Returns
+# Returns
 
-- `x::Vector{T}` : Stationary distribution of ``A``.
+- `x::Vector{T}`: Stationary distribution of ``A``.
 
-##### References
+# References
 
 - W. K. Grassmann, M. I. Taksar and D. P. Heyman, "Regenerative Analysis and
   Steady State Distributions for Markov Chains, " Operations Research (1985),
@@ -154,32 +155,34 @@ function gth_solve!(A::Matrix{T}) where T<:Real
 end
 
 """
+    recurrent_classes(mc)
+
 Find the recurrent classes of the Markov chain `mc`.
 
-##### Arguments
+# Arguments
 
 - `mc::MarkovChain`: MarkovChain instance.
 
-##### Returns
+# Returns
 
 - `::Vector{Vector{Int}}`: Vector of vectors that describe the recurrent
   classes of `mc`.
-
 """
 recurrent_classes(mc::MarkovChain) = attracting_components(DiGraph(mc.p))
 
 """
+    communication_classes(mc)
+
 Find the communication classes of the Markov chain `mc`.
 
-#### Arguments
+# Arguments
 
 - `mc::MarkovChain`: MarkovChain instance.
 
-### Returns
+# Returns
 
 - `::Vector{Vector{Int}}`: Vector of vectors that describe the communication
   classes of `mc`.
-
 """
 communication_classes(mc::MarkovChain) = strongly_connected_components(DiGraph(mc.p))
 
@@ -264,16 +267,18 @@ for (S, ex_T, ex_gth) in ((Real, :(T), :(gth_solve!)),
 end
 
 @doc doc"""
+    stationary_distributions(mc)
+
 Compute stationary distributions of the Markov chain `mc`, one for each
 recurrent class.
 
-##### Arguments
+# Arguments
 
-- `mc::MarkovChain{T}` : MarkovChain instance.
+- `mc::MarkovChain{T}`: MarkovChain instance.
 
-##### Returns
+# Returns
 
-- `stationary_dists::Vector{Vector{T1}}` : Vector of vectors that represent
+- `stationary_dists::Vector{Vector{T1}}`: Vector of vectors that represent
   stationary distributions, where the element type `T1` is `Rational` if `T` is
   `Int` (and equal to `T` otherwise).
 
@@ -357,19 +362,21 @@ Base.length(mcs::MCSimulator) = length(mcs.mcis)
 Base.IteratorSize(mcs::MCSimulator) = Base.IteratorSize(mcs.mcis)
 
 """
+    simulate(mc, ts_length; init=rand(1:n_states(mc)))
+
 Simulate one sample path of the Markov chain `mc`.
 The resulting vector has the state values of `mc` as elements.
 
-### Arguments
+# Arguments
 
-- `mc::MarkovChain` : MarkovChain instance.
-- `ts_length::Int` : Length of simulation
-- `;init::Int=rand(1:n_states(mc))` : Initial state
+- `mc::MarkovChain`: MarkovChain instance.
+- `ts_length::Int`: Length of simulation.
+- `;init::Int=rand(1:n_states(mc))`: Initial state.
 
-### Returns
+# Returns
 
-- `X::Vector` : Vector containing the sample path, with length
-  ts_length
+- `X::Vector`: Vector containing the sample path, with length
+  ts_length.
 """
 function simulate(mc::MarkovChain, ts_length::Int;
                   init::Int=rand(1:n_states(mc)))
@@ -379,16 +386,18 @@ end
 
 
 """
+    simulate!(X, mc; init=rand(1:n_states(mc)))
+
 Fill `X` with sample paths of the Markov chain `mc` as columns.
 The resulting matrix has the state values of `mc` as elements.
 
-### Arguments
+# Arguments
 
-- `X::Matrix` : Preallocated matrix to be filled with sample paths
+- `X::Matrix`: Preallocated matrix to be filled with sample paths
 of the Markov chain `mc`. The element types in `X` should be the
-same as the type of the state values of `mc`
-- `mc::MarkovChain` : MarkovChain instance.
-- `;init=rand(1:n_states(mc))` : Can be one of the following
+same as the type of the state values of `mc`.
+- `mc::MarkovChain`: MarkovChain instance.
+- `;init=rand(1:n_states(mc))`: Can be one of the following:
     - blank: random initial condition for each chain
     - scalar: same initial condition for each chain
     - vector: cycle through the elements, applying each as an
@@ -411,19 +420,21 @@ end
 # ------------------------ #
 
 """
+    simulate_indices(mc, ts_length; init=rand(1:n_states(mc)))
+
 Simulate one sample path of the Markov chain `mc`.
 The resulting vector has the indices of the state values of `mc` as elements.
 
-### Arguments
+# Arguments
 
-- `mc::MarkovChain` : MarkovChain instance.
-- `ts_length::Int` : Length of simulation
-- `;init::Int=rand(1:n_states(mc))` : Initial state
+- `mc::MarkovChain`: MarkovChain instance.
+- `ts_length::Int`: Length of simulation.
+- `;init::Int=rand(1:n_states(mc))`: Initial state.
 
-### Returns
+# Returns
 
-- `X::Vector{Int}` : Vector containing the sample path, with length
-  ts_length
+- `X::Vector{Int}`: Vector containing the sample path, with length
+  ts_length.
 """
 function simulate_indices(mc::MarkovChain, ts_length::Int;
                           init::Int=rand(1:n_states(mc)))
@@ -433,15 +444,17 @@ end
 
 
 """
+    simulate_indices!(X, mc; init=rand(1:n_states(mc)))
+
 Fill `X` with sample paths of the Markov chain `mc` as columns.
 The resulting matrix has the indices of the state values of `mc` as elements.
 
-### Arguments
+# Arguments
 
-- `X::Matrix{Int}` : Preallocated matrix to be filled with indices
+- `X::Matrix{Int}`: Preallocated matrix to be filled with indices
 of the sample paths of the Markov chain `mc`.
-- `mc::MarkovChain` : MarkovChain instance.
-- `;init=rand(1:n_states(mc))` : Can be one of the following
+- `mc::MarkovChain`: MarkovChain instance.
+- `;init=rand(1:n_states(mc))`: Can be one of the following:
     - blank: random initial condition for each chain
     - scalar: same initial condition for each chain
     - vector: cycle through the elements, applying each as an
