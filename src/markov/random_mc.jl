@@ -16,14 +16,14 @@ has `k` states with positive transition probability.
 
 # Arguments
 
-- `rng::AbstractRNG=GLOBAL_RNG` : Random number generator.
-- `n::Integer` : Number of states.
-- `k::Integer=n` : Number of nonzero entries in each column of the matrix. Set
+- `rng::AbstractRNG=GLOBAL_RNG`: Random number generator.
+- `n::Integer`: Number of states.
+- `k::Integer=n`: Number of nonzero entries in each column of the matrix. Set
   to `n` if none specified.
 
 # Returns
 
-- `mc::MarkovChain` : MarkovChain instance.
+- `mc::MarkovChain`: MarkovChain instance.
 
 # Examples
 
@@ -69,14 +69,14 @@ each row.
 
 # Arguments
 
-- `rng::AbstractRNG=GLOBAL_RNG` : Random number generator.
-- `n::Integer` : Number of states.
-- `k::Integer=n` : Number of nonzero entries in each column of the matrix. Set
+- `rng::AbstractRNG=GLOBAL_RNG`: Random number generator.
+- `n::Integer`: Number of states.
+- `k::Integer=n`: Number of nonzero entries in each column of the matrix. Set
   to `n` if none specified.
 
 # Returns
 
-- `p::Array` : Stochastic matrix.
+- `p::Array`: Stochastic matrix.
 """
 function random_stochastic_matrix(rng::AbstractRNG, n::Integer, k::Integer=n)
     if !(n > 0)
@@ -98,20 +98,20 @@ random_stochastic_matrix(n::Integer, k::Integer=n) =
 """
     _random_stochastic_matrix([rng], n, m; k=n)
 
-Generate a "non-square column stochstic matrix" of shape `(n, m)`, which contains
+Generate a "non-square column stochastic matrix" of shape `(n, m)`, which contains
 as columns `m` probability vectors of length `n` with `k` nonzero entries.
 
 # Arguments
 
-- `rng::AbstractRNG=GLOBAL_RNG` : Random number generator.
-- `n::Integer` : Number of states.
-- `m::Integer` : Number of probability vectors.
-- `;k::Integer(n)` : Number of nonzero entries in each column of the matrix. Set
+- `rng::AbstractRNG=GLOBAL_RNG`: Random number generator.
+- `n::Integer`: Number of states.
+- `m::Integer`: Number of probability vectors.
+- `;k::Integer(n)`: Number of nonzero entries in each column of the matrix. Set
   to `n` if none specified.
 
 # Returns
 
-- `p::Array` : Array of shape `(n, m)` containing `m` probability vectors of
+- `p::Array`: Array of shape `(n, m)` containing `m` probability vectors of
   length `n` as columns.
 """
 function _random_stochastic_matrix(rng::AbstractRNG, n::Integer, m::Integer;
@@ -152,19 +152,19 @@ distribution with mean 0 and standard deviation `scale`.
 
 # Arguments
 
-- `rng::AbstractRNG=GLOBAL_RNG` : Random number generator.
-- `num_states::Integer` : Number of states.
-- `num_actions::Integer` : Number of actions.
-- `beta::Real=rand(rng)` : Discount factor. Randomly chosen from
+- `rng::AbstractRNG=GLOBAL_RNG`: Random number generator.
+- `num_states::Integer`: Number of states.
+- `num_actions::Integer`: Number of actions.
+- `beta::Real=rand(rng)`: Discount factor. Randomly chosen from
   `[0, 1)` if not specified.
-- `;k::Integer(num_states)` : Number of possible next states for each
+- `;k::Integer(num_states)`: Number of possible next states for each
   state-action pair. Equal to `num_states` if not specified.
-- `scale::Real(1)` : Standard deviation of the normal distribution for the
+- `scale::Real(1)`: Standard deviation of the normal distribution for the
   reward values.
 
 # Returns
 
-- `ddp::DiscreteDP` : An instance of DiscreteDP.
+- `ddp::DiscreteDP`: An instance of DiscreteDP.
 """
 function random_discrete_dp(rng::AbstractRNG,
                             num_states::Integer,
@@ -198,13 +198,13 @@ Return `m` randomly sampled probability vectors of size `k`.
 
 # Arguments
 
-- `rng::AbstractRNG=GLOBAL_RNG` : Random number generator.
-- `k::Integer` : Size of each probability vector.
-- `m::Integer` : Number of probability vectors.
+- `rng::AbstractRNG=GLOBAL_RNG`: Random number generator.
+- `k::Integer`: Size of each probability vector.
+- `m::Integer`: Number of probability vectors.
 
 # Returns
 
-- `a::Array` : Matrix of shape `(k, m)`, or Vector of shape `(k,)` if `m` is not
+- `a::Array`: Matrix of shape `(k, m)`, or Vector of shape `(k,)` if `m` is not
   specified, containing probability vector(s) as column(s).
 """
 function random_probvec(rng::AbstractRNG, k::Integer, m::Integer)
