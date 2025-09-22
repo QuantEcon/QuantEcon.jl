@@ -12,21 +12,23 @@ https://lectures.quantecon.org/jl/finite_markov.html
 
 =#
 import Graphs: DiGraph, period, attracting_components,
-                    strongly_connected_components, is_strongly_connected
+               strongly_connected_components, is_strongly_connected
 
 @inline check_stochastic_matrix(P) = maximum(abs, sum(P, dims = 2) .- 1) < 5e-15 ? true : false
 
 """
+    MarkovChain
+
 Finite-state discrete-time Markov chain.
 
 Methods are available that provide useful information such as the stationary
 distributions, and communication and recurrent classes, and allow simulation of
 state transitions.
 
-##### Fields
+# Fields
 
-- `p::AbstractMatrix` : The transition matrix. Must be square, all elements must be nonnegative, and all rows must sum to unity.
-- `state_values::AbstractVector` : Vector containing the values associated with the states.
+- `p::AbstractMatrix`: The transition matrix. Must be square, all elements must be nonnegative, and all rows must sum to unity.
+- `state_values::AbstractVector`: Vector containing the values associated with the states.
 """
 mutable struct MarkovChain{T, TM<:AbstractMatrix{T}, TV<:AbstractVector}
     p::TM # valid stochastic matrix
@@ -57,7 +59,11 @@ MarkovChain(p::AbstractMatrix, state_values=1:size(p, 1)) =
 
 Base.eltype(mc::MarkovChain{T,TM,TV}) where {T,TM,TV} = eltype(TV)
 
-"Number of states in the Markov chain `mc`"
+"""
+    n_states(mc)
+
+Number of states in the Markov chain `mc`.
+"""
 n_states(mc::MarkovChain) = size(mc.p, 1)
 
 function Base.show(io::IO, mc::MarkovChain{T,TM}) where {T,TM}
@@ -67,6 +73,8 @@ function Base.show(io::IO, mc::MarkovChain{T,TM}) where {T,TM}
 end
 
 @doc doc"""
+    gth_solve(A)
+
 This routine computes the stationary distribution of an irreducible Markov
 transition matrix (stochastic matrix) or transition rate matrix (generator
 matrix) ``A``.
@@ -76,7 +84,7 @@ entries are all nonnegative) ``A``, this routine solves for a nonzero solution
 ``x`` to ``x (A - D) = 0``, where ``D`` is the diagonal matrix for which the rows of
 ``A - D`` sum to zero (i.e., ``D_{ii} = \sum_j A_{ij}`` for all ``i``). One (and only
 one, up to normalization) nonzero solution exists corresponding to each
-reccurent class of ``A``, and in particular, if ``A`` is irreducible, there is a
+recurrent class of ``A``, and in particular, if ``A`` is irreducible, there is a
 unique solution; when there are more than one solution, the routine returns the
 solution that contains in its support the first index ``i`` such that no path
 connects ``i`` to any index larger than ``i``. The solution is normalized so that
@@ -86,16 +94,15 @@ variant of Gaussian elimination, where only the off-diagonal entries of ``A`` ar
 used as the input data. For a nice exposition of the algorithm, see Stewart
 (2009), Chapter 10.
 
-##### Arguments
+# Arguments
 
-- `A::Matrix{T}` : Stochastic matrix or generator matrix. Must be of shape n x
-  n.
+- `A::Matrix{T}`: Stochastic matrix or generator matrix. Must be of shape n x n.
 
-##### Returns
+# Returns
 
-- `x::Vector{T}` : Stationary distribution of ``A``.
+- `x::Vector{T}`: Stationary distribution of ``A``.
 
-##### References
+# References
 
 - W. K. Grassmann, M. I. Taksar and D. P. Heyman, "Regenerative Analysis and
   Steady State Distributions for Markov Chains, " Operations Research (1985),
@@ -111,8 +118,9 @@ gth_solve(A::Matrix{T}) where {T<:Integer} =
     gth_solve!(convert(Matrix{Rational{T}}, A))
 
 """
-Same as `gth_solve`, but overwrite the input `A`, instead of creating a copy.
+    gth_solve!(A)
 
+Same as `gth_solve`, but overwrite the input `A`, instead of creating a copy.
 """
 function gth_solve!(A::Matrix{T}) where T<:Real
     n = size(A, 1)
@@ -147,74 +155,79 @@ function gth_solve!(A::Matrix{T}) where T<:Real
 end
 
 """
+    recurrent_classes(mc)
+
 Find the recurrent classes of the Markov chain `mc`.
 
-##### Arguments
+# Arguments
 
-- `mc::MarkovChain` : MarkovChain instance.
+- `mc::MarkovChain`: MarkovChain instance.
 
-##### Returns
+# Returns
 
-- `::Vector{Vector{Int}}` : Vector of vectors that describe the recurrent
+- `::Vector{Vector{Int}}`: Vector of vectors that describe the recurrent
   classes of `mc`.
-
 """
 recurrent_classes(mc::MarkovChain) = attracting_components(DiGraph(mc.p))
 
 """
+    communication_classes(mc)
+
 Find the communication classes of the Markov chain `mc`.
 
-#### Arguments
+# Arguments
 
-- `mc::MarkovChain` : MarkovChain instance.
+- `mc::MarkovChain`: MarkovChain instance.
 
-### Returns
+# Returns
 
-- `::Vector{Vector{Int}}` : Vector of vectors that describe the communication
+- `::Vector{Vector{Int}}`: Vector of vectors that describe the communication
   classes of `mc`.
-
 """
 communication_classes(mc::MarkovChain) = strongly_connected_components(DiGraph(mc.p))
 
 """
+    is_irreducible(mc)
+
 Indicate whether the Markov chain `mc` is irreducible.
 
-##### Arguments
+# Arguments
 
-- `mc::MarkovChain` : MarkovChain instance.
+- `mc::MarkovChain`: MarkovChain instance.
 
-##### Returns
+# Returns
 
-- `::Bool`
-
+- `::Bool`: True if the Markov chain is irreducible, false otherwise.
 """
 is_irreducible(mc::MarkovChain) =  is_strongly_connected(DiGraph(mc.p))
 
 """
+    is_aperiodic(mc)
+
 Indicate whether the Markov chain `mc` is aperiodic.
 
-##### Arguments
+# Arguments
 
-- `mc::MarkovChain` : MarkovChain instance.
+- `mc::MarkovChain`: MarkovChain instance.
 
-##### Returns
+# Returns
 
-- `::Bool`
-
+- `::Bool`: True if the Markov chain is aperiodic, false otherwise.
 """
 is_aperiodic(mc::MarkovChain) = period(mc) == 1
 
 """
+    period(mc)
+
 Return the period of the Markov chain `mc`.
 
-##### Arguments
+# Arguments
 
-- `mc::MarkovChain` : MarkovChain instance.
+- `mc::MarkovChain`: MarkovChain instance.
 
-##### Returns
+# Returns
 
-- `::Int` : Period of `mc`.
-
+- `::Int`: Period of `mc`.
 """
 function period(mc::MarkovChain)
     g = DiGraph(mc.p)
@@ -254,16 +267,18 @@ for (S, ex_T, ex_gth) in ((Real, :(T), :(gth_solve!)),
 end
 
 @doc doc"""
+    stationary_distributions(mc)
+
 Compute stationary distributions of the Markov chain `mc`, one for each
 recurrent class.
 
-##### Arguments
+# Arguments
 
-- `mc::MarkovChain{T}` : MarkovChain instance.
+- `mc::MarkovChain{T}`: MarkovChain instance.
 
-##### Returns
+# Returns
 
-- `stationary_dists::Vector{Vector{T1}}` : Vector of vectors that represent
+- `stationary_dists::Vector{Vector{T1}}`: Vector of vectors that represent
   stationary distributions, where the element type `T1` is `Rational` if `T` is
   `Int` (and equal to `T` otherwise).
 
@@ -271,7 +286,7 @@ recurrent class.
 stationary_distributions
 
 # From base/sparse/sparsematrix.jl
-"""Custom version of `full`, which allows convertion to type `T`"""
+"""Custom version of `full`, which allows conversion to type `T`."""
 function todense(T::Type, S::SparseMatrixCSC)
     A = zeros(T, S.m, S.n)
     for Sj in 1:S.n
@@ -284,7 +299,7 @@ function todense(T::Type, S::SparseMatrixCSC)
     return A
 end
 
-"""If `A` is already dense, return `A` as is"""
+"""If `A` is already dense, return `A` as is."""
 todense(::Type, A::Array) = A
 
 
@@ -347,19 +362,21 @@ Base.length(mcs::MCSimulator) = length(mcs.mcis)
 Base.IteratorSize(mcs::MCSimulator) = Base.IteratorSize(mcs.mcis)
 
 """
+    simulate(mc, ts_length; init=rand(1:n_states(mc)))
+
 Simulate one sample path of the Markov chain `mc`.
 The resulting vector has the state values of `mc` as elements.
 
-### Arguments
+# Arguments
 
-- `mc::MarkovChain` : MarkovChain instance.
-- `ts_length::Int` : Length of simulation
-- `;init::Int=rand(1:n_states(mc))` : Initial state
+- `mc::MarkovChain`: MarkovChain instance.
+- `ts_length::Int`: Length of simulation.
+- `;init::Int=rand(1:n_states(mc))`: Initial state.
 
-### Returns
+# Returns
 
-- `X::Vector` : Vector containing the sample path, with length
-  ts_length
+- `X::Vector`: Vector containing the sample path, with length
+  ts_length.
 """
 function simulate(mc::MarkovChain, ts_length::Int;
                   init::Int=rand(1:n_states(mc)))
@@ -369,16 +386,18 @@ end
 
 
 """
+    simulate!(X, mc; init=rand(1:n_states(mc)))
+
 Fill `X` with sample paths of the Markov chain `mc` as columns.
 The resulting matrix has the state values of `mc` as elements.
 
-### Arguments
+# Arguments
 
-- `X::Matrix` : Preallocated matrix to be filled with sample paths
+- `X::Matrix`: Preallocated matrix to be filled with sample paths
 of the Markov chain `mc`. The element types in `X` should be the
-same as the type of the state values of `mc`
-- `mc::MarkovChain` : MarkovChain instance.
-- `;init=rand(1:n_states(mc))` : Can be one of the following
+same as the type of the state values of `mc`.
+- `mc::MarkovChain`: MarkovChain instance.
+- `;init=rand(1:n_states(mc))`: Can be one of the following:
     - blank: random initial condition for each chain
     - scalar: same initial condition for each chain
     - vector: cycle through the elements, applying each as an
@@ -401,19 +420,21 @@ end
 # ------------------------ #
 
 """
+    simulate_indices(mc, ts_length; init=rand(1:n_states(mc)))
+
 Simulate one sample path of the Markov chain `mc`.
 The resulting vector has the indices of the state values of `mc` as elements.
 
-### Arguments
+# Arguments
 
-- `mc::MarkovChain` : MarkovChain instance.
-- `ts_length::Int` : Length of simulation
-- `;init::Int=rand(1:n_states(mc))` : Initial state
+- `mc::MarkovChain`: MarkovChain instance.
+- `ts_length::Int`: Length of simulation.
+- `;init::Int=rand(1:n_states(mc))`: Initial state.
 
-### Returns
+# Returns
 
-- `X::Vector{Int}` : Vector containing the sample path, with length
-  ts_length
+- `X::Vector{Int}`: Vector containing the sample path, with length
+  ts_length.
 """
 function simulate_indices(mc::MarkovChain, ts_length::Int;
                           init::Int=rand(1:n_states(mc)))
@@ -423,15 +444,17 @@ end
 
 
 """
+    simulate_indices!(X, mc; init=rand(1:n_states(mc)))
+
 Fill `X` with sample paths of the Markov chain `mc` as columns.
 The resulting matrix has the indices of the state values of `mc` as elements.
 
-### Arguments
+# Arguments
 
-- `X::Matrix{Int}` : Preallocated matrix to be filled with indices
+- `X::Matrix{Int}`: Preallocated matrix to be filled with indices
 of the sample paths of the Markov chain `mc`.
-- `mc::MarkovChain` : MarkovChain instance.
-- `;init=rand(1:n_states(mc))` : Can be one of the following
+- `mc::MarkovChain`: MarkovChain instance.
+- `;init=rand(1:n_states(mc))`: Can be one of the following:
     - blank: random initial condition for each chain
     - scalar: same initial condition for each chain
     - vector: cycle through the elements, applying each as an
