@@ -34,6 +34,7 @@ tests = [
         "ddp",
         "zeros",
         "optimization",
+        "pivoting",
         "interp",
         "sampler",
         "util",
