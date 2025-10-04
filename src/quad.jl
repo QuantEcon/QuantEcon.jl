@@ -842,10 +842,7 @@ using a first-order monomial rule.
 
 - `vcv::AbstractMatrix`: Variance-covariance matrix.
 
-# Returns
-
-- `nodes::Array{Float64}`: An array of quadrature nodes.
-- `weights::Array{Float64}`: An array of corresponding quadrature weights.
+$(qnw_returns)
 """
 function qnwmonomial1(vcv::AbstractMatrix)
     n = size(vcv, 1)
@@ -879,10 +876,7 @@ using a second-order monomial rule.
 
 - `vcv::AbstractMatrix`: Variance-covariance matrix.
 
-# Returns
-
-- `nodes::Array{Float64}`: An array of quadrature nodes.
-- `weights::Array{Float64}`: An array of corresponding quadrature weights.
+$(qnw_returns)
 """
 function qnwmonomial2(vcv::AbstractMatrix)
     n = size(vcv, 1)
@@ -951,10 +945,7 @@ quantile `q0` to the quantile `qN`.
     - `Even`: nodes will be evenly spaced between the quantiles.
     - `Quantile`: nodes will be placed at evenly spaced quantile values.
 
-# Returns
-
-- `nodes::Vector{Float64}`: Quadrature nodes.
-- `weights::Vector{Float64}`: Quadrature weights.
+$(qnw_returns)
 
 # Notes
 
