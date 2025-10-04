@@ -137,7 +137,8 @@ Computes nodes and weights for multivariate normal distribution.
 
 - `n::Union{Int, Vector{Int}}`: Number of desired nodes along each dimension.
 - `mu::Union{Real, Vector{Real}}`: Mean along each dimension.
-- `sig2::Union{Real, Vector{Real}, Matrix{Real}}(eye(length(n)))`: Covariance structure.
+- `sig2::Union{Real, Vector{Real}, Matrix{Real}}(eye(length(n)))`: Covariance
+  structure.
 
 $(qnw_returns)
 
@@ -298,8 +299,10 @@ Computes nodes and weights for beta distribution.
 # Arguments
 
 - `n::Union{Int, Vector{Int}}`: Number of desired nodes along each dimension.
-- `a::Union{Real, Vector{Real}}`: First parameter of the beta distribution, along each dimension.
-- `b::Union{Real, Vector{Real}}`: Second parameter of the beta distribution, along each dimension.
+- `a::Union{Real, Vector{Real}}`: First parameter of the beta distribution,
+  along each dimension.
+- `b::Union{Real, Vector{Real}}`: Second parameter of the beta distribution,
+  along each dimension.
 
 $(qnw_returns)
 
@@ -407,8 +410,10 @@ Computes nodes and weights for gamma distribution.
 # Arguments
 
 - `n::Union{Int, Vector{Int}}`: Number of desired nodes along each dimension.
-- `a::Union{Real, Vector{Real}}`: Shape parameter of the gamma distribution, along each dimension. Must be positive. Default is 1.
-- `b::Union{Real, Vector{Real}}`: Scale parameter of the gamma distribution, along each dimension. Must be positive. Default is 1.
+- `a::Union{Real, Vector{Real}}`: Shape parameter of the gamma distribution,
+  along each dimension. Must be positive. Default is 1.
+- `b::Union{Real, Vector{Real}}`: Scale parameter of the gamma distribution,
+  along each dimension. Must be positive. Default is 1.
 
 $(qnw_returns)
 
@@ -639,7 +644,8 @@ Computes quadrature nodes and weights for multivariate lognormal distribution.
 
 - `n::Union{Int, Vector{Int}}`: Number of desired nodes along each dimension.
 - `mu::Union{Real, Vector{Real}}`: Mean along each dimension.
-- `sig2::Union{Real, Vector{Real}, Matrix{Real}}(eye(length(n)))`: Covariance structure.
+- `sig2::Union{Real, Vector{Real}, Matrix{Real}}(eye(length(n)))`: Covariance
+  structure.
 
 $(qnw_returns)
 
@@ -756,7 +762,8 @@ Approximate the integral of `f`, given quadrature `nodes` and `weights`.
 
 # Arguments
 
-- `f::Function`: A callable function that is to be approximated over the domain spanned by `nodes`.
+- `f::Function`: A callable function that is to be approximated over the domain
+  spanned by `nodes`.
 - `nodes::Array`: Quadrature nodes.
 - `weights::Array`: Quadrature weights.
 - `args...(Void)`: Additional positional arguments to pass to `f`.
@@ -764,7 +771,8 @@ Approximate the integral of `f`, given quadrature `nodes` and `weights`.
 
 # Returns
 
-- `out::Float64`: The scalar that approximates integral of `f` on the hypercube formed by `[a, b]`.
+- `out::Float64`: The scalar that approximates integral of `f` on the hypercube
+  formed by `[a, b]`.
 """
 function do_quad(f::Function, nodes::Array, weights::Vector, args...;
                  kwargs...)
@@ -780,11 +788,15 @@ for dimension i defined by `a[i]` and `b[i]`, respectively; using `n[i]` points.
 
 # Arguments
 
-- `f::Function`: The function to integrate over. This should be a function that accepts as its first argument a matrix representing points along each dimension (each dimension is a column). Other arguments that need to be passed to the function are caught by `args...` and `kwargs...`.
+- `f::Function`: The function to integrate over. This should be a function that
+  accepts as its first argument a matrix representing points along each dimension
+  (each dimension is a column). Other arguments that need to be passed to the
+  function are caught by `args...` and `kwargs...`.
 - `n::Union{Int, Vector{Int}}`: Number of desired nodes along each dimension.
 - `a::Union{Real, Vector{Real}}`: Lower endpoint along each dimension.
 - `b::Union{Real, Vector{Real}}`: Upper endpoint along each dimension.
-- `kind::AbstractString("lege")`: Specifies which type of integration to perform. Valid values are:
+- `kind::AbstractString("lege")`: Specifies which type of integration to perform. Valid
+  values are:
     - `"lege"`: Gauss-Legendre
     - `"cheb"`: Gauss-Chebyshev
     - `"trap"`: trapezoid rule
@@ -798,7 +810,8 @@ for dimension i defined by `a[i]` and `b[i]`, respectively; using `n[i]` points.
 
 # Returns
 
-- `out::Float64`: The scalar that approximates integral of `f` on the hypercube formed by `[a, b]`.
+- `out::Float64`: The scalar that approximates integral of `f` on the hypercube
+  formed by `[a, b]`.
 
 $(qnw_refs)
 """
@@ -819,6 +832,21 @@ function quadrect(f::Function, n, a, b, kind = "lege", args...; kwargs...)
 end
 
 
+"""
+    qnwmonomial1(vcv)
+
+Computes monomial integration nodes and weights for multivariate normal distribution
+using a first-order monomial rule.
+
+# Arguments
+
+- `vcv::AbstractMatrix`: Variance-covariance matrix.
+
+# Returns
+
+- `nodes::Array{Float64}`: An array of quadrature nodes.
+- `weights::Array{Float64}`: An array of corresponding quadrature weights.
+"""
 function qnwmonomial1(vcv::AbstractMatrix)
     n = size(vcv, 1)
     @assert n == size(vcv, 2) "Variance covariance matrix must be square"
@@ -841,6 +869,21 @@ function qnwmonomial1(vcv::AbstractMatrix)
 end
 
 
+"""
+    qnwmonomial2(vcv)
+
+Computes monomial integration nodes and weights for multivariate normal distribution
+using a second-order monomial rule.
+
+# Arguments
+
+- `vcv::AbstractMatrix`: Variance-covariance matrix.
+
+# Returns
+
+- `nodes::Array{Float64}`: An array of quadrature nodes.
+- `weights::Array{Float64}`: An array of corresponding quadrature weights.
+"""
 function qnwmonomial2(vcv::AbstractMatrix)
     n = size(vcv, 1)
     @assert n == size(vcv, 2) "Variance covariance matrix must be square"
@@ -892,10 +935,7 @@ function _quadnodes(d::Distributions.ContinuousUnivariateDistribution, N::Int,
 end
 
 """
-    qnwdist(
-        d::Distributions.ContinuousUnivariateDistribution, N::Int,
-        q0::Real=0.001, qN::Real=0.999, method::Union{T,Type{T}}=Quantile
-    ) where T
+    qnwdist(d, N; q0=0.001, qN=0.999, method=Quantile)
 
 Construct `N` quadrature weights and nodes for distribution `d` from the
 quantile `q0` to the quantile `qN`. `method` can be one of:
