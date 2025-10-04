@@ -1,5 +1,5 @@
 """
-    LinInterp{TV,TB}
+    LinInterp
 
 Linear interpolation in one dimension.
 
@@ -26,7 +26,6 @@ julia> li.([0.1, 0.2, 0.3])  # use broadcasting to evaluate at multiple points
  0.019866933079506122
  0.02955202066613396
 ```
-
 """
 struct LinInterp{TV<:AbstractArray,TB<:AbstractVector}
     breaks::TB
@@ -139,7 +138,7 @@ end
 (li::LinInterp{<:AbstractMatrix})(xp::Number) = li(xp, 1:li._ncol)
 
 """
-    interp(grid::AbstractVector, function_vals::AbstractVector)
+    interp(grid, function_vals)
 
 Linear interpolation in one dimension.
 
