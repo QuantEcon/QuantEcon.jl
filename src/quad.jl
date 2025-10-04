@@ -938,10 +938,25 @@ end
     qnwdist(d, N; q0=0.001, qN=0.999, method=Quantile)
 
 Construct `N` quadrature weights and nodes for distribution `d` from the
-quantile `q0` to the quantile `qN`. `method` can be one of:
+quantile `q0` to the quantile `qN`.
 
-- `Even`: nodes will be evenly spaced between the quantiles
-- `Quantile`: nodes will be placed at evenly spaced quantile values
+# Arguments
+
+- `d::Distributions.ContinuousUnivariateDistribution`: The distribution for which
+  to construct quadrature nodes and weights.
+- `N::Int`: Number of desired quadrature nodes.
+- `q0::Real(0.001)`: Lower quantile bound.
+- `qN::Real(0.999)`: Upper quantile bound.
+- `method::Union{T,Type{T}}(Quantile)`: Method for node placement. Can be one of:
+    - `Even`: nodes will be evenly spaced between the quantiles.
+    - `Quantile`: nodes will be placed at evenly spaced quantile values.
+
+# Returns
+
+- `nodes::Vector{Float64}`: Quadrature nodes.
+- `weights::Vector{Float64}`: Quadrature weights.
+
+# Notes
 
 To construct the weights, consider splitting the nodes into cells centered at
 each node. Specifically, let notation `z_i` mean the `i`th node and let
