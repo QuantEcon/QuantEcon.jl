@@ -1,24 +1,30 @@
 """
-Linear interpolation in one dimension
+    LinInterp{TV,TB}
 
-##### Fields
+Linear interpolation in one dimension.
 
-- `breaks::AbstractVector` : A sorted array of grid points on which to interpolate
+# Fields
 
-- `vals::AbstractVector` : The function values associated with each of the grid points
+- `breaks::AbstractVector`: A sorted array of grid points on which to interpolate.
+- `vals::AbstractVector`: The function values associated with each of the grid points.
 
-##### Examples
+# Examples
 
 ```julia
-breaks = cumsum(0.1 .* rand(20))
-vals = 0.1 .* sin.(breaks)
-li = LinInterp(breaks, vals)
+julia> breaks = cumsum(0.1 .* rand(20));
 
-# do interpolation via `call` method on a LinInterp object
-li(0.2)
+julia> vals = 0.1 .* sin.(breaks);
 
-# use broadcasting to evaluate at multiple points
-li.([0.1, 0.2, 0.3])
+julia> li = LinInterp(breaks, vals);
+
+julia> li(0.2)  # do interpolation via `call` method on a LinInterp object
+0.019866933079506122
+
+julia> li.([0.1, 0.2, 0.3])  # use broadcasting to evaluate at multiple points
+3-element Vector{Float64}:
+ 0.009983341664682815
+ 0.019866933079506122
+ 0.02955202066613396
 ```
 
 """
@@ -135,20 +141,34 @@ end
 """
     interp(grid::AbstractVector, function_vals::AbstractVector)
 
-Linear interpolation in one dimension
+Linear interpolation in one dimension.
 
-##### Examples
+# Arguments
+
+- `grid::AbstractVector`: A vector of grid points (will be sorted if not already sorted).
+- `function_vals::AbstractVector`: The function values associated with each grid point.
+
+# Returns
+
+- `LinInterp`: A LinInterp object that can be called to perform linear interpolation.
+
+# Examples
 
 ```julia
-breaks = cumsum(0.1 .* rand(20))
-vals = 0.1 .* sin.(breaks)
-li = interp(breaks, vals)
+julia> breaks = cumsum(0.1 .* rand(20));
 
-# Do interpolation by treating `li` as a function you can pass scalars to
-li(0.2)
+julia> vals = 0.1 .* sin.(breaks);
 
-# use broadcasting to evaluate at multiple points
-li.([0.1, 0.2, 0.3])
+julia> li = interp(breaks, vals);
+
+julia> li(0.2)  # Do interpolation by treating `li` as a function you can pass scalars to
+0.019866933079506122
+
+julia> li.([0.1, 0.2, 0.3])  # use broadcasting to evaluate at multiple points
+3-element Vector{Float64}:
+ 0.009983341664682815
+ 0.019866933079506122
+ 0.02955202066613396
 ```
 """
 function interp(grid::AbstractVector, function_vals::AbstractVector)
