@@ -29,21 +29,17 @@ import Base: *
 #------------------------#
 
 """
-DiscreteDP type for specifying paramters for discrete dynamic programming model
+    DiscreteDP
 
-##### Parameters
+DiscreteDP type for specifying parameters for discrete dynamic programming model.
 
-- `R::Array{T,NR}` : Reward Array
-- `Q::Array{T,NQ}` : Transition Probability Array
-- `beta::Float64`  : Discount Factor
-- `a_indices::Vector{Tind}`: Action Indices. Empty unless using
-  SA formulation
-- `a_indptr::Vector{Tind}`: Action Index Pointers. Empty unless using
-  SA formulation
+# Fields
 
-##### Returns
-
-- `ddp::DiscreteDP` : DiscreteDP object
+- `R::Array{T,NR}`: Reward array.
+- `Q::Array{T,NQ}`: Transition probability array.
+- `beta::Float64`: Discount factor.
+- `a_indices::Vector{Tind}`: Action indices. Empty unless using SA formulation.
+- `a_indptr::Vector{Tind}`: Action index pointers. Empty unless using SA formulation.
 
 """
 mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}}
@@ -158,18 +154,21 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
 end
 
 """
-DiscreteDP type for specifying parameters for discrete dynamic programming
-model Dense Matrix Formulation
+    DiscreteDP(R, Q, beta)
 
-##### Parameters
+DiscreteDP constructor for specifying parameters for discrete dynamic programming
+model using dense matrix formulation.
 
-- `R::Array{T,NR}` : Reward Array
-- `Q::Array{T,NQ}` : Transition Probability Array
-- `beta::Float64`  : Discount Factor
+# Arguments
 
-##### Returns
+- `R::Array{T,NR}`: Reward array.
+- `Q::Array{T,NQ}`: Transition probability array.
+- `beta::Float64`: Discount factor.
 
-- `ddp::DiscreteDP` : Constructor for DiscreteDP object
+# Returns
+
+- `ddp::DiscreteDP`: Constructor for DiscreteDP object.
+
 """
 function DiscreteDP(
     R::Array{T,NR}, Q::AbstractArray{T,NQ}, beta::Tbeta) where {T,NQ,NR,Tbeta}
@@ -177,24 +176,22 @@ function DiscreteDP(
 end
 
 """
-DiscreteDP type for specifying parameters for discrete dynamic programming
-model State-Action Pair Formulation
+    DiscreteDP(R, Q, beta, s_indices, a_indices)
 
-##### Parameters
+DiscreteDP constructor for specifying parameters for discrete dynamic programming
+model using state-action pair formulation.
 
-- `R::Array{T,NR}` : Reward Array
-- `Q::Array{T,NQ}` : Transition Probability Array
-- `beta::Float64`  : Discount Factor
-- `s_indices::Vector{Tind}`: State Indices. Empty unless using
-  SA formulation
-- `a_indices::Vector{Tind}`: Action Indices. Empty unless using
-  SA formulation
-- `a_indptr::Vector{Tind}`: Action Index Pointers. Empty unless using
-  SA formulation
+# Arguments
 
-##### Returns
+- `R::Array{T,NR}`: Reward array.
+- `Q::Array{T,NQ}`: Transition probability array.
+- `beta::Float64`: Discount factor.
+- `s_indices::Vector{Tind}`: State indices.
+- `a_indices::Vector{Tind}`: Action indices.
 
-- `ddp::DiscreteDP` : Constructor for DiscreteDP object
+# Returns
+
+- `ddp::DiscreteDP`: Constructor for DiscreteDP object.
 
 """
 function DiscreteDP(R::AbstractArray{T,NR},
@@ -221,10 +218,11 @@ num_states(ddp::DDPsa) = size(ddp.Q, 2)
 
 abstract type DDPAlgorithm end
 """
-This refers to the Value Iteration solution algorithm.
+    VFI
 
-References
-----------
+Value Iteration solution algorithm.
+
+# References
 
 https://lectures.quantecon.org/jl/discrete_dp.html
 
@@ -232,10 +230,11 @@ https://lectures.quantecon.org/jl/discrete_dp.html
 struct VFI <: DDPAlgorithm end
 
 """
-This refers to the Policy Iteration solution algorithm.
+    PFI
 
-References
-----------
+Policy Iteration solution algorithm.
+
+# References
 
 https://lectures.quantecon.org/jl/discrete_dp.html
 
@@ -243,10 +242,11 @@ https://lectures.quantecon.org/jl/discrete_dp.html
 struct PFI <: DDPAlgorithm end
 
 """
-This refers to the Modified Policy Iteration solution algorithm.
+    MPFI
 
-References
-----------
+Modified Policy Iteration solution algorithm.
+
+# References
 
 https://lectures.quantecon.org/jl/discrete_dp.html
 
@@ -254,16 +254,17 @@ https://lectures.quantecon.org/jl/discrete_dp.html
 struct MPFI <: DDPAlgorithm end
 
 """
-`DPSolveResult` is an object for retaining results and associated metadata after
-solving the model
+    DPSolveResult
 
-##### Parameters
+Object for retaining results and associated metadata after solving the model.
 
-- `ddp::DiscreteDP` : DiscreteDP object
+# Fields
 
-##### Returns
-
-- `ddpr::DPSolveResult` : DiscreteDP results object
+- `v::Vector{Tval}`: Value function vector.
+- `Tv::Array{Tval}`: Temporary value function array.
+- `num_iter::Int`: Number of iterations.
+- `sigma::Array{Int,1}`: Policy function vector.
+- `mc::MarkovChain`: Controlled Markov chain.
 
 """
 mutable struct DPSolveResult{Algo<:DDPAlgorithm,Tval<:Real}
@@ -301,22 +302,25 @@ end
 # ------------------------ #
 
 @doc doc"""
+    bellman_operator!(ddp, v, Tv, sigma)
+
 The Bellman operator, which computes and returns the updated value function ``Tv``
 for a value function ``v``.
 
-##### Parameters
+# Arguments
 
-- `ddp::DiscreteDP` : Object that contains the model parameters
-- `v::AbstractVector{T<:AbstractFloat}`: The current guess of the value function
+- `ddp::DiscreteDP`: Object that contains the model parameters.
+- `v::AbstractVector{T<:AbstractFloat}`: The current guess of the value function.
 - `Tv::AbstractVector{T<:AbstractFloat}`: A buffer array to hold the updated value
-  function. Initial value not used and will be overwritten
+  function. Initial value not used and will be overwritten.
 - `sigma::AbstractVector`: A buffer array to hold the policy function. Initial
-  values not used and will be overwritten
+  values not used and will be overwritten.
 
-##### Returns
+# Returns
 
-- `Tv::typeof(Tv)` : Updated value function vector
-- `sigma::typeof(sigma)` : Updated policiy function vector
+- `Tv::typeof(Tv)`: Updated value function vector.
+- `sigma::typeof(sigma)`: Updated policy function vector.
+
 """
 function bellman_operator!(
         ddp::DiscreteDP, v::AbstractVector, Tv::AbstractVector,
@@ -328,35 +332,50 @@ function bellman_operator!(
 end
 
 @doc doc"""
-Apply the Bellman operator using `v=ddpr.v`, `Tv=ddpr.Tv`, and `sigma=ddpr.sigma`
+    bellman_operator!(ddp, ddpr)
 
-##### Notes
+Apply the Bellman operator using `v=ddpr.v`, `Tv=ddpr.Tv`, and `sigma=ddpr.sigma`.
 
-Updates `ddpr.Tv` and `ddpr.sigma` inplace
+# Arguments
+
+- `ddp::DiscreteDP`: Object that contains the model parameters.
+- `ddpr::DPSolveResult`: Object that contains result variables.
+
+# Returns
+
+- `Tv::typeof(ddpr.Tv)`: Updated value function vector.
+- `sigma::typeof(ddpr.sigma)`: Updated policy function vector.
+
+# Notes
+
+Updates `ddpr.Tv` and `ddpr.sigma` inplace.
 
 """
 bellman_operator!(ddp::DiscreteDP, ddpr::DPSolveResult) =
     bellman_operator!(ddp, ddpr.v, ddpr.Tv, ddpr.sigma)
 
 """
+    bellman_operator!(ddp, v, sigma)
+
 The Bellman operator, which computes and returns the updated value function ``Tv``
 for a given value function ``v``.
 
 This function will fill the input `v` with `Tv` and the input `sigma` with the
 corresponding policy rule.
 
-##### Parameters
+# Arguments
 
-- `ddp::DiscreteDP`: The ddp model
+- `ddp::DiscreteDP`: The ddp model.
 - `v::AbstractVector{T<:AbstractFloat}`: The current guess of the value function. This
-  array will be overwritten
+  array will be overwritten.
 - `sigma::AbstractVector`: A buffer array to hold the policy function. Initial
-  values not used and will be overwritten
+  values not used and will be overwritten.
 
-##### Returns
+# Returns
 
-- `Tv::Vector`: Updated value function vector
-- `sigma::typeof(sigma)`: Policy rule
+- `Tv::Vector`: Updated value function vector.
+- `sigma::typeof(sigma)`: Policy rule.
+
 """
 bellman_operator!(ddp::DiscreteDP, v::AbstractVector{T}, sigma::AbstractVector) where {T<:AbstractFloat} =
     bellman_operator!(ddp, v, v, sigma)
@@ -370,17 +389,20 @@ function bellman_operator!(ddp::DiscreteDP{T1,NR,NQ,T2},
 end
 
 @doc doc"""
+    bellman_operator(ddp, v)
+
 The Bellman operator, which computes and returns the updated value function ``Tv``
 for a given value function ``v``.
 
-##### Parameters
+# Arguments
 
-- `ddp::DiscreteDP`: The ddp model
-- `v::AbstractVector`: The current guess of the value function
+- `ddp::DiscreteDP`: The ddp model.
+- `v::AbstractVector`: The current guess of the value function.
 
-##### Returns
+# Returns
 
-- `Tv::Vector` : Updated value function vector
+- `Tv::Vector`: Updated value function vector.
+
 """
 bellman_operator(ddp::DiscreteDP, v::AbstractVector) =
     s_wise_max(ddp, ddp.R + ddp.beta * (ddp.Q * v))
@@ -390,36 +412,40 @@ bellman_operator(ddp::DiscreteDP, v::AbstractVector) =
 # ---------------------- #
 
 @doc doc"""
-Compute the ``v``-greedy policy
+    compute_greedy!(ddp, ddpr)
 
-##### Parameters
+Compute the ``v``-greedy policy.
 
-- `ddp::DiscreteDP` : Object that contains the model parameters
-- `ddpr::DPSolveResult` : Object that contains result variables
+# Arguments
 
-##### Returns
+- `ddp::DiscreteDP`: Object that contains the model parameters.
+- `ddpr::DPSolveResult`: Object that contains result variables.
 
-- `sigma::Vector{Int}` : Array containing `v`-greedy policy rule
+# Returns
 
-##### Notes
+- `sigma::Vector{Int}`: Array containing `v`-greedy policy rule.
 
-modifies ddpr.sigma and ddpr.Tv in place
+# Notes
+
+Modifies ddpr.sigma and ddpr.Tv in place.
 
 """
 compute_greedy!(ddp::DiscreteDP, ddpr::DPSolveResult) =
     (bellman_operator!(ddp, ddpr); ddpr.sigma)
 
 @doc doc"""
+    compute_greedy(ddp, v)
+
 Compute the ``v``-greedy policy.
 
-#### Arguments
+# Arguments
 
-- `v::AbstractVector` Value function vector of length `n`
-- `ddp::DiscreteDP` Object that contains the model parameters
+- `ddp::DiscreteDP`: Object that contains the model parameters.
+- `v::AbstractVector`: Value function vector of length `n`.
 
-#### Returns
+# Returns
 
-- `sigma:: v-greedy policy vector, of length `n`
+- `sigma::Vector{Int}`: v-greedy policy vector, of length `n`.
 
 """
 function compute_greedy(ddp::DiscreteDP, v::AbstractVector{TV}) where TV<:Real
@@ -434,24 +460,38 @@ end
 # ----------------------- #
 
 """
-Method of `evaluate_policy` that extracts sigma from a `DPSolveResult`
+    evaluate_policy(ddp, ddpr)
 
-See other docstring for details
+Method of `evaluate_policy` that extracts sigma from a `DPSolveResult`.
+
+See other docstring for details.
+
+# Arguments
+
+- `ddp::DiscreteDP`: Object that contains the model parameters.
+- `ddpr::DPSolveResult`: Object that contains result variables.
+
+# Returns
+
+- `v_sigma::Array{Float64}`: Value vector of `sigma`, of length `n`.
+
 """
 evaluate_policy(ddp::DiscreteDP, ddpr::DPSolveResult) =
     evaluate_policy(ddp, ddpr.sigma)
 
 """
+    evaluate_policy(ddp, sigma)
+
 Compute the value of a policy.
 
-##### Parameters
+# Arguments
 
-- `ddp::DiscreteDP` : Object that contains the model parameters
-- `sigma::AbstractVector{T<:Integer}` : Policy rule vector
+- `ddp::DiscreteDP`: Object that contains the model parameters.
+- `sigma::AbstractVector{T<:Integer}`: Policy rule vector.
 
-##### Returns
+# Returns
 
-- `v_sigma::Array{Float64}` : Value vector of `sigma`, of length `n`.
+- `v_sigma::Array{Float64}`: Value vector of `sigma`, of length `n`.
 
 """
 function evaluate_policy(ddp::DiscreteDP, sigma::AbstractVector{T}) where T<:Integer
@@ -470,24 +510,27 @@ end
 # ------------- #
 
 """
+    solve(ddp[, method=VFI]; max_iter=250, epsilon=1e-3, k=20)
+
 Solve the dynamic programming problem.
 
-##### Parameters
+# Arguments
 
-- `ddp::DiscreteDP` : Object that contains the Model Parameters
-- `method::Type{T<Algo}(VFI)`: Type name specifying solution method.
+- `ddp::DiscreteDP`: Object that contains the model parameters.
+- `method::Type{T<:DDPAlgorithm}(VFI)`: Type name specifying solution method.
   Acceptable arguments are `VFI` for value function iteration or `PFI` for
-  policy function iteration or `MPFI` for modified policy function iteration
-- `;max_iter::Int(250)` : Maximum number of iterations
-- `;epsilon::Float64(1e-3)` : Value for epsilon-optimality. Only used if
-  `method` is `VFI`
-- `;k::Int(20)` : Number of iterations for partial policy evaluation in
+  policy function iteration or `MPFI` for modified policy function iteration.
+- `;max_iter::Int(250)`: Maximum number of iterations.
+- `;epsilon::Float64(1e-3)`: Value for epsilon-optimality. Only used if
+  `method` is `VFI`.
+- `;k::Int(20)`: Number of iterations for partial policy evaluation in
    modified policy iteration (irrelevant for other methods).
 
-##### Returns
+# Returns
 
-- `ddpr::DPSolveResult{Algo}` : Optimization result represented as a
+- `ddpr::DPSolveResult{Algo}`: Optimization result represented as a
   `DPSolveResult`. See `DPSolveResult` for details.
+
 """
 function solve(ddp::DiscreteDP{T}, method::Type{Algo}=VFI;
                max_iter::Integer=250, epsilon::Real=1e-3,
@@ -533,12 +576,12 @@ and
 for ``j= J, \\ldots, 1``, where the terminal value function ``v_{J+1}`` is 
 exogenously given by `v_term`.
 
-# Parameters
+# Arguments
 
-- `ddp::DiscreteDP{T}` : Object that contains the Model Parameters
-- `J::Integer`: Number of decision periods
+- `ddp::DiscreteDP{T}`: Object that contains the model parameters.
+- `J::Integer`: Number of decision periods.
 - `v_term::AbstractVector{<:Real}=zeros(num_states(ddp))`: Terminal value 
-  function of length equal to n (the number of states)  
+  function of length equal to n (the number of states).
 
 # Returns
 
@@ -546,6 +589,7 @@ exogenously given by `v_term`.
   optimal value function at period j = 1, ..., J+1.
 - `sigmas::Matrix{Int}`: Array of shape (n, J) where `sigmas[:,j]` contains the
   optimal policy function at period j = 1, ..., J.
+
 """
 function backward_induction(ddp::DiscreteDP{T}, J::Integer,
                             v_term::AbstractVector{<:Real}=
@@ -566,41 +610,58 @@ end
 # --------- #
 
 """
+    MarkovChain(ddp, ddpr)
+
 Returns the controlled Markov chain for a given policy `sigma`.
 
-##### Parameters
+# Arguments
 
-- `ddp::DiscreteDP` : Object that contains the model parameters
-- `ddpr::DPSolveResult` : Object that contains result variables
+- `ddp::DiscreteDP`: Object that contains the model parameters.
+- `ddpr::DPSolveResult`: Object that contains result variables.
 
-##### Returns
+# Returns
 
-mc : MarkovChain
-     Controlled Markov chain.
+- `mc::MarkovChain`: Controlled Markov chain.
+
 """
 QuantEcon.MarkovChain(ddp::DiscreteDP, ddpr::DPSolveResult) =
     MarkovChain(RQ_sigma(ddp, ddpr)[2])
 
 """
-Method of `RQ_sigma` that extracts sigma from a `DPSolveResult`
+    RQ_sigma(ddp, ddpr)
 
-See other docstring for details
+Method of `RQ_sigma` that extracts sigma from a `DPSolveResult`.
+
+See other docstring for details.
+
+# Arguments
+
+- `ddp::DiscreteDP`: Object that contains the model parameters.
+- `ddpr::DPSolveResult`: Object that contains result variables.
+
+# Returns
+
+- `R_sigma::Array{Float64}`: Reward vector for `sigma`, of length `n`.
+- `Q_sigma::Array{Float64}`: Transition probability matrix for `sigma`,
+  of shape `(n, n)`.
+
 """
 RQ_sigma(ddp::DiscreteDP, ddpr::DPSolveResult) = RQ_sigma(ddp, ddpr.sigma)
 
 """
+    RQ_sigma(ddp, sigma)
+
 Given a policy `sigma`, return the reward vector `R_sigma` and
 the transition probability matrix `Q_sigma`.
 
-##### Parameters
+# Arguments
 
-- `ddp::DiscreteDP` : Object that contains the model parameters
-- `sigma::AbstractVector{Int}`: policy rule vector
+- `ddp::DiscreteDP`: Object that contains the model parameters.
+- `sigma::AbstractVector{Int}`: Policy rule vector.
 
-##### Returns
+# Returns
 
 - `R_sigma::Array{Float64}`: Reward vector for `sigma`, of length `n`.
-
 - `Q_sigma::Array{Float64}`: Transition probability matrix for `sigma`,
   of shape `(n, n)`.
 
@@ -636,23 +697,60 @@ function s_wise_max!(
 end
 
 """
+    s_wise_max(vals)
+
 Return the `Vector` `max_a vals(s, a)`,  where `vals` is represented as a
 `AbstractMatrix` of size `(num_states, num_actions)`.
+
+# Arguments
+
+- `vals::AbstractMatrix`: Matrix of values of size `(num_states, num_actions)`.
+
+# Returns
+
+- `out::Vector`: Vector of maximum values across actions for each state.
+
 """
 s_wise_max(vals::AbstractMatrix) = vec(maximum(vals, dims = 2))
 
 """
+    s_wise_max!(vals, out)
+
 Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
 `AbstractMatrix` of size `(num_states, num_actions)`.
+
+# Arguments
+
+- `vals::AbstractMatrix`: Matrix of values of size `(num_states, num_actions)`.
+- `out::AbstractVector`: Output vector to be populated with maximum values.
+
+# Returns
+
+- `out::AbstractVector`: Vector of maximum values across actions for each state.
+
 """
 s_wise_max!(vals::AbstractMatrix, out::AbstractVector) = (println("calling this one! "); maximum!(out, vals))
 
 """
+    s_wise_max!(vals, out, out_argmax)
+
 Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
 `AbstractMatrix` of size `(num_states, num_actions)`.
 
-Also fills `out_argmax` with the column number associated with the `indmax` in
-each row
+Also fills `out_argmax` with the column number associated with the `argmax` in
+each row.
+
+# Arguments
+
+- `vals::AbstractMatrix`: Matrix of values of size `(num_states, num_actions)`.
+- `out::AbstractVector`: Output vector to be populated with maximum values.
+- `out_argmax::AbstractVector`: Output vector to be populated with argmax indices.
+
+# Returns
+
+- `out::AbstractVector`: Vector of maximum values across actions for each state.
+- `out_argmax::AbstractVector`: Vector of argmax column indices for each state.
+
 """
 function s_wise_max!(
         vals::AbstractMatrix, out::AbstractVector, out_argmax::AbstractVector
@@ -693,8 +791,22 @@ function s_wise_max!(
 end
 
 """
+    s_wise_max!(a_indices, a_indptr, vals, out)
+
 Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
 `Vector` of size `(num_sa_pairs,)`.
+
+# Arguments
+
+- `a_indices::AbstractVector`: Action indices vector.
+- `a_indptr::AbstractVector`: Action index pointers vector.
+- `vals::AbstractVector`: Vector of values of size `(num_sa_pairs,)`.
+- `out::AbstractVector`: Output vector to be populated with maximum values.
+
+# Returns
+
+- `out::AbstractVector`: Vector of maximum values across actions for each state.
+
 """
 function s_wise_max!(
         a_indices::AbstractVector, a_indptr::AbstractVector,
@@ -716,11 +828,27 @@ function s_wise_max!(
 end
 
 """
+    s_wise_max!(a_indices, a_indptr, vals, out, out_argmax)
+
 Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
 `Vector` of size `(num_sa_pairs,)`.
 
-Also fills `out_argmax` with the cartesiean index associated with the `indmax` in
-each row
+Also fills `out_argmax` with the cartesian index associated with the `argmax` in
+each row.
+
+# Arguments
+
+- `a_indices::AbstractVector`: Action indices vector.
+- `a_indptr::AbstractVector`: Action index pointers vector.
+- `vals::AbstractVector`: Vector of values of size `(num_sa_pairs,)`.
+- `out::AbstractVector`: Output vector to be populated with maximum values.
+- `out_argmax::AbstractVector`: Output vector to be populated with argmax indices.
+
+# Returns
+
+- `out::AbstractVector`: Vector of maximum values across actions for each state.
+- `out_argmax::AbstractVector`: Vector of argmax indices for each state.
+
 """
 function s_wise_max!(
         a_indices::AbstractVector, a_indptr::AbstractVector, vals::AbstractVector,
@@ -744,15 +872,19 @@ end
 
 
 """
+    _has_sorted_sa_indices(s_indices, a_indices)
+
 Check whether `s_indices` and `a_indices` are sorted in lexicographic order.
 
-Parameters
-----------
-`s_indices`, `a_indices` : Vectors
+# Arguments
 
-Returns
--------
-bool: Whether `s_indices` and `a_indices` are sorted.
+- `s_indices::AbstractVector`: State indices vector.
+- `a_indices::AbstractVector`: Action indices vector.
+
+# Returns
+
+- `result::Bool`: Whether `s_indices` and `a_indices` are sorted.
+
 """
 function _has_sorted_sa_indices(
         s_indices::AbstractVector, a_indices::AbstractVector
@@ -772,14 +904,20 @@ function _has_sorted_sa_indices(
 end
 
 """
+    _generate_a_indptr!(num_states, s_indices, out)
+
 Generate `a_indptr`; stored in `out`. `s_indices` is assumed to be
 in sorted order.
 
-Parameters
-----------
-- `num_states::Integer`
-- `s_indices::AbstractVector{T}`
-- `out::AbstractVector{T}` :  with length = `num_states` + 1
+# Arguments
+
+- `num_states::Integer`: Number of states.
+- `s_indices::AbstractVector{T}`: State indices vector (must be sorted).
+- `out::AbstractVector{T}`: Output vector with length = `num_states` + 1.
+
+# Returns
+
+- `out::AbstractVector{T}`: Action index pointers vector.
 
 """
 function _generate_a_indptr!(
@@ -812,9 +950,20 @@ function _find_indices!(
 end
 
 @doc doc"""
-Define Matrix Multiplication between 3-dimensional matrix and a vector
+    *(A, v)
 
-Matrix multiplication over the last dimension of ``A``
+Define matrix multiplication between 3-dimensional matrix and a vector.
+
+Matrix multiplication over the last dimension of ``A``.
+
+# Arguments
+
+- `A::AbstractArray{T,3}`: 3-dimensional array.
+- `v::AbstractVector`: Vector.
+
+# Returns
+
+- `result::AbstractArray`: Result of matrix multiplication.
 
 """
 function *(A::AbstractArray{T,3}, v::AbstractVector) where T
@@ -828,8 +977,24 @@ function *(A::AbstractArray{T,3}, v::AbstractVector) where T
 end
 
 """
-Impliments Value Iteration
-NOTE: See `solve` for further details
+    _solve!(ddp, ddpr, max_iter, epsilon, k)
+
+Implements Value Iteration.
+
+NOTE: See `solve` for further details.
+
+# Arguments
+
+- `ddp::DiscreteDP`: Object that contains the model parameters.
+- `ddpr::DPSolveResult{VFI}`: Object that contains result variables.
+- `max_iter::Integer`: Maximum number of iterations.
+- `epsilon::Real`: Value for epsilon-optimality.
+- `k::Integer`: Number of iterations (not used for VFI).
+
+# Returns
+
+- `ddpr::DPSolveResult{VFI}`: Updated result object.
+
 """
 function _solve!(
         ddp::DiscreteDP, ddpr::DPSolveResult{VFI}, max_iter::Integer,
@@ -861,11 +1026,26 @@ function _solve!(
 end
 
 """
-Policy Function Iteration
+    _solve!(ddp, ddpr, max_iter, epsilon, k)
+
+Policy Function Iteration.
 
 NOTE: The epsilon is ignored in this method. It is only here so dispatch can
       go from `solve(::DiscreteDP, ::Type{Algo})` to any of the algorithms.
-      See `solve` for further details
+      See `solve` for further details.
+
+# Arguments
+
+- `ddp::DiscreteDP`: Object that contains the model parameters.
+- `ddpr::DPSolveResult{PFI}`: Object that contains result variables.
+- `max_iter::Integer`: Maximum number of iterations.
+- `epsilon::Real`: Value for epsilon-optimality (not used for PFI).
+- `k::Integer`: Number of iterations (not used for PFI).
+
+# Returns
+
+- `ddpr::DPSolveResult{PFI}`: Updated result object.
+
 """
 function _solve!(
         ddp::DiscreteDP, ddpr::DPSolveResult{PFI}, max_iter::Integer,
@@ -896,7 +1076,22 @@ span(x::AbstractVector) = maximum(x) - minimum(x)
 midrange(x::AbstractVector) = mean(extrema(x))
 
 """
-Modified Policy Function Iteration
+    _solve!(ddp, ddpr, max_iter, epsilon, k)
+
+Modified Policy Function Iteration.
+
+# Arguments
+
+- `ddp::DiscreteDP`: Object that contains the model parameters.
+- `ddpr::DPSolveResult{MPFI}`: Object that contains result variables.
+- `max_iter::Integer`: Maximum number of iterations.
+- `epsilon::Real`: Value for epsilon-optimality.
+- `k::Integer`: Number of iterations for partial policy evaluation.
+
+# Returns
+
+- `ddpr::DPSolveResult{MPFI}`: Updated result object.
+
 """
 function _solve!(
         ddp::DiscreteDP, ddpr::DPSolveResult{MPFI}, max_iter::Integer,
