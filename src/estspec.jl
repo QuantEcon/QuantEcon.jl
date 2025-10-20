@@ -14,18 +14,20 @@ https://lectures.quantecon.org/jl/estspec.html
 using DSP
 
 """
+    smooth(x, window_len, window="hanning")
+
 Smooth the data in x using convolution with a window of requested size and type.
 
-##### Arguments
+# Arguments
 
-- `x::Array`: An array containing the data to smooth
-- `window_len::Int(7)`: An odd integer giving the length of the window
-- `window::AbstractString("hanning")`: A string giving the window type.
-  Possible values are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`
+- `x::Array`: An array containing the data to smooth.
+- `window_len::Int`: An odd integer giving the length of the window.
+- `window::AbstractString`: A string giving the window type (default: "hanning").
+  Possible values are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`.
 
-##### Returns
+# Returns
 
-- `out::Array`: The array of smoothed data
+- `out::Array`: The array of smoothed data.
 """
 function smooth(x::Array, window_len::Int, window::AbstractString="hanning")
     if length(x) < window_len
@@ -66,7 +68,21 @@ function smooth(x::Array, window_len::Int, window::AbstractString="hanning")
     return conv(w ./ sum(w), s)[window_len+1:end-window_len]
 end
 
-"Version of `smooth` where `window_len` and `window` are keyword arguments"
+"""
+    smooth(x; window_len=7, window="hanning")
+
+Version of `smooth` where `window_len` and `window` are keyword arguments.
+
+# Arguments
+
+- `x::Array`: An array containing the data to smooth.
+- `;window_len::Int(7)`: An odd integer giving the length of the window.
+- `;window::AbstractString("hanning")`: A string giving the window type.
+
+# Returns
+
+- `out::Array`: The array of smoothed data.
+"""
 function smooth(x::Array; window_len::Int=7, window::AbstractString="hanning")
     smooth(x, window_len, window)
 end
@@ -91,48 +107,53 @@ function periodogram(x::Vector, window::AbstractString, window_len::Int=7)
 end
 
 @doc doc"""
+    periodogram(x)
+    periodogram(x, window, window_len=7)
+
 Computes the periodogram
 
 ```math
 I(w) = \frac{1}{n} | \sum_{t=0}^{n-1} x_t e^{itw} |^2
 ```
 
-at the Fourier frequences ``w_j := 2 \frac{\pi j}{n}, j = 0, \ldots, n - 1``, using the fast
-Fourier transform.  Only the frequences ``w_j`` in ``[0, \pi]`` and corresponding values
-``I(w_j)`` are returned.  If a window type is given then smoothing is performed.
+at the Fourier frequencies ``w_j := 2 \frac{\pi j}{n}, j = 0, \ldots, n - 1``, using the fast
+Fourier transform. Only the frequencies ``w_j`` in ``[0, \pi]`` and corresponding values
+``I(w_j)`` are returned. If a window type is given then smoothing is performed.
 
-##### Arguments
+# Arguments
 
-- `x::Array`: An array containing the data to smooth
-- `window_len::Int(7)`: An odd integer giving the length of the window
-- `window::AbstractString("hanning")`: A string giving the window type. Possible values
-  are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`
+- `x::Vector`: A vector containing the data to analyze.
+- `window::AbstractString`: A string giving the window type (optional).
+  Possible values are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`.
+- `window_len::Int`: An odd integer giving the length of the window (default: 7).
 
-##### Returns
+# Returns
 
-- `w::Array{Float64}`: Fourier frequencies at which the periodogram is evaluated
-- `I_w::Array{Float64}`: The periodogram at frequences `w`
+- `w::Vector{Float64}`: Fourier frequencies at which the periodogram is evaluated.
+- `I_w::Vector{Float64}`: The periodogram at frequencies `w`.
 
 """
 periodogram
 
 """
+    ar_periodogram(x, window="hanning", window_len=7)
+
 Compute periodogram from data `x`, using prewhitening, smoothing and recoloring.
 The data is fitted to an AR(1) model for prewhitening, and the residuals are
-used to compute a first-pass periodogram with smoothing.  The fitted
+used to compute a first-pass periodogram with smoothing. The fitted
 coefficients are then used for recoloring.
 
-##### Arguments
+# Arguments
 
-- `x::Array`: An array containing the data to smooth
-- `window_len::Int(7)`: An odd integer giving the length of the window
-- `window::AbstractString("hanning")`: A string giving the window type. Possible values
-  are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`
+- `x::Array`: An array containing the data to analyze.
+- `window::AbstractString`: A string giving the window type (default: "hanning").
+  Possible values are `flat`, `hanning`, `hamming`, `bartlett`, or `blackman`.
+- `window_len::Int`: An odd integer giving the length of the window (default: 7).
 
-##### Returns
+# Returns
 
-- `w::Array{Float64}`: Fourier frequencies at which the periodogram is evaluated
-- `I_w::Array{Float64}`: The periodogram at frequences `w`
+- `w::Vector{Float64}`: Fourier frequencies at which the periodogram is evaluated.
+- `I_w::Vector{Float64}`: The periodogram at frequencies `w`.
 
 """
 function ar_periodogram(x::Array, window::AbstractString="hanning", window_len::Int=7)

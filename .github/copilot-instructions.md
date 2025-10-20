@@ -41,6 +41,8 @@ When writing or updating docstrings in this codebase, follow these conventions:
 3. Add a blank line between section headers and their content
 4. Always include both `# Arguments` and `# Returns` sections for functions
 5. Use consistent formatting for parameter descriptions: no space before colon and end with period
+6. **Preserve `@doc doc` formatting**: If a docstring uses `@doc doc"""` syntax, preserve it - do not change it to plain `"""`. This is used for mathematical notation and LaTeX formatting.
+7. **Do not escape LaTeX commands**: In docstrings with `@doc doc"""`, LaTeX commands like `\frac`, `\sum`, `\pi`, `\ldots` should remain as single backslash, not double backslash.
 
 Example:
 ```julia
@@ -59,6 +61,29 @@ Brief description of what the function does.
 
 - `result::Type`: Description of what is returned.
 """
+```
+
+Example with `@doc doc` for mathematical notation:
+```julia
+@doc doc"""
+    function_with_math(x)
+
+Description with mathematical formula.
+
+```math
+f(x) = \frac{1}{n} \sum_{i=1}^{n} x_i
+```
+
+# Arguments
+
+- `x::Vector`: Input vector.
+
+# Returns
+
+- `result::Float64`: Computed result.
+
+"""
+function_with_math
 ```
 
 #### For Types/Structs:
