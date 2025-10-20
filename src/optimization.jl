@@ -1,3 +1,22 @@
+"""
+    golden_method(f, a, b; tol=eps()*10, maxit=1000)
+
+Applies Golden-section search to search for the maximum of a function 
+elementwise over intervals specified by vectors.
+
+# Arguments
+
+- `f::Function`: Function to maximize. Should accept a vector and return a vector of function values.
+- `a::AbstractVector`: Vector of lower bounds for each search interval.
+- `b::AbstractVector`: Vector of upper bounds for each search interval.
+- `tol::Real=eps()*10`: Convergence tolerance.
+- `maxit::Int=1000`: Maximum number of iterations.
+
+# Returns
+
+- `x::AbstractVector`: Vector of points where the function is maximized in each interval.
+- `fx::AbstractVector`: Vector of maximum function values.
+"""
 function golden_method(f::Function, a::AbstractVector, b::AbstractVector;
                        tol=eps()*10, maxit=1000)
     α1 = (3 - sqrt(5)) / 2
@@ -44,10 +63,25 @@ end
 # end
 
 """
-Applies Golden-section search to search for the _maximum_ of a function in
-the interval (a, b)
+    golden_method(f, a, b; tol=10*eps(), maxit=1000)
 
-https://en.wikipedia.org/wiki/Golden-section_search
+Applies Golden-section search to search for the maximum of a function in
+the interval (a, b).
+
+See: https://en.wikipedia.org/wiki/Golden-section_search
+
+# Arguments
+
+- `f::Function`: Function to maximize. Should accept a real number and return a real number.
+- `a::Real`: Lower bound of the search interval.
+- `b::Real`: Upper bound of the search interval.
+- `tol::Float64=10*eps()`: Convergence tolerance.
+- `maxit::Int=1000`: Maximum number of iterations.
+
+# Returns
+
+- `x::Real`: Point where the function is maximized.
+- `fx::Float64`: Maximum function value.
 """
 function golden_method(f::Function, a::Real, b::Real; tol::Float64=10*eps(),
                        maxit::Int=1000)
