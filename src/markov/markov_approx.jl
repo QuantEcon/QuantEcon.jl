@@ -19,7 +19,9 @@ std_norm_cdf(x::T) where {T <: Real} = 0.5 * erfc(-x/sqrt(2))
 std_norm_cdf(x::Array{T}) where {T <: Real} = 0.5 .* erfc(-x./sqrt(2))
 
 @doc doc"""
-Tauchen's (1996) method for approximating AR(1) process with finite markov chain
+    tauchen(N, ρ, σ, μ=0.0, n_std=3)
+
+Tauchen's (1996) method for approximating AR(1) process with finite markov chain.
 
 The process follows
 
@@ -29,18 +31,17 @@ The process follows
 
 where ``\epsilon_t \sim N (0, \sigma^2)``
 
-##### Arguments
+# Arguments
 
-- `N::Integer`: Number of points in markov process
-- `ρ::Real` : Persistence parameter in AR(1) process
-- `σ::Real` : Standard deviation of random component of AR(1) process
-- `μ::Real(0.0)` : Mean of AR(1) process
-- `n_std::Real(3)` : The number of standard deviations to each side the process
-  should span
+- `N::Integer`: Number of points in markov process.
+- `ρ::Real`: Persistence parameter in AR(1) process.
+- `σ::Real`: Standard deviation of random component of AR(1) process.
+- `μ::Real(0.0)`: Mean of AR(1) process.
+- `n_std::Real(3)`: The number of standard deviations to each side the process should span.
 
-##### Returns
+# Returns
 
-- `mc::MarkovChain` : Markov chain holding the state values and transition matrix
+- `mc::MarkovChain`: Markov chain holding the state values and transition matrix.
 
 """
 function tauchen(N::Integer, ρ::T1, σ::T2, μ=zero(promote_type(T1, T2)), n_std::T3=3) where {T1 <: Real, T2 <: Real, T3 <: Real}
@@ -89,6 +90,8 @@ end
 
 
 @doc doc"""
+    rouwenhorst(N, ρ, σ, μ=0.0)
+
 Rouwenhorst's method to approximate AR(1) processes.
 
 The process follows
@@ -99,15 +102,16 @@ The process follows
 
 where ``\epsilon_t \sim N (0, \sigma^2)``
 
-##### Arguments
-- `N::Integer` : Number of points in markov process
-- `ρ::Real` : Persistence parameter in AR(1) process
-- `σ::Real` : Standard deviation of random component of AR(1) process
-- `μ::Real(0.0)` :  Mean of AR(1) process
+# Arguments
 
-##### Returns
+- `N::Integer`: Number of points in markov process.
+- `ρ::Real`: Persistence parameter in AR(1) process.
+- `σ::Real`: Standard deviation of random component of AR(1) process.
+- `μ::Real(0.0)`: Mean of AR(1) process.
 
-- `mc::MarkovChain{Float64}` : Markov chain holding the state values and transition matrix
+# Returns
+
+- `mc::MarkovChain{Float64}`: Markov chain holding the state values and transition matrix.
 
 """
 function rouwenhorst(N::Integer, ρ::Real, σ::Real, μ::Real=0.0)
@@ -142,8 +146,9 @@ end
 # @inline _emcd_lt(a::Vector{T}, b::Vector{T}) where {T} = Base.lt(Base.Order.Lexicographic, a, b)
 
 @doc doc"""
-Accepts the simulation of a discrete state Markov chain and estimates
-the transition probabilities
+    estimate_mc_discrete(X)
+
+Accepts the simulation of a discrete state Markov chain and estimates the transition probabilities.
 
 Let ``S = s_1, s_2, \ldots, s_N`` with ``s_1 < s_2 < \ldots < s_N`` be the discrete
 states of a Markov chain. Furthermore, let ``P`` be the corresponding
@@ -172,14 +177,13 @@ For more info, refer to:
 - http://www.stat.cmu.edu/~cshalizi/462/lectures/06/markov-mle.pdf
 - https://stats.stackexchange.com/questions/47685/calculating-log-likelihood-for-given-mle-markov-chains
 
-##### Arguments
+# Arguments
 
-- `X::Vector{T}` : Simulated history of Markov states
+- `X::Vector{T}`: Simulated history of Markov states.
 
-##### Returns
+# Returns
 
-- `mc::MarkovChain{T}` : A Markov chain holding the state values and
-  transition matrix
+- `mc::MarkovChain{T}`: A Markov chain holding the state values and transition matrix.
 
 """
 function estimate_mc_discrete(X::Vector{T}, states::Vector{T}) where T
@@ -224,8 +228,9 @@ function estimate_mc_discrete(X::Vector{T}) where T
 end
 
 @doc doc"""
+    VAREstimationMethod
 
-types specifying the method for `discrete_var`
+Types specifying the method for `discrete_var`.
 
 """
 abstract type VAREstimationMethod end
@@ -235,6 +240,7 @@ struct Quadrature <: VAREstimationMethod end
 
 
 @doc doc"""
+    discrete_var(b, B, Psi, Nm, n_moments=2, method=Even(), n_sigmas=sqrt(Nm-1))
 
 Compute a finite-state Markov chain approximation to a VAR(1) process of the form
 
@@ -249,50 +255,32 @@ innovations of length `M`
 P, X = discrete_var(b, B, Psi, Nm, n_moments, method, n_sigmas)
 ```
 
-##### Arguments
+# Arguments
 
-- `b::Union{Real, AbstractVector}` : constant vector of length `M`.
-                                     `M=1` corresponds scalar case
-- `B::Union{Real, AbstractMatrix}` : `M x M` matrix of impact coefficients
-- `Psi::Union{Real, AbstractMatrix}` : `M x M` variance-covariance matrix of
-                                       the innovations
-    - `discrete_var` only accepts non-singular variance-covariance matrices, `Psi`.
-- `Nm::Integer > 3` : Desired number of discrete points in each dimension
+- `b::Union{Real, AbstractVector}`: Constant vector of length `M`. `M=1` corresponds scalar case.
+- `B::Union{Real, AbstractMatrix}`: `M x M` matrix of impact coefficients.
+- `Psi::Union{Real, AbstractMatrix}`: `M x M` variance-covariance matrix of the innovations. `discrete_var` only accepts non-singular variance-covariance matrices, `Psi`.
+- `Nm::Integer > 3`: Desired number of discrete points in each dimension.
 
-##### Optional
+# Optional
 
-- `n_moments::Integer` : Desired number of moments to match. The default is 2.
-- `method::VAREstimationMethod` : Specify the method used to determine the grid
-                                  points. Accepted inputs are `Even()`, `Quantile()`,
-                                  or `Quadrature()`. Please see the paper for more details.
-- `n_sigmas::Real` : If the `Even()` option is specified, `n_sigmas` is used to
-                     determine the number of unconditional standard deviations
-                     used to set the endpoints of the grid. The default is
-                     `sqrt(Nm-1)`.
+- `n_moments::Integer`: Desired number of moments to match. The default is 2.
+- `method::VAREstimationMethod`: Specify the method used to determine the grid points. Accepted inputs are `Even()`, `Quantile()`, or `Quadrature()`. Please see the paper for more details.
+- `n_sigmas::Real`: If the `Even()` option is specified, `n_sigmas` is used to determine the number of unconditional standard deviations used to set the endpoints of the grid. The default is `sqrt(Nm-1)`.
 
-##### Returns
+# Returns
 
-- `P` : `Nm^M x Nm^M` probability transition matrix. Each row
-        corresponds to a discrete conditional probability
-        distribution over the state M-tuples in `X`
-- `X` : `M x Nm^M` matrix of states. Each column corresponds to an
-        M-tuple of values which correspond to the state associated
-        with each row of `P`
+- `P`: `Nm^M x Nm^M` probability transition matrix. Each row corresponds to a discrete conditional probability distribution over the state M-tuples in `X`.
+- `X`: `M x Nm^M` matrix of states. Each column corresponds to an M-tuple of values which correspond to the state associated with each row of `P`.
 
-##### NOTES
+# NOTES
 
-- discrete_var only constructs tensor product grids where each dimension
-  contains the same number of points. For this reason it is recommended
-  that this code not be used for problems of more than about 4 or 5
-  dimensions due to curse of dimensionality issues.
-- Future updates will allow for singular variance-covariance matrices and
-  sparse grid specifications.
+- discrete_var only constructs tensor product grids where each dimension contains the same number of points. For this reason it is recommended that this code not be used for problems of more than about 4 or 5 dimensions due to curse of dimensionality issues.
+- Future updates will allow for singular variance-covariance matrices and sparse grid specifications.
 
-##### Reference
+# Reference
 
-- Farmer, L. E., & Toda, A. A. (2017).
-  "Discretizing nonlinear, non‐Gaussian Markov processes with exact conditional moments,"
-  Quantitative Economics, 8(2), 651-683.
+- Farmer, L. E., & Toda, A. A. (2017). "Discretizing nonlinear, non‐Gaussian Markov processes with exact conditional moments," Quantitative Economics, 8(2), 651-683.
 
 """
 function discrete_var(b::Union{Real, AbstractVector},
@@ -319,7 +307,7 @@ function discrete_var(b::Union{Real, AbstractVector},
     isposdef(Psi) || throw(ArgumentError("Psi must be a positive definite matrix"))
 
     # Check that Nm is a valid number of grid points
-    Nm >= 3 || throw(ArgumentError("Nm must be a positive interger greater than 3"))
+    Nm >= 3 || throw(ArgumentError("Nm must be a positive integer greater than 3"))
 
     # Check that n_moments is a valid number
     if n_moments < 1 || !(n_moments % 2 == 0 || n_moments == 1)
@@ -425,13 +413,17 @@ function discrete_var(b::Union{Real, AbstractVector},
 end
 
 """
-check persistency when `method` is `Quadrature` and give warning if needed
+    warn_persistency(B, method)
 
-##### Arguments
-- `B::Union{Real, AbstractMatrix}` : impact coefficient
-- `method::VAREstimationMethod` : method for grid making
+Check persistency when `method` is `Quadrature` and give warning if needed.
 
-##### Returns
+# Arguments
+
+- `B::Union{Real, AbstractMatrix}`: Impact coefficient.
+- `method::VAREstimationMethod`: Method for grid making.
+
+# Returns
+
 - `nothing`
 
 """
@@ -446,22 +438,23 @@ warn_persistency(::Union{Real, AbstractMatrix}, ::VAREstimationMethod) = nothing
 
 
 """
+    standardize_var(b, B, Psi, M)
 
-return standerdized AR(1) representation
+Return standardized AR(1) representation.
 
-##### Arguments
+# Arguments
 
-- `b::Real` : constant term
-- `B::Real` : impact coefficient
-- `Psi::Real` : variance of innovation
-- `M::Integer == 1` : must be one since the function is for AR(1)
+- `b::Real`: Constant term.
+- `B::Real`: Impact coefficient.
+- `Psi::Real`: Variance of innovation.
+- `M::Integer == 1`: Must be one since the function is for AR(1).
 
-##### Returns
+# Returns
 
-- `A::Real` : impact coefficient of standardized AR(1) process
-- `C::Real` : standard deviation of the innovation
-- `mu::Real` : mean of the standardized AR(1) process
-- `Sigma::Real` : variance of the standardized AR(1) process
+- `A::Real`: Impact coefficient of standardized AR(1) process.
+- `C::Real`: Standard deviation of the innovation.
+- `mu::Real`: Mean of the standardized AR(1) process.
+- `Sigma::Real`: Variance of the standardized AR(1) process.
 
 """
 function standardize_var(b::Real, B::Real, Psi::Real, M::Integer)
@@ -473,22 +466,23 @@ function standardize_var(b::Real, B::Real, Psi::Real, M::Integer)
 end
 
 """
+    standardize_var(b, B, Psi, M)
 
-return standerdized VAR(1) representation
+Return standardized VAR(1) representation.
 
-##### Arguments
+# Arguments
 
-- `b::AbstractVector` : `M x 1` constant term vector
-- `B::AbstractMatrix` : `M x M` matrix of impact coefficients
-- `Psi::AbstractMatrix` : `M x M` variance-covariance matrix of innovations
-- `M::Intger` : number of variables of the VAR(1) model
+- `b::AbstractVector`: `M x 1` constant term vector.
+- `B::AbstractMatrix`: `M x M` matrix of impact coefficients.
+- `Psi::AbstractMatrix`: `M x M` variance-covariance matrix of innovations.
+- `M::Integer`: Number of variables of the VAR(1) model.
 
-##### Returns
+# Returns
 
-- `A::Matirx` : impact coefficients of standardized VAR(1) process
-- `C::AbstractMatrix` : variance-covariance matrix of standardized model innovations
-- `mu::AbstractVector` : mean of the standardized VAR(1) process
-- `Sigma::AbstractMatrix` : variance-covariance matrix of the standardized VAR(1) process
+- `A::Matrix`: Impact coefficients of standardized VAR(1) process.
+- `C::AbstractMatrix`: Variance-covariance matrix of standardized model innovations.
+- `mu::AbstractVector`: Mean of the standardized VAR(1) process.
+- `Sigma::AbstractMatrix`: Variance-covariance matrix of the standardized VAR(1) process.
 
 """
 function standardize_var(b::AbstractVector, B::AbstractMatrix,
@@ -506,15 +500,17 @@ function standardize_var(b::AbstractVector, B::AbstractMatrix,
 end
 
 """
-construct prior guess for evenly spaced grid method
+    construct_prior_guess(cond_mean, Nm, y1D, nothing, method)
 
-##### Arguments
+Construct prior guess for evenly spaced grid method.
 
-- `cond_mean::AbstractVector` : conditional Mean of each variable
-- `Nm::Integer` : number of grid points
-- `y1D::AbstractMatrix` : grid of variable
-- `::AbstractMatrix` : bounds of each grid bin
-- `method::Even` : method for grid making
+# Arguments
+
+- `cond_mean::AbstractVector`: Conditional mean of each variable.
+- `Nm::Integer`: Number of grid points.
+- `y1D::AbstractMatrix`: Grid of variable.
+- `::AbstractMatrix`: Bounds of each grid bin.
+- `method::Even`: Method for grid making.
 
 """
 construct_prior_guess(cond_mean::AbstractVector, Nm::Integer,
@@ -522,15 +518,17 @@ construct_prior_guess(cond_mean::AbstractVector, Nm::Integer,
     pdf.(Normal.(repeat(cond_mean, 1, Nm), 1), y1D)
 
 """
-construct prior guess for quantile grid method
+    construct_prior_guess(cond_mean, Nm, y1D, y1Dbounds, method)
 
-##### Arguments
+Construct prior guess for quantile grid method.
 
-- `cond_mean::AbstractVector` : conditional Mean of each variable
-- `Nm::Integer` : number of grid points
-- `::AbstractMatrix` : grid of variable
-- `y1Dbounds::AbstractMatrix` : bounds of each grid bin
-- `method::Quantile` : method for grid making
+# Arguments
+
+- `cond_mean::AbstractVector`: Conditional mean of each variable.
+- `Nm::Integer`: Number of grid points.
+- `::AbstractMatrix`: Grid of variable.
+- `y1Dbounds::AbstractMatrix`: Bounds of each grid bin.
+- `method::Quantile`: Method for grid making.
 
 """
 construct_prior_guess(cond_mean::AbstractVector, Nm::Integer,
@@ -539,36 +537,39 @@ construct_prior_guess(cond_mean::AbstractVector, Nm::Integer,
            cdf.(Normal.(repeat(cond_mean, 1, Nm), 1), y1Dbounds[:, 1:end-1])
 
 """
-construct prior guess for quadrature grid method
+    construct_prior_guess(cond_mean, Nm, y1D, weights, method)
 
-##### Arguments
+Construct prior guess for quadrature grid method.
 
-- `cond_mean::AbstractVector` : conditional Mean of each variable
-- `Nm::Integer` : number of grid points
-- `y1D::AbstractMatrix` : grid of variable
-- `weights::AbstractVector` : weights of grid `y1D`
-- `method::Quadrature` : method for grid making
+# Arguments
+
+- `cond_mean::AbstractVector`: Conditional mean of each variable.
+- `Nm::Integer`: Number of grid points.
+- `y1D::AbstractMatrix`: Grid of variable.
+- `weights::AbstractVector`: Weights of grid `y1D`.
+- `method::Quadrature`: Method for grid making.
 
 """
 construct_prior_guess(cond_mean::AbstractVector, Nm::Integer,
                       y1D::AbstractMatrix, weights::AbstractVector, method::Quadrature) =
     (pdf.(Normal.(repeat(cond_mean, 1, Nm), 1), y1D) ./ pdf.(Ref(Normal()), y1D)).*weights'
 """
+    construct_1D_grid(Sigma, Nm, M, n_sigmas, method)
 
-construct one-dimensional evenly spaced grid of states
+Construct one-dimensional evenly spaced grid of states.
 
-##### Argument
+# Argument
 
-- `Sigma::ScalarOrArray` : variance-covariance matrix of the standardized process
-- `Nm::Integer` : number of grid points
-- `M::Integer` : number of variables (`M=1` corresponds to AR(1))
-- `n_sigmas::Real` : number of standard error determining end points of grid
-- `method::Even` : method for grid making
+- `Sigma::ScalarOrArray`: Variance-covariance matrix of the standardized process.
+- `Nm::Integer`: Number of grid points.
+- `M::Integer`: Number of variables (`M=1` corresponds to AR(1)).
+- `n_sigmas::Real`: Number of standard error determining end points of grid.
+- `method::Even`: Method for grid making.
 
-##### Return
+# Return
 
-- `y1D` : `M x Nm` matrix of variable grid
-- `nothing` : `nothing` of type `Void`
+- `y1D`: `M x Nm` matrix of variable grid.
+- `nothing`: `nothing` of type `Nothing`.
 
 """
 function construct_1D_grid(Sigma::Union{Real, AbstractMatrix}, Nm::Integer,
@@ -580,21 +581,22 @@ function construct_1D_grid(Sigma::Union{Real, AbstractMatrix}, Nm::Integer,
 end
 
 """
+    construct_1D_grid(Sigma, Nm, M, n_sigmas, method)
 
-construct one-dimensional quantile grid of states
+Construct one-dimensional quantile grid of states.
 
-##### Argument
+# Argument
 
-- `Sigma::AbstractMatrix` : variance-covariance matrix of the standardized process
-- `Nm::Integer` : number of grid points
-- `M::Integer` : number of variables (`M=1` corresponds to AR(1))
-- `n_sigmas::Real` : number of standard error determining end points of grid
-- `method::Quntile` : method for grid making
+- `Sigma::AbstractMatrix`: Variance-covariance matrix of the standardized process.
+- `Nm::Integer`: Number of grid points.
+- `M::Integer`: Number of variables (`M=1` corresponds to AR(1)).
+- `n_sigmas::Real`: Number of standard error determining end points of grid.
+- `method::Quantile`: Method for grid making.
 
-##### Return
+# Return
 
-- `y1D` : `M x Nm` matrix of variable grid
-- `y1Dbounds` : bounds of each grid bin
+- `y1D`: `M x Nm` matrix of variable grid.
+- `y1Dbounds`: Bounds of each grid bin.
 
 """
 function construct_1D_grid(Sigma::AbstractMatrix, Nm::Integer,
@@ -611,21 +613,22 @@ construct_1D_grid(Sigma::Real, Nm::Integer,
     construct_1D_grid(fill(Sigma, 1, 1), Nm, M, n_sigmas, method)
 
 """
+    construct_1D_grid(Sigma, Nm, M, n_sigmas, method)
 
-construct one-dimensional quadrature grid of states
+Construct one-dimensional quadrature grid of states.
 
-##### Argument
+# Argument
 
-- `::ScalarOrArray` : not used
-- `Nm::Integer` : number of grid points
-- `M::Integer` : number of variables (`M=1` corresponds to AR(1))
-- `n_sigmas::Real` : not used
-- `method::Quadrature` : method for grid making
+- `::ScalarOrArray`: Not used.
+- `Nm::Integer`: Number of grid points.
+- `M::Integer`: Number of variables (`M=1` corresponds to AR(1)).
+- `n_sigmas::Real`: Not used.
+- `method::Quadrature`: Method for grid making.
 
-##### Return
+# Return
 
-- `y1D` : `M x Nm` matrix of variable grid
-- `weights` : weights on each grid
+- `y1D`: `M x Nm` matrix of variable grid.
+- `weights`: Weights on each grid.
 
 """
 function construct_1D_grid(::ScalarOrArray, Nm::Integer,
@@ -636,19 +639,20 @@ function construct_1D_grid(::ScalarOrArray, Nm::Integer,
 end
 
 """
+    allcomb3(A)
 
-Return combinations of each column of matrix `A`.
-It is simiplifying `allcomb2` by using `gridmake` from QuantEcon
+Return combinations of each column of matrix `A`. It is simplifying `allcomb2` by using `gridmake` from QuantEcon.
 
-##### Arguments
+# Arguments
 
-- `A::AbstractMatrix` : `N x M` Matrix
+- `A::AbstractMatrix`: `N x M` Matrix.
 
-##### Returns
+# Returns
 
 - `N^M x M` Matrix, combination of each row of `A`.
 
-###### Example
+# Example
+
 ```julia-repl
 julia> allcomb3([1 4 7;
                  2 5 8;
@@ -682,39 +686,30 @@ allcomb3(A::AbstractMatrix) =
     reverse(gridmake(reverse([A[:, i] for i in 1:size(A, 2)], dims = 1)...), dims = 2)
 
 """
-Compute a discrete state approximation to a distribution with known moments,
-using the maximum entropy procedure proposed in Tanaka and Toda (2013)
+    discrete_approximation(D, T, Tbar, q=ones(length(D))/length(D), lambda0=zeros(Tbar))
+
+Compute a discrete state approximation to a distribution with known moments, using the maximum entropy procedure proposed in Tanaka and Toda (2013).
 
 ```julia
 p, lambda_bar, moment_error = discrete_approximation(D, T, Tbar, q, lambda0)
 ```
 
-##### Arguments
+# Arguments
 
-- `D::AbstractVector` : vector of grid points of length `N`.
-                        N is the number of points at which an approximation
-                        is to be constructed.
-- `T::Function` : A function that accepts a single `AbstractVector` of length `N`
-                  and returns an `L x N` matrix of moments evaluated
-                  at each grid point, where L is the number of moments to be
-                  matched.
-- `Tbar::AbstractVector` : length `L` vector of moments of the underlying distribution
-                           which should be matched
+- `D::AbstractVector`: Vector of grid points of length `N`. N is the number of points at which an approximation is to be constructed.
+- `T::Function`: A function that accepts a single `AbstractVector` of length `N` and returns an `L x N` matrix of moments evaluated at each grid point, where L is the number of moments to be matched.
+- `Tbar::AbstractVector`: Length `L` vector of moments of the underlying distribution which should be matched.
 
-##### Optional
+# Optional
 
-- `q::AbstractVector` : length `N` vector of prior weights for each point in D.
-                        The default is for each point to have an equal weight.
-- `lambda0::AbstractVector` : length `L` vector of initial guesses for the dual problem
-                              variables. The default is a vector of zeros.
+- `q::AbstractVector`: Length `N` vector of prior weights for each point in D. The default is for each point to have an equal weight.
+- `lambda0::AbstractVector`: Length `L` vector of initial guesses for the dual problem variables. The default is a vector of zeros.
 
-##### Returns
+# Returns
 
-- `p` : (1 x N) vector of probabilties assigned to each grid point in `D`.
-- `lambda_bar` : length `L` vector of dual problem variables which solve the
-                maximum entropy problem
-- `moment_error` : vector of errors in moments (defined by moments of
-                  discretization minus actual moments) of length `L`
+- `p`: (1 x N) vector of probabilities assigned to each grid point in `D`.
+- `lambda_bar`: Length `L` vector of dual problem variables which solve the maximum entropy problem.
+- `moment_error`: Vector of errors in moments (defined by moments of discretization minus actual moments) of length `L`.
 
 """
 function discrete_approximation(D::AbstractVector, T::Function, Tbar::AbstractVector,
@@ -762,24 +757,24 @@ end
 #     discrete_approximation(D, T, [Tbar], q, [lambda0])
 
 """
+    polynomial_moment(X, mu, scaling_factor, n_moments)
 
-Compute the moment defining function used in discrete_approximation
+Compute the moment defining function used in discrete_approximation.
 
 ```julia
 T = polynomial_moment(X, mu, scaling_factor, mMoments)
 ```
 
-##### Arguments:
+# Arguments
 
-- `X::AbstractVector` : length `N` vector of grid points
-- `mu::Real` : location parameter (conditional mean)
-- `scaling_factor::Real` : scaling factor for numerical stability.
-                          (typically largest grid point)
-- `n_moments::Integer` : number of polynomial moments
+- `X::AbstractVector`: Length `N` vector of grid points.
+- `mu::Real`: Location parameter (conditional mean).
+- `scaling_factor::Real`: Scaling factor for numerical stability. (typically largest grid point).
+- `n_moments::Integer`: Number of polynomial moments.
 
-##### Return
+# Return
 
-- `T` : moment defining function used in `discrete_approximation`
+- `T`: Moment defining function used in `discrete_approximation`.
 
 """
 function polynomial_moment(X::AbstractVector, mu::Real,
@@ -791,25 +786,24 @@ function polynomial_moment(X::AbstractVector, mu::Real,
 end
 
 """
+    entropy_obj(lambda, Tx, Tbar, q)
 
-Compute the maximum entropy objective function used in `discrete_approximation`
+Compute the maximum entropy objective function used in `discrete_approximation`.
 
 ```julia
 obj = entropy_obj(lambda, Tx, Tbar, q)
 ```
 
-##### Arguments
+# Arguments
 
-- `lambda::AbstractVector` : length `L` vector of values of the dual problem variables
-- `Tx::AbstractMatrix` : `L x N` matrix of moments evaluated at the grid points
-                         specified in discrete_approximation
-- `Tbar::AbstractVector` : length `L` vector of moments of the underlying distribution
-                           which should be matched
-- `q::AbstractVector` : length `N` vector of prior weights for each point in the grid.
+- `lambda::AbstractVector`: Length `L` vector of values of the dual problem variables.
+- `Tx::AbstractMatrix`: `L x N` matrix of moments evaluated at the grid points specified in discrete_approximation.
+- `Tbar::AbstractVector`: Length `L` vector of moments of the underlying distribution which should be matched.
+- `q::AbstractVector`: Length `N` vector of prior weights for each point in the grid.
 
-##### Returns
+# Returns
 
-- `obj` : scalar value of objective function evaluated at `lambda`
+- `obj`: Scalar value of objective function evaluated at `lambda`.
 
 """
 function entropy_obj(lambda::AbstractVector, Tx::AbstractMatrix,
@@ -822,11 +816,13 @@ function entropy_obj(lambda::AbstractVector, Tx::AbstractMatrix,
 end
 
 """
-Compute gradient of objective function
+    entropy_grad!(grad, lambda, Tx, Tbar, q)
 
-##### Returns
+Compute gradient of objective function.
 
-- `grad` : length `L` gradient vector of the objective function evaluated at `lambda`
+# Returns
+
+- `grad`: Length `L` gradient vector of the objective function evaluated at `lambda`.
 
 """
 function entropy_grad!(grad::AbstractVector, lambda::AbstractVector,
@@ -838,11 +834,13 @@ function entropy_grad!(grad::AbstractVector, lambda::AbstractVector,
 end
 
 """
-Compute hessian of objective function
+    entropy_hess!(hess, lambda, Tx, Tbar, q)
 
-##### Returns
+Compute hessian of objective function.
 
-- `hess` : `L x L` hessian matrix of the objective function evaluated at `lambda`
+# Returns
+
+- `hess`: `L x L` hessian matrix of the objective function evaluated at `lambda`.
 
 """
 function entropy_hess!(hess::AbstractMatrix, lambda::AbstractVector,
@@ -854,18 +852,18 @@ function entropy_hess!(hess::AbstractMatrix, lambda::AbstractVector,
 end
 
 @doc doc"""
+    min_var_trace(A)
 
-find a unitary matrix `U` such that the diagonal components of `U'AU` is as
-close to a multiple of identity matrix as possible
+Find a unitary matrix `U` such that the diagonal components of `U'AU` is as close to a multiple of identity matrix as possible.
 
-##### Arguments
+# Arguments
 
-- `A::AbstractMatrix` : square matrix
+- `A::AbstractMatrix`: Square matrix.
 
-##### Returns
+# Returns
 
-- `U` : unitary matrix
-- `fval` : minimum value
+- `U`: Unitary matrix.
+- `fval`: Minimum value.
 
 """
 function min_var_trace(A::AbstractMatrix)
