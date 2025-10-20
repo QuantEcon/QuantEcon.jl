@@ -517,7 +517,7 @@ Solve the dynamic programming problem.
 # Arguments
 
 - `ddp::DiscreteDP`: Object that contains the model parameters.
-- `method::Type{T<:DDPAlgorithm}(VFI)`: Type name specifying solution method.
+- `method::Type{<:DDPAlgorithm}(VFI)`: Type name specifying solution method.
   Acceptable arguments are `VFI` for value function iteration or `PFI` for
   policy function iteration or `MPFI` for modified policy function iteration.
 - `;max_iter::Int(250)`: Maximum number of iterations.
@@ -528,7 +528,7 @@ Solve the dynamic programming problem.
 
 # Returns
 
-- `ddpr::DPSolveResult{Algo}`: Optimization result represented as a
+- `ddpr::DPSolveResult{<:DDPAlgorithm}`: Optimization result represented as a
   `DPSolveResult`. See `DPSolveResult` for details.
 
 """
