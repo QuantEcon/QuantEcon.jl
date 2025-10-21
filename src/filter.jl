@@ -37,8 +37,13 @@ http://econweb.ucsd.edu/~jhamilto/hp.pdf
 # Arguments
 
 - `y::AbstractVector`: Data to be filtered.
-- `h::Integer`: Time horizon that we are likely to predict incorrectly. Original paper recommends 2 for annual data, 8 for quarterly data, 24 for monthly data.
-- `p::Integer`: Number of lags in regression. Must be greater than `h`. Note: For seasonal data, it's desirable for `p` and `h` to be integer multiples of the number of observations in a year. E.g., for quarterly data, `h = 8` and `p = 4` are recommended.
+- `h::Integer`: Time horizon that we are likely to predict incorrectly.
+  Original paper recommends 2 for annual data, 8 for quarterly data, 24 for
+  monthly data.
+- `p::Integer`: Number of lags in regression. Must be greater than `h`. Note:
+  For seasonal data, it's desirable for `p` and `h` to be integer multiples
+  of the number of observations in a year. E.g., for quarterly data, `h = 8`
+  and `p = 4` are recommended.
 
 # Returns
 
@@ -73,7 +78,11 @@ http://econweb.ucsd.edu/~jhamilto/hp.pdf
 # Arguments
 
 - `y::AbstractVector`: Data to be filtered.
-- `h::Integer`: Time horizon that we are likely to predict incorrectly. Original paper recommends 2 for annual data, 8 for quarterly data, 24 for monthly data. Note: For seasonal data, it's desirable for `h` to be an integer multiple of the number of observations in a year. E.g., for quarterly data, `h = 8` is recommended.
+- `h::Integer`: Time horizon that we are likely to predict incorrectly.
+  Original paper recommends 2 for annual data, 8 for quarterly data, 24 for
+  monthly data. Note: For seasonal data, it's desirable for `h` to be an
+  integer multiple of the number of observations in a year. E.g., for
+  quarterly data, `h = 8` is recommended.
 
 # Returns
 
