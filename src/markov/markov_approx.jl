@@ -176,8 +176,7 @@ there are unobserved states in the original Markov chain.
 For more info, refer to:
 
 - http://www.stat.cmu.edu/~cshalizi/462/lectures/06/markov-mle.pdf
-- https://stats.stackexchange.com/questions/47685/calculating-log-likelihood-for-
-  given-mle-markov-chains
+- https://stats.stackexchange.com/questions/47685/calculating-log-likelihood-for-given-mle-markov-chains
 
 # Arguments
 
