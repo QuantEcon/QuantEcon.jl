@@ -1,7 +1,9 @@
 # matrix_eqn.jl
 
 @doc doc"""
-Solves the discrete lyapunov equation.
+    solve_discrete_lyapunov(A, B, max_it=50)
+
+Solves the discrete Lyapunov equation.
 
 The problem is given by
 
@@ -19,17 +21,17 @@ starting from ``X_0 = B, a_0 = A``:
     X_j = X_{j-1} + a_{j-1} X_{j-1} a_{j-1}'
 ```
 
-##### Arguments
+# Arguments
 
-- `A::Matrix{Float64}` : An `n x n` matrix as described above.  We assume in order
-  for  convergence that the eigenvalues of ``A`` have moduli bounded by unity
-- `B::Matrix{Float64}` :  An `n x n` matrix as described above.  We assume in order
-  for convergence that the eigenvalues of ``B`` have moduli bounded by unity
-- `max_it::Int(50)` :  Maximum number of iterations
+- `A::Matrix{Float64}`: An `n x n` matrix as described above. We assume in order
+  for convergence that the eigenvalues of ``A`` have moduli bounded by unity.
+- `B::Matrix{Float64}`: An `n x n` matrix as described above. We assume in order
+  for convergence that the eigenvalues of ``B`` have moduli bounded by unity.
+- `max_it::Int(50)`: Maximum number of iterations.
 
-##### Returns
+# Returns
 
-- `gamma1::Matrix{Float64}` Represents the value ``X``
+- `gamma1::Matrix{Float64}`: Represents the value ``X``.
 
 """
 function solve_discrete_lyapunov(A::ScalarOrArray,
@@ -66,34 +68,37 @@ function solve_discrete_lyapunov(A::ScalarOrArray,
 end
 
 @doc doc"""
-Solves the discrete-time algebraic Riccati equation
+    solve_discrete_riccati(A, B, Q, R, N=zeros(size(R, 1), size(Q, 1)); tolerance=1e-10, max_it=50)
 
-The prolem is defined as
+Solves the discrete-time algebraic Riccati equation.
+
+The problem is defined as
 
 ```math
     X = A'XA - (N + B'XA)'(B'XB + R)^{-1}(N + B'XA) + Q
 ```
 
-via a modified structured doubling algorithm.  An explanation of the algorithm
+via a modified structured doubling algorithm. An explanation of the algorithm
 can be found in the reference below.
 
-##### Arguments
+# Arguments
 
-- `A` : `k x k` array.
-- `B` : `k x n` array
-- `R` : `n x n`, should be symmetric and positive definite
-- `Q` : `k x k`, should be symmetric and non-negative definite
-- `N::Matrix{Float64}(zeros(size(R, 1), size(Q, 1)))` : `n x k` array
-- `tolerance::Float64(1e-10)` Tolerance level for convergence
-- `max_iter::Int(50)` : The maximum number of iterations allowed
+- `A`: `k x k` array.
+- `B`: `k x n` array.
+- `R`: `n x n`, should be symmetric and positive definite.
+- `Q`: `k x k`, should be symmetric and non-negative definite.
+- `N::Matrix{Float64}(zeros(size(R, 1), size(Q, 1)))`: `n x k` array.
+- `tolerance::Float64(1e-10)`: Tolerance level for convergence.
+- `max_it::Int(50)`: The maximum number of iterations allowed.
 
 Note that `A, B, R, Q` can either be real (i.e. `k, n = 1`) or matrices.
 
-##### Returns
-- `X::Matrix{Float64}` The fixed point of the Riccati equation; a `k x k` array
-  representing the approximate solution
+# Returns
 
-##### References
+- `X::Matrix{Float64}`: The fixed point of the Riccati equation; a `k x k` array
+  representing the approximate solution.
+
+# References
 
 Chiang, Chun-Yueh, Hung-Yuan Fan, and Wen-Wei Lin. "STRUCTURED DOUBLING
 ALGORITHM FOR DISCRETE-TIME ALGEBRAIC RICCATI EQUATIONS WITH SINGULAR CONTROL
@@ -177,46 +182,55 @@ function solve_discrete_riccati(A::ScalarOrArray, B::ScalarOrArray,
 end
 
 @doc doc"""
-Simple method to return an element ``Z`` in the Riccati equation solver whose type is `Float64` (to be accepted by the `cond()` function)
+    getZ(R, gamma, BB)
 
-##### Arguments
+Simple method to return an element ``Z`` in the Riccati equation solver whose type is `Float64` (to be accepted by the `cond()` function).
 
-- `BB::Float64` : result of ``B' B``
-- `gamma::Float64` : parameter in the Riccati equation solver
-- `R::Float64`
+# Arguments
 
-##### Returns
-- `::Float64` : element ``Z`` in the Riccati equation solver
+- `R::Float64`: Input scalar.
+- `gamma::Float64`: Parameter in the Riccati equation solver.
+- `BB::Float64`: Result of ``B' B``.
+
+# Returns
+
+- `::Float64`: Element ``Z`` in the Riccati equation solver.
 
 """
 getZ(R::Float64, gamma::Float64, BB::Float64) = R + gamma * BB
 
 @doc doc"""
-Simple method to return an element ``Z`` in the Riccati equation solver whose type is `Float64` (to be accepted by the `cond()` function)
+    getZ(R, gamma, BB)
 
-##### Arguments
+Simple method to return an element ``Z`` in the Riccati equation solver whose type is `Float64` (to be accepted by the `cond()` function).
 
-- `BB::Union{Vector, Matrix}` : result of ``B' B``
-- `gamma::Float64` : parameter in the Riccati equation solver
-- `R::Float64`
+# Arguments
 
-##### Returns
-- `::Float64` : element ``Z`` in the Riccati equation solver
+- `R::Float64`: Input scalar.
+- `gamma::Float64`: Parameter in the Riccati equation solver.
+- `BB::Union{Vector, Matrix}`: Result of ``B' B``.
+
+# Returns
+
+- `::Float64`: Element ``Z`` in the Riccati equation solver.
 
 """
 getZ(R::Float64, gamma::Float64, BB::Union{Vector, Matrix}) = R + gamma * BB[1]
 
 @doc doc"""
-Simple method to return an element ``Z`` in the Riccati equation solver whose type is Matrix (to be accepted by the `cond()` function)
+    getZ(R, gamma, BB)
 
-##### Arguments
+Simple method to return an element ``Z`` in the Riccati equation solver whose type is Matrix (to be accepted by the `cond()` function).
 
-- `BB::Matrix` : result of ``B' B``
-- `gamma::Float64` : parameter in the Riccati equation solver
-- `R::Matrix`
+# Arguments
 
-##### Returns
-- `::Matrix` : element ``Z`` in the Riccati equation solver
+- `R::Matrix`: Input matrix.
+- `gamma::Float64`: Parameter in the Riccati equation solver.
+- `BB::Matrix`: Result of ``B' B``.
+
+# Returns
+
+- `::Matrix`: Element ``Z`` in the Riccati equation solver.
 
 """
 getZ(R::Matrix, gamma::Float64, BB::Matrix) = R + gamma .* BB
