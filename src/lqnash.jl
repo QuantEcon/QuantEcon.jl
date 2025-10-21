@@ -10,22 +10,22 @@ problems.
 =#
 
 @doc doc"""
-    nnash(a, b1, b2, r1, r2, q1, q2, s1, s2, w1, w2, m1, m2; beta=1.0, tol=1e-8, max_iter=1000)
+    nnash(A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2; beta=1.0, tol=1e-8, max_iter=1000)
 
 Compute the limit of a Nash linear quadratic dynamic game.
 
 Player `i` minimizes
 
 ```math
-    \sum_{t=1}^{\infty}(x_t' r_i x_t + 2 x_t' w_i
-    u_{it} +u_{it}' q_i u_{it} + u_{jt}' s_i u_{jt} + 2 u_{jt}'
-    m_i u_{it})
+    \sum_{t=1}^{\infty}\beta^{t-1}(x_t' R_i x_t + 2 x_t' W_i
+    u_{it} +u_{it}' Q_i u_{it} + u_{jt}' S_i u_{jt} + 2 u_{jt}'
+    M_i u_{it})
 ```
 
 subject to the law of motion
 
 ```math
-    x_{t+1} = A x_t + b_1 u_{1t} + b_2 u_{2t}
+    x_{t+1} = A x_t + B_1 u_{1t} + B_2 u_{2t}
 ```
 
 and a perceived control law ``u_j(t) = - f_j x_t`` for the other player.
