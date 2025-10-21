@@ -148,7 +148,8 @@ end
 @doc doc"""
     estimate_mc_discrete(X)
 
-Accepts the simulation of a discrete state Markov chain and estimates the transition probabilities.
+Accepts the simulation of a discrete state Markov chain and estimates the
+transition probabilities.
 
 Let ``S = s_1, s_2, \ldots, s_N`` with ``s_1 < s_2 < \ldots < s_N`` be the discrete
 states of a Markov chain. Furthermore, let ``P`` be the corresponding
@@ -175,7 +176,8 @@ there are unobserved states in the original Markov chain.
 For more info, refer to:
 
 - http://www.stat.cmu.edu/~cshalizi/462/lectures/06/markov-mle.pdf
-- https://stats.stackexchange.com/questions/47685/calculating-log-likelihood-for-given-mle-markov-chains
+- https://stats.stackexchange.com/questions/47685/calculating-log-likelihood-for-
+  given-mle-markov-chains
 
 # Arguments
 
@@ -257,30 +259,45 @@ P, X = discrete_var(b, B, Psi, Nm, n_moments, method, n_sigmas)
 
 # Arguments
 
-- `b::Union{Real, AbstractVector}`: Constant vector of length `M`. `M=1` corresponds scalar case.
+- `b::Union{Real, AbstractVector}`: Constant vector of length `M`. `M=1`
+  corresponds scalar case.
 - `B::Union{Real, AbstractMatrix}`: `M x M` matrix of impact coefficients.
-- `Psi::Union{Real, AbstractMatrix}`: `M x M` variance-covariance matrix of the innovations. `discrete_var` only accepts non-singular variance-covariance matrices, `Psi`.
+- `Psi::Union{Real, AbstractMatrix}`: `M x M` variance-covariance matrix of
+  the innovations. `discrete_var` only accepts non-singular variance-covariance
+  matrices, `Psi`.
 - `Nm::Integer > 3`: Desired number of discrete points in each dimension.
 
 # Optional
 
 - `n_moments::Integer`: Desired number of moments to match. The default is 2.
-- `method::VAREstimationMethod`: Specify the method used to determine the grid points. Accepted inputs are `Even()`, `Quantile()`, or `Quadrature()`. Please see the paper for more details.
-- `n_sigmas::Real`: If the `Even()` option is specified, `n_sigmas` is used to determine the number of unconditional standard deviations used to set the endpoints of the grid. The default is `sqrt(Nm-1)`.
+- `method::VAREstimationMethod`: Specify the method used to determine the grid
+  points. Accepted inputs are `Even()`, `Quantile()`, or `Quadrature()`.
+  Please see the paper for more details.
+- `n_sigmas::Real`: If the `Even()` option is specified, `n_sigmas` is used to
+  determine the number of unconditional standard deviations used to set the
+  endpoints of the grid. The default is `sqrt(Nm-1)`.
 
 # Returns
 
-- `P`: `Nm^M x Nm^M` probability transition matrix. Each row corresponds to a discrete conditional probability distribution over the state M-tuples in `X`.
-- `X`: `M x Nm^M` matrix of states. Each column corresponds to an M-tuple of values which correspond to the state associated with each row of `P`.
+- `P`: `Nm^M x Nm^M` probability transition matrix. Each row corresponds to a
+  discrete conditional probability distribution over the state M-tuples in `X`.
+- `X`: `M x Nm^M` matrix of states. Each column corresponds to an M-tuple of
+  values which correspond to the state associated with each row of `P`.
 
 # NOTES
 
-- discrete_var only constructs tensor product grids where each dimension contains the same number of points. For this reason it is recommended that this code not be used for problems of more than about 4 or 5 dimensions due to curse of dimensionality issues.
-- Future updates will allow for singular variance-covariance matrices and sparse grid specifications.
+- discrete_var only constructs tensor product grids where each dimension
+  contains the same number of points. For this reason it is recommended that
+  this code not be used for problems of more than about 4 or 5 dimensions due
+  to curse of dimensionality issues.
+- Future updates will allow for singular variance-covariance matrices and sparse
+  grid specifications.
 
 # Reference
 
-- Farmer, L. E., & Toda, A. A. (2017). "Discretizing nonlinear, non‐Gaussian Markov processes with exact conditional moments," Quantitative Economics, 8(2), 651-683.
+- Farmer, L. E., & Toda, A. A. (2017). "Discretizing nonlinear, non‐Gaussian
+  Markov processes with exact conditional moments," Quantitative Economics, 8(2),
+  651-683.
 
 """
 function discrete_var(b::Union{Real, AbstractVector},
@@ -641,7 +658,8 @@ end
 """
     allcomb3(A)
 
-Return combinations of each column of matrix `A`. It is simplifying `allcomb2` by using `gridmake` from QuantEcon.
+Return combinations of each column of matrix `A`. It is simplifying `allcomb2`
+by using `gridmake` from QuantEcon.
 
 # Arguments
 
@@ -688,7 +706,8 @@ allcomb3(A::AbstractMatrix) =
 """
     discrete_approximation(D, T, Tbar, q=ones(length(D))/length(D), lambda0=zeros(Tbar))
 
-Compute a discrete state approximation to a distribution with known moments, using the maximum entropy procedure proposed in Tanaka and Toda (2013).
+Compute a discrete state approximation to a distribution with known moments,
+using the maximum entropy procedure proposed in Tanaka and Toda (2013).
 
 ```julia
 p, lambda_bar, moment_error = discrete_approximation(D, T, Tbar, q, lambda0)
@@ -696,20 +715,28 @@ p, lambda_bar, moment_error = discrete_approximation(D, T, Tbar, q, lambda0)
 
 # Arguments
 
-- `D::AbstractVector`: Vector of grid points of length `N`. N is the number of points at which an approximation is to be constructed.
-- `T::Function`: A function that accepts a single `AbstractVector` of length `N` and returns an `L x N` matrix of moments evaluated at each grid point, where L is the number of moments to be matched.
-- `Tbar::AbstractVector`: Length `L` vector of moments of the underlying distribution which should be matched.
+- `D::AbstractVector`: Vector of grid points of length `N`. N is the number of
+  points at which an approximation is to be constructed.
+- `T::Function`: A function that accepts a single `AbstractVector` of length `N`
+  and returns an `L x N` matrix of moments evaluated at each grid point, where L
+  is the number of moments to be matched.
+- `Tbar::AbstractVector`: Length `L` vector of moments of the underlying
+  distribution which should be matched.
 
 # Optional
 
-- `q::AbstractVector`: Length `N` vector of prior weights for each point in D. The default is for each point to have an equal weight.
-- `lambda0::AbstractVector`: Length `L` vector of initial guesses for the dual problem variables. The default is a vector of zeros.
+- `q::AbstractVector`: Length `N` vector of prior weights for each point in D.
+  The default is for each point to have an equal weight.
+- `lambda0::AbstractVector`: Length `L` vector of initial guesses for the dual
+  problem variables. The default is a vector of zeros.
 
 # Returns
 
 - `p`: (1 x N) vector of probabilities assigned to each grid point in `D`.
-- `lambda_bar`: Length `L` vector of dual problem variables which solve the maximum entropy problem.
-- `moment_error`: Vector of errors in moments (defined by moments of discretization minus actual moments) of length `L`.
+- `lambda_bar`: Length `L` vector of dual problem variables which solve the
+  maximum entropy problem.
+- `moment_error`: Vector of errors in moments (defined by moments of
+  discretization minus actual moments) of length `L`.
 
 """
 function discrete_approximation(D::AbstractVector, T::Function, Tbar::AbstractVector,
@@ -769,7 +796,8 @@ T = polynomial_moment(X, mu, scaling_factor, mMoments)
 
 - `X::AbstractVector`: Length `N` vector of grid points.
 - `mu::Real`: Location parameter (conditional mean).
-- `scaling_factor::Real`: Scaling factor for numerical stability. (typically largest grid point).
+- `scaling_factor::Real`: Scaling factor for numerical stability. (typically
+  largest grid point).
 - `n_moments::Integer`: Number of polynomial moments.
 
 # Return
@@ -796,10 +824,14 @@ obj = entropy_obj(lambda, Tx, Tbar, q)
 
 # Arguments
 
-- `lambda::AbstractVector`: Length `L` vector of values of the dual problem variables.
-- `Tx::AbstractMatrix`: `L x N` matrix of moments evaluated at the grid points specified in discrete_approximation.
-- `Tbar::AbstractVector`: Length `L` vector of moments of the underlying distribution which should be matched.
-- `q::AbstractVector`: Length `N` vector of prior weights for each point in the grid.
+- `lambda::AbstractVector`: Length `L` vector of values of the dual problem
+  variables.
+- `Tx::AbstractMatrix`: `L x N` matrix of moments evaluated at the grid points
+  specified in discrete_approximation.
+- `Tbar::AbstractVector`: Length `L` vector of moments of the underlying
+  distribution which should be matched.
+- `q::AbstractVector`: Length `N` vector of prior weights for each point in the
+  grid.
 
 # Returns
 
@@ -854,7 +886,8 @@ end
 @doc doc"""
     min_var_trace(A)
 
-Find a unitary matrix `U` such that the diagonal components of `U'AU` is as close to a multiple of identity matrix as possible.
+Find a unitary matrix `U` such that the diagonal components of `U'AU` is as
+close to a multiple of identity matrix as possible.
 
 # Arguments
 
