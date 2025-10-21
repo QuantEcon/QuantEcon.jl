@@ -49,7 +49,7 @@ where ``{w_t}`` and ``{v_t}`` are independent and standard normal with dimension
 - `l::Int`: Dimension.
 - `mu_0::Vector`: This is the mean of initial draw and is of length `n`.
 - `Sigma_0::Matrix`: This is the variance of the initial draw and is `n x n` and
-                    also should be positive definite and symmetric.
+  also should be positive definite and symmetric.
 
 """
 mutable struct LSS{TSampler<:MVNSampler}
