@@ -123,9 +123,9 @@ Simulate `num_reps` observations of ``x_T`` and ``y_T`` given ``x_0 \sim N(\mu_0
 # Returns
 
 - `x::Matrix`: An `n x num_reps` matrix, where the j-th column is the j_th
-              observation of ``x_T``.
-- `y::Matrix`: An `k x num_reps` matrix, where the j-th column is the j_th
-              observation of ``y_T``.
+  observation of ``x_T``.
+- `y::Matrix`: A `k x num_reps` matrix, where the j-th column is the j_th
+  observation of ``y_T``.
 
 """
 function replicate(lss::LSS, t::Integer, num_reps::Integer=100)
