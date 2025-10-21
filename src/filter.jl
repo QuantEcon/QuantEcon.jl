@@ -1,13 +1,17 @@
 @doc doc"""
-apply Hodrick-Prescott filter to `AbstractVector`.
+    hp_filter(y, λ)
 
-##### Arguments
-- `y::AbstractVector` : data to be detrended
-- `λ::Real` : penalty on variation in trend
+Apply Hodrick-Prescott filter to `AbstractVector`.
 
-##### Returns
-- `y_cyclical::Vector`: cyclical component
-- `y_trend::Vector`: trend component
+# Arguments
+
+- `y::AbstractVector`: Data to be detrended.
+- `λ::Real`: Penalty on variation in trend.
+
+# Returns
+
+- `y_cyclical::Vector`: Cyclical component.
+- `y_trend::Vector`: Trend component.
 """
 function hp_filter(y::AbstractVector{T}, λ::Real) where T <: Real
     y = Vector(y)
@@ -24,22 +28,27 @@ function hp_filter(y::AbstractVector{T}, λ::Real) where T <: Real
 end
 
 @doc doc"""
-This function applies "Hamilton filter" to `AbstractVector`.
+    hamilton_filter(y, h, p)
+
+Apply Hamilton filter to `AbstractVector`.
 
 http://econweb.ucsd.edu/~jhamilto/hp.pdf
 
-##### Arguments
-- `y::AbstractVector` : data to be filtered
-- `h::Integer` : Time horizon that we are likely to predict incorrectly.
-                 Original paper recommends 2 for annual data, 8 for quarterly data,
-                 24 for monthly data.
-- `p::Integer` : Number of lags in regression. Must be greater than `h`.
-Note: For seasonal data, it's desirable for `p` and `h` to be integer multiples
-      of the number of obsevations in a year.
-      e.g. For quarterly data, `h = 8` and `p = 4` are recommended.
-##### Returns
-- `y_cycle::Vector` : cyclical component
-- `y_trend::Vector` : trend component
+# Arguments
+
+- `y::AbstractVector`: Data to be filtered.
+- `h::Integer`: Time horizon that we are likely to predict incorrectly.
+  Original paper recommends 2 for annual data, 8 for quarterly data, 24 for
+  monthly data.
+- `p::Integer`: Number of lags in regression. Must be greater than `h`. Note:
+  For seasonal data, it's desirable for `p` and `h` to be integer multiples
+  of the number of observations in a year. E.g., for quarterly data, `h = 8`
+  and `p = 4` are recommended.
+
+# Returns
+
+- `y_cycle::Vector`: Cyclical component.
+- `y_trend::Vector`: Trend component.
 """
 function hamilton_filter(y::AbstractVector, h::Integer, p::Integer)
     y = Vector(y)
@@ -60,22 +69,25 @@ function hamilton_filter(y::AbstractVector, h::Integer, p::Integer)
 end
 
 @doc doc"""
-This function applies "Hamilton filter" to `<:AbstractVector`
-under random walk assumption.
+    hamilton_filter(y, h)
+
+Apply Hamilton filter to `AbstractVector` under random walk assumption.
 
 http://econweb.ucsd.edu/~jhamilto/hp.pdf
 
-##### Arguments
-- `y::AbstractVector` : data to be filtered
-- `h::Integer` : Time horizon that we are likely to predict incorrectly.
-                 Original paper recommends 2 for annual data, 8 for quarterly data,
-                 24 for monthly data.
-Note: For seasonal data, it's desirable for `h` to be an integer multiple
-      of the number of obsevations in a year.
-      e.g. For quarterly data, `h = 8` is recommended.
-##### Returns
-- `y_cycle::Vector` : cyclical component
-- `y_trend::Vector` : trend component
+# Arguments
+
+- `y::AbstractVector`: Data to be filtered.
+- `h::Integer`: Time horizon that we are likely to predict incorrectly.
+  Original paper recommends 2 for annual data, 8 for quarterly data, 24 for
+  monthly data. Note: For seasonal data, it's desirable for `h` to be an
+  integer multiple of the number of observations in a year. E.g., for
+  quarterly data, `h = 8` is recommended.
+
+# Returns
+
+- `y_cycle::Vector`: Cyclical component.
+- `y_trend::Vector`: Trend component.
 """
 function hamilton_filter(y::AbstractVector, h::Integer)
     y = Vector(y)
