@@ -41,31 +41,33 @@ mutable struct ConvergenceError <: Exception
 end
 
 """
+    expand_bracket(f, x1, x2; ntry=50, fac=1.6)
+
 Given a function `f` and an initial guessed range `x1` to `x2`, the routine
 expands the range geometrically until a root is bracketed by the returned values
 `x1` and `x2` (in which case zbrac returns true) or until the range becomes
 unacceptably large (in which case a `ConvergenceError` is thrown).
 
-##### Arguments
+# Arguments
 
-- `f::Function`: The function you want to bracket
-- `x1::T`: Initial guess for lower border of bracket
-- `x2::T`: Initial guess ofr upper border of bracket
-- `;ntry::Int(50)`: The maximum number of expansion iterations
-- `;fac::Float64(1.6)`: Expansion factor (higher ⟶ larger interval size jumps)
+- `f::Function`: The function you want to bracket.
+- `x1::T`: Initial guess for lower border of bracket.
+- `x2::T`: Initial guess for upper border of bracket.
+- `;ntry::Int(50)`: The maximum number of expansion iterations.
+- `;fac::Float64(1.6)`: Expansion factor (higher ⟶ larger interval size jumps).
 
-##### Returns
+# Returns
 
-- `x1::T`: The lower end of an actual bracketing interval
-- `x2::T`: The upper end of an actual bracketing interval
+- `x1::T`: The lower end of an actual bracketing interval.
+- `x2::T`: The upper end of an actual bracketing interval.
 
-##### References
+# References
 
-This method is `zbrac` from numerical recipies in C++
+This method is `zbrac` from Numerical Recipes in C++.
 
-##### Exceptions
+# Exceptions
 
-- Throws a `ConvergenceError` if the maximum number of iterations is exceeded
+- Throws a `ConvergenceError` if the maximum number of iterations is exceeded.
 """
 function expand_bracket(f::Function, x1::T, x2::T;
                         ntry::Int=50, fac::Float64=1.6) where T<:Number
@@ -96,27 +98,29 @@ expand_bracket(f::Function, x1::T; ntry::Int=50, fac::Float64=1.6) where {T<:Num
     expand_bracket(f, 0.9x1, 1.1x1; ntry=ntry, fac=fac)
 
 """
+    divide_bracket(f, x1, x2, n=50)
+
 Given a function `f` defined on the interval `[x1, x2]`, subdivide the
 interval into `n` equally spaced segments, and search for zero crossings of the
 function. `nroot` will be set to the number of bracketing pairs found. If it is
 positive, the arrays `xb1[1..nroot]` and `xb2[1..nroot]` will be filled
 sequentially with any bracketing pairs that are found.
 
-##### Arguments
+# Arguments
 
-- `f::Function`: The function you want to bracket
-- `x1::T`: Lower border for search interval
-- `x2::T`: Upper border for search interval
-- `n::Int(50)`: The number of sub-intervals to divide `[x1, x2]` into
+- `f::Function`: The function you want to bracket.
+- `x1::T`: Lower border for search interval.
+- `x2::T`: Upper border for search interval.
+- `n::Int(50)`: The number of sub-intervals to divide `[x1, x2]` into.
 
-##### Returns
+# Returns
 
-- `x1b::Vector{T}`: `Vector` of lower borders of bracketing intervals
-- `x2b::Vector{T}`: `Vector` of upper borders of bracketing intervals
+- `x1b::Vector{T}`: `Vector` of lower borders of bracketing intervals.
+- `x2b::Vector{T}`: `Vector` of upper borders of bracketing intervals.
 
-##### References
+# References
 
-This is `zbrack` from Numerical Recepies Recepies in C++
+This is `zbrack` from Numerical Recipes in C++.
 """
 function divide_bracket(f::Function, x1::T, x2::T, n::Int=50) where T<:Number
     x1 <= x2 || throw(ArgumentError("x1 must be less than x2"))
@@ -143,39 +147,41 @@ function divide_bracket(f::Function, x1::T, x2::T, n::Int=50) where T<:Number
 end
 
 __zero_docstr_arg_ret = """
-##### Arguments
+# Arguments
 
-- `f::Function`: The function you want to bracket
-- `x1::T`: Lower border for search interval
-- `x2::T`: Upper border for search interval
-- `;maxiter::Int(500)`: Maximum number of bisection iterations
+- `f::Function`: The function you want to bracket.
+- `x1::T`: Lower border for search interval.
+- `x2::T`: Upper border for search interval.
+- `;maxiter::Int(500)`: Maximum number of bisection iterations.
 - `;xtol::Float64(1e-12)`: The routine converges when a root is known to lie
   within `xtol` of the value return. Should be >= 0. The routine modifies this to
   take into account the relative precision of doubles.
-- `;rtol::Float64(2*eps())`:The routine converges when a root is known to lie
-  within `rtol` times the value returned of the value returned. Should be ≥ 0
+- `;rtol::Float64(2*eps())`: The routine converges when a root is known to lie
+  within `rtol` times the value returned of the value returned. Should be ≥ 0.
 
-##### Returns
+# Returns
 
-- `x::T`: The found root
+- `x::T`: The found root.
 
-##### Exceptions
+# Exceptions
 
-- Throws an `ArgumentError` if `[x1, x2]` does not form a bracketing interval
-- Throws a `ConvergenceError` if the maximum number of iterations is exceeded
+- Throws an `ArgumentError` if `[x1, x2]` does not form a bracketing interval.
+- Throws a `ConvergenceError` if the maximum number of iterations is exceeded.
 
 """
 
 ## Bisection
 
 """
-Find the root of the `f` on the bracketing inverval `[x1, x2]` via bisection.
+    bisect(f, x1, x2; maxiter=500, xtol=1e-12, rtol=2*eps())
+
+Find the root of the `f` on the bracketing interval `[x1, x2]` via bisection.
 
 $__zero_docstr_arg_ret
 
-##### References
+# References
 
-Matches `bisect` function from scipy/scipy/optimize/Zeros/bisect.c
+Matches `bisect` function from scipy/scipy/optimize/Zeros/bisect.c.
 """
 function bisect(f::Function, x1::T, x2::T; maxiter::Int=500,
                 xtol::Float64=1e-12, rtol::Float64=2*eps()) where T<:AbstractFloat
@@ -322,13 +328,15 @@ function _brent_body(BE::BrentExtrapolation, f::Function,
 end
 
 """
-Find the root of the `f` on the bracketing inverval `[x1, x2]` via brent's algo.
+    brent(f, xa, xb; maxiter=500, xtol=1e-12, rtol=2*eps())
+
+Find the root of the `f` on the bracketing interval `[xa, xb]` via Brent's algorithm.
 
 $__zero_docstr_arg_ret
 
-##### References
+# References
 
-Matches `brentq` function from scipy/scipy/optimize/Zeros/bisectq.c
+Matches `brentq` function from scipy/scipy/optimize/Zeros/bisectq.c.
 """
 function brent(f::Function, xa::T, xb::T; maxiter::Int=500,
                xtol::Float64=1e-12, rtol::Float64=2*eps()) where T<:AbstractFloat
@@ -336,7 +344,9 @@ function brent(f::Function, xa::T, xb::T; maxiter::Int=500,
 end
 
 """
-Find a root of the `f` on the bracketing inverval `[x1, x2]` via modified brent
+    brenth(f, xa, xb; maxiter=500, xtol=1e-12, rtol=2*eps())
+
+Find a root of the `f` on the bracketing interval `[xa, xb]` via modified Brent's algorithm.
 
 This routine uses a hyperbolic extrapolation formula instead of the standard
 inverse quadratic formula. Otherwise it is the original Brent's algorithm, as
@@ -344,9 +354,9 @@ implemented in the `brent` function.
 
 $__zero_docstr_arg_ret
 
-##### References
+# References
 
-Matches `brenth` function from scipy/scipy/optimize/Zeros/bisecth.c
+Matches `brenth` function from scipy/scipy/optimize/Zeros/bisecth.c.
 """
 function brenth(f::Function, xa::T, xb::T; maxiter::Int=500,
                 xtol::Float64=1e-12, rtol::Float64=2*eps()) where T<:AbstractFloat
@@ -356,13 +366,15 @@ end
 ## Ridder's method
 
 """
-Find a root of the `f` on the bracketing inverval `[x1, x2]` via ridder algo
+    ridder(f, xa, xb; maxiter=500, xtol=1e-12, rtol=2*eps())
+
+Find a root of the `f` on the bracketing interval `[xa, xb]` via Ridder's algorithm.
 
 $__zero_docstr_arg_ret
 
-##### References
+# References
 
-Matches `ridder` function from scipy/scipy/optimize/Zeros/ridder.c
+Matches `ridder` function from scipy/scipy/optimize/Zeros/ridder.c.
 """
 function ridder(f::Function, xa::T, xb::T; maxiter::Int=500,
                 xtol::Float64=1e-12, rtol::Float64=2*eps()) where T<:AbstractFloat
