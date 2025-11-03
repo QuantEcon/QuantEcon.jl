@@ -31,11 +31,16 @@ and with model misspecification parameter ``\theta``.
 
 # Fields
 
-- `Q::Matrix{Float64}`: The cost(payoff) matrix for the controls. See above for more. ``Q`` should be `k x k` and symmetric and positive definite.
-- `R::Matrix{Float64}`: The cost(payoff) matrix for the state. See above for more. ``R`` should be `n x n` and symmetric and non-negative definite.
-- `A::Matrix{Float64}`: The matrix that corresponds with the state in the state space system. ``A`` should be `n x n`.
-- `B::Matrix{Float64}`: The matrix that corresponds with the control in the state space system. ``B`` should be `n x k`.
-- `C::Matrix{Float64}`: The matrix that corresponds with the random process in the state space system. ``C`` should be `n x j`.
+- `Q::Matrix{Float64}`: The cost(payoff) matrix for the controls. See above for
+  more. ``Q`` should be `k x k` and symmetric and positive definite.
+- `R::Matrix{Float64}`: The cost(payoff) matrix for the state. See above for
+  more. ``R`` should be `n x n` and symmetric and non-negative definite.
+- `A::Matrix{Float64}`: The matrix that corresponds with the state in the state
+  space system. ``A`` should be `n x n`.
+- `B::Matrix{Float64}`: The matrix that corresponds with the control in the
+  state space system. ``B`` should be `n x k`.
+- `C::Matrix{Float64}`: The matrix that corresponds with the random process in
+  the state space system. ``C`` should be `n x j`.
 - `beta::Real`: The discount factor in the robust control problem.
 - `theta::Real`: The robustness factor in the robust control problem.
 - `k, n, j::Int`: Dimensions of input matrices.
@@ -157,8 +162,10 @@ And the value function is ``-x'Px``.
 # Returns
 
 - `F::Matrix{Float64}`: The optimal control matrix from above.
-- `P::Matrix{Float64}`: The positive semi-definite matrix defining the value function.
-- `K::Matrix{Float64}`: The worst-case shock matrix ``K``, where ``w_{t+1} = K x_t`` is the worst case shock.
+- `P::Matrix{Float64}`: The positive semi-definite matrix defining the value
+  function.
+- `K::Matrix{Float64}`: The worst-case shock matrix ``K``, where
+  ``w_{t+1} = K x_t`` is the worst case shock.
 
 """
 function robust_rule(rlq::RBLQ)
@@ -197,15 +204,18 @@ of that method.
 # Arguments
 
 - `rlq::RBLQ`: Instance of `RBLQ` type.
-- `P::Matrix{Float64}(zeros(Float64, rlq.n, rlq.n))`: The initial guess for the value function matrix.
+- `P::Matrix{Float64}(zeros(Float64, rlq.n, rlq.n))`: The initial guess for the
+  value function matrix.
 - `;max_iter::Int(80)`: Maximum number of iterations that are allowed.
 - `;tol::Real(1e-8)`: The tolerance for convergence.
 
 # Returns
 
 - `F::Matrix{Float64}`: The optimal control matrix from above.
-- `P::Matrix{Float64}`: The positive semi-definite matrix defining the value function.
-- `K::Matrix{Float64}`: The worst-case shock matrix ``K``, where ``w_{t+1} = K x_t`` is the worst case shock.
+- `P::Matrix{Float64}`: The positive semi-definite matrix defining the value
+  function.
+- `K::Matrix{Float64}`: The worst-case shock matrix ``K``, where
+  ``w_{t+1} = K x_t`` is the worst case shock.
 
 """
 function robust_rule_simple(rlq::RBLQ,
