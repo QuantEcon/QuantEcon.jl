@@ -22,6 +22,8 @@ https://lectures.quantecon.org/jl/kalman.html
 =#
 
 @doc doc"""
+    LSS
+
 A type that describes the Gaussian Linear State Space Model
 of the form:
 
@@ -35,19 +37,19 @@ where ``{w_t}`` and ``{v_t}`` are independent and standard normal with dimension
 `k` and `l` respectively.  The initial conditions are ``\mu_0`` and ``\Sigma_0`` for ``x_0
 \sim N(\mu_0, \Sigma_0)``. When ``\Sigma_0=0``, the draw of ``x_0`` is exactly ``\mu_0``.
 
-#### Fields
+# Fields
 
-- `A::Matrix` Part of the state transition equation.  It should be `n x n`
-- `C::Matrix` Part of the state transition equation.  It should be `n x m`
-- `G::Matrix` Part of the observation equation.  It should be `k x n`
-- `H::Matrix` Part of the observation equation.  It should be `k x l`
-- `k::Int` Dimension
-- `n::Int` Dimension
-- `m::Int` Dimension
-- `l::Int` Dimension
-- `mu_0::Vector` This is the mean of initial draw and is of length `n`
-- `Sigma_0::Matrix` This is the variance of the initial draw and is `n x n` and
-                    also should be positive definite and symmetric
+- `A::Matrix`: Part of the state transition equation.  It should be `n x n`.
+- `C::Matrix`: Part of the state transition equation.  It should be `n x m`.
+- `G::Matrix`: Part of the observation equation.  It should be `k x n`.
+- `H::Matrix`: Part of the observation equation.  It should be `k x l`.
+- `k::Int`: Dimension.
+- `n::Int`: Dimension.
+- `m::Int`: Dimension.
+- `l::Int`: Dimension.
+- `mu_0::Vector`: This is the mean of initial draw and is of length `n`.
+- `Sigma_0::Matrix`: This is the variance of the initial draw and is `n x n` and
+  also should be positive definite and symmetric.
 
 """
 mutable struct LSS{TSampler<:MVNSampler}
@@ -108,20 +110,22 @@ function simulate(lss::LSS, ts_length=100)
 end
 
 @doc doc"""
+    replicate(lss, t, num_reps)
+
 Simulate `num_reps` observations of ``x_T`` and ``y_T`` given ``x_0 \sim N(\mu_0, \Sigma_0)``.
 
-#### Arguments
+# Arguments
 
-- `lss::LSS` An instance of the Gaussian linear state space model.
-- `t::Int = 10` The period that we want to replicate values for.
-- `num_reps::Int = 100` The number of replications we want
+- `lss::LSS`: An instance of the Gaussian linear state space model.
+- `t::Int = 10`: The period that we want to replicate values for.
+- `num_reps::Int = 100`: The number of replications we want.
 
-#### Returns
+# Returns
 
-- `x::Matrix` An `n x num_reps` matrix, where the j-th column is the j_th
-              observation of ``x_T``
-- `y::Matrix` An `k x num_reps` matrix, where the j-th column is the j_th
-              observation of ``y_T``
+- `x::Matrix`: An `n x num_reps` matrix, where the j-th column is the j_th
+  observation of ``x_T``.
+- `y::Matrix`: A `k x num_reps` matrix, where the j-th column is the j_th
+  observation of ``y_T``.
 
 """
 function replicate(lss::LSS, t::Integer, num_reps::Integer=100)
@@ -159,37 +163,45 @@ end
 
 
 @doc doc"""
+    moment_sequence(lss)
+
 Create an iterator to calculate the population mean and
-variance-convariance matrix for both ``x_t`` and ``y_t``, starting at
+variance-covariance matrix for both ``x_t`` and ``y_t``, starting at
 the initial condition `(self.mu_0, self.Sigma_0)`.  Each iteration
 produces a 4-tuple of items `(mu_x, mu_y, Sigma_x, Sigma_y)` for
 the next period.
 
-#### Arguments
+# Arguments
 
-- `lss::LSS` An instance of the Gaussian linear state space model
+- `lss::LSS`: An instance of the Gaussian linear state space model.
+
+# Returns
+
+- `iterator`: An iterator that yields 4-tuples `(mu_x, mu_y, Sigma_x, Sigma_y)` for each period.
 
 """
 moment_sequence(lss::LSS) = LSSMoments(lss)
 
 
 @doc doc"""
+    stationary_distributions(lss; max_iter, tol)
+
 Compute the moments of the stationary distributions of ``x_t`` and
 ``y_t`` if possible.  Computation is by iteration, starting from the
-initial conditions `lss.mu_0` and `lss.Sigma_0`
+initial conditions `lss.mu_0` and `lss.Sigma_0`.
 
-#### Arguments
+# Arguments
 
-- `lss::LSS` An instance of the Guassian linear state space model
-- `;max_iter::Int = 200` The maximum number of iterations allowed
-- `;tol::Float64 = 1e-5` The tolerance level one wishes to achieve
+- `lss::LSS`: An instance of the Gaussian linear state space model.
+- `;max_iter::Int = 200`: The maximum number of iterations allowed.
+- `;tol::Float64 = 1e-5`: The tolerance level one wishes to achieve.
 
-#### Returns
+# Returns
 
-- `mu_x::Vector` Represents the stationary mean of ``x_t``
-- `mu_y::Vector` Represents the stationary mean of ``y_t``
-- `Sigma_x::Matrix` Represents the var-cov matrix
-- `Sigma_y::Matrix` Represents the var-cov matrix
+- `mu_x::Vector`: Represents the stationary mean of ``x_t``.
+- `mu_y::Vector`: Represents the stationary mean of ``y_t``.
+- `Sigma_x::Matrix`: Represents the var-cov matrix.
+- `Sigma_y::Matrix`: Represents the var-cov matrix.
 
 """
 function stationary_distributions(lss::LSS; max_iter=200, tol=1e-5)
@@ -226,16 +238,18 @@ function geometric_sums(lss::LSS, bet, x_t)
 end
 
 @doc doc"""
+    is_stable(lss)
+
 Test for stability of linear state space system.
 First removes the constant row and column.
 
-#### Arguments
+# Arguments
 
-- `lss::LSS` The linear state space system
+- `lss::LSS`: The linear state space system.
 
-#### Returns
+# Returns
 
-- `stable::Bool` Whether or not the system is stable
+- `stable::Bool`: Whether or not the system is stable.
 
 """
 function is_stable(lss::LSS)
@@ -250,17 +264,19 @@ function is_stable(lss::LSS)
 end
 
 @doc doc"""
+    remove_constants(lss)
+
 Finds the row and column, if any,  that correspond to the constant
 term in a `LSS` system and removes them to get the matrix that needs
 to be checked for stability.
 
-#### Arguments
+# Arguments
 
-- `lss::LSS` The linear state space system
+- `lss::LSS`: The linear state space system.
 
-#### Returns
+# Returns
 
-- `A::Matrix` The matrix A with constant row and column removed
+- `A::Matrix`: The matrix A with constant row and column removed.
 
 """
 function remove_constants(lss::LSS)
