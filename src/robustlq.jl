@@ -13,6 +13,8 @@ https://lectures.quantecon.org/jl/robustness.html
 =#
 
 @doc doc"""
+    RBLQ
+
 Represents infinite horizon robust LQ control problems of the form
 
 ```math
@@ -27,16 +29,21 @@ subject to
 
 and with model misspecification parameter ``\theta``.
 
-##### Fields
+# Fields
 
-- `Q::Matrix{Float64}` :  The cost(payoff) matrix for the controls. See above for more. ``Q`` should be `k x k` and symmetric and positive definite
-- `R::Matrix{Float64}` :  The cost(payoff) matrix for the state. See above for more. ``R`` should be `n x n` and symmetric and non-negative definite
-- `A::Matrix{Float64}` :  The matrix that corresponds with the state in the state space system. ``A`` should be `n x n`
-- `B::Matrix{Float64}` :  The matrix that corresponds with the control in the state space system.  ``B`` should be `n x k`
-- `C::Matrix{Float64}` :  The matrix that corresponds with the random process in the state space system. ``C`` should be `n x j`
-- `beta::Real` : The discount factor in the robust control problem
-- `theta::Real` The robustness factor in the robust control problem
-- `k, n, j::Int` : Dimensions of input matrices
+- `Q::Matrix{Float64}`: The cost(payoff) matrix for the controls. See above for
+  more. ``Q`` should be `k x k` and symmetric and positive definite.
+- `R::Matrix{Float64}`: The cost(payoff) matrix for the state. See above for
+  more. ``R`` should be `n x n` and symmetric and non-negative definite.
+- `A::Matrix{Float64}`: The matrix that corresponds with the state in the state
+  space system. ``A`` should be `n x n`.
+- `B::Matrix{Float64}`: The matrix that corresponds with the control in the
+  state space system. ``B`` should be `n x k`.
+- `C::Matrix{Float64}`: The matrix that corresponds with the random process in
+  the state space system. ``C`` should be `n x j`.
+- `beta::Real`: The discount factor in the robust control problem.
+- `theta::Real`: The robustness factor in the robust control problem.
+- `k, n, j::Int`: Dimensions of input matrices.
 
 """
 mutable struct RBLQ
@@ -68,20 +75,22 @@ function RBLQ(Q::ScalarOrArray, R::ScalarOrArray, A::ScalarOrArray,
 end
 
 @doc doc"""
+    d_operator(rlq, P)
+
 The ``D`` operator, mapping ``P`` into
 
 ```math
     D(P) := P + PC(\theta I - C'PC)^{-1} C'P
 ```
 
-##### Arguments
+# Arguments
 
-- `rlq::RBLQ`: Instance of `RBLQ` type
-- `P::Matrix{Float64}` : size is `n x n`
+- `rlq::RBLQ`: Instance of `RBLQ` type.
+- `P::Matrix{Float64}`: Size is `n x n`.
 
-##### Returns
+# Returns
 
-- `dP::Matrix{Float64}` : The matrix ``P`` after applying the ``D`` operator
+- `dP::Matrix{Float64}`: The matrix ``P`` after applying the ``D`` operator.
 
 """
 function d_operator(rlq::RBLQ, P::Matrix)
@@ -93,7 +102,9 @@ function d_operator(rlq::RBLQ, P::Matrix)
 end
 
 @doc doc"""
-The ``D`` operator, mapping ``P`` into
+    b_operator(rlq, P)
+
+The ``B`` operator, mapping ``P`` into
 
 ```math
     B(P) := R - \beta^2 A'PB(Q + \beta B'PB)^{-1}B'PA + \beta A'PA
@@ -105,15 +116,15 @@ and also returning
     F := (Q + \beta B'PB)^{-1} \beta B'PA
 ```
 
-##### Arguments
+# Arguments
 
-- `rlq::RBLQ`: Instance of `RBLQ` type
-- `P::Matrix{Float64}` : size is `n x n`
+- `rlq::RBLQ`: Instance of `RBLQ` type.
+- `P::Matrix{Float64}`: Size is `n x n`.
 
-##### Returns
+# Returns
 
-- `F::Matrix{Float64}` : The ``F`` matrix as defined above
-- `new_p::Matrix{Float64}` : The matrix ``P`` after applying the ``B`` operator
+- `F::Matrix{Float64}`: The ``F`` matrix as defined above.
+- `new_p::Matrix{Float64}`: The matrix ``P`` after applying the ``B`` operator.
 
 """
 function b_operator(rlq::RBLQ, P::Matrix)
@@ -130,28 +141,31 @@ function b_operator(rlq::RBLQ, P::Matrix)
 end
 
 @doc doc"""
+    robust_rule(rlq)
+
 Solves the robust control problem.
 
 The algorithm here tricks the problem into a stacked LQ problem, as described in
-chapter 2 of Hansen- Sargent's text "Robustness".  The optimal control with
+chapter 2 of Hansen-Sargent's text "Robustness". The optimal control with
 observed state is
 
 ```math
     u_t = - F x_t
 ```
 
-And the value function is ``-x'Px``
+And the value function is ``-x'Px``.
 
-##### Arguments
+# Arguments
 
-- `rlq::RBLQ`: Instance of `RBLQ` type
+- `rlq::RBLQ`: Instance of `RBLQ` type.
 
+# Returns
 
-##### Returns
-
-- `F::Matrix{Float64}` : The optimal control matrix from above
-- `P::Matrix{Float64}` : The positive semi-definite matrix defining the value function
-- `K::Matrix{Float64}` : the worst-case shock matrix ``K``, where ``w_{t+1} = K x_t`` is the worst case shock
+- `F::Matrix{Float64}`: The optimal control matrix from above.
+- `P::Matrix{Float64}`: The positive semi-definite matrix defining the value
+  function.
+- `K::Matrix{Float64}`: The worst-case shock matrix ``K``, where
+  ``w_{t+1} = K x_t`` is the worst case shock.
 
 """
 function robust_rule(rlq::RBLQ)
@@ -176,28 +190,32 @@ end
 
 
 @doc doc"""
-Solve the robust LQ problem
+    robust_rule_simple(rlq, P=zeros(Float64, rlq.n, rlq.n); max_iter=80, tol=1e-8)
+
+Solve the robust LQ problem.
 
 A simple algorithm for computing the robust policy ``F`` and the
 corresponding value function ``P``, based around straightforward
-iteration with the robust Bellman operator.  This function is
+iteration with the robust Bellman operator. This function is
 easier to understand but one or two orders of magnitude slower
-than `self.robust_rule()`.  For more information see the docstring
+than `robust_rule()`. For more information see the docstring
 of that method.
 
-##### Arguments
+# Arguments
 
-- `rlq::RBLQ`: Instance of `RBLQ` type
-- `P_init::Matrix{Float64}(zeros(rlq.n, rlq.n))` : The initial guess for the
-value function matrix
-- `;max_iter::Int(80)`: Maximum number of iterations that are allowed
-- `;tol::Real(1e-8)` The tolerance for convergence
+- `rlq::RBLQ`: Instance of `RBLQ` type.
+- `P::Matrix{Float64}(zeros(Float64, rlq.n, rlq.n))`: The initial guess for the
+  value function matrix.
+- `;max_iter::Int(80)`: Maximum number of iterations that are allowed.
+- `;tol::Real(1e-8)`: The tolerance for convergence.
 
-##### Returns
+# Returns
 
-- `F::Matrix{Float64}` : The optimal control matrix from above
-- `P::Matrix{Float64}` : The positive semi-definite matrix defining the value function
-- `K::Matrix{Float64}` : the worst-case shock matrix ``K``, where ``w_{t+1} = K x_t`` is the worst case shock
+- `F::Matrix{Float64}`: The optimal control matrix from above.
+- `P::Matrix{Float64}`: The positive semi-definite matrix defining the value
+  function.
+- `K::Matrix{Float64}`: The worst-case shock matrix ``K``, where
+  ``w_{t+1} = K x_t`` is the worst case shock.
 
 """
 function robust_rule_simple(rlq::RBLQ,
@@ -229,17 +247,19 @@ function robust_rule_simple(rlq::RBLQ,
 end
 
 @doc doc"""
+    F_to_K(rlq, F)
+
 Compute agent 2's best cost-minimizing response ``K``, given ``F``.
 
-##### Arguments
+# Arguments
 
-- `rlq::RBLQ`: Instance of `RBLQ` type
-- `F::Matrix{Float64}`: A `k x n` array representing agent 1's policy
+- `rlq::RBLQ`: Instance of `RBLQ` type.
+- `F::Matrix{Float64}`: A `k x n` array representing agent 1's policy.
 
-##### Returns
+# Returns
 
-- `K::Matrix{Float64}` : Agent's best cost minimizing response corresponding to ``F``
-- `P::Matrix{Float64}` : The value function corresponding to ``F``
+- `K::Matrix{Float64}`: Agent's best cost minimizing response corresponding to ``F``.
+- `P::Matrix{Float64}`: The value function corresponding to ``F``.
 
 """
 function F_to_K(rlq::RBLQ, F::Matrix)
@@ -260,17 +280,19 @@ function F_to_K(rlq::RBLQ, F::Matrix)
 end
 
 @doc doc"""
-Compute agent 1's best cost-minimizing response ``K``, given ``F``.
+    K_to_F(rlq, K)
 
-##### Arguments
+Compute agent 1's best cost-minimizing response ``F``, given ``K``.
 
-- `rlq::RBLQ`: Instance of `RBLQ` type
-- `K::Matrix{Float64}`: A `k x n` array representing the worst case matrix
+# Arguments
 
-##### Returns
+- `rlq::RBLQ`: Instance of `RBLQ` type.
+- `K::Matrix{Float64}`: A `j x n` array representing the worst case matrix.
 
-- `F::Matrix{Float64}` : Agent's best cost minimizing response corresponding to ``K``
-- `P::Matrix{Float64}` : The value function corresponding to ``K``
+# Returns
+
+- `F::Matrix{Float64}`: Agent's best cost minimizing response corresponding to ``K``.
+- `P::Matrix{Float64}`: The value function corresponding to ``K``.
 
 """
 function K_to_F(rlq::RBLQ, K::Matrix)
@@ -286,19 +308,21 @@ function K_to_F(rlq::RBLQ, K::Matrix)
 end
 
 @doc doc"""
+    compute_deterministic_entropy(rlq, F, K, x0)
+
 Given ``K`` and ``F``, compute the value of deterministic entropy, which is
 ``\sum_t \beta^t x_t' K'K x_t`` with ``x_{t+1} = (A - BF + CK) x_t``.
 
-##### Arguments
+# Arguments
 
-- `rlq::RBLQ`: Instance of `RBLQ` type
-- `F::Matrix{Float64}` The policy function, a `k x n` array
-- `K::Matrix{Float64}` The worst case matrix, a `j x n` array
-- `x0::Vector{Float64}` : The initial condition for state
+- `rlq::RBLQ`: Instance of `RBLQ` type.
+- `F::Matrix{Float64}`: The policy function, a `k x n` array.
+- `K::Matrix{Float64}`: The worst case matrix, a `j x n` array.
+- `x0::Vector{Float64}`: The initial condition for state.
 
-##### Returns
+# Returns
 
-- `e::Float64` The deterministic entropy
+- `e::Float64`: The deterministic entropy.
 
 """
 function compute_deterministic_entropy(rlq::RBLQ, F, K, x0)
@@ -310,22 +334,24 @@ function compute_deterministic_entropy(rlq::RBLQ, F, K, x0)
 end
 
 @doc doc"""
+    evaluate_F(rlq, F)
+
 Given a fixed policy ``F``, with the interpretation ``u = -F x``, this function
 computes the matrix ``P_F`` and constant ``d_F`` associated with discounted cost
 ``J_F(x) = x' P_F x + d_F``.
 
-##### Arguments
+# Arguments
 
-- `rlq::RBLQ`: Instance of `RBLQ` type
-- `F::Matrix{Float64}` :  The policy function, a `k x n` array
+- `rlq::RBLQ`: Instance of `RBLQ` type.
+- `F::Matrix{Float64}`: The policy function, a `k x n` array.
 
-##### Returns
+# Returns
 
-- `P_F::Matrix{Float64}` : Matrix for discounted cost
-- `d_F::Float64` : Constant for discounted cost
-- `K_F::Matrix{Float64}` : Worst case policy
-- `O_F::Matrix{Float64}` : Matrix for discounted entropy
-- `o_F::Float64` : Constant for discounted entropy
+- `K_F::Matrix{Float64}`: Worst case policy.
+- `P_F::Matrix{Float64}`: Matrix for discounted cost.
+- `d_F::Float64`: Constant for discounted cost.
+- `O_F::Matrix{Float64}`: Matrix for discounted entropy.
+- `o_F::Float64`: Constant for discounted entropy.
 
 """
 function evaluate_F(rlq::RBLQ, F::Matrix)
