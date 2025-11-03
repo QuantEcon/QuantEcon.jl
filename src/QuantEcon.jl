@@ -1,6 +1,6 @@
 module QuantEcon
 
-import Base: show, isapprox
+import Base: show, isapprox, inv
 import Statistics: mean, std, var
 using Markdown
 using FFTW
@@ -58,7 +58,7 @@ export
 
 # modeltools
     AbstractUtility, LogUtility, CRRAUtility, CFEUtility, EllipticalUtility,
-    derivative,
+    derivative, derivativeinv, inv,
 
 # gth_solve
     gth_solve,
