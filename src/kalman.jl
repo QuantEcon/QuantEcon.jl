@@ -65,7 +65,7 @@ Set the current state estimate of the Kalman filter.
 
 # Returns
 
-- `Nothing`: This function modifies the Kalman filter in place.
+- `nothing`: This function modifies the Kalman filter in place.
 """
 function set_state!(k::Kalman, x_hat, Sigma)
     k.cur_x_hat = x_hat
@@ -95,7 +95,7 @@ The updates are according to
 
 # Returns
 
-- `Nothing`: This function modifies the Kalman filter in place.
+- `nothing`: This function modifies the Kalman filter in place.
 
 """
 function prior_to_filtered!(k::Kalman, y)
@@ -128,7 +128,7 @@ moments of the predictive distribution, which becomes the time
 
 # Returns
 
-- `Nothing`: This function modifies the Kalman filter in place.
+- `nothing`: This function modifies the Kalman filter in place.
 
 """
 function filtered_to_forecast!(k::Kalman)
@@ -155,7 +155,7 @@ update, from one period to the next.
 
 # Returns
 
-- `Nothing`: This function modifies the Kalman filter in place.
+- `nothing`: This function modifies the Kalman filter in place.
 
 """
 function update!(k::Kalman, y)
