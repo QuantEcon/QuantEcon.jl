@@ -20,11 +20,15 @@ standard normal and ``x_0`` the initial condition.
 
 # Arguments
 
-- `A::Union{Float64, Matrix{Float64}}`: The `n x n` matrix described above (scalar if `n = 1`).
-- `C::Union{Float64, Matrix{Float64}}`: The `n x n` matrix described above (scalar if `n = 1`).
-- `H::Union{Float64, Matrix{Float64}}`: The `n x n` matrix described above (scalar if `n = 1`).
+- `A::Union{Float64, Matrix{Float64}}`: The `n x n` matrix described above
+  (scalar if `n = 1`).
+- `C::Union{Float64, Matrix{Float64}}`: The `n x n` matrix described above
+  (scalar if `n = 1`).
+- `H::Union{Float64, Matrix{Float64}}`: The `n x n` matrix described above
+  (scalar if `n = 1`).
 - `beta::Float64`: Discount factor in `(0, 1)`.
-- `x_0::Union{Float64, Vector{Float64}}`: The initial condition. A conformable array (of length `n`) or a scalar if `n = 1`.
+- `x_0::Union{Float64, Vector{Float64}}`: The initial condition. A conformable
+  array (of length `n`) or a scalar if `n = 1`.
 
 # Returns
 
@@ -71,8 +75,10 @@ more information.
 
 # Arguments
 
-- `A::Matrix{Float64}`: An `n x n` matrix as described above. We assume in order for convergence that the eigenvalues of ``A`` have moduli bounded by unity.
-- `B::Matrix{Float64}`: An `n x n` matrix as described above. We assume in order for convergence that the eigenvalues of ``B`` have moduli bounded by unity.
+- `A::Matrix{Float64}`: An `n x n` matrix as described above. We assume in order
+  for convergence that the eigenvalues of ``A`` have moduli bounded by unity.
+- `B::Matrix{Float64}`: An `n x n` matrix as described above. We assume in order
+  for convergence that the eigenvalues of ``B`` have moduli bounded by unity.
 - `max_it::Int(50)`: Maximum number of iterations.
 
 # Returns
