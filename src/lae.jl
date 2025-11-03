@@ -20,13 +20,15 @@ https://lectures.quantecon.org/jl/stationary_densities.html
 
 
 """
+    LAE
+
 A look ahead estimator associated with a given stochastic kernel `p` and a vector
 of observations `X`.
 
-##### Fields
+# Fields
 
 - `p::Function`: The stochastic kernel. Signature is `p(x, y)` and it should be
-  vectorized in both inputs
+  vectorized in both inputs.
 - `X::Matrix`: A vector containing observations. Note that this can be passed as
   any kind of `AbstractArray` and will be coerced into an `n x 1` vector.
 
@@ -42,17 +44,19 @@ mutable struct LAE
 end
 
 """
+    lae_est(l, y)
+
 A vectorized function that returns the value of the look ahead estimate at the
 values in the array `y`.
 
-##### Arguments
+# Arguments
 
-- `l::LAE`: Instance of `LAE` type
-- `y::Array`: Array that becomes the `y` in `l.p(l.x, y)`
+- `l::LAE`: Instance of `LAE` type.
+- `y::Array`: Array that becomes the `y` in `l.p(l.x, y)`.
 
-##### Returns
+# Returns
 
-- `psi_vals::Vector`: Density at `(x, y)`
+- `psi_vals::Vector`: Density at `(x, y)`.
 
 """
 function lae_est(l::LAE, y::AbstractArray{T}) where T
