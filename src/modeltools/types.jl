@@ -21,25 +21,25 @@ once, rather than all the fields of a particular value.
 In addition to the new type `sim_name`, the following methods will be defined:
 
 - `sim_name(sz::NTuple{N,Int})`. This is a constructor for `sim_name` that
-  allocates arrays of size `sz` for each field. If `obs_typedef` inlcuded any
+  allocates arrays of size `sz` for each field. If `obs_typedef` included any
   type parameters, then the default values (specified in `default_type_params`)
   will be used.
-- `Base.endof(::sim_name)`: equal to the length of any of its fields
-- `Base.length(::sim_name)`: equal to the length of any of its fields
+- `Base.endof(::sim_name)`: Equal to the length of any of its fields.
+- `Base.length(::sim_name)`: Equal to the length of any of its fields.
 - The iterator protocol for `sim_name`. The type of each element of the
-  iterator is the type defined in `obs_typedef`. This amounts tho defining the
-  following methods
+  iterator is the type defined in `obs_typedef`. This amounts to defining the
+  following methods:
     - `Base.start(::sim_name)::Int`
     - `Base.next(::sim_name, ::Int)::Tuple{Observation,Int}`
     - `Base.done(::sim_name, ::Int)::Bool`
 - `Base.getindex(sim::sim_name, ix::Int)`. This implements _linear indexing_
   for `sim_name` and will return an instance of the type defined in
-  `obs_typedef`
+  `obs_typedef`.
 
-## Example
+# Examples
 
-NOTE: the `using MacroTools`  and call to `MacroTools.prettify` is not
-necessary and is only used here to clean up the output so it is easier to read
+NOTE: the `using MacroTools` and call to `MacroTools.prettify` is not
+necessary and is only used here to clean up the output so it is easier to read.
 
 ```
 julia> using MacroTools
