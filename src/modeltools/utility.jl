@@ -7,13 +7,23 @@ abstract type AbstractUtility end
 # Consumption utility
 
 @doc doc"""
+    LogUtility
+
 Type used to evaluate log utility. Log utility takes the form
 
+```math
 u(c) = \log(c)
+```
 
 Additionally, this code assumes that if c < 1e-10 then
 
-u(c) = log(1e-10) + 1e10*(c - 1e-10)
+```math
+u(c) = \log(1e-10) + 1e10*(c - 1e-10)
+```
+
+# Fields
+
+- `ξ::Float64`: Scaling parameter for the utility function.
 
 """
 struct LogUtility <: AbstractUtility
@@ -27,14 +37,26 @@ LogUtility() = LogUtility(1.0)
 derivative(u::LogUtility, c::Float64) =
     c > 1e-10 ? u.ξ / c : u.ξ*1e10
 
-"""
+@doc doc"""
+    CRRAUtility
+
 Type used to evaluate CRRA utility. CRRA utility takes the form
 
-u(c) = ξ c^(1 - γ) / (1 - γ)
+```math
+u(c) = \xi c^{1 - \gamma} / (1 - \gamma)
+```
 
 Additionally, this code assumes that if c < 1e-10 then
 
-u(c) = ξ (1e-10^(1 - γ) / (1 - γ) + 1e-10^(-γ) * (c - 1e-10))
+```math
+u(c) = \xi (1e-10^{1 - \gamma} / (1 - \gamma) + 1e-10^{-\gamma} * (c - 1e-10))
+```
+
+# Fields
+
+- `γ::Float64`: Coefficient of relative risk aversion.
+- `ξ::Float64`: Scaling parameter for the utility function.
+
 """
 struct CRRAUtility <: AbstractUtility
     γ::Float64
@@ -59,15 +81,27 @@ derivative(u::CRRAUtility, c::Float64) =
 
 # Labor Utility
 
-"""
+@doc doc"""
+    CFEUtility
+
 Type used to evaluate constant Frisch elasticity (CFE) utility. CFE
 utility takes the form
 
-v(l) = ξ l^(1 + 1/ϕ) / (1 + 1/ϕ)
+```math
+v(l) = \xi l^{1 + 1/\phi} / (1 + 1/\phi)
+```
 
 Additionally, this code assumes that if l < 1e-10 then
 
-v(l) = ξ (1e-10^(1 + 1/ϕ) / (1 + 1/ϕ) - 1e-10^(1/ϕ) * (1e-10 - l))
+```math
+v(l) = \xi (1e-10^{1 + 1/\phi} / (1 + 1/\phi) - 1e-10^{1/\phi} * (1e-10 - l))
+```
+
+# Fields
+
+- `ϕ::Float64`: Frisch elasticity of labor supply.
+- `ξ::Float64`: Scaling parameter for the utility function.
+
 """
 struct CFEUtility <: AbstractUtility
     ϕ::Float64
@@ -90,10 +124,20 @@ derivative(u::CFEUtility, l::Float64) =
     l > 1e-10 ? -u.ξ * l^(1.0/u.ϕ) : -u.ξ * 1e-10^(1.0/u.ϕ)
 
 
-"""
-Type used to evaluate elliptical utility function. Elliptical utility takes form
+@doc doc"""
+    EllipticalUtility
 
-v(l) = b (1 - l^μ)^(1 / μ)
+Type used to evaluate elliptical utility function. Elliptical utility takes the form
+
+```math
+v(l) = b (1 - l^\mu)^{1 / \mu}
+```
+
+# Fields
+
+- `b::Float64`: Scaling parameter for the utility function.
+- `μ::Float64`: Curvature parameter for the utility function.
+
 """
 struct EllipticalUtility <: AbstractUtility
     b::Float64
