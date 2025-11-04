@@ -20,7 +20,7 @@ TODO: as of 07/10/2014 it is not possible to define the property
 =#
 
 """
-    DiscreteRV{TV1,TV2}
+    DiscreteRV
 
 Generates an array of draws from a discrete random variable with
 vector of probabilities given by `q`.
@@ -46,7 +46,7 @@ function DiscreteRV(q::TV) where TV<:AbstractVector
 end
 
 """
-    rand(d::DiscreteRV)
+    rand(d)
 
 Make a single draw from the discrete distribution.
 
@@ -61,7 +61,7 @@ Make a single draw from the discrete distribution.
 Random.rand(d::DiscreteRV) = searchsortedfirst(d.Q, rand())
 
 """
-    rand(d::DiscreteRV, k::Int)
+    rand(d, k)
 
 Make multiple draws from the discrete distribution represented by a
 `DiscreteRV` instance.

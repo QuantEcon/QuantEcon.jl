@@ -29,7 +29,7 @@ The process follows
     y_t = \mu + \rho y_{t-1} + \epsilon_t
 ```
 
-where ``\epsilon_t \sim N (0, \sigma^2)``
+where ``\epsilon_t \sim N (0, \sigma^2)``.
 
 # Arguments
 
@@ -100,7 +100,7 @@ The process follows
     y_t = \mu + \rho y_{t-1} + \epsilon_t
 ```
 
-where ``\epsilon_t \sim N (0, \sigma^2)``
+where ``\epsilon_t \sim N (0, \sigma^2)``.
 
 # Arguments
 
@@ -250,11 +250,7 @@ Compute a finite-state Markov chain approximation to a VAR(1) process of the for
 ```
 
 where ``\epsilon_{t+1}`` is an vector of independent standard normal
-innovations of length `M`
-
-```julia
-P, X = discrete_var(b, B, Psi, Nm, n_moments, method, n_sigmas)
-```
+innovations of length `M`.
 
 # Arguments
 
@@ -708,10 +704,6 @@ allcomb3(A::AbstractMatrix) =
 Compute a discrete state approximation to a distribution with known moments,
 using the maximum entropy procedure proposed in Tanaka and Toda (2013).
 
-```julia
-p, lambda_bar, moment_error = discrete_approximation(D, T, Tbar, q, lambda0)
-```
-
 # Arguments
 
 - `D::AbstractVector`: Vector of grid points of length `N`. N is the number of
@@ -786,10 +778,6 @@ end
     polynomial_moment(X, mu, scaling_factor, n_moments)
 
 Compute the moment defining function used in discrete_approximation.
-
-```julia
-T = polynomial_moment(X, mu, scaling_factor, mMoments)
-```
 
 # Arguments
 

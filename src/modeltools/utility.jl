@@ -12,13 +12,13 @@ abstract type AbstractUtility end
 Type used to evaluate log utility. Log utility takes the form
 
 ```math
-u(c) = \log(c)
+u(c) = \xi \log(c)
 ```
 
 Additionally, this code assumes that if c < 1e-10 then
 
 ```math
-u(c) = \log(1e-10) + 1e10*(c - 1e-10)
+u(c) = \xi (\log(10^{-10}) + 10^10*(c - 10^{-10}))
 ```
 
 # Fields
@@ -49,7 +49,7 @@ u(c) = \xi c^{1 - \gamma} / (1 - \gamma)
 Additionally, this code assumes that if c < 1e-10 then
 
 ```math
-u(c) = \xi (1e-10^{1 - \gamma} / (1 - \gamma) + 1e-10^{-\gamma} * (c - 1e-10))
+u(c) = \xi ((10^{-10})^{1 - \gamma} / (1 - \gamma) + 10^{-10}^{-\gamma} * (c - 10^{-10}))
 ```
 
 # Fields
@@ -94,7 +94,7 @@ v(l) = \xi l^{1 + 1/\phi} / (1 + 1/\phi)
 Additionally, this code assumes that if l < 1e-10 then
 
 ```math
-v(l) = \xi (1e-10^{1 + 1/\phi} / (1 + 1/\phi) - 1e-10^{1/\phi} * (1e-10 - l))
+v(l) = \xi ((10^{-10})^{1 + 1/\phi} / (1 + 1/\phi) - (10^{-10})^{1/\phi} * (10^{-10} - l))
 ```
 
 # Fields
