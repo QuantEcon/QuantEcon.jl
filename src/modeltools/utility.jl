@@ -49,7 +49,7 @@ u(c) = \xi c^{1 - \gamma} / (1 - \gamma)
 Additionally, this code assumes that if c < 1e-10 then
 
 ```math
-u(c) = \xi ((10^{-10})^{1 - \gamma} / (1 - \gamma) + 10^{-10}^{-\gamma} * (c - 10^{-10}))
+u(c) = \xi ((10^{-10})^{1 - \gamma} / (1 - \gamma) + (10^{-10})^{-\gamma} * (c - 10^{-10}))
 ```
 
 # Fields
