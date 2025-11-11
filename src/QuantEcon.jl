@@ -174,6 +174,7 @@ include("quad.jl")
 include("quadsums.jl")
 include("zeros.jl")
 include("optimization.jl")
+include("pivoting.jl")
 include("modeltools/utility.jl")
 include("modeltools/types.jl")
 
