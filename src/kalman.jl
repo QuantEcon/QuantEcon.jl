@@ -70,7 +70,7 @@ Set the current state estimate of the Kalman filter.
 function set_state!(k::Kalman, x_hat, Sigma)
     k.cur_x_hat = x_hat
     k.cur_sigma = Sigma
-    Nothing
+    nothing
 end
 
 @doc doc"""
@@ -112,7 +112,7 @@ function prior_to_filtered!(k::Kalman, y)
     M = A / B
     k.cur_x_hat = x_hat + M * (y .- G * x_hat)
     k.cur_sigma = Sigma - M * G * Sigma
-    Nothing
+    nothing
 end
 
 """
@@ -139,7 +139,7 @@ function filtered_to_forecast!(k::Kalman)
     # and then update
     k.cur_x_hat = A * x_hat
     k.cur_sigma = A * Sigma * A' + Q
-    Nothing
+    nothing
 end
 
 """
@@ -161,7 +161,7 @@ update, from one period to the next.
 function update!(k::Kalman, y)
     prior_to_filtered!(k, y)
     filtered_to_forecast!(k)
-    Nothing
+    nothing
 end
 
 
