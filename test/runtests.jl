@@ -35,6 +35,7 @@ tests = [
         "zeros",
         "optimization",
         "pivoting",
+        "lcp_lemke",
         "interp",
         "sampler",
         "util",

@@ -136,6 +136,9 @@ export
     bisect, brenth, brent, ridder, expand_bracket, divide_bracket,
     golden_method,
 
+# lcp_lemke
+    lcp_lemke, lcp_lemke!,
+
 # interp
     interp, LinInterp,
 
@@ -175,6 +178,7 @@ include("quadsums.jl")
 include("zeros.jl")
 include("optimization.jl")
 include("pivoting.jl")
+include("lcp_lemke.jl")
 include("modeltools/utility.jl")
 include("modeltools/types.jl")
 
