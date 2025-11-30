@@ -18,7 +18,7 @@ function _assert_success(res::LCPResult, M, q;
 
     @test all(res.z .>= -atol)
 
-    w=M * res.z .+ q
+    w = M * res.z + q
     @test all(w .>= -atol)
 
     @test all(isapprox.(w .* res.z, 0; rtol=rtol, atol=atol))
@@ -46,7 +46,7 @@ end
             T = Float64
             z = Vector{T}(undef, n)
             tableau = Matrix{T}(undef, n, 2n+2)
-            basis = Vector{BigInt}(undef, n)
+            basis = Vector{Int}(undef, n)
             res = @inferred lcp_lemke!(z, tableau, basis, M, q)
             _assert_success(res, M, q; desired_z=desired_z)
         end

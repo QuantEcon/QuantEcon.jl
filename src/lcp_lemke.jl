@@ -85,7 +85,7 @@ by Lemke's algorithm (with the lexicographic pivoting rule).
       * 0: Solution found successfully
       * 1: Iteration limit reached
       * 2: Secondary ray termination
-  - `num_iter::Int`: number of iterations performed.
+  - `num_iter::Int`: Number of iterations performed.
 
 # Examples
 
@@ -136,7 +136,7 @@ end
 
 
 """
-    lcp_lemke!(z, tableau, basis, M, q; d=ones(eltype(M), size(M, 1)),
+    lcp_lemke!(z, tableau, basis, M, q; d=ones(T, size(M, 1)),
                max_iter=10^6, piv_options=PivOptions())
 
 Same as `lcp_lemke`, but allow for passing preallocated arrays `z` (to store
@@ -261,7 +261,7 @@ stores ``I``, `tableau[:, n+1:2n]` stores ``-M``, `tableau[:, 2n+1]` stores
 
 # Returns
 
-- `tableau, basis`
+- `tableau, basis`: Initialized tableau and basis.
 """
 function _initialize_tableau!(tableau::Matrix{T}, basis::Vector{<:Integer},
                               M::AbstractMatrix, q::AbstractVector,
@@ -317,7 +317,7 @@ Fetch the solution from `tableau` and `basis`.
 
 # Returns
 
-- `z`
+- `z`: Modified vector storing the solution.
 """
 function _get_solution!(z::Vector{T},
                         tableau::Matrix{T},
