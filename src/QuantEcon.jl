@@ -150,7 +150,12 @@ export
 
 # filter
     hp_filter,
-    hamilton_filter
+    hamilton_filter,
+    filter,
+    filter!,
+    smooth,
+    smooth!,
+    RegimeSwitchingModel
 
 
 include("sampler.jl")
