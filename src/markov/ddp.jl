@@ -121,7 +121,7 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
         # verify index ranges: out-of-range state indices would otherwise
         # be silently reattributed to other states below
         if any(s -> s < 1 || s > num_states, s_indices)
-            throw(ArgumentError("s_indices must be in [1, num_states]"))
+            throw(ArgumentError("s_indices must be in [1, $num_states]"))
         end
         if any(a -> a < 1, a_indices)
             throw(ArgumentError("a_indices must be positive"))
