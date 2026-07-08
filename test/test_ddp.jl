@@ -472,6 +472,13 @@ Tests for markov/ddp.jl
         @testset "dense constructor warns for beta = 1" begin
             @test_logs (:warn,) DiscreteDP(R, Q, 1.0)
         end
+
+        @testset "_max_abs_diff propagates NaN" begin
+            # like maximum(abs, x - y), which it replaces in the VFI loop
+            @test isnan(QuantEcon._max_abs_diff([1.0, NaN], [0.0, 0.0]))
+            @test isnan(QuantEcon._max_abs_diff([NaN, 1.0], [0.0, 0.0]))
+            @test QuantEcon._max_abs_diff([1.0, 3.0], [0.0, 0.0]) == 3.0
+        end
     end
 
 end # end @testset

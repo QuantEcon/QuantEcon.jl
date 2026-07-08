@@ -688,9 +688,10 @@ See other docstring for details.
 
 # Returns
 
-- `R_sigma::Array{Float64}`: Reward vector for `sigma`, of length `n`.
-- `Q_sigma::Array{Float64}`: Transition probability matrix for `sigma`,
-  of shape `(n, n)`.
+- `R_sigma::Vector`: Reward vector for `sigma`, of length `n`.
+- `Q_sigma::AbstractMatrix`: Transition probability matrix for `sigma`, of
+  shape `(n, n)`; dense for the product formulation, and sparse if `ddp.Q`
+  is sparse.
 
 """
 RQ_sigma(ddp::DiscreteDP, ddpr::DPSolveResult) = RQ_sigma(ddp, ddpr.sigma)
@@ -708,9 +709,10 @@ the transition probability matrix `Q_sigma`.
 
 # Returns
 
-- `R_sigma::Array{Float64}`: Reward vector for `sigma`, of length `n`.
-- `Q_sigma::Array{Float64}`: Transition probability matrix for `sigma`,
-  of shape `(n, n)`.
+- `R_sigma::Vector`: Reward vector for `sigma`, of length `n`.
+- `Q_sigma::AbstractMatrix`: Transition probability matrix for `sigma`, of
+  shape `(n, n)`; dense for the product formulation, and sparse if `ddp.Q`
+  is sparse.
 
 """
 function RQ_sigma(ddp::DDP, sigma::AbstractVector{T}) where T<:Integer
@@ -1046,14 +1048,13 @@ function _mul!(out::AbstractMatrix, A::AbstractArray{T,3},
     return out
 end
 
-# maximum(abs, x - y) without allocating the difference
+# maximum(abs, x - y) without allocating the difference; the max()
+# accumulator propagates NaNs, like maximum(abs, x - y) does (a `>`
+# comparison would silently skip them)
 function _max_abs_diff(x::AbstractVector, y::AbstractVector)
     err = abs(x[1] - y[1])
     @inbounds for i in eachindex(x, y)
-        d = abs(x[i] - y[i])
-        if d > err
-            err = d
-        end
+        err = max(err, abs(x[i] - y[i]))
     end
     return err
 end
