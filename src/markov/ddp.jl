@@ -806,11 +806,12 @@ each row.
 
 """
 function s_wise_max!(
-        vals::AbstractMatrix, out::AbstractVector, out_argmax::AbstractVector
-    )
-    # column-outer loop order, to traverse the column-major `vals`
-    # contiguously; seeding with the first column also ensures that
-    # `out` is always written with the element type of `vals`
+        vals::AbstractMatrix{T}, out::AbstractVector{T},
+        out_argmax::AbstractVector
+    ) where T
+    # fast path for matching element types (as in the solver loops):
+    # column-outer loop order, traversing the column-major `vals`
+    # contiguously, with `out` as the running-max accumulator
     nr, nc = size(vals)
     @inbounds for i_r in 1:nr
         out[i_r] = vals[i_r, 1]
@@ -822,6 +823,29 @@ function s_wise_max!(
             out[i_r] = v_rc
             out_argmax[i_r] = i_c
         end
+    end
+    out, out_argmax
+end
+
+function s_wise_max!(
+        vals::AbstractMatrix, out::AbstractVector, out_argmax::AbstractVector
+    )
+    # generic path for distinct element types: keep the running max in
+    # the element type of `vals`, so that the argmax is not affected by
+    # rounding to the element type of `out` (e.g. Float64 `vals` with a
+    # Float32 `out`)
+    nr, nc = size(vals)
+    for i_r in 1:nr
+        @inbounds cur_max = vals[i_r, 1]
+        out_argmax[i_r] = 1
+        for i_c in 2:nc
+            @inbounds v_rc = vals[i_r, i_c]
+            if v_rc > cur_max
+                cur_max = v_rc
+                out_argmax[i_r] = i_c
+            end
+        end
+        out[i_r] = cur_max
     end
     out, out_argmax
 end
@@ -1052,7 +1076,8 @@ end
 # accumulator propagates NaNs, like maximum(abs, x - y) does (a `>`
 # comparison would silently skip them)
 function _max_abs_diff(x::AbstractVector, y::AbstractVector)
-    err = abs(x[1] - y[1])
+    i1 = first(eachindex(x, y))
+    err = abs(x[i1] - y[i1])
     @inbounds for i in eachindex(x, y)
         err = max(err, abs(x[i] - y[i]))
     end
