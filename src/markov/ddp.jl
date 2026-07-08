@@ -22,8 +22,6 @@ Notes
 
 =#
 
-import Base: *
-
 #------------------------#
 #-Types and Constructors-#
 #------------------------#
@@ -62,6 +60,9 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
             throw(ArgumentError(msg))
       	end
         (beta < 0 || beta > 1) &&  throw(ArgumentError("beta must be [0, 1]"))
+        if beta == 1
+            @warn("infinite horizon solution methods are disabled with beta=1")
+        end
 
         # verify input integrity 2
  	num_states, num_actions = size(R)
@@ -73,9 +74,9 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
         R_max = s_wise_max(R)
         if any(R_max .== -Inf)
             # First state index such that all actions yield -Inf
-            s = findall(R_max .== -Inf) #-Only Gives True
-            throw(ArgumentError("for every state the reward must be finite for
-                some action: violated for state $s"))
+            s = findfirst(R_max .== -Inf)
+            throw(ArgumentError("for every state the reward must be finite " *
+                "for some action: violated for state $s"))
         end
 
         # here the indices and indptr are empty.
@@ -117,6 +118,15 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
             throw(ArgumentError(msg))
         end
 
+        # verify index ranges: out-of-range state indices would otherwise
+        # be silently reattributed to other states below
+        if any(s -> s < 1 || s > num_states, s_indices)
+            throw(ArgumentError("s_indices must be in [1, $num_states]"))
+        end
+        if any(a -> a < 1, a_indices)
+            throw(ArgumentError("a_indices must be positive"))
+        end
+
         if _has_sorted_sa_indices(s_indices, a_indices)
             a_indptr = Array{Int64}(undef, num_states + 1)
             _a_indices = copy(a_indices)
@@ -125,10 +135,9 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
             # transpose matrix to use Julia's CSC; now rows are actions and
             # columns are states (this is why it's called as_ptr not sa_ptr)
             m = maximum(a_indices)
-            n = maximum(s_indices)
             msg = "Duplicate s-a pair found"
-            as_ptr = sparse(a_indices, s_indices, 1:num_sa_pairs, m, n,
-                            (x,y)->throw(ArgumentError(msg)))
+            as_ptr = sparse(a_indices, s_indices, 1:num_sa_pairs, m,
+                            num_states, (x,y)->throw(ArgumentError(msg)))
             _a_indices = as_ptr.rowval
             a_indptr = as_ptr.colptr
 
@@ -138,11 +147,11 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
 
         # check feasibility
         aptr_diff = diff(a_indptr)
-        if any(aptr_diff .== 0.0)
+        if any(aptr_diff .== 0)
             # First state index such that no action is available
-            s = findall(aptr_diff .== 0.0)  # Only Gives True
-            throw(ArgumentError("for every state at least one action
-                must be available: violated for state $s"))
+            s = findfirst(aptr_diff .== 0)
+            throw(ArgumentError("for every state at least one action " *
+                "must be available: violated for state $s"))
         end
 
         # indices
@@ -261,17 +270,17 @@ Object for retaining results and associated metadata after solving the model.
 # Fields
 
 - `v::Vector{Tval}`: Value function vector.
-- `Tv::Array{Tval}`: Temporary value function array.
+- `Tv::Vector{Tval}`: Temporary value function vector.
 - `num_iter::Int`: Number of iterations.
-- `sigma::Array{Int,1}`: Policy function vector.
+- `sigma::Vector{Int}`: Policy function vector.
 - `mc::MarkovChain`: Controlled Markov chain.
 
 """
 mutable struct DPSolveResult{Algo<:DDPAlgorithm,Tval<:Real}
     v::Vector{Tval}
-    Tv::Array{Tval}
+    Tv::Vector{Tval}
     num_iter::Int
-    sigma::Array{Int,1}
+    sigma::Vector{Int}
     mc::MarkovChain
 
     function DPSolveResult{Algo,Tval}(
@@ -287,9 +296,13 @@ mutable struct DPSolveResult{Algo<:DDPAlgorithm,Tval<:Real}
 
     # method to pass initial value function (skip the s-wise max)
     function DPSolveResult{Algo,Tval}(
-            ddp::DiscreteDP, v::Vector
+            ddp::DiscreteDP, v::AbstractVector
         ) where {Algo,Tval}
-        ddpr = new{Algo,Tval}(v, similar(v), 0, similar(v, Int))
+        # copy the input so that the caller's array is not overwritten by
+        # the solution methods
+        v_own = Vector{Tval}(undef, length(v))
+        copyto!(v_own, v)
+        ddpr = new{Algo,Tval}(v_own, similar(v_own), 0, similar(v_own, Int))
 
         # fill in sigma with proper values
         compute_greedy!(ddp, ddpr)
@@ -326,7 +339,7 @@ function bellman_operator!(
         ddp::DiscreteDP, v::AbstractVector, Tv::AbstractVector,
         sigma::AbstractVector
     )
-    vals = ddp.R + ddp.beta * (ddp.Q * v)
+    vals = ddp.R + ddp.beta * _mul(ddp.Q, v)
     s_wise_max!(ddp, vals, Tv, sigma)
     Tv, sigma
 end
@@ -382,9 +395,9 @@ bellman_operator!(ddp::DiscreteDP, v::AbstractVector{T}, sigma::AbstractVector) 
 
 # method to allow dispatch on rationals
 # TODO from albep: not sure how to update this to the state-action pair formulation
-function bellman_operator!(ddp::DiscreteDP{T1,NR,NQ,T2},
+function bellman_operator!(ddp::DiscreteDP{T1,NQ,NR,T2},
                            v::AbstractVector{T3},
-                           sigma::AbstractVector) where {T1<:Rational,T2<:Rational,NR,NQ,T3<:Rational}
+                           sigma::AbstractVector) where {T1<:Rational,T2<:Rational,NQ,NR,T3<:Rational}
     bellman_operator!(ddp, v, v, sigma)
 end
 
@@ -405,7 +418,7 @@ for a given value function ``v``.
 
 """
 bellman_operator(ddp::DiscreteDP, v::AbstractVector) =
-    s_wise_max(ddp, ddp.R + ddp.beta * (ddp.Q * v))
+    s_wise_max(ddp, ddp.R + ddp.beta * _mul(ddp.Q, v))
 
 # ---------------------- #
 # Compute greedy methods #
@@ -531,11 +544,19 @@ Solve the dynamic programming problem.
 - `ddpr::DPSolveResult{<:DDPAlgorithm}`: Optimization result represented as a
   `DPSolveResult`. See `DPSolveResult` for details.
 
+# Notes
+
+An initial value function can be supplied as the second positional argument,
+`solve(ddp, v_init, method; ...)`; it is left unmodified. If not supplied,
+`v_init(s) = max_a r(s, a)` is used, except for `MPFI`, for which
+`v_init(s) = min_(s, a) r(s, a) / (1 - beta)` is used to guarantee
+convergence.
+
 """
 function solve(ddp::DiscreteDP{T}, method::Type{Algo}=VFI;
                max_iter::Integer=250, epsilon::Real=1e-3,
                k::Integer=20) where {Algo<:DDPAlgorithm,T}
-    ddpr = DPSolveResult{Algo,T}(ddp)
+    ddpr = DPSolveResult{Algo,T}(ddp, _default_v_init(ddp, Algo))
     _solve!(ddp, ddpr, max_iter, epsilon, k)
     ddpr.mc = MarkovChain(ddp, ddpr)
     ddpr
@@ -548,6 +569,19 @@ function solve(ddp::DiscreteDP{T}, v_init::AbstractVector{T},
     _solve!(ddp, ddpr, max_iter, epsilon, k)
     ddpr.mc = MarkovChain(ddp, ddpr)
     ddpr
+end
+
+# default initial value function: v(s) = max_a r(s, a) in general, and
+# for MPFI the constant min r / (1 - beta), which guarantees convergence
+_default_v_init(ddp::DiscreteDP, ::Type{<:DDPAlgorithm}) =
+    s_wise_max(ddp, ddp.R)
+
+function _default_v_init(ddp::DiscreteDP, ::Type{MPFI})
+    if ddp.beta == 1
+        throw(ArgumentError("method invalid for beta = 1"))
+    end
+    v_init_val = minimum(ddp.R[ddp.R .> -Inf]) / (one(ddp.beta) - ddp.beta)
+    return fill(v_init_val, num_states(ddp))
 end
 
 """
@@ -729,7 +763,7 @@ Populate `out` with  `max_a vals(s, a)`,  where `vals` is represented as a
 - `out::AbstractVector`: Vector of maximum values across actions for each state.
 
 """
-s_wise_max!(vals::AbstractMatrix, out::AbstractVector) = (println("calling this one! "); maximum!(out, vals))
+s_wise_max!(vals::AbstractMatrix, out::AbstractVector) = maximum!(out, vals)
 
 """
     s_wise_max!(vals, out, out_argmax)
@@ -758,11 +792,13 @@ function s_wise_max!(
     # naive implementation where I just iterate over the rows
     nr, nc = size(vals)
     for i_r in 1:nr
-        # reset temporaries
-        cur_max = -Inf
+        # seed with the first column, so that `out[i_r]` is always
+        # written and `cur_max` has the element type of `vals`
+        @inbounds cur_max = vals[i_r, 1]
+        out[i_r] = cur_max
         out_argmax[i_r] = 1
 
-        for i_c in 1:nc
+        for i_c in 2:nc
             @inbounds v_rc = vals[i_r, i_c]
             if v_rc > cur_max
                 out[i_r] = v_rc
@@ -780,7 +816,7 @@ end
 
 function s_wise_max(ddp::DDPsa, vals::AbstractVector)
     s_wise_max!(ddp.a_indices, ddp.a_indptr, vals,
-                 Array{Float64}(undef, num_states(ddp)))
+                 similar(vals, num_states(ddp)))
 end
 
 function s_wise_max!(
@@ -923,17 +959,19 @@ in sorted order.
 function _generate_a_indptr!(
         num_states::Int, s_indices::AbstractVector, out::AbstractVector
     )
+    L = length(s_indices)
     idx = 1
     out[1] = 1
     for s in 1:num_states-1
-        while(s_indices[idx] == s)
+        # bound idx: the last states may have no state-action pair
+        while idx <= L && s_indices[idx] == s
             idx += 1
         end
         out[s+1] = idx
     end
     # need this +1 to be consistent with Julia's sparse pointers:
     # colptr[i]:(colptr[i+1]-1)
-    out[num_states+1] = length(s_indices)+1
+    out[num_states+1] = L+1
     out
 end
 
@@ -950,15 +988,17 @@ function _find_indices!(
 end
 
 @doc doc"""
-    *(A, v)
+    _mul(A, v)
 
-Define matrix multiplication between 3-dimensional matrix and a vector.
+Matrix multiplication between an array `A` and a vector `v`, over the last
+dimension of ``A``.
 
-Matrix multiplication over the last dimension of ``A``.
+Note: not an overload of `Base.:*`, which would be type piracy for the
+3-dimensional method.
 
 # Arguments
 
-- `A::AbstractArray{T,3}`: 3-dimensional array.
+- `A::AbstractArray`: 2- or 3-dimensional array.
 - `v::AbstractVector`: Vector.
 
 # Returns
@@ -966,7 +1006,9 @@ Matrix multiplication over the last dimension of ``A``.
 - `result::AbstractArray`: Result of matrix multiplication.
 
 """
-function *(A::AbstractArray{T,3}, v::AbstractVector) where T
+_mul(A::AbstractMatrix, v::AbstractVector) = A * v
+
+function _mul(A::AbstractArray{T,3}, v::AbstractVector) where T
     shape = size(A)
     size(v, 1) == shape[end] || error("wrong dimensions")
 
@@ -1062,7 +1104,7 @@ function _solve!(
        compute_greedy!(ddp, ddpr)
 
        ddpr.num_iter += 1
-       if all(old_sigma .== ddpr.sigma)
+       if old_sigma == ddpr.sigma
            break
        end
        copyto!(old_sigma, ddpr.sigma)
@@ -1101,8 +1143,10 @@ function _solve!(
         throw(ArgumentError("method invalid for beta = 1"))
     end
 
+    # NOTE: ddpr.v is used as is; when called through `solve` without
+    # v_init, it has been initialized with min r / (1 - beta), which
+    # guarantees convergence
     beta = ddp.beta
-    fill!(ddpr.v, minimum(ddp.R[ddp.R .> -Inf]) / (1.0 - beta))
     old_sigma = copy(ddpr.sigma)
 
     tol = beta > 0 ? epsilon * (1-beta) / beta : Inf
