@@ -73,7 +73,7 @@ function add_ddp_benchmarks!(grp, ddp)
     # kernel inputs at the solution, for realistic values
     res = solve(ddp, PFI)
     v, sigma = res.v, res.sigma
-    vals = ddp.R + ddp.beta * (ddp.Q * v)
+    vals = ddp.R + ddp.beta * QuantEcon._mul(ddp.Q, v)
     Tv = similar(v)
     sigma_buf = similar(sigma)
 
