@@ -185,7 +185,7 @@ Tests for markov/ddp.jl
         end
         # Check beta = 1.0 is not allowed
         for ddp_item in ddp0_b1_collection
-            @test_throws ArgumentError solve(ddp_item, VFI)
+            @test_throws ArgumentError solve(ddp_item, PFI)
         end
     end
 
