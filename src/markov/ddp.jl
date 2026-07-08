@@ -339,7 +339,20 @@ function bellman_operator!(
         ddp::DiscreteDP, v::AbstractVector, Tv::AbstractVector,
         sigma::AbstractVector
     )
-    vals = ddp.R + ddp.beta * _mul(ddp.Q, v)
+    vals = similar(ddp.R, promote_type(eltype(ddp.R), eltype(v),
+                                       typeof(ddp.beta)))
+    bellman_operator!(ddp, v, Tv, sigma, vals)
+end
+
+# Method with a preallocated buffer `vals` (of the same shape as `ddp.R`)
+# for the state-action values; used by the solution methods to avoid
+# allocating in the iteration loops.
+function bellman_operator!(
+        ddp::DiscreteDP, v::AbstractVector, Tv::AbstractVector,
+        sigma::AbstractVector, vals::AbstractArray
+    )
+    _mul!(vals, ddp.Q, v)
+    vals .= ddp.R .+ ddp.beta .* vals
     s_wise_max!(ddp, vals, Tv, sigma)
     Tv, sigma
 end
@@ -701,9 +714,13 @@ the transition probability matrix `Q_sigma`.
 
 """
 function RQ_sigma(ddp::DDP, sigma::AbstractVector{T}) where T<:Integer
-    R_sigma = [ddp.R[i, sigma[i]] for i in 1:length(sigma)]
-    Q_sigma = hcat([getindex(ddp.Q, i, sigma[i], Colon())[:] for i=1:num_states(ddp)]...)
-    return R_sigma, Q_sigma'
+    n = num_states(ddp)
+    R_sigma = [ddp.R[i, sigma[i]] for i in 1:n]
+    Q_sigma = Matrix{eltype(ddp.Q)}(undef, n, n)
+    @inbounds for j in 1:n, i in 1:n
+        Q_sigma[i, j] = ddp.Q[i, sigma[i], j]
+    end
+    return R_sigma, Q_sigma
 end
 
 # TODO: express it in a similar way as above to exploit Julia's column major order
@@ -789,24 +806,20 @@ each row.
 function s_wise_max!(
         vals::AbstractMatrix, out::AbstractVector, out_argmax::AbstractVector
     )
-    # naive implementation where I just iterate over the rows
+    # column-outer loop order, to traverse the column-major `vals`
+    # contiguously; seeding with the first column also ensures that
+    # `out` is always written with the element type of `vals`
     nr, nc = size(vals)
-    for i_r in 1:nr
-        # seed with the first column, so that `out[i_r]` is always
-        # written and `cur_max` has the element type of `vals`
-        @inbounds cur_max = vals[i_r, 1]
-        out[i_r] = cur_max
+    @inbounds for i_r in 1:nr
+        out[i_r] = vals[i_r, 1]
         out_argmax[i_r] = 1
-
-        for i_c in 2:nc
-            @inbounds v_rc = vals[i_r, i_c]
-            if v_rc > cur_max
-                out[i_r] = v_rc
-                out_argmax[i_r] = i_c
-                cur_max = v_rc
-            end
+    end
+    @inbounds for i_c in 2:nc, i_r in 1:nr
+        v_rc = vals[i_r, i_c]
+        if v_rc > out[i_r]
+            out[i_r] = v_rc
+            out_argmax[i_r] = i_c
         end
-
     end
     out, out_argmax
 end
@@ -1018,6 +1031,33 @@ function _mul(A::AbstractArray{T,3}, v::AbstractVector) where T
     return reshape(out, shape[1:end-1])
 end
 
+# In-place version of `_mul`, storing the result in `out`
+_mul!(out::AbstractVector, A::AbstractMatrix, v::AbstractVector) =
+    mul!(out, A, v)
+
+function _mul!(out::AbstractMatrix, A::AbstractArray{T,3},
+               v::AbstractVector) where T
+    shape = size(A)
+    size(v, 1) == shape[end] || error("wrong dimensions")
+
+    B = reshape(A, (prod(shape[1:end-1]), shape[end]))
+    mul!(vec(out), B, v)
+
+    return out
+end
+
+# maximum(abs, x - y) without allocating the difference
+function _max_abs_diff(x::AbstractVector, y::AbstractVector)
+    err = abs(x[1] - y[1])
+    @inbounds for i in eachindex(x, y)
+        d = abs(x[i] - y[i])
+        if d > err
+            err = d
+        end
+    end
+    return err
+end
+
 """
     _solve!(ddp, ddpr, max_iter, epsilon, k)
 
@@ -1050,12 +1090,14 @@ function _solve!(
         tol = epsilon * (1-ddp.beta) / (2*ddp.beta)
     end
 
+    vals = similar(ddp.R, eltype(ddpr.v))  # buffer for state-action values
+
     for i in 1:max_iter
         # updates Tv in place
-        bellman_operator!(ddp, ddpr)
+        bellman_operator!(ddp, ddpr.v, ddpr.Tv, ddpr.sigma, vals)
 
         # compute error and update the v inside ddpr
-        err = maximum(abs, ddpr.Tv .- ddpr.v)
+        err = _max_abs_diff(ddpr.Tv, ddpr.v)
         copyto!(ddpr.v, ddpr.Tv)
         ddpr.num_iter += 1
 
@@ -1151,15 +1193,19 @@ function _solve!(
 
     tol = beta > 0 ? epsilon * (1-beta) / beta : Inf
 
+    vals = similar(ddp.R, eltype(ddpr.v))  # buffer for state-action values
+    dif = similar(ddpr.v)
+
     for i in 1:max_iter
-        bellman_operator!(ddp, ddpr)  # updates Tv, sigma inplace
-        dif = ddpr.Tv - ddpr.v
+        # updates Tv, sigma inplace
+        bellman_operator!(ddp, ddpr.v, ddpr.Tv, ddpr.sigma, vals)
+        dif .= ddpr.Tv .- ddpr.v
 
         ddpr.num_iter += 1
 
         # check convergence
         if span(dif) < tol
-            ddpr.v = ddpr.Tv .+ midrange(dif) * beta / (1-beta)
+            ddpr.v .= ddpr.Tv .+ midrange(dif) * beta / (1-beta)
             break
         end
 
@@ -1170,7 +1216,8 @@ function _solve!(
         # now do k iterations of policy iteration
         R_sigma, Q_sigma = RQ_sigma(ddp, ddpr)
         for i in 1:k
-            ddpr.Tv = R_sigma + beta * Q_sigma * ddpr.v
+            mul!(ddpr.Tv, Q_sigma, ddpr.v)
+            ddpr.Tv .= R_sigma .+ beta .* ddpr.Tv
             copyto!(ddpr.v, ddpr.Tv)
         end
 
