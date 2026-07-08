@@ -394,33 +394,31 @@ Tests for markov/ddp.jl
         # @test_throws ArgumentError DiscreteDP(R_sa, Q_sa, beta, s_indices, a_indices)
     end
 
-    # Regression markers for known bugs; flip @test_broken to @test when fixed
-    @testset "known issues (broken)" begin
+    @testset "regression tests for fixed bugs" begin
         @testset "solve must not mutate v_init" begin
-            # VFI and MPFI currently overwrite the caller's v_init in place
-            for ddp_item in ddp0_collection, Algo in (VFI, MPFI)
+            for ddp_item in ddp0_collection, Algo in (VFI, PFI, MPFI)
                 v_init = [0.0, 0.0]
                 solve(ddp_item, v_init, Algo)
-                @test_broken v_init == [0.0, 0.0]
+                @test v_init == [0.0, 0.0]
             end
         end
 
         @testset "MPFI must respect v_init" begin
-            # currently v_init is discarded and v is reinitialized to
-            # min(R) / (1 - beta); starting at v_star must converge at once
+            # starting at v_star must converge at once
             for ddp_item in ddp0_collection
                 res = solve(ddp_item, copy(v_star), MPFI)
-                @test_broken res.num_iter == 1
+                @test res.num_iter == 1
+                @test maximum(abs, res.v - v_star) < epsilon/2
             end
         end
 
         @testset "DDPsa s_wise_max must preserve eltype" begin
-            # currently the output array is hardcoded to Float64
             _R = [1//2, 1//1, 1//3]
             _Q = [1//2 1//2; 0//1 1//1; 0//1 1//1]
             _ddp = DiscreteDP(_R, _Q, 19//20, s_indices, a_indices)
-            @test_broken eltype(QuantEcon.s_wise_max(_ddp, _ddp.R)) ==
+            @test eltype(QuantEcon.s_wise_max(_ddp, _ddp.R)) ==
                 Rational{Int}
+            @test QuantEcon.s_wise_max(_ddp, _ddp.R) == [1//1, 1//3]
         end
 
         @testset "action-less trailing state must be ArgumentError" begin
@@ -428,16 +426,51 @@ Tests for markov/ddp.jl
             # ArgumentError, not a BoundsError from _generate_a_indptr!
             _R = [1.0, 0.0, 0.5]
             _Q = fill(1/3, 3, 3)
-            _s_ind = [1, 1, 2]  # state 3 has no action
             _a_ind = [1, 2, 1]
-            @test_broken (
-                try
-                    DiscreteDP(_R, _Q, beta, _s_ind, _a_ind)
-                    false
-                catch e
-                    e isa ArgumentError
+            # sorted indices
+            @test_throws ArgumentError DiscreteDP(_R, _Q, beta,
+                                                  [1, 1, 2], _a_ind)
+            # unsorted indices
+            @test_throws ArgumentError DiscreteDP(_R, _Q, beta,
+                                                  [2, 1, 1], [1, 1, 2])
+        end
+
+        @testset "out-of-range indices must be ArgumentError" begin
+            # a state index out of [1, num_states] would otherwise be
+            # silently reattributed to another state
+            _R = [1.0, 2.0]
+            _Q = [1.0 0.0; 0.0 1.0]
+            _Q_sp = sparse(_Q)
+            # sorted indices
+            @test_throws ArgumentError DiscreteDP(_R, _Q, beta,
+                                                  [1, 3], [1, 1])
+            @test_throws ArgumentError DiscreteDP(_R, _Q_sp, beta,
+                                                  [1, 3], [1, 1])
+            # unsorted indices
+            @test_throws ArgumentError DiscreteDP(_R, _Q, beta,
+                                                  [3, 1], [1, 1])
+            # nonpositive indices
+            @test_throws ArgumentError DiscreteDP(_R, _Q, beta,
+                                                  [0, 1], [1, 1])
+            @test_throws ArgumentError DiscreteDP(_R, _Q, beta,
+                                                  [1, 2], [1, 0])
+        end
+
+        @testset "2-arg s_wise_max! must not print" begin
+            vals = [1.0 3.0; 4.0 2.0]
+            out = zeros(2)
+            mktemp() do path, io
+                redirect_stdout(io) do
+                    QuantEcon.s_wise_max!(vals, out)
                 end
-            )
+                flush(io)
+                @test filesize(path) == 0
+            end
+            @test out == [3.0, 4.0]
+        end
+
+        @testset "dense constructor warns for beta = 1" begin
+            @test_logs (:warn,) DiscreteDP(R, Q, 1.0)
         end
     end
 
