@@ -85,7 +85,10 @@ function add_ddp_benchmarks!(grp, ddp)
     grp["evaluate_policy"] = @benchmarkable evaluate_policy($ddp, $sigma)
     grp["solve_PFI"] = @benchmarkable solve($ddp, PFI)
     grp["solve_MPFI"] = @benchmarkable solve($ddp, MPFI)
-    grp["solve_VFI_50iter"] = @benchmarkable solve($ddp, VFI; max_iter=50)
+    # epsilon=0 makes the tolerance unattainable, so that exactly max_iter
+    # iterations are performed
+    grp["solve_VFI_50iter"] =
+        @benchmarkable solve($ddp, VFI; max_iter=50, epsilon=0.0)
     grp["backward_induction_20"] = @benchmarkable backward_induction($ddp, 20)
     return grp
 end
@@ -94,26 +97,29 @@ end
 
 suite = BenchmarkGroup()
 
-seed = 1234
-rng = MersenneTwister(seed)
+# A fresh generator per case, so that adding or reordering cases does not
+# alter the model data of the other cases
+new_rng() = MersenneTwister(1234)
 
 # Product formulation, two sizes: allocation/overhead-dominated (small)
 # and BLAS-dominated (large)
-for (n, m) in [(100, 50), (500, 100)]
-    ddp = random_ddp(rng, n, m)
-    grp = suite["dense_n$(n)_m$(m)"] = BenchmarkGroup()
+ddp_dense_small = random_ddp(new_rng(), 100, 50)
+ddp_dense_large = random_ddp(new_rng(), 500, 100)
+for (label, ddp) in [("dense_n100_m50", ddp_dense_small),
+                     ("dense_n500_m100", ddp_dense_large)]
+    grp = suite[label] = BenchmarkGroup()
     grp["constructor"] =
         @benchmarkable DiscreteDP($(ddp.R), $(ddp.Q), $(ddp.beta))
     add_ddp_benchmarks!(grp, ddp)
 end
 
-# State-action pair formulation with dense Q: the large product-form model
-# converted, for a direct comparison between the two formulations
-let (n, m) = (500, 100)
-    ddp = random_ddp(rng, n, m)
+# State-action pair formulation with dense Q: the same model as
+# dense_n500_m100, converted, for a direct comparison between the two
+# formulations
+let ddp = ddp_dense_large
     R_sa, Q_sa, s_indices, a_indices = sa_pair_arrays(ddp)
     ddp_sa = DiscreteDP(R_sa, Q_sa, ddp.beta, s_indices, a_indices)
-    grp = suite["sa_dense_n$(n)_m$(m)"] = BenchmarkGroup()
+    grp = suite["sa_dense_n500_m100"] = BenchmarkGroup()
     grp["constructor"] = @benchmarkable DiscreteDP(
         $R_sa, $Q_sa, $(ddp.beta), $s_indices, $a_indices
     )
@@ -122,7 +128,7 @@ end
 
 # State-action pair formulation with sparse Q
 let (n, m, k) = (3000, 50, 5)
-    ddp_sp = random_sparse_sa_ddp(rng, n, m, k)
+    ddp_sp = random_sparse_sa_ddp(new_rng(), n, m, k)
     grp = suite["sa_sparse_n$(n)_m$(m)_k$(k)"] = BenchmarkGroup()
     grp["constructor"] = @benchmarkable DiscreteDP(
         $(ddp_sp.R), $(ddp_sp.Q), $(ddp_sp.beta),

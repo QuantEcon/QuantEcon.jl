@@ -16,16 +16,17 @@ subgroup of `SUITE`. Currently covered:
 
 ### `ddp` ([`ddp.jl`](ddp.jl))
 
-The suite runs four model cases (random models with a fixed seed):
+The suite runs four model cases (random models, each generated with its
+own fixed-seed RNG so that the cases are independent of one another):
 
 - `dense_n100_m50`: product formulation (`R` of shape `(n, m)`, dense `Q`
   of shape `(n, m, n)`), 100 states and 50 actions — small enough that
   allocations and overhead dominate;
 - `dense_n500_m100`: product formulation, 500 states and 100 actions —
   large enough that BLAS operations dominate;
-- `sa_dense_n500_m100`: the 500 x 100 model in the state-action pair
-  formulation (`R` of length `L`, dense `Q` of shape `(L, n)`), for a
-  direct comparison between the two formulations;
+- `sa_dense_n500_m100`: the same model as `dense_n500_m100`, converted to
+  the state-action pair formulation (`R` of length `L`, dense `Q` of shape
+  `(L, n)`), for a direct comparison between the two formulations;
 - `sa_sparse_n3000_m50_k5`: state-action pair formulation with sparse `Q`,
   3000 states, 50 actions, and 5 nonzero transition probabilities per
   state-action pair.
@@ -41,14 +42,15 @@ For each case, the following are benchmarked:
 | `evaluate_policy` | Policy evaluation (linear solve) |
 | `solve_PFI` | End-to-end `solve` with policy iteration |
 | `solve_MPFI` | End-to-end `solve` with modified policy iteration |
-| `solve_VFI_50iter` | `solve` with value iteration, capped at 50 iterations |
+| `solve_VFI_50iter` | `solve` with value iteration, exactly 50 iterations |
 | `backward_induction_20` | `backward_induction` with 20 periods |
 
 Kernel benchmarks (`bellman_operator`, `s_wise_max`, `RQ_sigma`,
 `evaluate_policy`) use the converged value function and optimal policy as
-inputs so that they are realistic. VFI is capped at `max_iter=50` so that
-the benchmark measures a fixed amount of work independently of convergence
-behavior.
+inputs so that they are realistic. VFI is run with `max_iter=50` and
+`epsilon=0` (an unattainable tolerance), so that the benchmark measures a
+fixed amount of work — exactly 50 iterations — independently of
+convergence behavior.
 
 Note that the suite holds the dense `Q` arrays of the two large cases in
 memory (roughly 0.5 GB in total).
