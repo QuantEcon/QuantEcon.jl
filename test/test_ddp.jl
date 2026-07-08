@@ -472,6 +472,33 @@ Tests for markov/ddp.jl
         @testset "dense constructor warns for beta = 1" begin
             @test_logs (:warn,) DiscreteDP(R, Q, 1.0)
         end
+
+        @testset "_max_abs_diff propagates NaN" begin
+            # like maximum(abs, x - y), which it replaces in the VFI loop
+            @test isnan(QuantEcon._max_abs_diff([1.0, NaN], [0.0, 0.0]))
+            @test isnan(QuantEcon._max_abs_diff([NaN, 1.0], [0.0, 0.0]))
+            @test QuantEcon._max_abs_diff([1.0, 3.0], [0.0, 0.0]) == 3.0
+        end
+
+        @testset "s_wise_max! argmax with mixed precision" begin
+            # the argmax must be decided at the precision of vals, not of
+            # out: with a Float32 out, 1.0 + 4e-8 rounds back to 1.0f0,
+            # which must not let a smaller later column win
+            vals = [1.0 1.0+4e-8 1.0+2e-8]
+            out = zeros(Float32, 1)
+            out_argmax = zeros(Int, 1)
+            QuantEcon.s_wise_max!(vals, out, out_argmax)
+            @test out_argmax[1] == 2
+
+            # and through the public bellman_operator! with Float32 buffers
+            _R = [1.0 1.0+4e-8 1.0+2e-8; 0.0 1.0 0.0]
+            _Q = ones(2, 3, 2) ./ 2
+            _ddp = DiscreteDP(_R, _Q, 0.0)  # beta = 0 isolates R
+            _v = zeros(Float32, 2)
+            _sigma = zeros(Int, 2)
+            bellman_operator!(_ddp, _v, similar(_v), _sigma)
+            @test _sigma == [2, 2]
+        end
     end
 
 end # end @testset
