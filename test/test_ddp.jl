@@ -74,7 +74,15 @@ Tests for markov/ddp.jl
             end
         end
 
-        # TODO: add test for DDPsa
+        # test for DDPsa: must agree with the dense formulation
+        # (feasible policies only: A(1) = {1, 2}, A(2) = {1})
+        sigmas_sa = ([1, 1], [2, 1])
+        for sig in sigmas_sa
+            r_dense, q_dense = RQ_sigma(ddp0, sig)
+            r_sa, q_sa = RQ_sigma(ddp0_sa, sig)
+            @test r_sa == r_dense
+            @test Matrix(q_sa) == Matrix(q_dense)
+        end
     end
 
     @testset "compute_greedy methods" begin
@@ -242,24 +250,27 @@ Tests for markov/ddp.jl
         # "single-product stochastic inventory control"
         
         #set up DDP constructor
-        s_indices = [1, 1, 1, 1, 2, 2, 2, 3, 3, 4]
-        a_indices = [1, 2, 3, 4, 1, 2, 3, 1, 2, 1]
-        R = [ 0//1, -1//1, -2//1, -5//1,  5//1,  0//1, -3//1,  6//1, -1//1,  5//1]
-        Q = [ 1//1 0//1 0//1 0//1;
-              3//4 1//4 0//1 0//1;
-              1//4 1//2 1//4 0//1;
-              0//1 1//4 1//2 1//4;
-              3//4 1//4 0//1 0//1;
-              1//4 1//2 1//4 0//1;
-              0//1 1//4 1//2 1//4;
-              1//4 1//2 1//4 0//1;
-              0//1 1//4 1//2 1//4;
-              0//1 1//4 1//2 1//4]
-        beta = 1
-        ddp_rational = DiscreteDP(R, Q, beta, s_indices, a_indices)
-        R = convert.(Float64, R)
-        Q = convert.(Float64, Q)
-        ddp_float = DiscreteDP(R, Q, beta, s_indices, a_indices)
+        # NOTE: use fresh names (not s_indices, R, Q, beta, ...): assignments
+        # in a testset to names defined in the enclosing scope would overwrite
+        # the shared fixtures used by the subsequent testsets
+        s_ind_bi = [1, 1, 1, 1, 2, 2, 2, 3, 3, 4]
+        a_ind_bi = [1, 2, 3, 4, 1, 2, 3, 1, 2, 1]
+        R_bi = [ 0//1, -1//1, -2//1, -5//1,  5//1,  0//1, -3//1,  6//1, -1//1,  5//1]
+        Q_bi = [ 1//1 0//1 0//1 0//1;
+                 3//4 1//4 0//1 0//1;
+                 1//4 1//2 1//4 0//1;
+                 0//1 1//4 1//2 1//4;
+                 3//4 1//4 0//1 0//1;
+                 1//4 1//2 1//4 0//1;
+                 0//1 1//4 1//2 1//4;
+                 1//4 1//2 1//4 0//1;
+                 0//1 1//4 1//2 1//4;
+                 0//1 1//4 1//2 1//4]
+        beta_bi = 1
+        ddp_rational = DiscreteDP(R_bi, Q_bi, beta_bi, s_ind_bi, a_ind_bi)
+        R_bi_f = convert.(Float64, R_bi)
+        Q_bi_f = convert.(Float64, Q_bi)
+        ddp_float = DiscreteDP(R_bi_f, Q_bi_f, beta_bi, s_ind_bi, a_ind_bi)
         
         # test for backward induction
         J = 3
@@ -363,14 +374,15 @@ Tests for markov/ddp.jl
 
     @testset "ddp_negative_inf_error()" begin
         # Dense Matrix
-        n, m = 3, 2
-        R = [0 1;
-             0 -Inf;
-            -Inf -Inf]
-        Q = fill(1.0/n, n, m, n)
-        beta = 0.95
+        # (fresh names, so as not to overwrite the shared fixtures; see the
+        # note in the "Backward induction" testset)
+        _n, _m = 3, 2
+        _R = [0 1;
+              0 -Inf;
+             -Inf -Inf]
+        _Q = fill(1.0/_n, _n, _m, _n)
 
-        @test_throws ArgumentError DiscreteDP(R, Q, beta)
+        @test_throws ArgumentError DiscreteDP(_R, _Q, beta)
 
         # State-Action Pair Formulation
         #
@@ -380,6 +392,53 @@ Tests for markov/ddp.jl
         # Q_sa_dense = reshape(Q, n*m, n)          #TODO: @sglyon Not sure how to reshape in Julia
         #
         # @test_throws ArgumentError DiscreteDP(R_sa, Q_sa, beta, s_indices, a_indices)
+    end
+
+    # Regression markers for known bugs; flip @test_broken to @test when fixed
+    @testset "known issues (broken)" begin
+        @testset "solve must not mutate v_init" begin
+            # VFI and MPFI currently overwrite the caller's v_init in place
+            for ddp_item in ddp0_collection, Algo in (VFI, MPFI)
+                v_init = [0.0, 0.0]
+                solve(ddp_item, v_init, Algo)
+                @test_broken v_init == [0.0, 0.0]
+            end
+        end
+
+        @testset "MPFI must respect v_init" begin
+            # currently v_init is discarded and v is reinitialized to
+            # min(R) / (1 - beta); starting at v_star must converge at once
+            for ddp_item in ddp0_collection
+                res = solve(ddp_item, copy(v_star), MPFI)
+                @test_broken res.num_iter == 1
+            end
+        end
+
+        @testset "DDPsa s_wise_max must preserve eltype" begin
+            # currently the output array is hardcoded to Float64
+            _R = [1//2, 1//1, 1//3]
+            _Q = [1//2 1//2; 0//1 1//1; 0//1 1//1]
+            _ddp = DiscreteDP(_R, _Q, 19//20, s_indices, a_indices)
+            @test_broken eltype(QuantEcon.s_wise_max(_ddp, _ddp.R)) ==
+                Rational{Int}
+        end
+
+        @testset "action-less trailing state must be ArgumentError" begin
+            # a trailing state with no action must raise the informative
+            # ArgumentError, not a BoundsError from _generate_a_indptr!
+            _R = [1.0, 0.0, 0.5]
+            _Q = fill(1/3, 3, 3)
+            _s_ind = [1, 1, 2]  # state 3 has no action
+            _a_ind = [1, 2, 1]
+            @test_broken (
+                try
+                    DiscreteDP(_R, _Q, beta, _s_ind, _a_ind)
+                    false
+                catch e
+                    e isa ArgumentError
+                end
+            )
+        end
     end
 
 end # end @testset
