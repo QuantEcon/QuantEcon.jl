@@ -489,6 +489,37 @@ Tests for markov/ddp.jl
             end
             @test isapprox(solve(_d, PFI).v, sol.v)
         end
+
+        @testset "non-floating reward eltypes" begin
+            # full action grid: no -Inf sentinel is needed, and the
+            # eltype is preserved
+            R_int = [1 2; 3 4]
+            Q_int = zeros(Int, 2, 2, 2)
+            Q_int[:, :, 1] .= 1
+            ddp_int = DiscreteDP(R_int, Q_int, 1//2)
+            ddp_int_rt = to_product_form(to_sa_pair_form(ddp_int,
+                                                         sparse=false))
+            @test ddp_int_rt.R == R_int
+            @test eltype(ddp_int_rt.R) == Int
+            @test ddp_int_rt.Q == Q_int
+
+            # Rational rewards: -1//0 is an exact -Inf sentinel, so
+            # partial action grids round-trip exactly
+            R_r = [1//2, 1//1, 1//3]
+            Q_r = [1//2 1//2; 0//1 1//1; 0//1 1//1]
+            ddp_r = DiscreteDP(R_r, Q_r, 19//20, [1, 1, 2], [1, 2, 1])
+            ddp_r_pf = to_product_form(ddp_r)
+            @test ddp_r_pf.R[2, 2] == -1//0
+            @test num_sa_pairs(ddp_r_pf) == 3
+            ddp_r_rt = to_sa_pair_form(ddp_r_pf, sparse=false)
+            @test ddp_r_rt.R == R_r
+            @test Matrix(ddp_r_rt.Q) == Q_r
+
+            # Int rewards with a partial action grid: informative error
+            ddp_int_partial = DiscreteDP([1, 2, 3], [1 0; 0 1; 0 1],
+                                         1//2, [1, 1, 2], [1, 2, 1])
+            @test_throws ArgumentError to_product_form(ddp_int_partial)
+        end
     end
 
     @testset "regression tests for fixed bugs" begin

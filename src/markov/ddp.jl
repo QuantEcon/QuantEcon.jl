@@ -328,8 +328,10 @@ Convert `ddp` to the equivalent `DiscreteDP` in product form, with a
 reward array of shape `(n, m)` and a transition probability array of
 shape `(n, m, n)`, where `m` is the largest action index. Infeasible
 pairs are assigned a reward of `-Inf` and a zero vector of transition
-probabilities. An instance already in product form is returned
-unmodified.
+probabilities; when such pairs exist, the reward element type must be
+able to represent `-Inf` (a floating point type, or a `Rational`, for
+which the sentinel is `-1//0`). An instance already in product form is
+returned unmodified.
 
 # Arguments
 
@@ -344,7 +346,21 @@ function to_product_form(ddp::DDPsa{T}) where T
     n = num_states(ddp)
     m = maximum(ddp.a_indices)
     L = num_sa_pairs(ddp)
-    R = fill(convert(T, -Inf), n, m)
+    R = Matrix{T}(undef, n, m)
+    if L < n * m
+        # some product-form cells are infeasible: fill with the -Inf
+        # sentinel, representable for floating point types and for
+        # Rationals (as -1//0)
+        R_neg_inf = try
+            convert(T, -Inf)
+        catch
+            throw(ArgumentError("the model has infeasible state-action " *
+                "pairs, which cannot be represented with reward eltype " *
+                "$T (no -Inf available); convert the rewards to a " *
+                "floating point or Rational eltype first"))
+        end
+        fill!(R, R_neg_inf)
+    end
     for i in 1:L
         R[ddp.s_indices[i], ddp.a_indices[i]] = ddp.R[i]
     end
