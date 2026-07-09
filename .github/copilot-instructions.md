@@ -64,7 +64,7 @@ Brief description of what the function does.
 ```
 
 Example with `@doc doc` for mathematical notation:
-```julia
+````julia
 @doc doc"""
     function_with_math(x)
 
@@ -81,10 +81,9 @@ f(x) = \frac{1}{n} \sum_{i=1}^{n} x_i
 # Returns
 
 - `result::Float64`: Computed result.
-
 """
 function_with_math
-```
+````
 
 #### For Types/Structs:
 1. Start with a four-space indented type signature showing just the type name (do not include constructor parameters)
