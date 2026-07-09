@@ -34,7 +34,10 @@ DiscreteDP type for specifying parameters for discrete dynamic programming model
 # Fields
 
 - `R::Array{T,NR}`: Reward array.
-- `Q::Array{T,NQ}`: Transition probability array.
+- `Q::AbstractArray{T,NQ}`: Transition probability array. For the
+  state-action pair formulation with sparse `Q`, the data are stored
+  internally in transposed (states-tomorrow x sa-pairs) order and `Q` is
+  the lazy `Transpose` view of them, with the documented shape `(L, n)`.
 - `beta::Float64`: Discount factor.
 - `a_indices::Vector{Tind}`: Action indices. Empty unless using SA formulation.
 - `a_indptr::Vector{Tind}`: Action index pointers. Empty unless using SA formulation.
@@ -158,6 +161,18 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
         _a_indices = Vector{Tind}(_a_indices)
         a_indptr = Vector{Tind}(a_indptr)
 
+        # store a sparse Q transposed internally (states-tomorrow x
+        # sa-pairs), so that the transition probabilities of each pair
+        # occupy a contiguous CSC column: the expected values Q * v and
+        # the row gather in RQ_sigma then traverse the data contiguously;
+        # ddp.Q is the lazy transpose view of the internal storage, with
+        # the documented shape (L, n). A dense Q is stored as is: BLAS
+        # handles either direction, and the transposition would cost a
+        # full copy at construction for a modest gain.
+        if issparse(Q)
+            Q = transpose(sparse(transpose(Q)))
+        end
+
         new{T,NQ,NR,Tbeta,Tind,typeof(Q)}(R, Q, beta, _a_indices, a_indptr)
     end
 end
@@ -171,7 +186,7 @@ model using dense matrix formulation.
 # Arguments
 
 - `R::Array{T,NR}`: Reward array.
-- `Q::Array{T,NQ}`: Transition probability array.
+- `Q::AbstractArray{T,NQ}`: Transition probability array.
 - `beta::Float64`: Discount factor.
 
 # Returns
@@ -192,8 +207,8 @@ model using state-action pair formulation.
 
 # Arguments
 
-- `R::Array{T,NR}`: Reward array.
-- `Q::Array{T,NQ}`: Transition probability array.
+- `R::AbstractArray{T,NR}`: Reward array.
+- `Q::AbstractArray{T,NQ}`: Transition probability array; may be sparse.
 - `beta::Float64`: Discount factor.
 - `s_indices::Vector{Tind}`: State indices.
 - `a_indices::Vector{Tind}`: Action indices.
@@ -725,14 +740,20 @@ function RQ_sigma(ddp::DDP, sigma::AbstractVector{T}) where T<:Integer
     return R_sigma, Q_sigma
 end
 
-# TODO: express it in a similar way as above to exploit Julia's column major order
 function RQ_sigma(ddp::DDPsa, sigma::AbstractVector{T}) where T<:Integer
     sigma_indices = Array{T}(undef, num_states(ddp))
     _find_indices!(ddp.a_indices, ddp.a_indptr, sigma, sigma_indices)
     R_sigma = ddp.R[sigma_indices]
-    Q_sigma = ddp.Q[sigma_indices, :]
+    Q_sigma = _gather_rows(ddp.Q, sigma_indices)
     return R_sigma, Q_sigma
 end
+
+# gather the rows `indices` of Q; with the transposed internal storage of
+# the sa formulation, a row gather on the lazy view is a column gather on
+# the parent (contiguous, and fast for a sparse parent)
+_gather_rows(Q::Transpose, indices::AbstractVector) =
+    copy(transpose(parent(Q)[:, indices]))
+_gather_rows(Q::AbstractMatrix, indices::AbstractVector) = Q[indices, :]
 
 # ---------------- #
 # Internal methods #

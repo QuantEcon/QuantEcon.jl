@@ -39,6 +39,11 @@ Tests for markov/ddp.jl
     ddp0_sa_b1 = DiscreteDP(R_sa, Q_sa, 1.0, s_indices, a_indices)
 
     @test issparse(ddp0_sa.Q)
+    # ddp.Q preserves the values and (L, n) shape of the input, while the
+    # internal storage is transposed (states-tomorrow x sa-pairs)
+    @test size(ddp0_sa.Q) == (L, n)
+    @test Matrix(ddp0_sa.Q) == Matrix(Q_sa)
+    @test parent(ddp0_sa.Q) isa SparseMatrixCSC
 
     # List of ddp formulations
     ddp0_collection = (ddp0, ddp0_sa)
@@ -82,7 +87,15 @@ Tests for markov/ddp.jl
             r_sa, q_sa = RQ_sigma(ddp0_sa, sig)
             @test r_sa == r_dense
             @test Matrix(q_sa) == Matrix(q_dense)
+            # Q_sigma must be a materialized sparse matrix, not a lazy
+            # view of the internal transposed storage
+            @test q_sa isa SparseMatrixCSC
         end
+
+        # the controlled Markov chain from the sparse sa formulation
+        # works with downstream Markov-chain utilities
+        res_sa = solve(ddp0_sa, PFI)
+        @test isapprox(sum(stationary_distributions(res_sa.mc)[1]), 1)
     end
 
     @testset "compute_greedy methods" begin
