@@ -29,6 +29,14 @@ Always test Examples sections in docstrings to ensure they execute without error
 - For REPL-style examples, verify the actual output matches what is documented
 - Test Examples sections before committing any docstring changes that include or modify Examples
 
+### Benchmarks:
+The repository has a benchmark suite in the standard BenchmarkTools.jl format under `benchmark/` (see `benchmark/README.md` for full usage):
+- Setup (once): `julia --project=benchmark -e 'using Pkg; Pkg.develop(path="."); Pkg.instantiate()'`
+- Run the whole suite: `julia --project=benchmark benchmark/benchmarks.jl` -- takes a few minutes. NEVER CANCEL.
+- Compare two commits with PkgBenchmark.jl: `judge("QuantEcon", "<target>", "<baseline>")`; note that `judge` runs committed states, so commit your changes first.
+- **Benchmarks are NOT run in CI.** When you rename or remove internal functions used by `benchmark/*.jl` (e.g. `QuantEcon._mul`), update the benchmark files in the same PR and check that the suite still builds: `julia --project=benchmark -e 'include("benchmark/benchmarks.jl")'`.
+- For performance-sensitive changes (especially under `src/markov/`), report before/after numbers from this suite in the PR description.
+
 ### No linting or formatting tools are configured
 Julia packages typically do not use external linters or formatters like other language ecosystems. Code style follows the Julia community conventions in the [Julia Style Guide](https://docs.julialang.org/en/v1/manual/style-guide/).
 
@@ -131,6 +139,31 @@ julia> result = my_function(x, y)
 2. **Check for typos in docstrings:** Always proofread docstrings for spelling errors, especially in technical terms and commonly misspelled words like "representation," "calculating," "response"
 3. **Apply these checks systematically:** When updating any docstring, review the entire file for similar formatting inconsistencies and typos
 
+## Contribution Conventions
+
+### Keeping these instructions up to date:
+- This file (`.github/copilot-instructions.md`) is the single source of repository instructions for AI agents (`AGENTS.md` and `CLAUDE.md` only point here). Update it whenever necessary as part of the change that makes it outdated: when adding or restructuring directories, changing workflows or conventions, bumping the required Julia version, or learning a repository-specific pitfall worth passing on. Stale instructions are worse than none.
+
+### Commit and PR titles:
+- Prefix commit subjects and PR titles with the change type: `FIX:` for bug fixes (use `FIX:`, not `BUG:`), `PERF:` for performance changes, `TEST:` for test-only changes, `DOC:` for documentation, `MAINT:` for maintenance.
+
+### PR descriptions:
+- Do not hard-wrap lines: keep each paragraph and each bullet point on a single line (GitHub soft-wraps; manual line breaks render poorly).
+- State explicitly whether the change is behavior-preserving; if it removes or changes anything that appears in the published API documentation (including docstrings picked up by `@autodocs`, even for internal or `Base`-extending methods), describe it as a breaking change and flag it for the release notes.
+- For performance PRs, include measured before/after numbers from the benchmark suite.
+
+### Cross-language parity with QuantEcon.py:
+- Parts of this package mirror [QuantEcon.py](https://github.com/QuantEcon/QuantEcon.py); in particular, `src/markov/ddp.jl` mirrors `quantecon/markov/ddp.py`.
+- A bug found in one implementation likely exists in the other: check the sibling and fix (or at least report) both.
+- Behavioral changes (validation, defaults, `v_init` handling, etc.) should keep the two implementations consistent; note the corresponding PR/issue of the sibling repository in the PR description.
+
+### Performance work guidelines:
+When replacing a library call with a hand-written kernel (or adding caching), a green test suite is not sufficient: preserve the semantic guarantees the replaced code provided silently. Known pitfalls, each of which has caused a real bug in this repository or its Python sibling:
+- **NaN propagation**: `maximum`/`max` propagate NaNs, while a `>` comparison silently skips them. Use a `max()` accumulator, not a `>` branch, when replacing reductions.
+- **Precision of comparisons**: keep running maxima (and similar accumulators) in the element type of the *source* array, not of a lower-precision output buffer; otherwise argmax-type decisions can be wrong for mixed-precision inputs. Restrict fast paths to matching element types via dispatch.
+- **Stale caches**: fields like `R`, `Q`, `beta` are documented mutable attributes; do not cache derived objects (views, factorizations) of them at construction unless the cache is invalidated on rebinding. Prefer computing cheap views per call.
+- Verify optimization ideas by measurement before adopting them; vectorized library code often beats hand-written loops.
+
 ## Validation
 
 ### Always manually validate changes by running complete scenarios:
@@ -206,6 +239,7 @@ println(\"VFI converged in \", results.num_iter, \" iterations\")
   - `interp.jl`, `quad.jl` - Interpolation and quadrature methods
   - `util.jl` - Grid generation and utility functions
 - `test/` - Test files following `test_*.jl` naming convention
+- `benchmark/` - Benchmark suite in BenchmarkTools.jl/PkgBenchmark.jl format (see `benchmark/README.md`)
 - `docs/` - Documentation source and build system using Documenter.jl
 - `examples/` - Example usage scripts
 - `Project.toml` - Package metadata and dependencies
@@ -240,6 +274,9 @@ When working on this codebase, developers frequently need to:
 3. Run individual test file: `julia --project=. -e "using Pkg, Test, QuantEcon; @testset \"Single test\" begin include(\"test/test_FILENAME.jl\") end"`
 4. Test timing: Full test suite takes ~5 minutes, individual test files take 2-60 seconds each
 
+### Writing tests — scope pitfall:
+In Julia, an assignment inside a `@testset` to a name defined in the enclosing scope reassigns the enclosing variable rather than creating a local one. In test files where fixtures (`R`, `Q`, `beta`, ...) are shared across testsets at the top level, use fresh local names inside testsets (e.g. `_R`, `R_bi`) instead of reusing fixture names; otherwise later testsets silently run against the wrong data. This has caused vacuously passing tests in this repository before (see the fix in PR #384).
+
 ### Working with examples:
 - Run examples from repository root: `julia --project=. examples/finite_dp_og_example.jl`
 - Examples demonstrate real-world usage patterns
@@ -268,7 +305,7 @@ When working on this codebase, developers frequently need to:
 
 ### If builds fail:
 1. Check network connectivity for package installation
-2. Ensure Julia 1.6+ is installed  
+2. Ensure Julia 1.10+ is installed (the `[compat]` bound in `Project.toml` is `julia = "1.10"`)
 3. Clear package cache: `julia -e "using Pkg; Pkg.gc()"`
 4. Reinstall dependencies: `julia --project=. -e "using Pkg; Pkg.instantiate()"`
 
