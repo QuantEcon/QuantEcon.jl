@@ -186,7 +186,7 @@ model using dense matrix formulation.
 # Arguments
 
 - `R::Array{T,NR}`: Reward array.
-- `Q::Array{T,NQ}`: Transition probability array.
+- `Q::AbstractArray{T,NQ}`: Transition probability array.
 - `beta::Float64`: Discount factor.
 
 # Returns
@@ -207,8 +207,8 @@ model using state-action pair formulation.
 
 # Arguments
 
-- `R::Array{T,NR}`: Reward array.
-- `Q::Array{T,NQ}`: Transition probability array.
+- `R::AbstractArray{T,NR}`: Reward array.
+- `Q::AbstractArray{T,NQ}`: Transition probability array; may be sparse.
 - `beta::Float64`: Discount factor.
 - `s_indices::Vector{Tind}`: State indices.
 - `a_indices::Vector{Tind}`: Action indices.

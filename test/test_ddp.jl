@@ -87,7 +87,15 @@ Tests for markov/ddp.jl
             r_sa, q_sa = RQ_sigma(ddp0_sa, sig)
             @test r_sa == r_dense
             @test Matrix(q_sa) == Matrix(q_dense)
+            # Q_sigma must be a materialized sparse matrix, not a lazy
+            # view of the internal transposed storage
+            @test q_sa isa SparseMatrixCSC
         end
+
+        # the controlled Markov chain from the sparse sa formulation
+        # works with downstream Markov-chain utilities
+        res_sa = solve(ddp0_sa, PFI)
+        @test isapprox(sum(stationary_distributions(res_sa.mc)[1]), 1)
     end
 
     @testset "compute_greedy methods" begin
