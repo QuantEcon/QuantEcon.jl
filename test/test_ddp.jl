@@ -39,6 +39,11 @@ Tests for markov/ddp.jl
     ddp0_sa_b1 = DiscreteDP(R_sa, Q_sa, 1.0, s_indices, a_indices)
 
     @test issparse(ddp0_sa.Q)
+    # ddp.Q preserves the values and (L, n) shape of the input, while the
+    # internal storage is transposed (states-tomorrow x sa-pairs)
+    @test size(ddp0_sa.Q) == (L, n)
+    @test Matrix(ddp0_sa.Q) == Matrix(Q_sa)
+    @test parent(ddp0_sa.Q) isa SparseMatrixCSC
 
     # List of ddp formulations
     ddp0_collection = (ddp0, ddp0_sa)
