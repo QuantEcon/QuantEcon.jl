@@ -131,6 +131,7 @@ export
     DiscreteDP, VFI, PFI, MPFI, solve, RQ_sigma,
     evaluate_policy, bellman_operator, compute_greedy,
     bellman_operator!, compute_greedy!, num_states, backward_induction,
+    num_sa_pairs, to_sa_pair_form, to_product_form,
 
 # zeros / optimization
     bisect, brenth, brent, ridder, expand_bracket, divide_bracket,

@@ -407,6 +407,121 @@ Tests for markov/ddp.jl
         # @test_throws ArgumentError DiscreteDP(R_sa, Q_sa, beta, s_indices, a_indices)
     end
 
+    @testset "sa-pair sorting and stored indices" begin
+        # sorted fixtures
+        _s_ind = [1, 1, 2]
+        _a_ind = [1, 2, 1]
+        _a_indptr = [1, 3, 4]
+        _R = [0.0, 1.0, 2.0]
+        _Q = [1.0 0.0; 0.5 0.5; 0.0 1.0]
+        # shuffled variants of the same model
+        _s_ind_sh = [1, 2, 1]
+        _a_ind_sh = [1, 1, 2]
+        _R_sh = [0.0, 2.0, 1.0]
+        _Q_sh = [1.0 0.0; 0.0 1.0; 0.5 0.5]
+
+        for (R_i, Q_i, s_i, a_i) in ((_R, _Q, _s_ind, _a_ind),
+                                     (_R_sh, _Q_sh, _s_ind_sh, _a_ind_sh))
+            for Q_c in (Q_i, sparse(Q_i))
+                _ddp = DiscreteDP(R_i, Q_c, beta, s_i, a_i)
+                @test _ddp.s_indices == _s_ind
+                @test _ddp.a_indices == _a_ind
+                @test _ddp.a_indptr == _a_indptr
+                @test _ddp.R == _R
+                @test Matrix(_ddp.Q) == _Q
+            end
+        end
+    end
+
+    @testset "num_sa_pairs and form converters" begin
+        _n, _m = 3, 2
+        _R = [0.0 1.0; 1.0 0.0; -Inf 1.0]
+        _Q = fill(1/3, (_n, _m, _n))
+        _Q[1, 1, 1] = 0.0
+        _Q[1, 1, 2] = 2/3
+        _ddp = DiscreteDP(_R, _Q, beta)
+        @test num_sa_pairs(_ddp) == 5
+
+        # expected sa-pair arrays (lexicographic pair order)
+        sa_R = [0.0, 1.0, 1.0, 0.0, 1.0]
+        sa_Q = fill(1/3, (5, _n))
+        sa_Q[1, 1] = 0.0
+        sa_Q[1, 2] = 2/3
+
+        ddp_sa = to_sa_pair_form(_ddp)
+        ddp_sa2 = to_sa_pair_form(ddp_sa)
+        ddp_sa3 = to_sa_pair_form(_ddp, sparse=false)
+        ddp_pf2 = to_product_form(ddp_sa)
+        ddp_pf3 = to_product_form(ddp_sa3)
+        ddp_pf4 = to_product_form(_ddp)
+
+        # identity on instances already in the target form
+        @test ddp_sa2 === ddp_sa
+        @test ddp_pf4 === _ddp
+
+        @test issparse(ddp_sa.Q)
+        @test !issparse(ddp_sa3.Q)
+        for _d in (ddp_sa, ddp_sa3)
+            @test _d.R == sa_R
+            @test Matrix(_d.Q) == sa_Q
+            @test _d.beta == beta
+            @test _d.s_indices == [1, 1, 2, 2, 3]
+            @test _d.a_indices == [1, 2, 1, 2, 2]
+            @test num_sa_pairs(_d) == 5
+        end
+
+        # the infeasible pair gets reward -Inf and a zero probability row
+        funky_Q = fill(1/3, (_n, _m, _n))
+        funky_Q[1, 1, 1] = 0.0
+        funky_Q[1, 1, 2] = 2/3
+        funky_Q[3, 1, :] .= 0.0
+        for _d in (ddp_pf2, ddp_pf3)
+            @test _d.R == _R
+            @test _d.Q == funky_Q
+            @test _d.beta == beta
+        end
+
+        # all representations solve to the same solution
+        sol = solve(_ddp, PFI)
+        for _d in (ddp_sa, ddp_sa3, ddp_pf2, ddp_pf3)
+            for Algo in (VFI, PFI, MPFI)
+                @test solve(_d, Algo).sigma == sol.sigma
+            end
+            @test isapprox(solve(_d, PFI).v, sol.v)
+        end
+
+        @testset "non-floating reward eltypes" begin
+            # full action grid: no -Inf sentinel is needed, and the
+            # eltype is preserved
+            R_int = [1 2; 3 4]
+            Q_int = zeros(Int, 2, 2, 2)
+            Q_int[:, :, 1] .= 1
+            ddp_int = DiscreteDP(R_int, Q_int, 1//2)
+            ddp_int_rt = to_product_form(to_sa_pair_form(ddp_int,
+                                                         sparse=false))
+            @test ddp_int_rt.R == R_int
+            @test eltype(ddp_int_rt.R) == Int
+            @test ddp_int_rt.Q == Q_int
+
+            # Rational rewards: -1//0 is an exact -Inf sentinel, so
+            # partial action grids round-trip exactly
+            R_r = [1//2, 1//1, 1//3]
+            Q_r = [1//2 1//2; 0//1 1//1; 0//1 1//1]
+            ddp_r = DiscreteDP(R_r, Q_r, 19//20, [1, 1, 2], [1, 2, 1])
+            ddp_r_pf = to_product_form(ddp_r)
+            @test ddp_r_pf.R[2, 2] == -1//0
+            @test num_sa_pairs(ddp_r_pf) == 3
+            ddp_r_rt = to_sa_pair_form(ddp_r_pf, sparse=false)
+            @test ddp_r_rt.R == R_r
+            @test Matrix(ddp_r_rt.Q) == Q_r
+
+            # Int rewards with a partial action grid: informative error
+            ddp_int_partial = DiscreteDP([1, 2, 3], [1 0; 0 1; 0 1],
+                                         1//2, [1, 1, 2], [1, 2, 1])
+            @test_throws ArgumentError to_product_form(ddp_int_partial)
+        end
+    end
+
     @testset "regression tests for fixed bugs" begin
         @testset "solve must not mutate v_init" begin
             for ddp_item in ddp0_collection, Algo in (VFI, PFI, MPFI)

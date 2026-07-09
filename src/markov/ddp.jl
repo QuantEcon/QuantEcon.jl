@@ -38,7 +38,9 @@ DiscreteDP type for specifying parameters for discrete dynamic programming model
   state-action pair formulation with sparse `Q`, the data are stored
   internally in transposed (states-tomorrow x sa-pairs) order and `Q` is
   the lazy `Transpose` view of them, with the documented shape `(L, n)`.
-- `beta::Float64`: Discount factor.
+- `beta::Real`: Discount factor.
+- `s_indices::Vector{Tind}`: State indices, sorted. Empty unless using SA
+  formulation.
 - `a_indices::Vector{Tind}`: Action indices. Empty unless using SA formulation.
 - `a_indptr::Vector{Tind}`: Action index pointers. Empty unless using SA formulation.
 
@@ -47,6 +49,7 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
     R::Array{T,NR}                     # Reward Array
     Q::TQ                     # Transition Probability Array
     beta::Tbeta                        # Discount Factor
+    s_indices::Vector{Tind}  # State Indices
     a_indices::Vector{Tind}  # Action Indices
     a_indptr::Vector{Tind}   # Action Index Pointers
 
@@ -83,10 +86,12 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
         end
 
         # here the indices and indptr are empty.
+        _s_indices = Vector{Int}()
         _a_indices = Vector{Int}()
         a_indptr = Vector{Int}()
 
-        new{T,NQ,NR,Tbeta,Tind,typeof(Q)}(R, Q, beta, _a_indices, a_indptr)
+        new{T,NQ,NR,Tbeta,Tind,typeof(Q)}(R, Q, beta, _s_indices, _a_indices,
+                                          a_indptr)
     end
 
     # Note: We left R, Q as type Array to produce more helpful error message with regards to shape.
@@ -132,6 +137,7 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
 
         if _has_sorted_sa_indices(s_indices, a_indices)
             a_indptr = Array{Int64}(undef, num_states + 1)
+            _s_indices = copy(s_indices)
             _a_indices = copy(a_indices)
             _generate_a_indptr!(num_states, s_indices, a_indptr)
         else
@@ -146,6 +152,12 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
 
             R = R[as_ptr.nzval]
             Q = Q[as_ptr.nzval, :]
+
+            # reconstruct the sorted state indices from a_indptr
+            _s_indices = Vector{Int}(undef, num_sa_pairs)
+            for i in 1:num_states, j in a_indptr[i]:(a_indptr[i+1]-1)
+                _s_indices[j] = i
+            end
         end
 
         # check feasibility
@@ -158,6 +170,7 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
         end
 
         # indices
+        _s_indices = Vector{Tind}(_s_indices)
         _a_indices = Vector{Tind}(_a_indices)
         a_indptr = Vector{Tind}(a_indptr)
 
@@ -173,7 +186,8 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
             Q = transpose(sparse(transpose(Q)))
         end
 
-        new{T,NQ,NR,Tbeta,Tind,typeof(Q)}(R, Q, beta, _a_indices, a_indptr)
+        new{T,NQ,NR,Tbeta,Tind,typeof(Q)}(R, Q, beta, _s_indices, _a_indices,
+                                          a_indptr)
     end
 end
 
@@ -187,7 +201,7 @@ model using dense matrix formulation.
 
 - `R::Array{T,NR}`: Reward array.
 - `Q::AbstractArray{T,NQ}`: Transition probability array.
-- `beta::Float64`: Discount factor.
+- `beta::Real`: Discount factor.
 
 # Returns
 
@@ -209,7 +223,7 @@ model using state-action pair formulation.
 
 - `R::AbstractArray{T,NR}`: Reward array.
 - `Q::AbstractArray{T,NQ}`: Transition probability array; may be sparse.
-- `beta::Float64`: Discount factor.
+- `beta::Real`: Discount factor.
 - `s_indices::Vector{Tind}`: State indices.
 - `a_indices::Vector{Tind}`: Action indices.
 
@@ -238,6 +252,159 @@ const DDPsa{T,Tbeta,Tind,TQ} =  DiscreteDP{T,2,1,Tbeta,Tind,TQ}
 
 num_states(ddp::DDP) = size(ddp.R, 1)
 num_states(ddp::DDPsa) = size(ddp.Q, 2)
+
+"""
+    num_sa_pairs(ddp)
+
+Number of feasible state-action pairs: for the state-action pair
+formulation, the number of pairs given at construction; for the product
+formulation, the number of pairs with a finite reward.
+
+# Arguments
+
+- `ddp::DiscreteDP`: Object that contains the model parameters.
+
+# Returns
+
+- `L::Int`: Number of feasible state-action pairs.
+
+"""
+num_sa_pairs(ddp::DDP) = count(>(-Inf), ddp.R)
+num_sa_pairs(ddp::DDPsa) = length(ddp.R)
+
+#-----------------#
+#-Form Converters-#
+#-----------------#
+
+"""
+    to_sa_pair_form(ddp; sparse=true)
+
+Convert `ddp` to the equivalent `DiscreteDP` in state-action pair form.
+The feasible pairs are those with a finite reward, enumerated in
+lexicographic order. An instance already in state-action pair form is
+returned unmodified.
+
+# Arguments
+
+- `ddp::DiscreteDP`: Object that contains the model parameters.
+- `;sparse::Bool(true)`: Whether to store the transition probability
+  array of the converted instance as a sparse matrix.
+
+# Returns
+
+- `ddp_sa::DiscreteDP`: The equivalent `DiscreteDP` in state-action pair
+  form.
+
+"""
+function to_sa_pair_form(ddp::DDP{T}; sparse::Bool=true) where T
+    n, m = size(ddp.R)
+    L = num_sa_pairs(ddp)
+    s_indices = Vector{Int}(undef, L)
+    a_indices = Vector{Int}(undef, L)
+    R = Vector{T}(undef, L)
+    Q = Matrix{T}(undef, L, n)
+    k = 0
+    for s in 1:n, a in 1:m
+        if ddp.R[s, a] > -Inf
+            k += 1
+            s_indices[k] = s
+            a_indices[k] = a
+            R[k] = ddp.R[s, a]
+            for j in 1:n
+                Q[k, j] = ddp.Q[s, a, j]
+            end
+        end
+    end
+    Q_out = sparse ? SparseArrays.sparse(Q) : Q
+    return DiscreteDP(R, Q_out, ddp.beta, s_indices, a_indices)
+end
+
+to_sa_pair_form(ddp::DDPsa; sparse::Bool=true) = ddp
+
+"""
+    to_product_form(ddp)
+
+Convert `ddp` to the equivalent `DiscreteDP` in product form, with a
+reward array of shape `(n, m)` and a transition probability array of
+shape `(n, m, n)`, where `m` is the largest action index. Infeasible
+pairs are assigned a reward of `-Inf` and a zero vector of transition
+probabilities; when such pairs exist, the reward element type must be
+able to represent `-Inf` (a floating point type, or a `Rational`, for
+which the sentinel is `-1//0`). An instance already in product form is
+returned unmodified.
+
+# Arguments
+
+- `ddp::DiscreteDP`: Object that contains the model parameters.
+
+# Returns
+
+- `ddp_pf::DiscreteDP`: The equivalent `DiscreteDP` in product form.
+
+"""
+function to_product_form(ddp::DDPsa{T}) where T
+    n = num_states(ddp)
+    m = maximum(ddp.a_indices)
+    L = num_sa_pairs(ddp)
+    R = Matrix{T}(undef, n, m)
+    if L < n * m
+        # some product-form cells are infeasible: fill with the -Inf
+        # sentinel, representable for floating point types and for
+        # Rationals (as -1//0)
+        R_neg_inf = try
+            convert(T, -Inf)
+        catch
+            throw(ArgumentError("the model has infeasible state-action " *
+                "pairs, which cannot be represented with reward eltype " *
+                "$T (no -Inf available); convert the rewards to a " *
+                "floating point or Rational eltype first"))
+        end
+        fill!(R, R_neg_inf)
+    end
+    for i in 1:L
+        R[ddp.s_indices[i], ddp.a_indices[i]] = ddp.R[i]
+    end
+    Q = zeros(T, n, m, n)
+    _fill_product_Q!(Q, ddp.s_indices, ddp.a_indices, ddp.Q)
+    return DiscreteDP(R, Q, ddp.beta)
+end
+
+to_product_form(ddp::DDP) = ddp
+
+# fill the rows Q[s_indices[i], a_indices[i], :] of the product-form array
+# from row i of the sa-form Q_sa, without materializing a dense copy: for
+# the transposed sparse internal storage, iterate the nonzeros of column i
+# of the parent
+function _fill_product_Q!(
+        Q::AbstractArray, s_indices::AbstractVector,
+        a_indices::AbstractVector,
+        Q_sa::Transpose{<:Any,<:SparseMatrixCSC}
+    )
+    B = parent(Q_sa)
+    rows = rowvals(B)
+    vals = nonzeros(B)
+    for i in eachindex(s_indices, a_indices)
+        s, a = s_indices[i], a_indices[i]
+        for k in nzrange(B, i)
+            Q[s, a, rows[k]] = vals[k]
+        end
+    end
+    return Q
+end
+
+function _fill_product_Q!(
+        Q::AbstractArray, s_indices::AbstractVector,
+        a_indices::AbstractVector, Q_sa::AbstractMatrix
+    )
+    n = size(Q_sa, 2)
+    for i in eachindex(s_indices, a_indices)
+        s, a = s_indices[i], a_indices[i]
+        for j in 1:n
+            Q[s, a, j] = Q_sa[i, j]
+        end
+    end
+    return Q
+end
 
 
 abstract type DDPAlgorithm end
