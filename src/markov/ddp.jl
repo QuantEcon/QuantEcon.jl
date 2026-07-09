@@ -38,7 +38,7 @@ DiscreteDP type for specifying parameters for discrete dynamic programming model
   state-action pair formulation with sparse `Q`, the data are stored
   internally in transposed (states-tomorrow x sa-pairs) order and `Q` is
   the lazy `Transpose` view of them, with the documented shape `(L, n)`.
-- `beta::Float64`: Discount factor.
+- `beta::Real`: Discount factor.
 - `s_indices::Vector{Tind}`: State indices, sorted. Empty unless using SA
   formulation.
 - `a_indices::Vector{Tind}`: Action indices. Empty unless using SA formulation.
@@ -201,7 +201,7 @@ model using dense matrix formulation.
 
 - `R::Array{T,NR}`: Reward array.
 - `Q::AbstractArray{T,NQ}`: Transition probability array.
-- `beta::Float64`: Discount factor.
+- `beta::Real`: Discount factor.
 
 # Returns
 
@@ -223,7 +223,7 @@ model using state-action pair formulation.
 
 - `R::AbstractArray{T,NR}`: Reward array.
 - `Q::AbstractArray{T,NQ}`: Transition probability array; may be sparse.
-- `beta::Float64`: Discount factor.
+- `beta::Real`: Discount factor.
 - `s_indices::Vector{Tind}`: State indices.
 - `a_indices::Vector{Tind}`: Action indices.
 
@@ -345,19 +345,50 @@ function to_product_form(ddp::DDPsa{T}) where T
     m = maximum(ddp.a_indices)
     L = num_sa_pairs(ddp)
     R = fill(convert(T, -Inf), n, m)
-    Q = zeros(T, n, m, n)
-    Q_dense = Matrix(ddp.Q)
     for i in 1:L
-        s, a = ddp.s_indices[i], ddp.a_indices[i]
-        R[s, a] = ddp.R[i]
-        for j in 1:n
-            Q[s, a, j] = Q_dense[i, j]
-        end
+        R[ddp.s_indices[i], ddp.a_indices[i]] = ddp.R[i]
     end
+    Q = zeros(T, n, m, n)
+    _fill_product_Q!(Q, ddp.s_indices, ddp.a_indices, ddp.Q)
     return DiscreteDP(R, Q, ddp.beta)
 end
 
 to_product_form(ddp::DDP) = ddp
+
+# fill the rows Q[s_indices[i], a_indices[i], :] of the product-form array
+# from row i of the sa-form Q_sa, without materializing a dense copy: for
+# the transposed sparse internal storage, iterate the nonzeros of column i
+# of the parent
+function _fill_product_Q!(
+        Q::AbstractArray, s_indices::AbstractVector,
+        a_indices::AbstractVector,
+        Q_sa::Transpose{<:Any,<:SparseMatrixCSC}
+    )
+    B = parent(Q_sa)
+    rows = rowvals(B)
+    vals = nonzeros(B)
+    for i in eachindex(s_indices, a_indices)
+        s, a = s_indices[i], a_indices[i]
+        for k in nzrange(B, i)
+            Q[s, a, rows[k]] = vals[k]
+        end
+    end
+    return Q
+end
+
+function _fill_product_Q!(
+        Q::AbstractArray, s_indices::AbstractVector,
+        a_indices::AbstractVector, Q_sa::AbstractMatrix
+    )
+    n = size(Q_sa, 2)
+    for i in eachindex(s_indices, a_indices)
+        s, a = s_indices[i], a_indices[i]
+        for j in 1:n
+            Q[s, a, j] = Q_sa[i, j]
+        end
+    end
+    return Q
+end
 
 
 abstract type DDPAlgorithm end
