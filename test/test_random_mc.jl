@@ -33,6 +33,31 @@ using Random
         @test Ps[2] == Ps[1]
     end
 
+    @testset "Test random_stochastic_matrix with sparse=Val(true)" begin
+        n, k = 5, 3
+        seed = 1234
+        for k_ in (n, k)
+            P_dense =
+                @inferred random_stochastic_matrix(MersenneTwister(seed), n, k_)
+            P_sparse = @inferred random_stochastic_matrix(
+                MersenneTwister(seed), n, k_, sparse=Val(true))
+            @test P_sparse isa SparseMatrixCSC{Float64,Int}
+            @test nnz(P_sparse) == n * k_
+            # the same seed samples the same matrix in both formats
+            @test Matrix(P_sparse) == P_dense
+        end
+
+        mc = @inferred random_markov_chain(MersenneTwister(seed), n, k,
+                                           sparse=Val(true))
+        @test mc.p isa SparseMatrixCSC
+        @test size(mc.p) == (n, n)
+        # defaults for k and rng
+        @test random_markov_chain(n, sparse=Val(true)).p isa SparseMatrixCSC
+        @test random_markov_chain(n, k, sparse=Val(true)).p isa SparseMatrixCSC
+
+        @test_throws ArgumentError random_markov_chain(2, 3, sparse=Val(true))
+    end
+
     @testset "Test random_stochastic_matrix with k=1" begin
         n, k = 3, 1
         P = random_stochastic_matrix(n, k)
