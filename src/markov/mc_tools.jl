@@ -14,7 +14,13 @@ https://lectures.quantecon.org/jl/finite_markov.html
 import Graphs: DiGraph, period, attracting_components,
                strongly_connected_components, is_strongly_connected
 
-@inline check_stochastic_matrix(P) = maximum(abs, sum(P, dims = 2) .- 1) < 5e-15 ? true : false
+# Row sums can deviate from 1 by rounding of the entries and accumulation
+# in the sum, both growing linearly with the matrix size
+@inline function check_stochastic_matrix(P)
+    T = eltype(P)
+    atol = max(5e-15, size(P, 1) * (T <: AbstractFloat ? eps(T) : eps()))
+    return maximum(abs, sum(P, dims = 2) .- 1) <= atol
+end
 
 """
     MarkovChain
@@ -123,11 +129,13 @@ gth_solve(A::Matrix{T}) where {T<:Integer} =
 Same as `gth_solve`, but overwrite the input `A`, instead of creating a copy.
 """
 function gth_solve!(A::Matrix{T}) where T<:Real
-    n = size(A, 1)
+    n, m = size(A)
+    n == m ||
+        throw(DimensionMismatch("matrix must be square; got ($n, $m)"))
     x = zeros(T, n)
 
     @inbounds for k in 1:n-1
-        scale = sum(A[k, k+1:n])
+        scale = @views sum(A[k, k+1:n])
         if scale <= zero(T)
             # There is one (and only one) recurrent class contained in
             # {1, ..., k};
@@ -135,7 +143,7 @@ function gth_solve!(A::Matrix{T}) where T<:Real
             n = k
             break
         end
-        A[k+1:n, k] /= scale
+        @views A[k+1:n, k] ./= scale
 
         for j in k+1:n, i in k+1:n
             A[i, j] += A[i, k] * A[k, j]
@@ -149,7 +157,7 @@ function gth_solve!(A::Matrix{T}) where T<:Real
     end
 
     # normalisation
-    x /= sum(x)
+    x ./= sum(x)
 
     return x
 end

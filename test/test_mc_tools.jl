@@ -26,13 +26,6 @@ function kmr_markov_matrix_sequential(n::Integer, p::T, ε::T) where T<:Real
 end
 
 
-function Base.isapprox(x::Vector{Vector{<:Real}},
-                       y::Vector{Vector{<:Real}})
-    length(x) == length(y) || return false
-    return all(xy -> isapprox(x, y), zip(x, y))
-end
-
-
 @testset "Testing mc_tools.jl" begin
     # Matrix with two recurrent classes [1, 2] and [4, 5, 6],
     # which have periods 2 and 3, respectively
@@ -352,6 +345,13 @@ end
         @test isapprox(x, P_dict["stationary_dist"])
     end
 
+    @testset "test gth_solve throws errors" begin
+        # not square
+        @test_throws DimensionMismatch gth_solve(rand(3, 2))
+        @test_throws DimensionMismatch gth_solve(rand(1:10, 3, 2))
+        @test_throws DimensionMismatch QuantEcon.gth_solve!(rand(3, 2))
+    end
+
     @testset "test MarkovChain with KMR matrices" begin
         for P in kmr_matrices
             mc = MarkovChain(P)
@@ -383,6 +383,23 @@ end
 
         # negative element, but sums to 1
         @test_throws ArgumentError MarkovChain([-1 1; 0.2 0.8])
+    end
+
+    @testset "test MarkovChain row sum tolerance" begin
+        # row sum error within size-dependent tolerance
+        n = 100
+        P = fill(1/n, n, n)
+        P[1, 1] += 1e-14
+        @test MarkovChain(P) isa MarkovChain
+
+        # row sum error beyond tolerance
+        P[1, 1] += 1e-12
+        @test_throws ArgumentError MarkovChain(P)
+
+        # Float32: row-normalized random matrix
+        P32 = rand(Float32, 50, 50)
+        P32 ./= sum(P32, dims=2)
+        @test MarkovChain(P32) isa MarkovChain
     end
 
     mc3 = MarkovChain([0.4 0.6; 0.2 0.8])
