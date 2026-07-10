@@ -6,9 +6,10 @@ computation, and simulation (`simulate`, `simulate!`, `simulate_indices`),
 for both dense and sparse transition matrices.
 
 The simulation benchmarks include a long-path case (per-step sampling cost
-dominates) and a short-path case with many states (per-call setup cost —
-transition matrix conversion and CDF construction — dominates), so that
-changes to either component are visible separately.
+dominates) and a short-path case with many states, in warm-cache form
+(transition CDFs cached on the shared MarkovChain instance) and, for the
+latter, in `_cold` form (fresh chain per sample, timing the CDF-cache
+construction), so that changes to either component are visible separately.
 =#
 using QuantEcon
 using BenchmarkTools
@@ -90,7 +91,9 @@ let grp = suite["constructor"] = BenchmarkGroup()
 end
 
 # stationary_distributions: recurrent class detection + GTH solve; the
-# random matrices are irreducible, so there is exactly one class
+# random matrices are irreducible, so there is exactly one class, while
+# the reducible case has two diagonal blocks (and exercises the graph
+# path, which strictly positive matrices bypass)
 let grp = suite["stationary_distributions"] = BenchmarkGroup()
     mc_sparse_small = MarkovChain(mc_random_sparse_stochastic_matrix(
         new_mc_rng(), 300, 4))
@@ -98,26 +101,44 @@ let grp = suite["stationary_distributions"] = BenchmarkGroup()
         $(MarkovChain(mc_random_stochastic_matrix(new_mc_rng(), 200))))
     grp["sparse_n300_k4"] = @benchmarkable stationary_distributions(
         $mc_sparse_small)
+    P_red = zeros(200, 200)
+    P_red[1:100, 1:100] = random_stochastic_matrix(new_mc_rng(), 100)
+    P_red[101:200, 101:200] = random_stochastic_matrix(new_mc_rng(), 100)
+    grp["dense_n200_reducible"] = @benchmarkable stationary_distributions(
+        $(MarkovChain(P_red)))
 end
 
 # The simulation routines draw from the global RNG, so it is re-seeded in
 # `setup` (outside the timed region) to make the sampled paths reproducible.
 # `setup` runs once per sample, not per evaluation, so `evals=1` is pinned
 # to keep every evaluation seeded (relevant once these get fast enough for
-# the tuner to pick evals > 1)
+# the tuner to pick evals > 1).
+#
+# The `MarkovChain` objects are shared across samples, so these cases
+# measure the warm-cache steady state (the transition CDFs are cached on
+# the instance on first use); the `_cold` cases construct a fresh chain in
+# `setup`, so the timed call includes building the CDF cache.
 let grp = suite["simulate"] = BenchmarkGroup()
     # long path: per-step sampling dominates
     grp["dense_n100_ts10000"] =
         @benchmarkable simulate($mc_dense_small, 10_000; init=1) setup=(
             Random.seed!(1234)) evals=1
-    # short path, many states: per-call setup dominates
+    # short path, many states: cache construction dominates when cold
     grp["dense_n1000_ts100"] =
         @benchmarkable simulate($mc_dense_large, 100; init=1) setup=(
             Random.seed!(1234)) evals=1
-    # sparse transition matrix (currently converted to dense internally)
+    grp["dense_n1000_ts100_cold"] =
+        @benchmarkable simulate(mc_c, 100; init=1) setup=(
+            Random.seed!(1234);
+            mc_c = MarkovChain($(mc_dense_large.p))) evals=1
+    # sparse transition matrix (dedicated sparse sampler)
     grp["sparse_n1000_k4_ts10000"] =
         @benchmarkable simulate($mc_sparse, 10_000; init=1) setup=(
             Random.seed!(1234)) evals=1
+    grp["sparse_n1000_k4_ts10000_cold"] =
+        @benchmarkable simulate(mc_c, 10_000; init=1) setup=(
+            Random.seed!(1234);
+            mc_c = MarkovChain($(mc_sparse.p))) evals=1
 end
 
 let grp = suite["simulate!"] = BenchmarkGroup()

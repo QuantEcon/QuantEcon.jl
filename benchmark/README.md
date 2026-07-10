@@ -69,11 +69,19 @@ irreducible), each generated with its own fixed-seed RNG:
 | `gth_solve/n{50,200,1000}` | GTH solver on a dense stochastic matrix |
 | `constructor/dense_n100`, `constructor/sparse_n1000_k4` | `MarkovChain` construction (input verification) |
 | `stationary_distributions/dense_n200`, `stationary_distributions/sparse_n300_k4` | Recurrent class detection + GTH solve |
+| `stationary_distributions/dense_n200_reducible` | Two recurrent classes; exercises the graph path, which strictly positive matrices bypass |
 | `simulate/dense_n100_ts10000` | Long path: per-step sampling dominates |
-| `simulate/dense_n1000_ts100` | Short path, many states: per-call setup (matrix conversion, CDF construction) dominates |
-| `simulate/sparse_n1000_k4_ts10000` | Sparse transition matrix (currently converted to dense internally) |
+| `simulate/dense_n1000_ts100` | Short path, many states |
+| `simulate/sparse_n1000_k4_ts10000` | Sparse transition matrix (dedicated sparse sampler) |
+| `simulate/{dense_n1000_ts100,sparse_n1000_k4_ts10000}_cold` | As above, on a freshly constructed chain: the timed call includes building the CDF cache |
 | `simulate!/dense_n100_10000x10` | 10 paths into a preallocated matrix |
 | `simulate_indices/dense_n100_ts10000` | Long path, index-valued output |
+
+The `MarkovChain` objects of the `simulate` cases are shared across
+samples, so those cases measure the warm-cache steady state: the
+transition CDFs are computed and cached on the instance on first use.
+The `_cold` cases construct a fresh chain in `setup` to time the
+first-use cost.
 
 ## Running the suite standalone
 
