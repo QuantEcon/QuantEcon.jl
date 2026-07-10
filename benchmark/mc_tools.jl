@@ -61,22 +61,22 @@ suite = BenchmarkGroup()
 
 # A fresh generator per case, so that adding or reordering cases does not
 # alter the model data of the other cases
-new_rng() = MersenneTwister(1234)
+new_mc_rng() = MersenneTwister(1234)
 
 # gth_solve: raw solver on dense stochastic matrices (the public gth_solve
 # copies its input, so the benchmark includes the O(n^2) copy, which is
 # negligible relative to the O(n^3) elimination)
 let grp = suite["gth_solve"] = BenchmarkGroup()
     for n in (50, 200, 1000)
-        A = random_stochastic_matrix(new_rng(), n)
+        A = random_stochastic_matrix(new_mc_rng(), n)
         grp["n$n"] = @benchmarkable gth_solve($A)
     end
 end
 
 # Model cases shared by the remaining groups
-mc_dense_small = MarkovChain(random_stochastic_matrix(new_rng(), 100))
-mc_dense_large = MarkovChain(random_stochastic_matrix(new_rng(), 1000))
-mc_sparse = MarkovChain(random_sparse_stochastic_matrix(new_rng(), 1000, 4))
+mc_dense_small = MarkovChain(random_stochastic_matrix(new_mc_rng(), 100))
+mc_dense_large = MarkovChain(random_stochastic_matrix(new_mc_rng(), 1000))
+mc_sparse = MarkovChain(random_sparse_stochastic_matrix(new_mc_rng(), 1000, 4))
 
 let grp = suite["constructor"] = BenchmarkGroup()
     grp["dense_n100"] = @benchmarkable MarkovChain($(mc_dense_small.p))
@@ -87,41 +87,44 @@ end
 # random matrices are irreducible, so there is exactly one class
 let grp = suite["stationary_distributions"] = BenchmarkGroup()
     mc_sparse_small = MarkovChain(random_sparse_stochastic_matrix(
-        new_rng(), 300, 4))
+        new_mc_rng(), 300, 4))
     grp["dense_n200"] = @benchmarkable stationary_distributions(
-        $(MarkovChain(random_stochastic_matrix(new_rng(), 200))))
+        $(MarkovChain(random_stochastic_matrix(new_mc_rng(), 200))))
     grp["sparse_n300_k4"] = @benchmarkable stationary_distributions(
         $mc_sparse_small)
 end
 
 # The simulation routines draw from the global RNG, so it is re-seeded in
-# `setup` (outside the timed region) to make the sampled paths reproducible
+# `setup` (outside the timed region) to make the sampled paths reproducible.
+# `setup` runs once per sample, not per evaluation, so `evals=1` is pinned
+# to keep every evaluation seeded (relevant once these get fast enough for
+# the tuner to pick evals > 1)
 let grp = suite["simulate"] = BenchmarkGroup()
     # long path: per-step sampling dominates
     grp["dense_n100_ts10000"] =
         @benchmarkable simulate($mc_dense_small, 10_000; init=1) setup=(
-            Random.seed!(1234))
+            Random.seed!(1234)) evals=1
     # short path, many states: per-call setup dominates
     grp["dense_n1000_ts100"] =
         @benchmarkable simulate($mc_dense_large, 100; init=1) setup=(
-            Random.seed!(1234))
+            Random.seed!(1234)) evals=1
     # sparse transition matrix (currently converted to dense internally)
     grp["sparse_n1000_k4_ts10000"] =
         @benchmarkable simulate($mc_sparse, 10_000; init=1) setup=(
-            Random.seed!(1234))
+            Random.seed!(1234)) evals=1
 end
 
 let grp = suite["simulate!"] = BenchmarkGroup()
     X = Matrix{Int}(undef, 10_000, 10)
     grp["dense_n100_10000x10"] =
         @benchmarkable simulate!($X, $mc_dense_small; init=1) setup=(
-            Random.seed!(1234))
+            Random.seed!(1234)) evals=1
 end
 
 let grp = suite["simulate_indices"] = BenchmarkGroup()
     grp["dense_n100_ts10000"] =
         @benchmarkable simulate_indices($mc_dense_small, 10_000; init=1) setup=(
-            Random.seed!(1234))
+            Random.seed!(1234)) evals=1
 end
 
 suite
