@@ -14,12 +14,33 @@ https://lectures.quantecon.org/jl/finite_markov.html
 import Graphs: DiGraph, period, attracting_components,
                strongly_connected_components, is_strongly_connected
 
+# Sums of the rows of P, accumulated in Float64 for half/single precision
+# so that the check itself adds no rounding at the precision of the entries
+_row_sums(P::AbstractMatrix{T}) where {T<:Union{Float16,Float32}} =
+    P * ones(Float64, size(P, 2))
+_row_sums(P::AbstractMatrix) = sum(P, dims = 2)
+
+# Maximum number of summands in a row sum
+_max_row_count(P::AbstractMatrix) = size(P, 2)
+function _max_row_count(P::SparseMatrixCSC)
+    counts = zeros(Int, size(P, 1))
+    for r in rowvals(P)
+        counts[r] += 1
+    end
+    return max(maximum(counts), 1)
+end
+
 # Row sums can deviate from 1 by rounding of the entries and accumulation
-# in the sum, both growing linearly with the matrix size
+# in the sum, both growing with the number of summands in a row — but the
+# tolerance is capped at sqrt(eps) so that it can never approach the scale
+# of the entries themselves, and floored to retain the pre-existing
+# 5e-15 behavior for small Float64 matrices (and for exact element types)
 @inline function check_stochastic_matrix(P)
     T = eltype(P)
-    atol = max(5e-15, size(P, 1) * (T <: AbstractFloat ? eps(T) : eps()))
-    return maximum(abs, sum(P, dims = 2) .- 1) <= atol
+    E = (T <: AbstractFloat && isconcretetype(T)) ? T : Float64
+    epsE = Float64(eps(E))
+    atol = max(5e-15, min(_max_row_count(P) * epsE, sqrt(epsE)))
+    return maximum(abs, _row_sums(P) .- 1) <= atol
 end
 
 """

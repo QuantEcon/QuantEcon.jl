@@ -400,6 +400,21 @@ end
         P32 = rand(Float32, 50, 50)
         P32 ./= sum(P32, dims=2)
         @test MarkovChain(P32) isa MarkovChain
+
+        # the tolerance must stay well below the scale of the entries:
+        # for Float16 at n = 1024, n * eps == 1
+        @test_throws ArgumentError MarkovChain(zeros(Float16, 1024, 1024))
+
+        # sparse: the tolerance scales with the entries per row, not n
+        @test_throws ArgumentError MarkovChain(
+            spdiagm(0 => fill(0.99f0, 100_000)))
+        @test MarkovChain(spdiagm(0 => fill(1.0f0, 100_000))) isa MarkovChain
+
+        # exact Float16 matrix
+        @test MarkovChain(Float16[0.5 0.5; 0.25 0.75]) isa MarkovChain
+
+        # abstract element type
+        @test MarkovChain(AbstractFloat[0.5 0.5; 0.25 0.75]) isa MarkovChain
     end
 
     mc3 = MarkovChain([0.4 0.6; 0.2 0.8])
