@@ -433,15 +433,20 @@ Tests for markov/ddp.jl
         end
 
         # the unsorted inputs must not be mutated by construction, and
-        # constructing from the same arrays again must succeed (issue #117)
-        s_orig, a_orig = copy(_s_ind_sh), copy(_a_ind_sh)
-        R_orig, Q_orig = copy(_R_sh), copy(_Q_sh)
-        for _ in 1:2
-            _ddp = DiscreteDP(_R_sh, _Q_sh, beta, _s_ind_sh, _a_ind_sh)
-            @test _s_ind_sh == s_orig
-            @test _a_ind_sh == a_orig
-            @test _R_sh == R_orig
-            @test _Q_sh == Q_orig
+        # constructing from the same arrays again must succeed (issue
+        # #117); fresh inputs per Q format, never passed to a constructor
+        # before, so that the literal baselines cannot be contaminated
+        for make_Q in (identity, sparse)
+            s_in, a_in = [1, 2, 1], [1, 1, 2]
+            R_in = [0.0, 2.0, 1.0]
+            Q_in = make_Q([1.0 0.0; 0.0 1.0; 0.5 0.5])
+            for _ in 1:2  # reconstruction from the same arrays must succeed
+                _ddp = DiscreteDP(R_in, Q_in, beta, s_in, a_in)
+                @test s_in == [1, 2, 1]
+                @test a_in == [1, 1, 2]
+                @test R_in == [0.0, 2.0, 1.0]
+                @test Matrix(Q_in) == [1.0 0.0; 0.0 1.0; 0.5 0.5]
+            end
         end
     end
 
