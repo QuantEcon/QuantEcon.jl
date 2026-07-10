@@ -94,27 +94,34 @@ let grp = suite["stationary_distributions"] = BenchmarkGroup()
         $mc_sparse_small)
 end
 
+# The simulation routines draw from the global RNG, so it is re-seeded in
+# `setup` (outside the timed region) to make the sampled paths reproducible
 let grp = suite["simulate"] = BenchmarkGroup()
     # long path: per-step sampling dominates
     grp["dense_n100_ts10000"] =
-        @benchmarkable simulate($mc_dense_small, 10_000; init=1)
+        @benchmarkable simulate($mc_dense_small, 10_000; init=1) setup=(
+            Random.seed!(1234))
     # short path, many states: per-call setup dominates
     grp["dense_n1000_ts100"] =
-        @benchmarkable simulate($mc_dense_large, 100; init=1)
+        @benchmarkable simulate($mc_dense_large, 100; init=1) setup=(
+            Random.seed!(1234))
     # sparse transition matrix (currently converted to dense internally)
     grp["sparse_n1000_k4_ts10000"] =
-        @benchmarkable simulate($mc_sparse, 10_000; init=1)
+        @benchmarkable simulate($mc_sparse, 10_000; init=1) setup=(
+            Random.seed!(1234))
 end
 
 let grp = suite["simulate!"] = BenchmarkGroup()
     X = Matrix{Int}(undef, 10_000, 10)
     grp["dense_n100_10000x10"] =
-        @benchmarkable simulate!($X, $mc_dense_small; init=1)
+        @benchmarkable simulate!($X, $mc_dense_small; init=1) setup=(
+            Random.seed!(1234))
 end
 
 let grp = suite["simulate_indices"] = BenchmarkGroup()
     grp["dense_n100_ts10000"] =
-        @benchmarkable simulate_indices($mc_dense_small, 10_000; init=1)
+        @benchmarkable simulate_indices($mc_dense_small, 10_000; init=1) setup=(
+            Random.seed!(1234))
 end
 
 suite
