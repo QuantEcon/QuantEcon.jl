@@ -43,6 +43,32 @@ end
     return maximum(abs, _row_sums(P) .- 1) <= atol
 end
 
+# --------------------------------------- #
+# Transition-CDF samplers used by simulate #
+# --------------------------------------- #
+
+# Dense: cdfs[:, i] is the CDF of the transition probabilities of state i,
+# stored transposed so that each CDF is contiguous in memory
+struct MCDenseSampler{T<:Real}
+    cdfs::Matrix{T}
+end
+
+# Sparse: pt is the transpose of p, so that column i of pt holds the
+# nonzero transition probabilities of state i contiguously, and cdfs1d
+# holds their running sums
+struct MCSparseSampler{Tv<:Real,Ti<:Integer}
+    pt::SparseMatrixCSC{Tv,Ti}
+    cdfs1d::Vector{Tv}
+end
+
+# Sampler type for a transition matrix of type TM, used to type the cache
+# field of MarkovChain. The dense CDFs have the accumulation type of
+# cumsum (e.g. Int for Bool or Int8 entries).
+_sampler_type(::Type{TM}) where {T,TM<:AbstractMatrix{T}} =
+    MCDenseSampler{Base.promote_op(Base.add_sum, T, T)}
+_sampler_type(::Type{SparseMatrixCSC{Tv,Ti}}) where {Tv,Ti} =
+    MCSparseSampler{Tv,Ti}
+
 """
     MarkovChain
 
@@ -56,12 +82,21 @@ state transitions.
 
 - `p::AbstractMatrix`: The transition matrix. Must be square, all elements must be nonnegative, and all rows must sum to unity.
 - `state_values::AbstractVector`: Vector containing the values associated with the states.
+
+The transition CDFs used by the simulation routines are computed on the
+first simulation call and cached. Assigning a new matrix to `p` invalidates
+the cache; modifying the matrix in place does not, so assign to `p` after
+in-place modification.
 """
-mutable struct MarkovChain{T, TM<:AbstractMatrix{T}, TV<:AbstractVector}
+mutable struct MarkovChain{T, TM<:AbstractMatrix{T}, TV<:AbstractVector,
+                           TS<:Union{MCDenseSampler,MCSparseSampler}}
     p::TM # valid stochastic matrix
     state_values::TV
+    sampler::Union{Nothing,TS}  # lazily built transition-CDF cache;
+                                # see _get_sampler
 
-    function MarkovChain{T,TM,TV}(p::AbstractMatrix, state_values) where {T,TM,TV}
+    function MarkovChain{T,TM,TV,TS}(p::AbstractMatrix,
+                                     state_values) where {T,TM,TV,TS}
         n, m = size(p)
 
         n != m &&
@@ -76,13 +111,20 @@ mutable struct MarkovChain{T, TM<:AbstractMatrix{T}, TV<:AbstractVector}
         length(state_values) != n &&
             throw(DimensionMismatch("state_values should have $n elements"))
 
-        return new{T,TM,TV}(p, state_values)
+        return new{T,TM,TV,TS}(p, state_values, nothing)
     end
 end
 
 # Provide constructor that infers T from eltype of matrix
 MarkovChain(p::AbstractMatrix, state_values=1:size(p, 1)) =
-    MarkovChain{eltype(p), typeof(p), typeof(state_values)}(p, state_values)
+    MarkovChain{eltype(p), typeof(p), typeof(state_values),
+                _sampler_type(typeof(p))}(p, state_values)
+
+# Assigning a new matrix to `p` invalidates the sampling cache
+function Base.setproperty!(mc::MarkovChain, name::Symbol, x)
+    name === :p && setfield!(mc, :sampler, nothing)
+    return setfield!(mc, name, convert(fieldtype(typeof(mc), name), x))
+end
 
 Base.eltype(mc::MarkovChain{T,TM,TV}) where {T,TM,TV} = eltype(TV)
 
@@ -197,7 +239,16 @@ Find the recurrent classes of the Markov chain `mc`.
 - `::Vector{Vector{Int}}`: Vector of vectors that describe the recurrent
   classes of `mc`.
 """
-recurrent_classes(mc::MarkovChain) = attracting_components(DiGraph(mc.p))
+function recurrent_classes(mc::MarkovChain)
+    # A strictly positive matrix is irreducible, with the whole state space
+    # as its single recurrent class; the check is much cheaper than
+    # building the graph. (Skipped for sparse matrices, which contain
+    # structural zeros except in the pathological fully-dense case.)
+    if !issparse(mc.p) && all(>(zero(eltype(mc.p))), mc.p)
+        return [collect(1:n_states(mc))]
+    end
+    return attracting_components(DiGraph(mc.p))
+end
 
 """
     communication_classes(mc)
@@ -332,34 +383,77 @@ end
 todense(::Type, A::Array) = A
 
 
+function MCSparseSampler(p::SparseMatrixCSC)
+    pt = copy(transpose(p))
+    vals = nonzeros(pt)
+    cdfs1d = similar(vals)
+    for i in 1:size(pt, 2)
+        s = zero(eltype(cdfs1d))
+        for idx in nzrange(pt, i)
+            s += vals[idx]
+            cdfs1d[idx] = s
+        end
+    end
+    return MCSparseSampler(pt, cdfs1d)
+end
+
+_sampler_for(p::SparseMatrixCSC) = MCSparseSampler(p)
+_sampler_for(p::AbstractMatrix) =
+    MCDenseSampler(collect(transpose(cumsum(p, dims=2))))
+
+# Return the cached sampler of `mc`, building it on the first call
+function _get_sampler(mc::MarkovChain)
+    s = getfield(mc, :sampler)
+    if s === nothing
+        s = _sampler_for(mc.p)
+        setfield!(mc, :sampler, s)
+    end
+    return s
+end
+
+#=
+Draw the next state from state `i` given a uniform random value `u`. If
+`u` exceeds the last CDF value (possible when the row sum falls slightly
+short of 1 by rounding), fall back to the last state with positive
+transition probability, i.e., the first position attaining the final CDF
+value.
+=#
+function draw_next(s::MCDenseSampler, i::Integer, u::Real)
+    cdf = view(s.cdfs, :, i)
+    k = searchsortedfirst(cdf, u)
+    if k > length(cdf)
+        k = searchsortedfirst(cdf, cdf[end])
+    end
+    return k
+end
+
+function draw_next(s::MCSparseSampler, i::Integer, u::Real)
+    r = nzrange(s.pt, i)
+    cdf = view(s.cdfs1d, r)
+    k = searchsortedfirst(cdf, u)
+    if k > length(cdf)
+        k = searchsortedfirst(cdf, cdf[end])
+    end
+    return rowvals(s.pt)[r[k]]
+end
+
+
 mutable struct MCIndSimulator{T<:MarkovChain,S}
     mc::T
     len::Int
     init::Int
-    drvs::S
+    sampler::S
 end
 
-function MCIndSimulator(mc::MarkovChain, len::Int, init::Int)
-    # NOTE: ensure dense array and transpose before slicing the array. Then
-    #       when passing to DiscreteRV use `sub` to avoid allocating again
-    p = Matrix(mc.p)'
-    drvs = [DiscreteRV(view(p, :, i)) for i in 1:size(mc.p, 1)]
-    MCIndSimulator(mc, len, init, drvs)
-end
-
-# Base.start(mcis::MCIndSimulator) = (mcis.init, 0)
-# function Base.next(mcis::MCIndSimulator, state::Tuple{Int,Int})
-#     ix, t = state
-#     (ix, (rand(mcis.drvs[ix]), t+1))
-# end
-# Base.done(mcis::MCIndSimulator, s::Tuple{Int,Int}) = s[2] >= mcis.len
+MCIndSimulator(mc::MarkovChain, len::Int, init::Int) =
+    MCIndSimulator(mc, len, init, _get_sampler(mc))
 
 function Base.iterate(mcis::MCIndSimulator, state::Tuple{Int,Int}=(mcis.init, 0))
     ix, t = state
     if t >= mcis.len
         return nothing
     end
-    (ix, (rand(mcis.drvs[ix]), t+1))
+    (ix, (draw_next(mcis.sampler, ix, rand()), t+1))
 end
 
 Base.length(mcis::MCIndSimulator) = mcis.len

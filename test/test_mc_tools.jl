@@ -522,6 +522,44 @@ end
         end  # testset
     end
 
+    @testset "sampler cache" begin
+        # deterministic chains: staying put vs cycling
+        P_id = Matrix{Float64}(I, 3, 3)
+        P_cyc = [0. 1. 0.; 0. 0. 1.; 1. 0. 0.]
+        mc = @inferred MarkovChain(P_id)
+        @test simulate_indices(mc, 5, init=1) == fill(1, 5)
+        # assigning a new matrix must invalidate the cached CDFs
+        mc.p = P_cyc
+        @test simulate_indices(mc, 4, init=1) == [1, 2, 3, 1]
+
+        # dense and sparse paths draw identical sample paths from the
+        # same random stream
+        P = [0.3 0.4 0.3; 0.2 0.3 0.5; 0.5 0.25 0.25]
+        mc_d = @inferred MarkovChain(P)
+        mc_s = @inferred MarkovChain(sparse(P))
+        Random.seed!(1234)
+        X_d = @inferred simulate_indices(mc_d, 1000, init=1)
+        Random.seed!(1234)
+        X_s = @inferred simulate_indices(mc_s, 1000, init=1)
+        @test X_d == X_s
+
+        # eltypes promoted by cumsum in the dense CDFs (Bool -> Int)
+        mc_b = @inferred MarkovChain([false true; true false])
+        @test simulate_indices(mc_b, 3, init=1) == [1, 2, 1]
+    end
+
+    @testset "draw_next overflow fallback" begin
+        # row 1 sums to slightly less than 1 (within the constructor
+        # tolerance) and ends with a zero: a draw beyond the last CDF
+        # value must map to the last state with positive probability
+        P = [0.5 0.5-4e-15 0.; 0. 0. 1.; 1. 0. 0.]
+        for mc in (@inferred(MarkovChain(P)),
+                   @inferred(MarkovChain(sparse(P))))
+            s = @inferred QuantEcon._get_sampler(mc)
+            @test QuantEcon.draw_next(s, 1, prevfloat(1.0)) == 2
+        end
+    end
+
     @testset "simulate iterators" begin
         p = [0.0 1.0 0.0 0.0
              0.0 0.0 1.0 0.0
