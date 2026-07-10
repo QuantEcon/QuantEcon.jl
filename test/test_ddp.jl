@@ -431,6 +431,18 @@ Tests for markov/ddp.jl
                 @test Matrix(_ddp.Q) == _Q
             end
         end
+
+        # the unsorted inputs must not be mutated by construction, and
+        # constructing from the same arrays again must succeed (issue #117)
+        s_orig, a_orig = copy(_s_ind_sh), copy(_a_ind_sh)
+        R_orig, Q_orig = copy(_R_sh), copy(_Q_sh)
+        for _ in 1:2
+            _ddp = DiscreteDP(_R_sh, _Q_sh, beta, _s_ind_sh, _a_ind_sh)
+            @test _s_ind_sh == s_orig
+            @test _a_ind_sh == a_orig
+            @test _R_sh == R_orig
+            @test _Q_sh == Q_orig
+        end
     end
 
     @testset "num_sa_pairs and form converters" begin
