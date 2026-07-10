@@ -14,7 +14,34 @@ https://lectures.quantecon.org/jl/finite_markov.html
 import Graphs: DiGraph, period, attracting_components,
                strongly_connected_components, is_strongly_connected
 
-@inline check_stochastic_matrix(P) = maximum(abs, sum(P, dims = 2) .- 1) < 5e-15 ? true : false
+# Sums of the rows of P, accumulated in Float64 for half/single precision
+# so that the check itself adds no rounding at the precision of the entries
+_row_sums(P::AbstractMatrix{T}) where {T<:Union{Float16,Float32}} =
+    P * ones(Float64, size(P, 2))
+_row_sums(P::AbstractMatrix) = sum(P, dims = 2)
+
+# Maximum number of summands in a row sum
+_max_row_count(P::AbstractMatrix) = size(P, 2)
+function _max_row_count(P::SparseMatrixCSC)
+    counts = zeros(Int, size(P, 1))
+    for r in rowvals(P)
+        counts[r] += 1
+    end
+    return max(maximum(counts), 1)
+end
+
+# Row sums can deviate from 1 by rounding of the entries and accumulation
+# in the sum, both growing with the number of summands in a row — but the
+# tolerance is capped at sqrt(eps) so that it can never approach the scale
+# of the entries themselves, and floored to retain the pre-existing
+# 5e-15 behavior for small Float64 matrices (and for exact element types)
+@inline function check_stochastic_matrix(P)
+    T = eltype(P)
+    E = (T <: AbstractFloat && isconcretetype(T)) ? T : Float64
+    epsE = Float64(eps(E))
+    atol = max(5e-15, min(_max_row_count(P) * epsE, sqrt(epsE)))
+    return maximum(abs, _row_sums(P) .- 1) <= atol
+end
 
 """
     MarkovChain
@@ -123,11 +150,13 @@ gth_solve(A::Matrix{T}) where {T<:Integer} =
 Same as `gth_solve`, but overwrite the input `A`, instead of creating a copy.
 """
 function gth_solve!(A::Matrix{T}) where T<:Real
-    n = size(A, 1)
+    n, m = size(A)
+    n == m ||
+        throw(DimensionMismatch("matrix must be square; got ($n, $m)"))
     x = zeros(T, n)
 
     @inbounds for k in 1:n-1
-        scale = sum(A[k, k+1:n])
+        scale = @views sum(A[k, k+1:n])
         if scale <= zero(T)
             # There is one (and only one) recurrent class contained in
             # {1, ..., k};
@@ -135,7 +164,7 @@ function gth_solve!(A::Matrix{T}) where T<:Real
             n = k
             break
         end
-        A[k+1:n, k] /= scale
+        @views A[k+1:n, k] ./= scale
 
         for j in k+1:n, i in k+1:n
             A[i, j] += A[i, k] * A[k, j]
@@ -149,7 +178,7 @@ function gth_solve!(A::Matrix{T}) where T<:Real
     end
 
     # normalisation
-    x /= sum(x)
+    x ./= sum(x)
 
     return x
 end
