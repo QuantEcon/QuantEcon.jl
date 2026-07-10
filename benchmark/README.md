@@ -10,7 +10,9 @@ Each benchmarked module has its own file, included by `benchmarks.jl` as a
 subgroup of `SUITE`. Currently covered:
 
 - [`ddp.jl`](ddp.jl): `DiscreteDP` (`src/markov/ddp.jl`), under
-  `SUITE["ddp"]`.
+  `SUITE["ddp"]`;
+- [`mc_tools.jl`](mc_tools.jl): `MarkovChain` (`src/markov/mc_tools.jl`),
+  under `SUITE["mc_tools"]`.
 
 ## What is benchmarked
 
@@ -54,6 +56,24 @@ convergence behavior.
 
 Note that the suite holds the dense `Q` arrays of the two large cases in
 memory (roughly 0.5 GB in total).
+
+### `mc_tools` ([`mc_tools.jl`](mc_tools.jl))
+
+The suite is organized by function, over random models (dense stochastic
+matrices with normalized random rows; sparse stochastic matrices with `k`
+nonzeros per row, containing a Hamiltonian cycle so that the chain is
+irreducible), each generated with its own fixed-seed RNG:
+
+| Key | Description |
+|:----|:------------|
+| `gth_solve/n{50,200,1000}` | GTH solver on a dense stochastic matrix |
+| `constructor/dense_n100`, `constructor/sparse_n1000_k4` | `MarkovChain` construction (input verification) |
+| `stationary_distributions/dense_n200`, `stationary_distributions/sparse_n300_k4` | Recurrent class detection + GTH solve |
+| `simulate/dense_n100_ts10000` | Long path: per-step sampling dominates |
+| `simulate/dense_n1000_ts100` | Short path, many states: per-call setup (matrix conversion, CDF construction) dominates |
+| `simulate/sparse_n1000_k4_ts10000` | Sparse transition matrix (currently converted to dense internally) |
+| `simulate!/dense_n100_10000x10` | 10 paths into a preallocated matrix |
+| `simulate_indices/dense_n100_ts10000` | Long path, index-valued output |
 
 ## Running the suite standalone
 
