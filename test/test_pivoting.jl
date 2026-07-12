@@ -39,4 +39,28 @@ using QuantEcon: _pivoting!, _lex_min_ratio_test!
             @test isapprox(tableau, tableau_opt)
         end
     end
+
+    @testset "Loop and BLAS kernels agree" begin
+        rng = MersenneTwister(0)
+        pivcol, pivrow = 3, 2
+        # sizes below and above PIVOTING_BLAS_CUTOFF
+        for n in (10, QuantEcon.PIVOTING_BLAS_CUTOFF + 36)
+            tableau_0 = rand(rng, n, 2n+2) .+ 0.5
+            col_buf = Vector{Float64}(undef, n)
+
+            tableau_loop = copy(tableau_0)
+            QuantEcon._pivoting_loop!(tableau_loop, pivcol, pivrow, col_buf)
+            tableau_blas = copy(tableau_0)
+            QuantEcon._pivoting_blas!(tableau_blas, pivcol, pivrow, col_buf)
+            @test tableau_loop ≈ tableau_blas rtol=1e-13
+
+            tableau = copy(tableau_0)
+            @inferred _pivoting!(tableau, pivcol, pivrow, col_buf)
+            @test tableau ==
+                (n > QuantEcon.PIVOTING_BLAS_CUTOFF ? tableau_blas :
+                                                      tableau_loop)
+            # the pivot column is reduced to the unit vector exactly
+            @test tableau[:, pivcol] == [i == pivrow ? 1. : 0. for i in 1:n]
+        end
+    end
 end
