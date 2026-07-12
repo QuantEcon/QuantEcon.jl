@@ -67,4 +67,14 @@ using QuantEcon: _pivoting!, _lex_min_ratio_test!
         end
     end
 
+    @testset "Non-BLAS eltype normalization stays finite" begin
+        # inv(p) overflows Float16, so the loop kernel must divide
+        # directly for non-BLAS eltypes
+        p = Float16(1e-5)
+        tableau = Float16[p p 0; p 2p p]
+        col_buf = Vector{Float16}(undef, 2)
+        _pivoting!(tableau, 1, 1, col_buf)
+        @test all(isfinite, tableau)
+        @test tableau == Float16[1 1 0; 0 p p]
+    end
 end

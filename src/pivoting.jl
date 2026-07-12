@@ -87,7 +87,15 @@ function _pivoting_loop!(tableau::AbstractMatrix{T},
                          col_buf::Vector{T}) where {T<:AbstractFloat}
     nrows, ncols = size(tableau)
     @inbounds begin
-        inv_pivot_elt = inv(tableau[pivot_row, pivot_col])
+        # For BLAS eltypes, multiply by the reciprocal, matching the BLAS
+        # kernel (safe: any pivot passing the tolerance checks is far above
+        # the inv overflow threshold); for narrower eltypes (e.g. Float16)
+        # inv can overflow where direct division stays finite, so divide.
+        # `use_inv` is a compile-time constant, so the branch specializes
+        # away.
+        use_inv = T <: BlasFloat
+        pivot_elt = tableau[pivot_row, pivot_col]
+        inv_pivot_elt = use_inv ? inv(pivot_elt) : pivot_elt
 
         x = col_buf
         for i in 1:nrows
@@ -96,7 +104,8 @@ function _pivoting_loop!(tableau::AbstractMatrix{T},
         x[pivot_row] = zero(T)
 
         for j in 1:ncols
-            y_j = tableau[pivot_row, j] * inv_pivot_elt
+            y_j = use_inv ? tableau[pivot_row, j] * inv_pivot_elt :
+                            tableau[pivot_row, j] / pivot_elt
             @simd for i in 1:nrows
                 tableau[i, j] -= x[i] * y_j
             end
