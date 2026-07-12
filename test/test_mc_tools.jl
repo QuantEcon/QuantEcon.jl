@@ -522,6 +522,55 @@ end
         end  # testset
     end
 
+    @testset "transition samplers" begin
+        # deterministic chains: staying put vs cycling
+        P_id = Matrix{Float64}(I, 3, 3)
+        P_cyc = [0. 1. 0.; 0. 0. 1.; 1. 0. 0.]
+        @test simulate_indices(@inferred(MarkovChain(P_id)), 5, init=1) ==
+            fill(1, 5)
+        @test simulate_indices(@inferred(MarkovChain(P_cyc)), 4, init=1) ==
+            [1, 2, 3, 1]
+
+        # dense and sparse paths draw identical sample paths from the
+        # same random stream
+        P = [0.3 0.4 0.3; 0.2 0.3 0.5; 0.5 0.25 0.25]
+        mc_d = @inferred MarkovChain(P)
+        mc_s = @inferred MarkovChain(sparse(P))
+        Random.seed!(1234)
+        X_d = @inferred simulate_indices(mc_d, 1000, init=1)
+        Random.seed!(1234)
+        X_s = @inferred simulate_indices(mc_s, 1000, init=1)
+        @test X_d == X_s
+
+        # eltypes promoted by cumsum in the dense CDFs (Bool -> Int)
+        mc_b = @inferred MarkovChain([false true; true false])
+        @test simulate_indices(mc_b, 3, init=1) == [1, 2, 1]
+
+        # sparse matrix with non-Int index type: the sparse sampler must
+        # return Int states for the iterator state to stay Tuple{Int,Int}
+        P32 = SparseMatrixCSC(2, 2, Int32[1, 2, 3], Int32[2, 1], [1., 1.])
+        mc32 = MarkovChain(P32)
+        @test simulate_indices(mc32, 3, init=1) == [1, 2, 1]
+        @test simulate(mc32, 3, init=1) == [1, 2, 1]
+
+        # abstractly typed transition matrix: the sampler eltypes are
+        # unconstrained, like the matrix eltype of MarkovChain itself
+        mc_n = MarkovChain(Matrix{Number}([0. 1.; 1. 0.]))
+        @test simulate_indices(mc_n, 3, init=1) == [1, 2, 1]
+    end
+
+    @testset "draw_next overflow fallback" begin
+        # row 1 sums to slightly less than 1 (within the constructor
+        # tolerance) and ends with a zero: a draw beyond the last CDF
+        # value must map to the last state with positive probability
+        P = [0.5 0.5-4e-15 0.; 0. 0. 1.; 1. 0. 0.]
+        for mc in (@inferred(MarkovChain(P)),
+                   @inferred(MarkovChain(sparse(P))))
+            s = @inferred QuantEcon._sampler_for(mc.p)
+            @test QuantEcon.draw_next(s, 1, prevfloat(1.0)) == 2
+        end
+    end
+
     @testset "simulate iterators" begin
         p = [0.0 1.0 0.0 0.0
              0.0 0.0 1.0 0.0
