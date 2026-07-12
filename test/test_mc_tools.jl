@@ -545,6 +545,13 @@ end
         # eltypes promoted by cumsum in the dense CDFs (Bool -> Int)
         mc_b = @inferred MarkovChain([false true; true false])
         @test simulate_indices(mc_b, 3, init=1) == [1, 2, 1]
+
+        # sparse matrix with non-Int index type: the sparse sampler must
+        # return Int states for the iterator state to stay Tuple{Int,Int}
+        P32 = SparseMatrixCSC(2, 2, Int32[1, 2, 3], Int32[2, 1], [1., 1.])
+        mc32 = MarkovChain(P32)
+        @test simulate_indices(mc32, 3, init=1) == [1, 2, 1]
+        @test simulate(mc32, 3, init=1) == [1, 2, 1]
     end
 
     @testset "draw_next overflow fallback" begin

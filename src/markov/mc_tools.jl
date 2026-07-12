@@ -400,7 +400,9 @@ function draw_next(s::MCSparseSampler, i::Integer, u::Real)
     if k > length(cdf)
         k = searchsortedfirst(cdf, cdf[end])
     end
-    return rowvals(s.pt)[r[k]]
+    # Int: the row values have the index type of pt, while the iterator
+    # state of MCIndSimulator is Tuple{Int,Int}
+    return Int(rowvals(s.pt)[r[k]])
 end
 
 
