@@ -9,7 +9,7 @@ import QuantEcon: MarkovChain, DiscreteDP
 
 # random_markov_chain
 """
-    random_markov_chain([rng], n[, k])
+    random_markov_chain([rng], n[, k]; sparse=Val(false))
 
 Return a randomly sampled MarkovChain instance with `n` states, where each state
 has `k` states with positive transition probability.
@@ -18,8 +18,10 @@ has `k` states with positive transition probability.
 
 - `rng::AbstractRNG=GLOBAL_RNG`: Random number generator.
 - `n::Integer`: Number of states.
-- `k::Integer=n`: Number of nonzero entries in each column of the matrix. Set
+- `k::Integer=n`: Number of nonzero entries in each row of the matrix. Set
   to `n` if none specified.
+- `sparse::Union{Val{true},Val{false}}=Val(false)`: If `Val(true)`, the
+  transition matrix is stored as a `SparseMatrixCSC`.
 
 # Returns
 
@@ -49,50 +51,95 @@ julia> mc.p
  0.753163  0.246837  0.0
 ```
 """
-function random_markov_chain(rng::AbstractRNG, n::Integer, k::Integer=n)
-    p = random_stochastic_matrix(rng, n, k)
+function random_markov_chain(rng::AbstractRNG, n::Integer, k::Integer=n;
+                             sparse::Union{Val{true},Val{false}}=Val(false))
+    p = random_stochastic_matrix(rng, n, k, sparse=sparse)
     mc = MarkovChain(p)
     return mc
 end
 
-random_markov_chain(n::Integer, k::Integer=n) =
-    random_markov_chain(Random.GLOBAL_RNG, n, k)
+random_markov_chain(n::Integer, k::Integer=n;
+                    sparse::Union{Val{true},Val{false}}=Val(false)) =
+    random_markov_chain(Random.GLOBAL_RNG, n, k, sparse=sparse)
 
 
 # random_stochastic_matrix
 
 """
-    random_stochastic_matrix([rng], n[, k])
+    random_stochastic_matrix([rng], n[, k]; sparse=Val(false))
 
-Return a randomly sampled `n x n` stochastic matrix with `k` nonzero entries for
-each row.
+Return a randomly sampled `n x n` stochastic matrix with `k` nonzero entries
+for each row.
 
 # Arguments
 
 - `rng::AbstractRNG=GLOBAL_RNG`: Random number generator.
 - `n::Integer`: Number of states.
-- `k::Integer=n`: Number of nonzero entries in each column of the matrix. Set
+- `k::Integer=n`: Number of nonzero entries in each row of the matrix. Set
   to `n` if none specified.
+- `sparse::Union{Val{true},Val{false}}=Val(false)`: If `Val(true)`, return a
+  `SparseMatrixCSC` instead of a dense matrix. For a given `rng`, both
+  formats sample the same matrix.
 
 # Returns
 
-- `p::Array`: Stochastic matrix.
+- `p::AbstractMatrix`: Stochastic matrix.
 """
-function random_stochastic_matrix(rng::AbstractRNG, n::Integer, k::Integer=n)
+function random_stochastic_matrix(rng::AbstractRNG, n::Integer, k::Integer=n;
+                                  sparse::Union{Val{true},Val{false}}=Val(false))
+    _random_stochastic_matrix_check(n, k)
+
+    if sparse isa Val{false}
+        p = _random_stochastic_matrix(rng, n, n, k=k)
+        return transpose(p)
+    else
+        probvecs = random_probvec(rng, k, n)  # probvecs[:, j] is row j of p
+        col_indices = _random_nonzero_indices(rng, n, n, k)
+        row_indices = repeat(1:n, inner=k)
+        return SparseArrays.sparse(row_indices, col_indices, vec(probvecs),
+                                   n, n)
+    end
+end
+
+random_stochastic_matrix(n::Integer, k::Integer=n;
+                         sparse::Union{Val{true},Val{false}}=Val(false)) =
+    random_stochastic_matrix(Random.GLOBAL_RNG, n, k, sparse=sparse)
+
+
+function _random_stochastic_matrix_check(n::Integer, k::Integer)
     if !(n > 0)
         throw(ArgumentError("n must be a positive integer"))
     end
     if !(k > 0 && k <= n)
         throw(ArgumentError("k must be an integer with 0 < k <= n"))
     end
-
-    p = _random_stochastic_matrix(rng, n, n, k=k)
-
-    return transpose(p)
+    return nothing
 end
 
-random_stochastic_matrix(n::Integer, k::Integer=n) =
-    random_stochastic_matrix(Random.GLOBAL_RNG, n, k)
+
+"""
+    _random_nonzero_indices(rng, n, m, k)
+
+Sample, for each of `m` probability vectors, the indices in `1:n` of its `k`
+nonzero entries, concatenated into one vector of length `k*m`. Trivially
+`1:n` for each vector if `k == n`, consuming no random numbers, so that for
+a given `rng` all `random_stochastic_matrix` output types sample the same
+matrix.
+"""
+function _random_nonzero_indices(rng::AbstractRNG, n::Integer, m::Integer,
+                                 k::Integer)
+    indices = Vector{Int}(undef, k*m)
+    if k == n
+        for j in 1:m
+            indices[(j-1)*k+1:j*k] = 1:n
+        end
+    else
+        for j in 1:m
+            indices[(j-1)*k+1:j*k] = sample(rng, 1:n, k, replace=false)
+        end
+    end
+    return indices
+end
 
 
 """
@@ -122,10 +169,7 @@ function _random_stochastic_matrix(rng::AbstractRNG, n::Integer, m::Integer;
 
     # if k < n
     # Randomly sample row indices for each column for nonzero values
-    row_indices = Vector{Int}(undef, k*m)
-    for j in 1:m
-        row_indices[(j-1)*k+1:j*k] = sample(rng, 1:n, k, replace=false)
-    end
+    row_indices = _random_nonzero_indices(rng, n, m, k)
 
     p = zeros(n, m)
     for j in 1:m

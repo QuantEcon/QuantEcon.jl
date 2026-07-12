@@ -17,10 +17,16 @@ using SparseArrays
 
 #= Model generators =#
 
+# The generators are deliberately local (prefixed to avoid shadowing
+# QuantEcon.random_stochastic_matrix): they provide guarantees the package
+# generators do not (row sums within the constructor tolerance at any size,
+# irreducibility of the sparse chain), and keep the benchmark models
+# independent of changes to markov/random_mc.jl.
+
 # Random dense stochastic matrix. Rows are normalized twice so that the
 # recomputed row sums equal 1 within a few ulps, as required by the strict
 # tolerance of the MarkovChain constructor.
-function random_stochastic_matrix(rng, n)
+function mc_random_stochastic_matrix(rng, n)
     P = rand(rng, n, n)
     P ./= sum(P, dims=2)
     P ./= sum(P, dims=2)
@@ -30,7 +36,7 @@ end
 # Random sparse stochastic matrix with k nonzeros per row. Each row i
 # contains the entry (i, i%n+1), so that the matrix has a Hamiltonian cycle
 # and is therefore irreducible.
-function random_sparse_stochastic_matrix(rng, n, k)
+function mc_random_sparse_stochastic_matrix(rng, n, k)
     rows = Vector{Int}(undef, n * k)
     cols = Vector{Int}(undef, n * k)
     vals = Vector{Float64}(undef, n * k)
@@ -68,15 +74,15 @@ new_mc_rng() = MersenneTwister(1234)
 # negligible relative to the O(n^3) elimination)
 let grp = suite["gth_solve"] = BenchmarkGroup()
     for n in (50, 200, 1000)
-        A = random_stochastic_matrix(new_mc_rng(), n)
+        A = mc_random_stochastic_matrix(new_mc_rng(), n)
         grp["n$n"] = @benchmarkable gth_solve($A)
     end
 end
 
 # Model cases shared by the remaining groups
-mc_dense_small = MarkovChain(random_stochastic_matrix(new_mc_rng(), 100))
-mc_dense_large = MarkovChain(random_stochastic_matrix(new_mc_rng(), 1000))
-mc_sparse = MarkovChain(random_sparse_stochastic_matrix(new_mc_rng(), 1000, 4))
+mc_dense_small = MarkovChain(mc_random_stochastic_matrix(new_mc_rng(), 100))
+mc_dense_large = MarkovChain(mc_random_stochastic_matrix(new_mc_rng(), 1000))
+mc_sparse = MarkovChain(mc_random_sparse_stochastic_matrix(new_mc_rng(), 1000, 4))
 
 let grp = suite["constructor"] = BenchmarkGroup()
     grp["dense_n100"] = @benchmarkable MarkovChain($(mc_dense_small.p))
@@ -86,10 +92,10 @@ end
 # stationary_distributions: recurrent class detection + GTH solve; the
 # random matrices are irreducible, so there is exactly one class
 let grp = suite["stationary_distributions"] = BenchmarkGroup()
-    mc_sparse_small = MarkovChain(random_sparse_stochastic_matrix(
+    mc_sparse_small = MarkovChain(mc_random_sparse_stochastic_matrix(
         new_mc_rng(), 300, 4))
     grp["dense_n200"] = @benchmarkable stationary_distributions(
-        $(MarkovChain(random_stochastic_matrix(new_mc_rng(), 200))))
+        $(MarkovChain(mc_random_stochastic_matrix(new_mc_rng(), 200))))
     grp["sparse_n300_k4"] = @benchmarkable stationary_distributions(
         $mc_sparse_small)
 end
