@@ -101,8 +101,8 @@ let grp = suite["stationary_distributions"] = BenchmarkGroup()
     grp["sparse_n300_k4"] = @benchmarkable stationary_distributions(
         $mc_sparse_small)
     P_red = zeros(200, 200)
-    P_red[1:100, 1:100] = random_stochastic_matrix(new_mc_rng(), 100)
-    P_red[101:200, 101:200] = random_stochastic_matrix(new_mc_rng(), 100)
+    P_red[1:100, 1:100] = mc_random_stochastic_matrix(new_mc_rng(), 100)
+    P_red[101:200, 101:200] = mc_random_stochastic_matrix(new_mc_rng(), 100)
     grp["dense_n200_reducible"] = @benchmarkable stationary_distributions(
         $(MarkovChain(P_red)))
 end
