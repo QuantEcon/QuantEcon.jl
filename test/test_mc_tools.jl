@@ -552,6 +552,11 @@ end
         mc32 = MarkovChain(P32)
         @test simulate_indices(mc32, 3, init=1) == [1, 2, 1]
         @test simulate(mc32, 3, init=1) == [1, 2, 1]
+
+        # abstractly typed transition matrix: the sampler eltypes are
+        # unconstrained, like the matrix eltype of MarkovChain itself
+        mc_n = MarkovChain(Matrix{Number}([0. 1.; 1. 0.]))
+        @test simulate_indices(mc_n, 3, init=1) == [1, 2, 1]
     end
 
     @testset "draw_next overflow fallback" begin

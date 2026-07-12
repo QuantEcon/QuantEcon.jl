@@ -49,14 +49,14 @@ end
 
 # Dense: cdfs[:, i] is the CDF of the transition probabilities of state i,
 # stored transposed so that each CDF is contiguous in memory
-struct MCDenseSampler{T<:Real}
+struct MCDenseSampler{T}
     cdfs::Matrix{T}
 end
 
 # Sparse: pt is the transpose of p, so that column i of pt holds the
 # nonzero transition probabilities of state i contiguously, and cdfs1d
 # holds their running sums
-struct MCSparseSampler{Tv<:Real,Ti<:Integer}
+struct MCSparseSampler{Tv,Ti<:Integer}
     pt::SparseMatrixCSC{Tv,Ti}
     cdfs1d::Vector{Tv}
 end
