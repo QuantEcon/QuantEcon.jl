@@ -20,7 +20,7 @@ has `k` states with positive transition probability.
 - `n::Integer`: Number of states.
 - `k::Integer=n`: Number of nonzero entries in each row of the matrix. Set
   to `n` if none specified.
-- `sparse::Union{Val{true},Val{false}}(Val(false))`: If `Val(true)`, the
+- `sparse::Union{Val{true},Val{false}}=Val(false)`: If `Val(true)`, the
   transition matrix is stored as a `SparseMatrixCSC`.
 
 # Returns
@@ -77,7 +77,7 @@ for each row.
 - `n::Integer`: Number of states.
 - `k::Integer=n`: Number of nonzero entries in each row of the matrix. Set
   to `n` if none specified.
-- `sparse::Union{Val{true},Val{false}}(Val(false))`: If `Val(true)`, return a
+- `sparse::Union{Val{true},Val{false}}=Val(false)`: If `Val(true)`, return a
   `SparseMatrixCSC` instead of a dense matrix. For a given `rng`, both
   formats sample the same matrix.
 
@@ -118,7 +118,7 @@ end
 
 
 """
-    _random_nonzero_indices([rng], n, m, k)
+    _random_nonzero_indices(rng, n, m, k)
 
 Sample, for each of `m` probability vectors, the indices in `1:n` of its `k`
 nonzero entries, concatenated into one vector of length `k*m`. Trivially

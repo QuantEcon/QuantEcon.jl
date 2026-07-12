@@ -37,14 +37,16 @@ using Random
         n, k = 5, 3
         seed = 1234
         for k_ in (n, k)
-            P_dense =
-                @inferred random_stochastic_matrix(MersenneTwister(seed), n, k_)
+            rng_dense, rng_sparse = MersenneTwister(seed), MersenneTwister(seed)
+            P_dense = @inferred random_stochastic_matrix(rng_dense, n, k_)
             P_sparse = @inferred random_stochastic_matrix(
-                MersenneTwister(seed), n, k_, sparse=Val(true))
+                rng_sparse, n, k_, sparse=Val(true))
             @test P_sparse isa SparseMatrixCSC{Float64,Int}
             @test nnz(P_sparse) == n * k_
             # the same seed samples the same matrix in both formats
             @test Matrix(P_sparse) == P_dense
+            # and leaves the rng stream in the same state
+            @test rand(rng_sparse) == rand(rng_dense)
         end
 
         mc = @inferred random_markov_chain(MersenneTwister(seed), n, k,
@@ -60,10 +62,12 @@ using Random
 
     @testset "Test random_stochastic_matrix with k=1" begin
         n, k = 3, 1
-        P = random_stochastic_matrix(n, k)
-        @test all((P .== 0) .| (P .== 1))
-        @test all(x->isequal(sum(x), 1),
-                  [P[i, :] for i in 1:size(P)[1]]) == true
+        for P in (random_stochastic_matrix(n, k),
+                  random_stochastic_matrix(n, k, sparse=Val(true)))
+            @test all((P .== 0) .| (P .== 1))
+            @test all(x->isequal(sum(x), 1),
+                      [P[i, :] for i in 1:size(P)[1]]) == true
+        end
     end
 
     @testset "Test errors properly thrown" begin
