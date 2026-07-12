@@ -6,10 +6,9 @@ computation, and simulation (`simulate`, `simulate!`, `simulate_indices`),
 for both dense and sparse transition matrices.
 
 The simulation benchmarks include a long-path case (per-step sampling cost
-dominates) and a short-path case with many states, in warm-cache form
-(transition CDFs cached on the shared MarkovChain instance) and, for the
-latter, in `_cold` form (fresh chain per sample, timing the CDF-cache
-construction), so that changes to either component are visible separately.
+dominates) and a short-path case with many states (per-call setup cost —
+transition-CDF construction — dominates), so that changes to either
+component are visible separately.
 =#
 using QuantEcon
 using BenchmarkTools
@@ -113,32 +112,19 @@ end
 # `setup` runs once per sample, not per evaluation, so `evals=1` is pinned
 # to keep every evaluation seeded (relevant once these get fast enough for
 # the tuner to pick evals > 1).
-#
-# The `MarkovChain` objects are shared across samples, so these cases
-# measure the warm-cache steady state (the transition CDFs are cached on
-# the instance on first use); the `_cold` cases construct a fresh chain in
-# `setup`, so the timed call includes building the CDF cache.
 let grp = suite["simulate"] = BenchmarkGroup()
     # long path: per-step sampling dominates
     grp["dense_n100_ts10000"] =
         @benchmarkable simulate($mc_dense_small, 10_000; init=1) setup=(
             Random.seed!(1234)) evals=1
-    # short path, many states: cache construction dominates when cold
+    # short path, many states: per-call CDF construction dominates
     grp["dense_n1000_ts100"] =
         @benchmarkable simulate($mc_dense_large, 100; init=1) setup=(
             Random.seed!(1234)) evals=1
-    grp["dense_n1000_ts100_cold"] =
-        @benchmarkable simulate(mc_c, 100; init=1) setup=(
-            Random.seed!(1234);
-            mc_c = MarkovChain($(mc_dense_large.p))) evals=1
     # sparse transition matrix (dedicated sparse sampler)
     grp["sparse_n1000_k4_ts10000"] =
         @benchmarkable simulate($mc_sparse, 10_000; init=1) setup=(
             Random.seed!(1234)) evals=1
-    grp["sparse_n1000_k4_ts10000_cold"] =
-        @benchmarkable simulate(mc_c, 10_000; init=1) setup=(
-            Random.seed!(1234);
-            mc_c = MarkovChain($(mc_sparse.p))) evals=1
 end
 
 let grp = suite["simulate!"] = BenchmarkGroup()

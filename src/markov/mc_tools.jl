@@ -61,14 +61,6 @@ struct MCSparseSampler{Tv<:Real,Ti<:Integer}
     cdfs1d::Vector{Tv}
 end
 
-# Sampler type for a transition matrix of type TM, used to type the cache
-# field of MarkovChain. The dense CDFs have the accumulation type of
-# cumsum (e.g. Int for Bool or Int8 entries).
-_sampler_type(::Type{TM}) where {T,TM<:AbstractMatrix{T}} =
-    MCDenseSampler{Base.promote_op(Base.add_sum, T, T)}
-_sampler_type(::Type{SparseMatrixCSC{Tv,Ti}}) where {Tv,Ti} =
-    MCSparseSampler{Tv,Ti}
-
 """
     MarkovChain
 
@@ -82,21 +74,12 @@ state transitions.
 
 - `p::AbstractMatrix`: The transition matrix. Must be square, all elements must be nonnegative, and all rows must sum to unity.
 - `state_values::AbstractVector`: Vector containing the values associated with the states.
-
-The transition CDFs used by the simulation routines are computed on the
-first simulation call and cached. Assigning a new matrix to `p` invalidates
-the cache; modifying the matrix in place does not, so assign to `p` after
-in-place modification.
 """
-mutable struct MarkovChain{T, TM<:AbstractMatrix{T}, TV<:AbstractVector,
-                           TS<:Union{MCDenseSampler,MCSparseSampler}}
+mutable struct MarkovChain{T, TM<:AbstractMatrix{T}, TV<:AbstractVector}
     p::TM # valid stochastic matrix
     state_values::TV
-    sampler::Union{Nothing,TS}  # lazily built transition-CDF cache;
-                                # see _get_sampler
 
-    function MarkovChain{T,TM,TV,TS}(p::AbstractMatrix,
-                                     state_values) where {T,TM,TV,TS}
+    function MarkovChain{T,TM,TV}(p::AbstractMatrix, state_values) where {T,TM,TV}
         n, m = size(p)
 
         n != m &&
@@ -111,20 +94,13 @@ mutable struct MarkovChain{T, TM<:AbstractMatrix{T}, TV<:AbstractVector,
         length(state_values) != n &&
             throw(DimensionMismatch("state_values should have $n elements"))
 
-        return new{T,TM,TV,TS}(p, state_values, nothing)
+        return new{T,TM,TV}(p, state_values)
     end
 end
 
 # Provide constructor that infers T from eltype of matrix
 MarkovChain(p::AbstractMatrix, state_values=1:size(p, 1)) =
-    MarkovChain{eltype(p), typeof(p), typeof(state_values),
-                _sampler_type(typeof(p))}(p, state_values)
-
-# Assigning a new matrix to `p` invalidates the sampling cache
-function Base.setproperty!(mc::MarkovChain, name::Symbol, x)
-    name === :p && setfield!(mc, :sampler, nothing)
-    return setfield!(mc, name, convert(fieldtype(typeof(mc), name), x))
-end
+    MarkovChain{eltype(p), typeof(p), typeof(state_values)}(p, state_values)
 
 Base.eltype(mc::MarkovChain{T,TM,TV}) where {T,TM,TV} = eltype(TV)
 
@@ -401,16 +377,6 @@ _sampler_for(p::SparseMatrixCSC) = MCSparseSampler(p)
 _sampler_for(p::AbstractMatrix) =
     MCDenseSampler(collect(transpose(cumsum(p, dims=2))))
 
-# Return the cached sampler of `mc`, building it on the first call
-function _get_sampler(mc::MarkovChain)
-    s = getfield(mc, :sampler)
-    if s === nothing
-        s = _sampler_for(mc.p)
-        setfield!(mc, :sampler, s)
-    end
-    return s
-end
-
 #=
 Draw the next state from state `i` given a uniform random value `u`. If
 `u` exceeds the last CDF value (possible when the row sum falls slightly
@@ -446,7 +412,7 @@ mutable struct MCIndSimulator{T<:MarkovChain,S}
 end
 
 MCIndSimulator(mc::MarkovChain, len::Int, init::Int) =
-    MCIndSimulator(mc, len, init, _get_sampler(mc))
+    MCIndSimulator(mc, len, init, _sampler_for(mc.p))
 
 function Base.iterate(mcis::MCIndSimulator, state::Tuple{Int,Int}=(mcis.init, 0))
     ix, t = state

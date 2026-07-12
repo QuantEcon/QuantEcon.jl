@@ -522,15 +522,14 @@ end
         end  # testset
     end
 
-    @testset "sampler cache" begin
+    @testset "transition samplers" begin
         # deterministic chains: staying put vs cycling
         P_id = Matrix{Float64}(I, 3, 3)
         P_cyc = [0. 1. 0.; 0. 0. 1.; 1. 0. 0.]
-        mc = @inferred MarkovChain(P_id)
-        @test simulate_indices(mc, 5, init=1) == fill(1, 5)
-        # assigning a new matrix must invalidate the cached CDFs
-        mc.p = P_cyc
-        @test simulate_indices(mc, 4, init=1) == [1, 2, 3, 1]
+        @test simulate_indices(@inferred(MarkovChain(P_id)), 5, init=1) ==
+            fill(1, 5)
+        @test simulate_indices(@inferred(MarkovChain(P_cyc)), 4, init=1) ==
+            [1, 2, 3, 1]
 
         # dense and sparse paths draw identical sample paths from the
         # same random stream
@@ -555,7 +554,7 @@ end
         P = [0.5 0.5-4e-15 0.; 0. 0. 1.; 1. 0. 0.]
         for mc in (@inferred(MarkovChain(P)),
                    @inferred(MarkovChain(sparse(P))))
-            s = @inferred QuantEcon._get_sampler(mc)
+            s = @inferred QuantEcon._sampler_for(mc.p)
             @test QuantEcon.draw_next(s, 1, prevfloat(1.0)) == 2
         end
     end
