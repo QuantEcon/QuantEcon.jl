@@ -8,16 +8,19 @@ using LinearAlgebra: BLAS, BlasFloat
 const TOL_PIV = 1e-10
 const TOL_RATIO_DIFF = 1e-15
 
-# For tableaus with at most this many rows, `_pivoting!` uses a plain SIMD
-# loop instead of BLAS. A rank-1 update has no data reuse for BLAS kernels
-# to exploit, so the loop matches single-threaded BLAS throughput, while
-# below this size BLAS multithreading cannot amortize its synchronization
-# latency (and the loop also avoids the call overhead). The crossover is
+# For tableaus with at most this many elements, `_pivoting!` uses a plain
+# SIMD loop instead of BLAS. A rank-1 update has no data reuse for BLAS
+# kernels to exploit, so the loop matches single-threaded BLAS throughput,
+# while below this size BLAS multithreading cannot amortize its
+# synchronization latency (and the loop also avoids the call overhead).
+# The total tableau size is what the crossover tracks (the memory traffic
+# of the update), across square and rectangular shapes alike; it is
 # machine dependent, but only through a square root of the hardware
-# constants, and sits at ~100 rows on machines from laptops to servers;
-# 64 errs on the safe side, as using the loop slightly below the true
-# crossover costs a few percent where using BLAS above it costs nothing.
-const PIVOTING_BLAS_CUTOFF = 64
+# constants, and sits at 16k-19k elements on the machines measured (square
+# and rectangular shapes on laptop and server hardware). 2^14 errs on the
+# safe side, as using the loop slightly below the true crossover costs a
+# few percent where using BLAS above it costs nothing.
+const PIVOTING_BLAS_CUTOFF = 2^14
 
 """
     _pivoting!(tableau, pivot_col, pivot_row, col_buf)
@@ -25,7 +28,7 @@ const PIVOTING_BLAS_CUTOFF = 64
 Perform a pivoting step. Modify `tableau` in place.
 
 For a strided tableau of BLAS-compatible eltype with more than
-`PIVOTING_BLAS_CUTOFF` rows the update is delegated to BLAS, and is
+`PIVOTING_BLAS_CUTOFF` elements the update is delegated to BLAS, and is
 performed by a plain loop otherwise; the two paths agree up to roundoff.
 
 # Arguments
@@ -45,7 +48,7 @@ function _pivoting!(tableau::AbstractMatrix{T},
                     pivot_col::Integer, pivot_row::Integer,
                     col_buf::Vector{T}) where {T<:AbstractFloat}
     if tableau isa StridedMatrix{<:BlasFloat} &&
-            size(tableau, 1) > PIVOTING_BLAS_CUTOFF
+            length(tableau) > PIVOTING_BLAS_CUTOFF
         _pivoting_blas!(tableau, pivot_col, pivot_row, col_buf)
     else
         _pivoting_loop!(tableau, pivot_col, pivot_row, col_buf)

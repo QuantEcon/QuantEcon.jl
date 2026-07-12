@@ -33,12 +33,15 @@ new_lcp_rng() = MersenneTwister(1234)
 
 for n in (10, 50, 200)
     M, q = lcp_random_pd(new_lcp_rng(), n)
+    # the fixture must exercise pivoting, not the trivial all(q .>= 0) path
+    @assert lcp_lemke(M, q).num_iter > 0
     suite["dense_n$n"] = @benchmarkable lcp_lemke($M, $q)
 end
 
 # Repeated-solve regime: caller-owned output and workspace arrays
 let n = 10
     M, q = lcp_random_pd(new_lcp_rng(), n)
+    @assert lcp_lemke(M, q).num_iter > 0
     z = Vector{Float64}(undef, n)
     tableau = Matrix{Float64}(undef, n, 2n+2)
     basis = Vector{Int}(undef, n)

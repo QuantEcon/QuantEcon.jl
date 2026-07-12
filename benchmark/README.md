@@ -11,6 +11,8 @@ subgroup of `SUITE`. Currently covered:
 
 - [`ddp.jl`](ddp.jl): `DiscreteDP` (`src/markov/ddp.jl`), under
   `SUITE["ddp"]`;
+- [`lcp_lemke.jl`](lcp_lemke.jl): `lcp_lemke` (`src/lcp_lemke.jl`, with the
+  pivoting kernels of `src/pivoting.jl`), under `SUITE["lcp_lemke"]`;
 - [`mc_tools.jl`](mc_tools.jl): `MarkovChain` (`src/markov/mc_tools.jl`),
   under `SUITE["mc_tools"]`.
 

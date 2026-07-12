@@ -43,10 +43,13 @@ using QuantEcon: _pivoting!, _lex_min_ratio_test!
     @testset "Loop and BLAS kernels agree" begin
         rng = MersenneTwister(0)
         pivcol, pivrow = 3, 2
-        # sizes below and above PIVOTING_BLAS_CUTOFF
-        for n in (10, QuantEcon.PIVOTING_BLAS_CUTOFF + 36)
-            tableau_0 = rand(rng, n, 2n+2) .+ 0.5
-            col_buf = Vector{Float64}(undef, n)
+        cutoff = QuantEcon.PIVOTING_BLAS_CUTOFF
+        # small, and rectangular shapes exactly at and just above the
+        # dispatch boundary in total tableau size
+        for (nrows, ncols) in ((10, 22), (64, cutoff ÷ 64),
+                               (64, cutoff ÷ 64 + 1))
+            tableau_0 = rand(rng, nrows, ncols) .+ 0.5
+            col_buf = Vector{Float64}(undef, nrows)
 
             tableau_loop = copy(tableau_0)
             QuantEcon._pivoting_loop!(tableau_loop, pivcol, pivrow, col_buf)
@@ -57,10 +60,11 @@ using QuantEcon: _pivoting!, _lex_min_ratio_test!
             tableau = copy(tableau_0)
             @inferred _pivoting!(tableau, pivcol, pivrow, col_buf)
             @test tableau ==
-                (n > QuantEcon.PIVOTING_BLAS_CUTOFF ? tableau_blas :
-                                                      tableau_loop)
+                (nrows * ncols > cutoff ? tableau_blas : tableau_loop)
             # the pivot column is reduced to the unit vector exactly
-            @test tableau[:, pivcol] == [i == pivrow ? 1. : 0. for i in 1:n]
+            @test tableau[:, pivcol] ==
+                [i == pivrow ? 1. : 0. for i in 1:nrows]
         end
     end
+
 end
