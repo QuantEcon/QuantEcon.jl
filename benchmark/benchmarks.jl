@@ -17,6 +17,7 @@ using BenchmarkTools
 const SUITE = BenchmarkGroup()
 
 SUITE["ddp"] = include("ddp.jl")
+SUITE["lcp_lemke"] = include("lcp_lemke.jl")
 SUITE["mc_tools"] = include("mc_tools.jl")
 
 #= Standalone execution =#
