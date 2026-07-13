@@ -168,4 +168,40 @@ end
         _assert_success(res, M, q)
     end
 
+    @testset "lcp_lemke! with full workspace allocates nothing" begin
+        _M = [1. 0 0; 2 1 0; 2 2 1]
+        _q = [-8., -12, -14]
+        n = size(_M, 1)
+        z = Vector{Float64}(undef, n)
+        tableau = Matrix{Float64}(undef, n, 2n+2)
+        basis = Vector{Int}(undef, n)
+        d = ones(n)
+        col_buf = Vector{Float64}(undef, n)
+        argmins = Vector{Int}(undef, n)
+
+        solve!() = lcp_lemke!(z, tableau, basis, _M, _q,
+                              d=d, col_buf=col_buf, argmins=argmins)
+        res = @inferred solve!()  # warmup; also compiles
+        _assert_success(res, _M, _q; desired_z=[8, 0, 0])
+
+        # The only allocation allowed is the returned LCPResult itself,
+        # which older Julia versions heap-allocate where newer ones elide
+        # it; measure that baseline in the same escape pattern (returned
+        # from a function) instead of hard-coding its size
+        make_result() = LCPResult(z, res.success, res.status, res.num_iter)
+        make_result()  # warmup
+        @test (@allocated solve!()) <= (@allocated make_result())
+
+        # the trivial case q >= 0 materializes none of the lazy defaults
+        q0 = zeros(3)
+        trivial!() = lcp_lemke!(z, tableau, basis, _M, q0)
+        trivial!()  # warmup
+        @test (@allocated trivial!()) <= (@allocated make_result())
+
+        # argmins is overwritten before basis is read to determine the
+        # leaving variable, so aliasing the two must be rejected
+        @test_throws AssertionError lcp_lemke!(z, tableau, basis, _M, _q,
+                                               argmins=basis)
+    end
+
 end

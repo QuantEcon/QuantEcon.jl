@@ -136,43 +136,82 @@ end
 
 
 """
-    lcp_lemke!(z, tableau, basis, M, q; d=ones(T, size(M, 1)),
-               max_iter=10^6, piv_options=PivOptions())
+    lcp_lemke!(z, tableau, basis, M, q; d=nothing, max_iter=10^6,
+               piv_options=PivOptions(), col_buf=nothing, argmins=nothing)
 
 Same as `lcp_lemke`, but allow for passing preallocated arrays `z` (to store
-the solution), `tableau` and `basis` (for workspace).
+the solution), `tableau` and `basis` (for workspace), and, as keyword
+arguments, the covering vector `d` and the workspace vectors `col_buf` and
+`argmins`. Each keyword left as `nothing` is allocated internally (`d` as the
+vector of ones), lazily, so that the trivial case `q >= 0` allocates none of
+them.
 
 If `M` is an `n x n` matrix, `z` must be a `Vector{T}` of length `n`, `tableau`
 a `Matrix{T}` of size `(n, 2n+2)`, and `basis` a `Vector{<:Integer}` of length
-`n`, where `T<:AbstractFloat`.
+`n`, where `T<:AbstractFloat`; `col_buf` must be a `Vector{T}` of length `n`,
+and `argmins` a `Vector{Int}` of length at least `n`; `argmins` must not alias
+`basis`. With `d`, `col_buf`, and `argmins` all supplied, the call performs no
+workspace allocations; for machine-float element types such as `Float64`, it
+is then allocation-free apart from the small returned `LCPResult` struct,
+which is typically also elided on Julia 1.12 and later, so that repeated
+solves generate no garbage-collector pressure:
+
+    n = size(M, 1)
+    z = Vector{Float64}(undef, n)
+    tableau = Matrix{Float64}(undef, n, 2n+2)
+    basis = Vector{Int}(undef, n)
+    d = ones(n)
+    col_buf = Vector{Float64}(undef, n)
+    argmins = Vector{Int}(undef, n)
+    res = lcp_lemke!(z, tableau, basis, M, q,
+                     d=d, col_buf=col_buf, argmins=argmins)
 """
 function lcp_lemke!(
     z::Vector{T}, tableau::Matrix{T}, basis::Vector{<:Integer},
     M::AbstractMatrix, q::AbstractVector;
-    d::AbstractVector=ones(T, size(M, 1)),
+    d::Union{AbstractVector,Nothing}=nothing,
     max_iter::Integer=10^6,
-    piv_options::PivOptions=PivOptions()
+    piv_options::PivOptions=PivOptions(),
+    col_buf::Union{Vector{T},Nothing}=nothing,
+    argmins::Union{Vector{Int},Nothing}=nothing
 ) where {T<:AbstractFloat}
     n = size(M, 1)
     @assert size(M, 2) == n "M must be square"
     @assert length(q) == n "q must have length n"
-    @assert length(d) == n "d must have length n"
-    @assert all(d .> 0) "d must be strictly positive"
+    if d !== nothing
+        @assert length(d) == n "d must have length n"
+        @assert all(x -> x > 0, d) "d must be strictly positive"
+    end
 
     @assert length(z) == n "z must have length n"
     @assert size(tableau) == (n, 2n+2) "tableau must have size (n, 2n+2)"
     @assert length(basis) == n "basis must have length n"
+    if col_buf !== nothing
+        @assert length(col_buf) == n "col_buf must have length n"
+    end
+    if argmins !== nothing
+        @assert length(argmins) >= n "argmins must have length at least n"
+        # _lex_min_ratio_test! overwrites argmins before basis[pivrow] is
+        # read to determine the leaving variable
+        @assert !Base.mightalias(argmins, basis) "argmins must not alias basis"
+    end
 
     success = false
     status  = 1
     num_iter = 0
 
-    if all(q .>= 0)  # Trivial case
+    if all(x -> x >= 0, q)  # Trivial case
         fill!(z, zero(T))
         success = true
         status = 0
         return LCPResult(z, success, status, num_iter)
     end
+
+    # Materialize unsupplied keyword defaults, lazily so that the trivial
+    # case above allocates none of them
+    d = d === nothing ? ones(T, n) : d
+    col_buf = col_buf === nothing ? Vector{T}(undef, n) : col_buf
+    argmins = argmins === nothing ? Vector{Int}(undef, n) : argmins
 
     _initialize_tableau!(tableau, basis, M, q, d)
 
@@ -190,15 +229,9 @@ function lcp_lemke!(
         end
     end
 
-    # Vector to hold a copy of the pivot column in _pivoting!
-    col_buf = Vector{T}(undef, n)
-
     _pivoting!(tableau, pivcol, pivrow, col_buf)
     basis[pivrow], pivcol = pivcol, pivrow + n
     num_iter += 1
-
-    # Vector to store row indices in lex_min_ratio_test!
-    argmins = Vector{Int}(undef, n)
 
     while num_iter < max_iter
         pivrow_found, pivrow = _lex_min_ratio_test!(

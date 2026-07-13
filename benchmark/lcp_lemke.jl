@@ -38,7 +38,10 @@ for n in (10, 50, 200)
     suite["dense_n$n"] = @benchmarkable lcp_lemke($M, $q)
 end
 
-# Repeated-solve regime: caller-owned output and workspace arrays
+# Repeated-solve regime: caller-owned output arrays with default keywords
+# (the remaining workspace is materialized lazily inside), and, in the
+# second case, with the full workspace supplied so that the timed call
+# performs no workspace allocations
 let n = 10
     M, q = lcp_random_pd(new_lcp_rng(), n)
     @assert lcp_lemke(M, q).num_iter > 0
@@ -47,6 +50,12 @@ let n = 10
     basis = Vector{Int}(undef, n)
     suite["dense_n10_prealloc"] =
         @benchmarkable lcp_lemke!($z, $tableau, $basis, $M, $q)
+    d = ones(n)
+    col_buf = Vector{Float64}(undef, n)
+    argmins = Vector{Int}(undef, n)
+    suite["dense_n10_full_workspace"] =
+        @benchmarkable lcp_lemke!($z, $tableau, $basis, $M, $q, d=$d,
+                                  col_buf=$col_buf, argmins=$argmins)
 end
 
 suite
