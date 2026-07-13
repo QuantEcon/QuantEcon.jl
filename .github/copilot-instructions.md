@@ -35,6 +35,7 @@ The repository has a benchmark suite in the standard BenchmarkTools.jl format un
 - Run the whole suite: `julia --project=benchmark benchmark/benchmarks.jl` -- takes a few minutes. NEVER CANCEL.
 - Compare two commits with PkgBenchmark.jl: `judge("QuantEcon", "<target>", "<baseline>")`; note that `judge` runs committed states, so commit your changes first.
 - **Benchmarks are NOT run in CI.** When you rename or remove internal functions used by `benchmark/*.jl` (e.g. `QuantEcon._mul`), update the benchmark files in the same PR and check that the suite still builds: `julia --project=benchmark -e 'include("benchmark/benchmarks.jl")'`.
+- **Never change the workload behind an existing benchmark key**: `judge` compares keys across commits, so a changed workload silently invalidates before/after comparisons. Add a new key instead (e.g. `dense_n10_prealloc` vs `dense_n10_full_workspace` in `benchmark/lcp_lemke.jl`).
 - For performance-sensitive changes (especially under `src/markov/`), report before/after numbers from this suite in the PR description.
 
 ### No linting or formatting tools are configured
@@ -162,6 +163,7 @@ When replacing a library call with a hand-written kernel (or adding caching), a 
 - **NaN propagation**: `maximum`/`max` propagate NaNs, while a `>` comparison silently skips them. Use a `max()` accumulator, not a `>` branch, when replacing reductions.
 - **Precision of comparisons**: keep running maxima (and similar accumulators) in the element type of the *source* array, not of a lower-precision output buffer; otherwise argmax-type decisions can be wrong for mixed-precision inputs. Restrict fast paths to matching element types via dispatch.
 - **Stale caches**: fields like `R`, `Q`, `beta` are documented mutable attributes; do not cache derived objects (views, factorizations) of them at construction unless the cache is invalidated on rebinding. Prefer computing cheap views per call.
+- **Workspace aliasing**: caller-supplied workspace arrays of matching type and length invite reuse by callers. Check whether the algorithm reads any array after another is overwritten, and assert non-aliasing with `Base.mightalias` where corruption would be silent (e.g. `argmins` must not alias `basis` in `lcp_lemke!`).
 - Verify optimization ideas by measurement before adopting them; vectorized library code often beats hand-written loops.
 
 ## Validation
@@ -221,6 +223,7 @@ println(\"VFI converged in \", results.num_iter, \" iterations\")
 
 ### Critical validation requirements:
 - ALL scenarios above must run successfully after any code change
+- Run each scenario in its own `julia -e` process as shown: scenario 3 binds `u`, which collides with the `function u` defined by scenario 4's example file if run in a shared process
 - NEVER commit code changes without running these validation scenarios
 - If any validation scenario fails, investigate and fix before proceeding
 - Run the full test suite (`Pkg.test()`) before finalizing any significant changes
