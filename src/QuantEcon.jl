@@ -151,7 +151,8 @@ export
 
 # filter
     hp_filter,
-    hamilton_filter
+    hamilton_filter,
+    bk_filter
 
 
 include("sampler.jl")
