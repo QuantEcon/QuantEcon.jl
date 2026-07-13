@@ -11,6 +11,8 @@ subgroup of `SUITE`. Currently covered:
 
 - [`ddp.jl`](ddp.jl): `DiscreteDP` (`src/markov/ddp.jl`), under
   `SUITE["ddp"]`;
+- [`lcp_lemke.jl`](lcp_lemke.jl): `lcp_lemke` (`src/lcp_lemke.jl`, with the
+  pivoting kernels of `src/pivoting.jl`), under `SUITE["lcp_lemke"]`;
 - [`mc_tools.jl`](mc_tools.jl): `MarkovChain` (`src/markov/mc_tools.jl`),
   under `SUITE["mc_tools"]`.
 
@@ -56,6 +58,17 @@ convergence behavior.
 
 Note that the suite holds the dense `Q` arrays of the two large cases in
 memory (roughly 0.5 GB in total).
+
+### `lcp_lemke` ([`lcp_lemke.jl`](lcp_lemke.jl))
+
+Lemke's algorithm on random LCPs with positive definite `M` (so that a
+solution exists and the algorithm terminates with it), each generated with
+its own fixed-seed RNG:
+
+| Key | Description |
+|:----|:------------|
+| `dense_n{10,50,200}` | `lcp_lemke` end to end; n = 10 and 50 exercise the loop kernel of `_pivoting!`, n = 200 the BLAS kernel |
+| `dense_n10_prealloc` | `lcp_lemke!` with caller-owned arrays (repeated-solve regime) |
 
 ### `mc_tools` ([`mc_tools.jl`](mc_tools.jl))
 
