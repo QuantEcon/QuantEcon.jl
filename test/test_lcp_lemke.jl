@@ -183,7 +183,14 @@ end
                               d=d, col_buf=col_buf, argmins=argmins)
         res = @inferred solve!()  # warmup; also compiles
         _assert_success(res, _M, _q; desired_z=[8, 0, 0])
-        @test (@allocated solve!()) == 0
+
+        # The only allocation allowed is the returned LCPResult itself,
+        # which older Julia versions heap-allocate where newer ones elide
+        # it; measure that baseline in the same escape pattern (returned
+        # from a function) instead of hard-coding its size
+        make_result() = LCPResult(z, res.success, res.status, res.num_iter)
+        make_result()  # warmup
+        @test (@allocated solve!()) <= (@allocated make_result())
     end
 
 end

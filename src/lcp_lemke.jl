@@ -149,8 +149,9 @@ If `M` is an `n x n` matrix, `z` must be a `Vector{T}` of length `n`, `tableau`
 a `Matrix{T}` of size `(n, 2n+2)`, and `basis` a `Vector{<:Integer}` of length
 `n`, where `T<:AbstractFloat`; `col_buf` must be a `Vector{T}` of length `n`,
 and `argmins` a `Vector{Int}` of length at least `n`. With `d`, `col_buf`, and
-`argmins` all supplied, the call performs no allocations, so that repeated
-solves generate no garbage-collector pressure:
+`argmins` all supplied, the call performs no allocations apart from the small
+returned `LCPResult` struct, which is also elided on Julia 1.12 and later, so
+that repeated solves generate no garbage-collector pressure:
 
     n = size(M, 1)
     z = Vector{Float64}(undef, n)
