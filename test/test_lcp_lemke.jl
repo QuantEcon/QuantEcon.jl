@@ -191,6 +191,12 @@ end
         make_result() = LCPResult(z, res.success, res.status, res.num_iter)
         make_result()  # warmup
         @test (@allocated solve!()) <= (@allocated make_result())
+
+        # the trivial case q >= 0 materializes none of the lazy defaults
+        q0 = zeros(3)
+        trivial!() = lcp_lemke!(z, tableau, basis, _M, q0)
+        trivial!()  # warmup
+        @test (@allocated trivial!()) <= (@allocated make_result())
     end
 
 end
