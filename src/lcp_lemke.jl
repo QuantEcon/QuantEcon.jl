@@ -149,10 +149,12 @@ them.
 If `M` is an `n x n` matrix, `z` must be a `Vector{T}` of length `n`, `tableau`
 a `Matrix{T}` of size `(n, 2n+2)`, and `basis` a `Vector{<:Integer}` of length
 `n`, where `T<:AbstractFloat`; `col_buf` must be a `Vector{T}` of length `n`,
-and `argmins` a `Vector{Int}` of length at least `n`. With `d`, `col_buf`, and
-`argmins` all supplied, the call performs no allocations apart from the small
-returned `LCPResult` struct, which is also elided on Julia 1.12 and later, so
-that repeated solves generate no garbage-collector pressure:
+and `argmins` a `Vector{Int}` of length at least `n`; `argmins` must not alias
+`basis`. With `d`, `col_buf`, and `argmins` all supplied, the call performs no
+workspace allocations; for machine-float element types such as `Float64`, it
+is then allocation-free apart from the small returned `LCPResult` struct,
+which is typically also elided on Julia 1.12 and later, so that repeated
+solves generate no garbage-collector pressure:
 
     n = size(M, 1)
     z = Vector{Float64}(undef, n)
@@ -189,6 +191,9 @@ function lcp_lemke!(
     end
     if argmins !== nothing
         @assert length(argmins) >= n "argmins must have length at least n"
+        # _lex_min_ratio_test! overwrites argmins before basis[pivrow] is
+        # read to determine the leaving variable
+        @assert !Base.mightalias(argmins, basis) "argmins must not alias basis"
     end
 
     success = false

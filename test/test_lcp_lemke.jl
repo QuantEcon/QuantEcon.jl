@@ -197,6 +197,11 @@ end
         trivial!() = lcp_lemke!(z, tableau, basis, _M, q0)
         trivial!()  # warmup
         @test (@allocated trivial!()) <= (@allocated make_result())
+
+        # argmins is overwritten before basis is read to determine the
+        # leaving variable, so aliasing the two must be rejected
+        @test_throws AssertionError lcp_lemke!(z, tableau, basis, _M, _q,
+                                               argmins=basis)
     end
 
 end
