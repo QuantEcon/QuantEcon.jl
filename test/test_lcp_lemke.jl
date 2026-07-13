@@ -168,4 +168,22 @@ end
         _assert_success(res, M, q)
     end
 
+    @testset "lcp_lemke! with full workspace allocates nothing" begin
+        _M = [1. 0 0; 2 1 0; 2 2 1]
+        _q = [-8., -12, -14]
+        n = size(_M, 1)
+        z = Vector{Float64}(undef, n)
+        tableau = Matrix{Float64}(undef, n, 2n+2)
+        basis = Vector{Int}(undef, n)
+        d = ones(n)
+        col_buf = Vector{Float64}(undef, n)
+        argmins = Vector{Int}(undef, n)
+
+        solve!() = lcp_lemke!(z, tableau, basis, _M, _q,
+                              d=d, col_buf=col_buf, argmins=argmins)
+        res = @inferred solve!()  # warmup; also compiles
+        _assert_success(res, _M, _q; desired_z=[8, 0, 0])
+        @test (@allocated solve!()) == 0
+    end
+
 end

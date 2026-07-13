@@ -68,7 +68,7 @@ its own fixed-seed RNG:
 | Key | Description |
 |:----|:------------|
 | `dense_n{10,50,200}` | `lcp_lemke` end to end; n = 10 and 50 exercise the loop kernel of `_pivoting!`, n = 200 the BLAS kernel |
-| `dense_n10_prealloc` | `lcp_lemke!` with caller-owned arrays (repeated-solve regime) |
+| `dense_n10_prealloc` | `lcp_lemke!` with caller-owned output and full workspace (repeated-solve regime; allocation-free) |
 
 ### `mc_tools` ([`mc_tools.jl`](mc_tools.jl))
 
