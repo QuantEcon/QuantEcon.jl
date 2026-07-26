@@ -531,9 +531,13 @@ function Base.getindex(
     # the arithmetic only proposes a candidate position; the isequal
     # check below is the authority, so that the dict-free specialization
     # has exactly the lookup semantics of the dict-backed map (e.g.
-    # -0.0 must miss against a stored 0, as isequal distinguishes them)
+    # -0.0 must miss against a stored 0, as isequal distinguishes them).
+    # The offset is computed at least at Int precision: the range eltype
+    # itself may be too narrow (Int8 offsets run up to 255), while
+    # BigInt endpoints must stay unconverted
+    P = promote_type(eltype(r), Int)
     i = try
-        Int(v - first(r)) + 1
+        Int(v - convert(P, first(r))) + 1
     catch
         throw(_indexmap_notfound(v))
     end

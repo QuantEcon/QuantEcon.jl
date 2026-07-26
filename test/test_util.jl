@@ -191,6 +191,22 @@
             @test im_big[lo + 2] == 3
             @test_throws ArgumentError im_big[lo - 1]
         end
+
+        @testset "unit-range offset does not overflow narrow eltypes" begin
+            # the offset must not be computed in the range eltype: the
+            # Int8 offset 255 wraps in Int8 arithmetic
+            im8 = IndexMap(typemin(Int8):typemax(Int8))
+            @test im8[typemin(Int8)] == 1
+            @test im8[typemax(Int8)] == 256
+
+            imu = IndexMap(UInt8(250):UInt8(255))
+            @test imu[UInt8(255)] == 6
+            @test_throws ArgumentError imu[UInt8(3)]
+
+            imb = IndexMap(false:true)
+            @test imb[true] == 2
+            @test_throws ArgumentError imb[2]
+        end
     end
 
 end
