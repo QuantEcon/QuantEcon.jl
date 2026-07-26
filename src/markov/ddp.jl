@@ -807,23 +807,6 @@ QuantEcon.MarkovChain(ddp::DiscreteDP, sigma::AbstractVector{<:Integer}) =
     MarkovChain(RQ_sigma(ddp, sigma)[2])
 
 """
-    controlled_mc(res)
-
-Return the Markov chain controlled by the optimal policy of a solved
-model, `res.mc`. The chain is returned by reference, not copied.
-
-# Arguments
-
-- `res::DPSolveResult`: Object that contains result variables.
-
-# Returns
-
-- `mc::MarkovChain`: Controlled Markov chain.
-
-"""
-controlled_mc(res::DPSolveResult) = res.mc
-
-"""
     RQ_sigma(ddp, sigma)
 
 Given a policy `sigma`, return the reward vector `R_sigma` and
@@ -1315,7 +1298,13 @@ function _solve!(
         throw(ArgumentError("method invalid for beta = 1"))
     end
 
-    vals = similar(ddp.R, eltype(v))  # buffer for state-action values
+    # buffer for state-action values, in the same promoted element type
+    # as allocated by the 4-arg bellman_operator! method that the greedy
+    # step used to go through: with mixed-precision models (e.g. Float32
+    # rewards with a Float64 beta), a buffer in eltype(v) would round
+    # near-tied action values to equality before the argmax
+    vals = similar(ddp.R, promote_type(eltype(ddp.R), eltype(v),
+                                       typeof(ddp.beta)))
 
     num_iter = 0
     for i in 1:max_iter
