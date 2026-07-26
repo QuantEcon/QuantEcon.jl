@@ -104,6 +104,7 @@ export
 
 # util
     meshgrid, gridmake, gridmake!, ckron, is_stable, num_compositions,
+    IndexMap,
     SimplexGrid, simplex_grid, simplex_index, next_k_array!, k_array_rank,
 
 # robustlq
@@ -132,6 +133,7 @@ export
     evaluate_policy, bellman_operator, compute_greedy,
     bellman_operator!, num_states, backward_induction,
     num_sa_pairs, to_sa_pair_form, to_product_form,
+    sigma_values, state_to_index, DDPPolicyFunction, DDPValueFunction,
 
 # zeros / optimization
     bisect, brenth, brent, ridder, expand_bracket, divide_bracket,

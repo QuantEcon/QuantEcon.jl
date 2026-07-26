@@ -697,4 +697,145 @@ Tests for markov/ddp.jl
         end
     end
 
+    @testset "state_values and action_values (#120)" begin
+        @testset "identity defaults" begin
+            @test ddp0.state_values == 1:2
+            @test ddp0.action_values == 1:2
+            @test ddp0_sa.state_values == 1:2
+            @test ddp0_sa.action_values == 1:2  # 1:maximum(a_indices)
+        end
+
+        @testset "supplied values are stored by reference" begin
+            _sv = [(0.0, :lo), (1.0, :hi)]
+            _av = [10.0, 20.0]
+            _ddp = DiscreteDP(R, Q, beta; state_values=_sv, action_values=_av)
+            @test _ddp.state_values === _sv
+            @test _ddp.action_values === _av
+            _ddp_sa = DiscreteDP(R_sa, Q_sa, beta, s_indices, a_indices;
+                                 state_values=_sv, action_values=_av)
+            @test _ddp_sa.state_values === _sv
+            @test _ddp_sa.action_values === _av
+        end
+
+        @testset "validation" begin
+            @test_throws ArgumentError DiscreteDP(R, Q, beta;
+                                                  state_values=[:a])
+            @test_throws ArgumentError DiscreteDP(R, Q, beta;
+                                                  action_values=[:a])
+            @test_throws ArgumentError DiscreteDP(R_sa, Q_sa, beta,
+                                                  s_indices, a_indices;
+                                                  state_values=[:a])
+            # SA: length(action_values) < maximum(a_indices)
+            @test_throws ArgumentError DiscreteDP(R_sa, Q_sa, beta,
+                                                  s_indices, a_indices;
+                                                  action_values=[:a])
+            # SA: a proper superset of the referenced actions is legal
+            _ddp_sa = DiscreteDP(R_sa, Q_sa, beta, s_indices, a_indices;
+                                 action_values=[:a, :b, :c])
+            @test _ddp_sa.action_values == [:a, :b, :c]
+        end
+
+        @testset "conversion threading and phantom actions" begin
+            _sv = [(:s, 1), (:s, 2)]
+            _av = [:x, :y, :z]
+            # action :z (index 3) is feasible nowhere
+            _R = [1.0 2.0 -Inf; 3.0 -Inf -Inf]
+            _Q = zeros(2, 3, 2)
+            _Q[1, 1, 1] = 1.0
+            _Q[1, 2, 1] = 1.0
+            _Q[2, 1, 1] = 1.0
+            _ddp = DiscreteDP(_R, _Q, 0.9; state_values=_sv, action_values=_av)
+
+            _ddp_sa = to_sa_pair_form(_ddp)
+            @test _ddp_sa.state_values === _sv
+            @test _ddp_sa.action_values === _av
+            @test maximum(_ddp_sa.a_indices) == 2
+
+            # cardinality restoration: the phantom column comes back
+            _ddp_rt = to_product_form(_ddp_sa)
+            @test _ddp_rt.state_values === _sv
+            @test _ddp_rt.action_values === _av
+            @test _ddp_rt.R == _R
+            @test _ddp_rt.Q == _Q
+
+            # with defaults, dense -> SA attaches 1:m (not 1:max index)
+            _ddp_d = DiscreteDP(_R, _Q, 0.9)
+            _ddp_d_sa = to_sa_pair_form(_ddp_d)
+            @test _ddp_d_sa.action_values == 1:3
+            @test size(to_product_form(_ddp_d_sa).R) == (2, 3)
+        end
+
+        @testset "controlled chain carries state_values" begin
+            _sv = [(0.0, :lo), (1.0, :hi)]
+            _ddp = DiscreteDP(R, Q, beta; state_values=_sv)
+            _res = solve(_ddp, PFI)
+            @test _res.mc.state_values === _sv
+            @test simulate(_res.mc, 3; init=1) isa Vector{eltype(_sv)}
+            _mc = MarkovChain(_ddp, [1, 1])
+            @test _mc.state_values === _sv
+        end
+
+        @testset "decode layer" begin
+            _sv = [(0.0, :lo), (1.0, :hi)]
+            _av = [10.0, 20.0]
+            for _base in ddp0_collection
+                _ddp = _base isa QuantEcon.DDP ?
+                    DiscreteDP(R, Q, beta;
+                               state_values=_sv, action_values=_av) :
+                    DiscreteDP(R_sa, Q_sa, beta, s_indices, a_indices;
+                               state_values=_sv, action_values=_av)
+                _res = solve(_ddp, PFI)
+
+                # sigma_values pairs with state_values
+                @test (@inferred sigma_values(_res)) ==
+                    _av[_res.sigma]
+
+                # state_to_index: exact, ambiguity-free lookups
+                @test state_to_index(_ddp, (1.0, :hi)) == 2
+                @test_throws ArgumentError state_to_index(_ddp, (2.0, :hi))
+
+                # functors: value-keyed queries, fully inferred
+                _pf = @inferred DDPPolicyFunction(_res)
+                _vf = @inferred DDPValueFunction(_res; im=_pf.im)
+                for (_i, _s) in enumerate(_sv)
+                    @test (@inferred _pf(_s)) == _av[_res.sigma[_i]]
+                    @test (@inferred _vf(_s)) == _res.v[_i]
+                end
+                @test_throws ArgumentError _pf((2.0, :hi))
+            end
+
+            # identity defaults degrade seamlessly
+            _res0 = solve(ddp0, PFI)
+            @test sigma_values(_res0) == _res0.sigma
+            _pf0 = DDPPolicyFunction(_res0)
+            @test _pf0.im.dict === nothing
+            @test _pf0(1) == _res0.sigma[1]
+        end
+
+        @testset "duplicated values: decoration yes, inversion no" begin
+            # repeated action labels are legal (shared display names)
+            _ddp_a = DiscreteDP(R, Q, beta; action_values=[:stay, :stay])
+            _res_a = solve(_ddp_a, PFI)
+            @test sigma_values(_res_a) == [:stay, :stay]
+
+            # repeated state labels: forward decoding works ...
+            _ddp_s = DiscreteDP(R, Q, beta; state_values=[:lo, :lo])
+            _res_s = solve(_ddp_s, PFI)
+            @test sigma_values(_res_s) == _res_s.sigma
+            @test simulate(_res_s.mc, 3; init=1) isa Vector{Symbol}
+
+            # ... inversion fails at the earliest moment it can know
+            _err = try
+                DDPPolicyFunction(_res_s)
+            catch _e
+                _e
+            end
+            @test _err isa ArgumentError
+            @test occursin("repeated", _err.msg)
+            @test occursin("sigma_values", _err.msg)
+            @test_throws ArgumentError DDPValueFunction(_res_s)
+            @test_throws ArgumentError state_to_index(_ddp_s, :lo)
+        end
+    end
+
 end # end @testset

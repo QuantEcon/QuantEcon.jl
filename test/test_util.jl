@@ -132,4 +132,45 @@
 
     end
 
+    @testset "IndexMap" begin
+        @testset "vector of tuples" begin
+            vals = [(0.0, 0.1), (1.0, 0.1), (0.0, 1.0), (1.0, 1.0)]
+            im = IndexMap(vals)
+            @test length(im) == 4
+            for (i, v) in enumerate(vals)
+                @test (@inferred im[v]) == i
+                @test vals[im[v]] === v
+            end
+            @test_throws ArgumentError im[(2.0, 0.1)]
+        end
+
+        @testset "isequal semantics" begin
+            im = IndexMap([1, 2, 3])
+            @test im[2.0] == 2  # isequal(2.0, 2)
+            @test_throws ArgumentError im[2.5]
+        end
+
+        @testset "uniqueness required" begin
+            @test_throws ArgumentError IndexMap([:a, :b, :a])
+            # buffer-reuse trap: n aliases of one array collapse the map
+            buf = [0.0]
+            aliased = [buf, buf]
+            @test_throws ArgumentError IndexMap(aliased)
+        end
+
+        @testset "unit-range specialization" begin
+            im = IndexMap(1:5)
+            @test im.dict === nothing
+            @test (@inferred im[3]) == 3
+            @test_throws ArgumentError im[0]
+            @test_throws ArgumentError im[6]
+            @test_throws ArgumentError im[2.5]
+            @test im[2.0] == 2
+
+            im_shift = IndexMap(5:9)
+            @test im_shift[7] == 3
+            @test im_shift.vals[im_shift[7]] == 7
+        end
+    end
+
 end

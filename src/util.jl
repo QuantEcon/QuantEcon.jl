@@ -435,3 +435,103 @@ function k_array_rank(T::Type{<:Integer}, a::Vector{<:Integer})
 end
 
 k_array_rank(a::Vector{<:Integer}) = k_array_rank(Int, a)
+
+"""
+    IndexMap{TV,TD}
+
+Mapping from the values of a vector to their indices: `im[v]` returns
+the index `i` such that `im.vals[i]` equals `v`, and throws an
+informative `ArgumentError` when `v` is not among the values.
+Construction requires the values to be unique. For an
+`AbstractUnitRange` no dictionary is stored and lookups use
+bounds-checked arithmetic.
+
+`IndexMap` is the persistent counterpart of `Base.indexin`, which
+builds an equivalent dictionary internally, answers one batch of
+queries with first-match and `nothing`-on-miss semantics, and discards
+it on every call; `IndexMap` builds the map once, requiring unique
+values, for repeated single-value lookups with informative errors.
+
+Lookups use `isequal`/`hash` semantics: query with values obtained from
+the wrapped vector itself (exact equality); custom mutable value types
+should define `isequal` and `hash`. The vector is held by reference, and
+mutating a stored value corrupts the map.
+
+# Fields
+
+- `vals::TV`: The wrapped vector of values.
+- `dict::TD`: Value-to-index dictionary; `nothing` for an
+  `AbstractUnitRange`.
+
+# Examples
+
+```julia
+julia> im = IndexMap([(0.0, 0.1), (1.0, 0.1), (0.0, 1.0), (1.0, 1.0)]);
+
+julia> im[(0.0, 1.0)]
+3
+```
+"""
+struct IndexMap{TV<:AbstractVector,TD<:Union{Dict,Nothing}}
+    vals::TV
+    dict::TD
+end
+
+"""
+    IndexMap(vals)
+
+Construct an `IndexMap` from `vals`, whose elements must be unique in
+the sense of `isequal` (`ArgumentError` otherwise). The uniqueness check
+also catches the buffer-reuse bug where collecting a lazy generator that
+yields one mutated buffer stores aliases of a single array.
+
+# Arguments
+
+- `vals::AbstractVector`: Vector of unique values.
+
+# Returns
+
+- `im::IndexMap`: Mapping from the values to their indices, satisfying
+  `vals[im[v]] === v`.
+
+"""
+function IndexMap(vals::AbstractVector)
+    dict = Dict{eltype(vals),Int}()
+    sizehint!(dict, length(vals))
+    for (i, v) in pairs(vals)
+        j = get(dict, v, 0)
+        if j != 0
+            throw(ArgumentError("values must be unique: vals[$j] and " *
+                "vals[$i] are equal ($(repr(v))); if vals was collected " *
+                "from a generator, check that it does not yield a reused " *
+                "buffer"))
+        end
+        dict[v] = i
+    end
+    return IndexMap(vals, dict)
+end
+
+IndexMap(vals::AbstractUnitRange{<:Integer}) = IndexMap(vals, nothing)
+
+function Base.getindex(im::IndexMap, v)
+    idx = get(im.dict, v, nothing)
+    if idx === nothing
+        throw(ArgumentError("value $(repr(v)) is not among the values of " *
+            "this IndexMap (lookups use isequal; query with values " *
+            "obtained from the wrapped vector)"))
+    end
+    return idx
+end
+
+function Base.getindex(
+        im::IndexMap{<:AbstractUnitRange{<:Integer},Nothing}, v::Number
+    )
+    r = im.vals
+    if !(isinteger(v) && first(r) <= v <= last(r))
+        throw(ArgumentError("value $(repr(v)) is not among the values of " *
+            "this IndexMap"))
+    end
+    return Int(v) - Int(first(r)) + 1
+end
+
+Base.length(im::IndexMap) = length(im.vals)
