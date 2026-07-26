@@ -151,11 +151,42 @@ Tests for markov/ddp.jl
         end
     end
 
-    @testset "compute_greedy! changes ddpr.v" begin
+    @testset "bellman_operator! overwrites the Tv buffer" begin
         res = solve(ddp0, VFI)
-        res.Tv[:] .= 500.0
-        compute_greedy!(ddp0, res)
-        @test maximum(abs, res.Tv .- 500.0) > 0
+        _Tv = fill(500.0, length(res.v))
+        _sigma = similar(res.sigma)
+        bellman_operator!(ddp0, res.v, _Tv, _sigma)
+        @test maximum(abs, _Tv .- 500.0) > 0
+        @test _sigma == res.sigma
+    end
+
+    @testset "DPSolveResult metadata and construction" begin
+        for _ddp in ddp0_collection
+            for Algo in (VFI, PFI, MPFI)
+                # explicitly passed options are recorded
+                _res = solve(_ddp, Algo; max_iter=137, epsilon=1e-4, k=17)
+                @test _res.epsilon == 1e-4
+                @test _res.max_iter == 137
+                @test _res.k == 17
+
+                # defaulted options are recorded
+                _res_d = solve(_ddp, Algo)
+                @test _res_d.epsilon == 1e-3
+                @test _res_d.max_iter == 250
+                @test _res_d.k == 20
+
+                # the model is held by reference, not copied
+                @test _res_d.ddp === _ddp
+
+                # the result is immutable and concretely typed
+                @test !ismutable(_res_d)
+                @test isconcretetype(typeof(_res_d))
+
+                # controlled_mc returns the stored chain, type-stably
+                @test controlled_mc(_res_d) === _res_d.mc
+                @test (@inferred controlled_mc(_res_d)) === _res_d.mc
+            end
+        end
     end
 
     @testset "value_iteration" begin
