@@ -132,8 +132,9 @@ export
     DiscreteDP, VFI, PFI, MPFI, solve, RQ_sigma,
     evaluate_policy, bellman_operator, compute_greedy,
     bellman_operator!, num_states, backward_induction,
-    num_sa_pairs, to_sa_pair_form, to_product_form,
+    num_sa_pairs, to_sa_pair_form, to_product_form, markov_chain,
     sigma_values, state_to_index, DDPPolicyFunction, DDPValueFunction,
+    DiscreteDPSolver,
 
 # zeros / optimization
     bisect, brenth, brent, ridder, expand_bracket, divide_bracket,
@@ -184,5 +185,15 @@ include("pivoting.jl")
 include("lcp_lemke.jl")
 include("modeltools/utility.jl")
 include("modeltools/types.jl")
+
+function __init__()
+    Base.Experimental.register_error_hint(MethodError) do io, exc, argtypes, kwargs
+        if exc.f === DiscreteDPSolver
+            print(io, "\nDiscreteDPSolver is provided by the POMDPs.jl " *
+                "integration: load both POMDPs and POMDPTools " *
+                "(`using POMDPs, POMDPTools`) to enable it.")
+        end
+    end
+end
 
 end # module

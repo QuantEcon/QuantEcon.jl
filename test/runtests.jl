@@ -39,6 +39,10 @@ tests = [
         "interp",
         "sampler",
         "util",
+        # must be LAST: loads POMDPs/POMDPTools, which makes bare
+        # `solve`/`simulate` ambiguous for later files and activates
+        # the extension (test_ddp.jl tests the method-less stub)
+        "pomdps",
         ]
 
 
