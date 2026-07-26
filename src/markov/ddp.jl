@@ -130,7 +130,8 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
             R::AbstractArray, Q::TQ, beta::Real, s_indices::Vector,
             a_indices::Vector;
             state_values::AbstractVector=1:size(Q, 2),
-            action_values::AbstractVector=1:maximum(a_indices)
+            action_values::AbstractVector=
+                1:(isempty(a_indices) ? 0 : maximum(a_indices))
         ) where {T,NQ,NR,Tbeta,Tind,TQ}
         # verify input integrity 1
         if NQ != 2
@@ -172,7 +173,7 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
                   "of states"
             throw(ArgumentError(msg))
         end
-        if maximum(a_indices) > length(action_values)
+        if !isempty(a_indices) && maximum(a_indices) > length(action_values)
             msg = "a_indices must not exceed the length of action_values"
             throw(ArgumentError(msg))
         end
@@ -949,6 +950,16 @@ function _state_values_index_map(svals::AbstractVector)
     return IndexMap(svals)
 end
 
+# a caller-supplied index map must index state_values in the same
+# order: a mismatched map would silently permute the decoded solution
+function _check_im_matches(im::IndexMap, svals::AbstractVector)
+    if !(im.vals === svals || isequal(im.vals, svals))
+        throw(ArgumentError("im must index res.ddp.state_values in the " *
+            "same order"))
+    end
+    return nothing
+end
+
 """
     DDPPolicyFunction{TIM,TAV}
 
@@ -983,7 +994,9 @@ Construct the policy function of a solved model.
 
 - `res::DPSolveResult`: Object that contains result variables.
 - `;im::IndexMap`: Index map over `res.ddp.state_values`; pass a shared
-  one to construct several decode functors with a single map.
+  one to construct several decode functors with a single map. Must
+  index `res.ddp.state_values` in the same order (validated at
+  construction).
 
 # Returns
 
@@ -991,9 +1004,12 @@ Construct the policy function of a solved model.
   optimal action value at the state with value `s`.
 
 """
-DDPPolicyFunction(res::DPSolveResult;
-                  im::IndexMap=_state_values_index_map(res.ddp.state_values)) =
-    DDPPolicyFunction(im, res.sigma, res.ddp.action_values)
+function DDPPolicyFunction(res::DPSolveResult;
+                           im::IndexMap=
+                               _state_values_index_map(res.ddp.state_values))
+    _check_im_matches(im, res.ddp.state_values)
+    return DDPPolicyFunction(im, res.sigma, res.ddp.action_values)
+end
 
 (pf::DDPPolicyFunction)(s) = pf.action_values[pf.sigma[pf.im[s]]]
 
@@ -1028,7 +1044,9 @@ Construct the value function of a solved model.
 
 - `res::DPSolveResult`: Object that contains result variables.
 - `;im::IndexMap`: Index map over `res.ddp.state_values`; pass a shared
-  one to construct several decode functors with a single map.
+  one to construct several decode functors with a single map. Must
+  index `res.ddp.state_values` in the same order (validated at
+  construction).
 
 # Returns
 
@@ -1036,9 +1054,12 @@ Construct the value function of a solved model.
   optimal value at the state with value `s`.
 
 """
-DDPValueFunction(res::DPSolveResult;
-                 im::IndexMap=_state_values_index_map(res.ddp.state_values)) =
-    DDPValueFunction(im, res.v)
+function DDPValueFunction(res::DPSolveResult;
+                          im::IndexMap=
+                              _state_values_index_map(res.ddp.state_values))
+    _check_im_matches(im, res.ddp.state_values)
+    return DDPValueFunction(im, res.v)
+end
 
 (vf::DDPValueFunction)(s) = vf.v[vf.im[s]]
 

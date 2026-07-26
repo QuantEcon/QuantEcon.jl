@@ -492,7 +492,7 @@ yields one mutated buffer stores aliases of a single array.
 # Returns
 
 - `im::IndexMap`: Mapping from the values to their indices, satisfying
-  `vals[im[v]] === v`.
+  `isequal(vals[im[v]], v)`.
 
 """
 function IndexMap(vals::AbstractVector)
@@ -513,25 +513,33 @@ end
 
 IndexMap(vals::AbstractUnitRange{<:Integer}) = IndexMap(vals, nothing)
 
+_indexmap_notfound(v) =
+    ArgumentError("value $(repr(v)) is not among the values of this " *
+        "IndexMap (lookups use isequal; query with values obtained " *
+        "from the wrapped vector)")
+
 function Base.getindex(im::IndexMap, v)
     idx = get(im.dict, v, nothing)
-    if idx === nothing
-        throw(ArgumentError("value $(repr(v)) is not among the values of " *
-            "this IndexMap (lookups use isequal; query with values " *
-            "obtained from the wrapped vector)"))
-    end
+    idx === nothing && throw(_indexmap_notfound(v))
     return idx
 end
 
 function Base.getindex(
-        im::IndexMap{<:AbstractUnitRange{<:Integer},Nothing}, v::Number
+        im::IndexMap{<:AbstractUnitRange{<:Integer},Nothing}, v
     )
     r = im.vals
-    if !(isinteger(v) && first(r) <= v <= last(r))
-        throw(ArgumentError("value $(repr(v)) is not among the values of " *
-            "this IndexMap"))
+    # the arithmetic only proposes a candidate position; the isequal
+    # check below is the authority, so that the dict-free specialization
+    # has exactly the lookup semantics of the dict-backed map (e.g.
+    # -0.0 must miss against a stored 0, as isequal distinguishes them)
+    i = try
+        Int(v - first(r)) + 1
+    catch
+        throw(_indexmap_notfound(v))
     end
-    return Int(v) - Int(first(r)) + 1
+    (checkbounds(Bool, r, i) && isequal(r[i], v)) ||
+        throw(_indexmap_notfound(v))
+    return i
 end
 
 Base.length(im::IndexMap) = length(im.vals)

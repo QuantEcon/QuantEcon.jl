@@ -733,6 +733,17 @@ Tests for markov/ddp.jl
             _ddp_sa = DiscreteDP(R_sa, Q_sa, beta, s_indices, a_indices;
                                  action_values=[:a, :b, :c])
             @test _ddp_sa.action_values == [:a, :b, :c]
+
+            # empty SA inputs must reach the informative feasibility
+            # error, not an empty-reduction error from the
+            # action_values default
+            _err = try
+                DiscreteDP(Float64[], zeros(0, 2), beta, Int[], Int[])
+            catch _e
+                _e
+            end
+            @test _err isa ArgumentError
+            @test occursin("at least one action", _err.msg)
         end
 
         @testset "conversion threading and phantom actions" begin
@@ -810,6 +821,28 @@ Tests for markov/ddp.jl
             _pf0 = DDPPolicyFunction(_res0)
             @test _pf0.im.dict === nothing
             @test _pf0(1) == _res0.sigma[1]
+        end
+
+        @testset "caller-supplied im is validated" begin
+            _sv = [(0.0, :lo), (1.0, :hi)]
+            _ddp = DiscreteDP(R, Q, beta; state_values=_sv)
+            _res = solve(_ddp, PFI)
+            _pf = DDPPolicyFunction(_res)
+
+            # sharing between functors (the intended use) works
+            _vf = DDPValueFunction(_res; im=_pf.im)
+            @test _vf(_sv[2]) == _res.v[2]
+
+            # an equal-but-distinct map is accepted (cross-result
+            # sharing over an identical state space)
+            _im2 = IndexMap([(0.0, :lo), (1.0, :hi)])
+            @test DDPPolicyFunction(_res; im=_im2)(_sv[1]) == _pf(_sv[1])
+
+            # a mismatched ordering must fail at construction, not
+            # silently permute the decoded solution
+            _bad = IndexMap(reverse(_sv))
+            @test_throws ArgumentError DDPPolicyFunction(_res; im=_bad)
+            @test_throws ArgumentError DDPValueFunction(_res; im=_bad)
         end
 
         @testset "duplicated values: decoration yes, inversion no" begin

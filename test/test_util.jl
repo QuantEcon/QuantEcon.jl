@@ -171,6 +171,26 @@
             @test im_shift[7] == 3
             @test im_shift.vals[im_shift[7]] == 7
         end
+
+        @testset "unit-range lookup semantics match the dict path" begin
+            im = IndexMap(0:2)
+            @test im[0] == 1
+            @test im[0.0] == 1
+            # isequal(-0.0, 0) is false: both representations must miss
+            @test_throws ArgumentError im[-0.0]
+            @test_throws ArgumentError IndexMap(collect(0:2))[-0.0]
+            # non-numeric misses raise the documented error, not a
+            # MethodError from the absent dict
+            @test_throws ArgumentError im[:missing]
+            @test_throws ArgumentError im[2.5]
+
+            # ranges whose values exceed Int, but whose offsets fit
+            lo = big(typemax(Int)) + 1
+            im_big = IndexMap(lo:(lo + 2))
+            @test im_big[lo] == 1
+            @test im_big[lo + 2] == 3
+            @test_throws ArgumentError im_big[lo - 1]
+        end
     end
 
 end
