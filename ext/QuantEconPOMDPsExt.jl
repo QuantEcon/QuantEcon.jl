@@ -49,11 +49,17 @@ function _action_index(amap::IndexMap, s, a)
 end
 
 """
-    DiscreteDP(m::POMDPs.MDP)
+    DiscreteDP(m::POMDPs.MDP; sparse=Val(true))
 
-Tabulate an explicit-finite POMDPs.jl model into a `DiscreteDP` in
-state-action pair form, with `state_values = vec(collect(states(m)))`
-and `action_values = vec(collect(actions(m)))` attached.
+Tabulate an explicit-finite POMDPs.jl model into a `DiscreteDP`, with
+`state_values = vec(collect(states(m)))` and
+`action_values = vec(collect(actions(m)))` attached. With
+`sparse=Val(true)` (the default) the result is in state-action pair
+form with a sparse transition matrix; with `sparse=Val(false)` it is in
+dense product form, constructed directly (equivalent to
+`to_product_form` of the sparse import, without the intermediate). The
+keyword is value-typed so that the formulation is determined in the
+type domain.
 
 The importer is index-free: it enumerates `states(m)` and `actions(m)`
 and builds its own value-to-index maps, so `stateindex`/`actionindex`
@@ -64,13 +70,21 @@ set at `s`; rewards are the expected `reward(m, s, a, sp)` under
 fallback); states with `isterminal(m, s)` are encoded as zero-reward
 self-loops, so their value is exactly zero.
 """
-function QuantEcon.DiscreteDP(m::POMDPs.MDP)
+function QuantEcon.DiscreteDP(m::POMDPs.MDP;
+                              sparse::Val{S}=Val(true)) where {S}
+    S isa Bool || throw(ArgumentError(
+        "sparse must be Val(true) or Val(false)"))
     svals = vec(collect(POMDPs.states(m)))
     smap = IndexMap(svals)     # also rejects duplicate/aliased states
     avals = vec(collect(POMDPs.actions(m)))
     amap = IndexMap(avals)
     bet = POMDPs.discount(m)
+    return _tabulate(m, svals, smap, avals, amap, bet, sparse)
+end
 
+# state-action pair form, sparse Q
+function _tabulate(m::POMDPs.MDP, svals, smap, avals, amap, bet,
+                   ::Val{true})
     s_indices = Int[]; a_indices = Int[]; R = Float64[]
     QI = Int[]; QJ = Int[]; QV = Float64[]
     L = 0
@@ -105,28 +119,64 @@ function QuantEcon.DiscreteDP(m::POMDPs.MDP)
                       state_values=svals, action_values=avals)
 end
 
+# dense product form, constructed directly: n and m are known upfront,
+# so the final arrays are the only allocations; infeasible pairs keep
+# the -Inf reward and zero transition row of the dense convention
+function _tabulate(m::POMDPs.MDP, svals, smap, avals, amap, bet,
+                   ::Val{false})
+    n = length(svals)
+    R = fill(-Inf, n, length(avals))
+    Q = zeros(n, length(avals), n)
+    for (s_i, s) in enumerate(svals)
+        for a in POMDPs.actions(m, s)
+            a_i = _action_index(amap, s, a)
+            isinf(R[s_i, a_i]) || throw(ArgumentError(
+                "actions(m, s) at state $s yields the duplicate action $a"))
+            if POMDPs.isterminal(m, s)
+                R[s_i, a_i] = 0.0
+                Q[s_i, a_i, s_i] = 1.0
+            else
+                r_sa = 0.0
+                for (sp, w) in weighted_iterator(POMDPs.transition(m, s, a))
+                    w > 0 || continue
+                    Q[s_i, a_i, _next_state_index(smap, s, a, sp)] += w
+                    r_sa += w * POMDPs.reward(m, s, a, sp)
+                end
+                R[s_i, a_i] = r_sa
+            end
+        end
+    end
+    return DiscreteDP(R, Q, bet; state_values=svals, action_values=avals)
+end
+
 # ------ #
 # Solver #
 # ------ #
 
 """
-    DiscreteDPSolver(algo=VFI; max_iter=250, epsilon=1e-3, k=20)
+    DiscreteDPSolver(algo=VFI; sparse=Val(true), max_iter=250,
+                     epsilon=1e-3, k=20)
 
 POMDPs.jl solver based on the `DiscreteDP` solution methods. `algo` is
-one of `VFI`, `PFI`, or `MPFI`; the keyword options are those of
-`solve`. `POMDPs.solve(solver, m)` tabulates `m` via `DiscreteDP(m)`,
-solves it, and returns a `DiscreteDPPolicy`.
+one of `VFI`, `PFI`, or `MPFI`; `sparse` selects the tabulation
+formulation (`Val(true)` for state-action pair form with sparse
+storage, `Val(false)` for dense product form; value-typed, and carried
+as a type parameter of the solver); the remaining keyword options are
+those of `solve`. `POMDPs.solve(solver, m)` tabulates `m` via
+`DiscreteDP(m)`, solves it, and returns a `DiscreteDPPolicy`.
 """
-struct DiscreteDPSolver{Algo<:DDPAlgorithm} <: POMDPs.Solver
+struct DiscreteDPSolver{Algo<:DDPAlgorithm,S} <: POMDPs.Solver
     max_iter::Int
     epsilon::Float64
     k::Int
 end
 
-function DiscreteDPSolver(::Type{Algo}=VFI; max_iter::Integer=250,
-                          epsilon::Real=1e-3,
-                          k::Integer=20) where {Algo<:DDPAlgorithm}
-    return DiscreteDPSolver{Algo}(max_iter, epsilon, k)
+function DiscreteDPSolver(::Type{Algo}=VFI; sparse::Val{S}=Val(true),
+                          max_iter::Integer=250, epsilon::Real=1e-3,
+                          k::Integer=20) where {Algo<:DDPAlgorithm,S}
+    S isa Bool || throw(ArgumentError(
+        "sparse must be Val(true) or Val(false)"))
+    return DiscreteDPSolver{Algo,S}(max_iter, epsilon, k)
 end
 
 # the single method extending the core generic; every other use of the
@@ -159,9 +209,9 @@ struct DiscreteDPPolicy{M<:POMDPs.MDP,TPF<:DDPPolicyFunction,
     res::TR
 end
 
-function POMDPs.solve(solver::DiscreteDPSolver{Algo},
-                      m::POMDPs.MDP) where {Algo}
-    ddp = QuantEcon.DiscreteDP(m)
+function POMDPs.solve(solver::DiscreteDPSolver{Algo,S},
+                      m::POMDPs.MDP) where {Algo,S}
+    ddp = QuantEcon.DiscreteDP(m; sparse=Val(S))
     res = QuantEcon.solve(ddp, Algo; max_iter=solver.max_iter,
                           epsilon=solver.epsilon, k=solver.k)
     im = IndexMap(res.ddp.state_values)

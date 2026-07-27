@@ -65,6 +65,34 @@ using POMDPTools
         @test _res.v[3] == 0.0
     end
 
+    @testset "importer and solver: sparse option" begin
+        _dt = DiscreteDP(TestMDP())                     # default: SA sparse
+        @test issparse(_dt.Q)
+        _dd = DiscreteDP(TestMDP(); sparse=Val(false))  # dense product form
+        @test _dd.Q isa Array{Float64,3}
+        @test size(_dd.R) == (3, 2)
+        @test _dd.R[2, 2] == -Inf                       # infeasible pair
+        # the direct dense construction equals the compositional route
+        _pf = to_product_form(_dt)
+        @test _dd.R == _pf.R
+        @test _dd.Q == _pf.Q
+        _r_s = QuantEcon.solve(_dt, PFI)
+        _r_d = QuantEcon.solve(_dd, PFI)
+        @test _r_d.sigma == _r_s.sigma
+        @test _r_d.v ≈ _r_s.v
+
+        # the flag is a type parameter of the solver and reaches the
+        # tabulation
+        _m = as_mdp(ddp0)
+        _pol_d = POMDPs.solve(DiscreteDPSolver(PFI; sparse=Val(false)), _m)
+        @test _pol_d.res.ddp.Q isa Array{Float64,3}
+        _pol_s = POMDPs.solve(DiscreteDPSolver(PFI), _m)
+        @test issparse(_pol_s.res.ddp.Q)
+        for _s in states(_m)
+            @test action(_pol_d, _s) == action(_pol_s, _s)
+        end
+    end
+
     @testset "importer: cross-validation against SparseTabularMDP" begin
         _m = TestMDP()
         _stm = SparseTabularMDP(_m)
