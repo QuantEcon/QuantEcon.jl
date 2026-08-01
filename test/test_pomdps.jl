@@ -65,6 +65,42 @@ using POMDPTools
         @test _res.v[3] == 0.0
     end
 
+    @testset "importer: terminal state with empty actions(m, s)" begin
+        # natural POMDPs.jl idiom: no feasible action at a terminal
+        # state; the terminal encoding must not depend on actions(m, s)
+        struct EmptyTermMDP <: POMDPs.MDP{Int,Int} end
+        POMDPs.states(::EmptyTermMDP) = 1:2
+        POMDPs.actions(::EmptyTermMDP) = 1:2
+        POMDPs.actions(m::EmptyTermMDP, s::Int) =
+            POMDPs.isterminal(m, s) ? () : (1:2)
+        POMDPs.discount(::EmptyTermMDP) = 0.9
+        POMDPs.isterminal(::EmptyTermMDP, s::Int) = s == 2
+        POMDPs.transition(::EmptyTermMDP, s::Int, a::Int) =
+            a == 1 ? SparseCat([1, 2], [0.6, 0.4]) : Deterministic(2)
+        POMDPs.reward(::EmptyTermMDP, s::Int, a::Int, sp::Int) = 1.0
+
+        # sparse: self-loop pairs for every global action
+        _dt = DiscreteDP(EmptyTermMDP())
+        @test _dt.s_indices == [1, 1, 2, 2]
+        @test _dt.a_indices == [1, 2, 1, 2]
+        @test _dt.R[3] == _dt.R[4] == 0.0
+        @test Matrix(_dt.Q)[3, :] == [0.0, 1.0]
+        @test Matrix(_dt.Q)[4, :] == [0.0, 1.0]
+
+        # dense: full zero-reward row with self-loops
+        _dd = DiscreteDP(EmptyTermMDP(); sparse=Val(false))
+        @test _dd.R[2, :] == [0.0, 0.0]
+        @test _dd.Q[2, 1, :] == [0.0, 1.0]
+        @test _dd.Q[2, 2, :] == [0.0, 1.0]
+
+        # both forms solve, agree, and give the terminal state value 0
+        _r_s = QuantEcon.solve(_dt, PFI)
+        _r_d = QuantEcon.solve(_dd, PFI)
+        @test _r_s.v[2] == 0.0
+        @test _r_d.sigma == _r_s.sigma
+        @test _r_d.v ≈ _r_s.v
+    end
+
     @testset "importer and solver: sparse option" begin
         _dt = DiscreteDP(TestMDP())                     # default: SA sparse
         @test issparse(_dt.Q)

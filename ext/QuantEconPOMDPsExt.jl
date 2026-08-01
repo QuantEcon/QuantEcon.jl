@@ -68,7 +68,15 @@ unique, value-hashable objects; `actions(m, s)` defines the feasible
 set at `s`; rewards are the expected `reward(m, s, a, sp)` under
 `transition(m, s, a)` (3-argument models are covered by the POMDPs.jl
 fallback); states with `isterminal(m, s)` are encoded as zero-reward
-self-loops, so their value is exactly zero.
+self-loops under every action in `actions(m)`, so their value is
+exactly zero (`actions(m, s)` is not consulted at terminal states, so
+it may be empty there).
+
+Rewards and transition probabilities are normalized to `Float64`,
+whatever the model's numerical element types. Transition weights are
+taken from `transition(m, s, a)` as-is, with only exactly-zero branches
+dropped: their validity (nonnegativity, summing to one) is the model's
+responsibility, as it is the caller's in the native constructors.
 """
 function QuantEcon.DiscreteDP(m::POMDPs.MDP;
                               sparse::Val{S}=Val(true)) where {S}
@@ -90,11 +98,13 @@ function _tabulate(m::POMDPs.MDP, svals, smap, avals, amap, bet,
     L = 0
     for (s_i, s) in enumerate(svals)
         if POMDPs.isterminal(m, s)
-            # zero-reward self-loop for every feasible action
-            for a in POMDPs.actions(m, s)
+            # zero-reward self-loop under every global action;
+            # actions(m, s) is not consulted (it may be empty at a
+            # terminal state)
+            for a_i in eachindex(avals)
                 L += 1
                 push!(s_indices, s_i)
-                push!(a_indices, _action_index(amap, s, a))
+                push!(a_indices, a_i)
                 push!(R, 0.0)
                 push!(QI, L); push!(QJ, s_i); push!(QV, 1.0)
             end
@@ -105,7 +115,7 @@ function _tabulate(m::POMDPs.MDP, svals, smap, avals, amap, bet,
                 push!(a_indices, _action_index(amap, s, a))
                 r_sa = 0.0
                 for (sp, w) in weighted_iterator(POMDPs.transition(m, s, a))
-                    w > 0 || continue
+                    iszero(w) && continue
                     sp_i = _next_state_index(smap, s, a, sp)
                     push!(QI, L); push!(QJ, sp_i); push!(QV, w)
                     r_sa += w * POMDPs.reward(m, s, a, sp)
@@ -128,17 +138,20 @@ function _tabulate(m::POMDPs.MDP, svals, smap, avals, amap, bet,
     R = fill(-Inf, n, length(avals))
     Q = zeros(n, length(avals), n)
     for (s_i, s) in enumerate(svals)
-        for a in POMDPs.actions(m, s)
-            a_i = _action_index(amap, s, a)
-            isinf(R[s_i, a_i]) || throw(ArgumentError(
-                "actions(m, s) at state $s yields the duplicate action $a"))
-            if POMDPs.isterminal(m, s)
-                R[s_i, a_i] = 0.0
-                Q[s_i, a_i, s_i] = 1.0
-            else
+        if POMDPs.isterminal(m, s)
+            # zero-reward self-loop under every global action;
+            # actions(m, s) is not consulted (it may be empty at a
+            # terminal state)
+            R[s_i, :] .= 0.0
+            Q[s_i, :, s_i] .= 1.0
+        else
+            for a in POMDPs.actions(m, s)
+                a_i = _action_index(amap, s, a)
+                isinf(R[s_i, a_i]) || throw(ArgumentError(
+                    "actions(m, s) at state $s yields the duplicate action $a"))
                 r_sa = 0.0
                 for (sp, w) in weighted_iterator(POMDPs.transition(m, s, a))
-                    w > 0 || continue
+                    iszero(w) && continue
                     Q[s_i, a_i, _next_state_index(smap, s, a, sp)] += w
                     r_sa += w * POMDPs.reward(m, s, a, sp)
                 end
