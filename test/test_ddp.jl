@@ -151,11 +151,45 @@ Tests for markov/ddp.jl
         end
     end
 
-    @testset "compute_greedy! changes ddpr.v" begin
+    @testset "bellman_operator! overwrites the Tv buffer" begin
         res = solve(ddp0, VFI)
-        res.Tv[:] .= 500.0
-        compute_greedy!(ddp0, res)
-        @test maximum(abs, res.Tv .- 500.0) > 0
+        _Tv = fill(500.0, length(res.v))
+        _sigma = similar(res.sigma)
+        bellman_operator!(ddp0, res.v, _Tv, _sigma)
+        @test maximum(abs, _Tv .- 500.0) > 0
+        @test _sigma == res.sigma
+    end
+
+    @testset "DPSolveResult metadata and construction" begin
+        # local helper: @inferred needs a function call to check that
+        # field access on the result infers concretely
+        _get_mc(r) = r.mc
+
+        for _ddp in ddp0_collection
+            for Algo in (VFI, PFI, MPFI)
+                # explicitly passed options are recorded
+                _res = solve(_ddp, Algo; max_iter=137, epsilon=1e-4, k=17)
+                @test _res.epsilon == 1e-4
+                @test _res.max_iter == 137
+                @test _res.k == 17
+
+                # defaulted options are recorded
+                _res_d = solve(_ddp, Algo)
+                @test _res_d.epsilon == 1e-3
+                @test _res_d.max_iter == 250
+                @test _res_d.k == 20
+
+                # the model is held by reference, not copied
+                @test _res_d.ddp === _ddp
+
+                # the result is immutable and concretely typed
+                @test !ismutable(_res_d)
+                @test isconcretetype(typeof(_res_d))
+
+                # the mc field is concretely typed: access infers
+                @test (@inferred _get_mc(_res_d)) === _res_d.mc
+            end
+        end
     end
 
     @testset "value_iteration" begin
@@ -623,6 +657,23 @@ Tests for markov/ddp.jl
             @test isnan(QuantEcon._max_abs_diff([1.0, NaN], [0.0, 0.0]))
             @test isnan(QuantEcon._max_abs_diff([NaN, 1.0], [0.0, 0.0]))
             @test QuantEcon._max_abs_diff([1.0, 3.0], [0.0, 0.0]) == 3.0
+        end
+
+        @testset "PFI argmax with mixed precision" begin
+            # the state-action value buffer of the PFI greedy step must
+            # use the promoted element type, not eltype(v): with Float32
+            # rewards and a Float64 beta, the two actions at state 1 are
+            # near-tied (~1e-11 apart at ~10), distinguishable in Float64
+            # but rounded to equality in Float32, where the first-action
+            # tie-break would flip the policy to [1, 1]
+            _R_mp = Float32[1.0 -8.0; 2.0 2.0]
+            _Q_mp = zeros(Float32, 2, 2, 2)
+            _Q_mp[1, 1, 1] = 1.0
+            _Q_mp[1, 2, 2] = 1.0
+            _Q_mp[2, 1, 2] = 1.0
+            _Q_mp[2, 2, 2] = 1.0
+            _ddp_mp = DiscreteDP(_R_mp, _Q_mp, 0.900000000001)
+            @test solve(_ddp_mp, PFI).sigma == [2, 1]
         end
 
         @testset "s_wise_max! argmax with mixed precision" begin
