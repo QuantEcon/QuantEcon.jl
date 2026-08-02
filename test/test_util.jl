@@ -132,4 +132,81 @@
 
     end
 
+    @testset "IndexMap" begin
+        @testset "vector of tuples" begin
+            vals = [(0.0, 0.1), (1.0, 0.1), (0.0, 1.0), (1.0, 1.0)]
+            im = IndexMap(vals)
+            @test length(im) == 4
+            for (i, v) in enumerate(vals)
+                @test (@inferred im[v]) == i
+                @test vals[im[v]] === v
+            end
+            @test_throws ArgumentError im[(2.0, 0.1)]
+        end
+
+        @testset "isequal semantics" begin
+            im = IndexMap([1, 2, 3])
+            @test im[2.0] == 2  # isequal(2.0, 2)
+            @test_throws ArgumentError im[2.5]
+        end
+
+        @testset "uniqueness required" begin
+            @test_throws ArgumentError IndexMap([:a, :b, :a])
+            # buffer-reuse trap: n aliases of one array collapse the map
+            buf = [0.0]
+            aliased = [buf, buf]
+            @test_throws ArgumentError IndexMap(aliased)
+        end
+
+        @testset "unit-range specialization" begin
+            im = IndexMap(1:5)
+            @test im.dict === nothing
+            @test (@inferred im[3]) == 3
+            @test_throws ArgumentError im[0]
+            @test_throws ArgumentError im[6]
+            @test_throws ArgumentError im[2.5]
+            @test im[2.0] == 2
+
+            im_shift = IndexMap(5:9)
+            @test im_shift[7] == 3
+            @test im_shift.vals[im_shift[7]] == 7
+        end
+
+        @testset "unit-range lookup semantics match the dict path" begin
+            im = IndexMap(0:2)
+            @test im[0] == 1
+            @test im[0.0] == 1
+            # isequal(-0.0, 0) is false: both representations must miss
+            @test_throws ArgumentError im[-0.0]
+            @test_throws ArgumentError IndexMap(collect(0:2))[-0.0]
+            # non-numeric misses raise the documented error, not a
+            # MethodError from the absent dict
+            @test_throws ArgumentError im[:missing]
+            @test_throws ArgumentError im[2.5]
+
+            # ranges whose values exceed Int, but whose offsets fit
+            lo = big(typemax(Int)) + 1
+            im_big = IndexMap(lo:(lo + 2))
+            @test im_big[lo] == 1
+            @test im_big[lo + 2] == 3
+            @test_throws ArgumentError im_big[lo - 1]
+        end
+
+        @testset "unit-range offset does not overflow narrow eltypes" begin
+            # the offset must not be computed in the range eltype: the
+            # Int8 offset 255 wraps in Int8 arithmetic
+            im8 = IndexMap(typemin(Int8):typemax(Int8))
+            @test im8[typemin(Int8)] == 1
+            @test im8[typemax(Int8)] == 256
+
+            imu = IndexMap(UInt8(250):UInt8(255))
+            @test imu[UInt8(255)] == 6
+            @test_throws ArgumentError imu[UInt8(3)]
+
+            imb = IndexMap(false:true)
+            @test imb[true] == 2
+            @test_throws ArgumentError imb[2]
+        end
+    end
+
 end

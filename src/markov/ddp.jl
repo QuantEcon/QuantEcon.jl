@@ -43,18 +43,34 @@ DiscreteDP type for specifying parameters for discrete dynamic programming model
   formulation.
 - `a_indices::Vector{Tind}`: Action indices. Empty unless using SA formulation.
 - `a_indptr::Vector{Tind}`: Action index pointers. Empty unless using SA formulation.
+- `state_values::TSV`: Values associated with the states, of length `n`.
+  Pure decoration for decoding results; the solution methods never read
+  it. Held by reference.
+- `action_values::TAV`: Values associated with the actions. Its length
+  defines the number of actions `m`; for the state-action pair
+  formulation, actions not referenced by `a_indices` are allowed
+  (feasible nowhere). Held by reference. Values are labels, not
+  identifiers: repeated labels are legal and mean shared display names
+  (actions) or observable-level annotation (states); uniqueness is
+  demanded only by operations that invert (see `IndexMap`,
+  `state_to_index`, `DDPPolicyFunction`).
 
 """
-mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}}
+mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ},
+                          TSV<:AbstractVector,TAV<:AbstractVector}
     R::Array{T,NR}                     # Reward Array
     Q::TQ                     # Transition Probability Array
     beta::Tbeta                        # Discount Factor
     s_indices::Vector{Tind}  # State Indices
     a_indices::Vector{Tind}  # Action Indices
     a_indptr::Vector{Tind}   # Action Index Pointers
+    state_values::TSV        # State Values
+    action_values::TAV       # Action Values
 
     function DiscreteDP{T,NQ,NR,Tbeta,Tind,TQ}(
-            R::Array, Q::TQ, beta::Real
+            R::Array, Q::TQ, beta::Real;
+            state_values::AbstractVector=1:size(R, 1),
+            action_values::AbstractVector=1:size(R, 2)
         ) where {T,NQ,NR,Tbeta,Tind,TQ}
         # verify input integrity 1
         if NQ != 3
@@ -76,6 +92,18 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
             throw(ArgumentError("shapes of R and Q must be (n,m) and (n,m,n)"))
         end
 
+        # verify state/action values
+        if length(state_values) != num_states
+            msg = "length of state_values must be equal to the number " *
+                  "of states"
+            throw(ArgumentError(msg))
+        end
+        if length(action_values) != num_actions
+            msg = "length of action_values must be equal to the number " *
+                  "of actions"
+            throw(ArgumentError(msg))
+        end
+
         # check feasibility
         R_max = s_wise_max(R)
         if any(R_max .== -Inf)
@@ -90,8 +118,9 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
         _a_indices = Vector{Int}()
         a_indptr = Vector{Int}()
 
-        new{T,NQ,NR,Tbeta,Tind,typeof(Q)}(R, Q, beta, _s_indices, _a_indices,
-                                          a_indptr)
+        new{T,NQ,NR,Tbeta,Tind,typeof(Q),typeof(state_values),
+            typeof(action_values)}(R, Q, beta, _s_indices, _a_indices,
+                                   a_indptr, state_values, action_values)
     end
 
     # Note: We left R, Q as type Array to produce more helpful error message with regards to shape.
@@ -99,7 +128,10 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
 
     function DiscreteDP{T,NQ,NR,Tbeta,Tind,TQ}(
             R::AbstractArray, Q::TQ, beta::Real, s_indices::Vector,
-            a_indices::Vector
+            a_indices::Vector;
+            state_values::AbstractVector=1:size(Q, 2),
+            action_values::AbstractVector=
+                1:(isempty(a_indices) ? 0 : maximum(a_indices))
         ) where {T,NQ,NR,Tbeta,Tind,TQ}
         # verify input integrity 1
         if NQ != 2
@@ -133,6 +165,17 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
         end
         if any(a -> a < 1, a_indices)
             throw(ArgumentError("a_indices must be positive"))
+        end
+
+        # verify state/action values
+        if length(state_values) != num_states
+            msg = "length of state_values must be equal to the number " *
+                  "of states"
+            throw(ArgumentError(msg))
+        end
+        if !isempty(a_indices) && maximum(a_indices) > length(action_values)
+            msg = "a_indices must not exceed the length of action_values"
+            throw(ArgumentError(msg))
         end
 
         if _has_sorted_sa_indices(s_indices, a_indices)
@@ -186,13 +229,15 @@ mutable struct DiscreteDP{T<:Real,NQ,NR,Tbeta<:Real,Tind,TQ<:AbstractArray{T,NQ}
             Q = transpose(sparse(transpose(Q)))
         end
 
-        new{T,NQ,NR,Tbeta,Tind,typeof(Q)}(R, Q, beta, _s_indices, _a_indices,
-                                          a_indptr)
+        new{T,NQ,NR,Tbeta,Tind,typeof(Q),typeof(state_values),
+            typeof(action_values)}(R, Q, beta, _s_indices, _a_indices,
+                                   a_indptr, state_values, action_values)
     end
 end
 
 """
-    DiscreteDP(R, Q, beta)
+    DiscreteDP(R, Q, beta; state_values=1:size(R, 1),
+               action_values=1:size(R, 2))
 
 DiscreteDP constructor for specifying parameters for discrete dynamic programming
 model using dense matrix formulation.
@@ -202,6 +247,10 @@ model using dense matrix formulation.
 - `R::Array{T,NR}`: Reward array.
 - `Q::AbstractArray{T,NQ}`: Transition probability array.
 - `beta::Real`: Discount factor.
+- `;state_values::AbstractVector(1:size(R, 1))`: Values associated with
+  the states, of length `n`.
+- `;action_values::AbstractVector(1:size(R, 2))`: Values associated with
+  the actions, of length `m`.
 
 # Returns
 
@@ -209,12 +258,15 @@ model using dense matrix formulation.
 
 """
 function DiscreteDP(
-    R::Array{T,NR}, Q::AbstractArray{T,NQ}, beta::Tbeta) where {T,NQ,NR,Tbeta}
-    DiscreteDP{T,NQ,NR,Tbeta,Int,typeof(Q)}(R, Q, beta)
+    R::Array{T,NR}, Q::AbstractArray{T,NQ}, beta::Tbeta;
+    kwargs...) where {T,NQ,NR,Tbeta}
+    DiscreteDP{T,NQ,NR,Tbeta,Int,typeof(Q)}(R, Q, beta; kwargs...)
 end
 
 """
-    DiscreteDP(R, Q, beta, s_indices, a_indices)
+    DiscreteDP(R, Q, beta, s_indices, a_indices;
+               state_values=1:size(Q, 2),
+               action_values=1:maximum(a_indices))
 
 DiscreteDP constructor for specifying parameters for discrete dynamic programming
 model using state-action pair formulation.
@@ -226,6 +278,11 @@ model using state-action pair formulation.
 - `beta::Real`: Discount factor.
 - `s_indices::Vector{Tind}`: State indices.
 - `a_indices::Vector{Tind}`: Action indices.
+- `;state_values::AbstractVector(1:size(Q, 2))`: Values associated with
+  the states, of length `n`.
+- `;action_values::AbstractVector(1:maximum(a_indices))`: Values
+  associated with the actions; its length defines the number of actions,
+  and may exceed `maximum(a_indices)` (actions feasible nowhere).
 
 # Returns
 
@@ -235,8 +292,10 @@ model using state-action pair formulation.
 function DiscreteDP(R::AbstractArray{T,NR},
                     Q::AbstractArray{T,NQ},
                     beta::Tbeta, s_indices::Vector{Tind},
-                    a_indices::Vector{Tind}) where {T,NQ,NR,Tbeta,Tind}
-    DiscreteDP{T,NQ,NR,Tbeta,Tind,typeof(Q)}(R, Q, beta, s_indices, a_indices)
+                    a_indices::Vector{Tind};
+                    kwargs...) where {T,NQ,NR,Tbeta,Tind}
+    DiscreteDP{T,NQ,NR,Tbeta,Tind,typeof(Q)}(R, Q, beta, s_indices, a_indices;
+                                             kwargs...)
 end
 
 #--------------#
@@ -316,7 +375,9 @@ function to_sa_pair_form(ddp::DDP{T}; sparse::Bool=true) where T
         end
     end
     Q_out = sparse ? SparseArrays.sparse(Q) : Q
-    return DiscreteDP(R, Q_out, ddp.beta, s_indices, a_indices)
+    return DiscreteDP(R, Q_out, ddp.beta, s_indices, a_indices;
+                      state_values=ddp.state_values,
+                      action_values=ddp.action_values)
 end
 
 to_sa_pair_form(ddp::DDPsa; sparse::Bool=true) = ddp
@@ -326,7 +387,8 @@ to_sa_pair_form(ddp::DDPsa; sparse::Bool=true) = ddp
 
 Convert `ddp` to the equivalent `DiscreteDP` in product form, with a
 reward array of shape `(n, m)` and a transition probability array of
-shape `(n, m, n)`, where `m` is the largest action index. Infeasible
+shape `(n, m, n)`, where `m = length(ddp.action_values)` (with the
+default `action_values`, the largest action index). Infeasible
 pairs are assigned a reward of `-Inf` and a zero vector of transition
 probabilities; when such pairs exist, the reward element type must be
 able to represent `-Inf` (a floating point type, or a `Rational`, for
@@ -344,7 +406,7 @@ returned unmodified.
 """
 function to_product_form(ddp::DDPsa{T}) where T
     n = num_states(ddp)
-    m = maximum(ddp.a_indices)
+    m = length(ddp.action_values)
     L = num_sa_pairs(ddp)
     R = Matrix{T}(undef, n, m)
     if L < n * m
@@ -366,7 +428,8 @@ function to_product_form(ddp::DDPsa{T}) where T
     end
     Q = zeros(T, n, m, n)
     _fill_product_Q!(Q, ddp.s_indices, ddp.a_indices, ddp.Q)
-    return DiscreteDP(R, Q, ddp.beta)
+    return DiscreteDP(R, Q, ddp.beta; state_values=ddp.state_values,
+                      action_values=ddp.action_values)
 end
 
 to_product_form(ddp::DDP) = ddp
@@ -791,7 +854,9 @@ end
 """
     MarkovChain(ddp, sigma)
 
-Returns the controlled Markov chain for a given policy `sigma`.
+Returns the controlled Markov chain for a given policy `sigma`. The
+chain carries `ddp.state_values` (by reference), so that simulated paths
+decode themselves.
 
 # Arguments
 
@@ -804,7 +869,199 @@ Returns the controlled Markov chain for a given policy `sigma`.
 
 """
 QuantEcon.MarkovChain(ddp::DiscreteDP, sigma::AbstractVector{<:Integer}) =
-    MarkovChain(RQ_sigma(ddp, sigma)[2])
+    MarkovChain(RQ_sigma(ddp, sigma)[2], ddp.state_values)
+
+"""
+    sigma_values(res)
+
+Return the optimal policy decoded to action values,
+`res.ddp.action_values[res.sigma]`; the entries pair with
+`res.ddp.state_values`.
+
+# Arguments
+
+- `res::DPSolveResult`: Object that contains result variables.
+
+# Returns
+
+- `table::AbstractVector`: Action value of the optimal policy at each
+  state, of length `n`.
+
+"""
+sigma_values(res::DPSolveResult) = res.ddp.action_values[res.sigma]
+
+"""
+    state_to_index(ddp, s)
+
+Return the index of the state with value `s`, compared by `isequal`.
+Intended for casual one-off lookups: each call scans `state_values`; for
+repeated lookups construct an `IndexMap` over `ddp.state_values` once
+and query that instead.
+
+Throws an `ArgumentError` if `s` is not among the state values, or if it
+appears more than once (the lookup is then ambiguous; repeated state
+values are legal as observable-level annotation, but cannot be
+inverted).
+
+# Arguments
+
+- `ddp::DiscreteDP`: Object that contains the model parameters.
+- `s`: State value to look up.
+
+# Returns
+
+- `i::Int`: Index of the state with value `s`.
+
+"""
+function state_to_index(ddp::DiscreteDP, s)
+    svals = ddp.state_values
+    i = findfirst(isequal(s), svals)
+    if i === nothing
+        throw(ArgumentError("state value $(repr(s)) is not in " *
+            "state_values (lookups use isequal; query with values " *
+            "obtained from the object)"))
+    end
+    if findnext(isequal(s), svals, i + 1) !== nothing
+        throw(ArgumentError("state value $(repr(s)) appears more than " *
+            "once in state_values: the index lookup is ambiguous"))
+    end
+    return i
+end
+
+# state_values -> index map for the decode functors, pre-validated with
+# a domain-specific error message (identity ranges are unique by
+# construction and skip the check)
+_state_values_index_map(svals::AbstractUnitRange{<:Integer}) = IndexMap(svals)
+
+function _state_values_index_map(svals::AbstractVector)
+    counts = Dict{eltype(svals),Int}()
+    for v in svals
+        counts[v] = get(counts, v, 0) + 1
+    end
+    if length(counts) != length(svals)
+        dups = join((string(repr(v), " (x", c, ")")
+                     for (v, c) in counts if c > 1), ", ")
+        throw(ArgumentError("state_values contains repeated values: " *
+            dups * "; a total map from state values cannot be " *
+            "constructed. Repeated values remain usable for forward " *
+            "decoding (sigma_values, simulation of res.mc) and for " *
+            "unambiguous queries (state_to_index)."))
+    end
+    return IndexMap(svals)
+end
+
+# a caller-supplied index map must index state_values in the same
+# order: a mismatched map would silently permute the decoded solution
+function _check_im_matches(im::IndexMap, svals::AbstractVector)
+    if !(im.vals === svals || isequal(im.vals, svals))
+        throw(ArgumentError("im must index res.ddp.state_values in the " *
+            "same order"))
+    end
+    return nothing
+end
+
+"""
+    DDPPolicyFunction{TIM,TAV}
+
+Callable policy function of a solved model: `pf(s)` returns the optimal
+action value at the state with value `s`, compared by `isequal` (query
+with values obtained from the model). Holds references to `res.sigma`
+and `res.ddp.action_values`; construct it after the solve is final.
+Read-only after construction.
+
+Construction requires `state_values` to be unique
+(see `state_to_index` for the granularity rule).
+
+# Fields
+
+- `im::TIM`: `IndexMap` over the state values.
+- `sigma::Vector{Int}`: Optimal policy, by state index.
+- `action_values::TAV`: Values associated with the actions.
+
+"""
+struct DDPPolicyFunction{TIM<:IndexMap,TAV<:AbstractVector}
+    im::TIM
+    sigma::Vector{Int}
+    action_values::TAV
+end
+
+"""
+    DDPPolicyFunction(res; im=IndexMap(res.ddp.state_values))
+
+Construct the policy function of a solved model.
+
+# Arguments
+
+- `res::DPSolveResult`: Object that contains result variables.
+- `;im::IndexMap`: Index map over `res.ddp.state_values`; pass a shared
+  one to construct several decode functors with a single map. Must
+  index `res.ddp.state_values` in the same order (validated at
+  construction).
+
+# Returns
+
+- `pf::DDPPolicyFunction`: Callable policy function; `pf(s)` returns the
+  optimal action value at the state with value `s`.
+
+"""
+function DDPPolicyFunction(res::DPSolveResult;
+                           im::IndexMap=
+                               _state_values_index_map(res.ddp.state_values))
+    _check_im_matches(im, res.ddp.state_values)
+    return DDPPolicyFunction(im, res.sigma, res.ddp.action_values)
+end
+
+(pf::DDPPolicyFunction)(s) = pf.action_values[pf.sigma[pf.im[s]]]
+
+"""
+    DDPValueFunction{TIM,Tval}
+
+Callable value function of a solved model: `vf(s)` returns the optimal
+value at the state with value `s`, compared by `isequal` (query with
+values obtained from the model). Holds a reference to `res.v`; construct
+it after the solve is final. Read-only after construction.
+
+Construction requires `state_values` to be unique
+(see `state_to_index` for the granularity rule).
+
+# Fields
+
+- `im::TIM`: `IndexMap` over the state values.
+- `v::Vector{Tval}`: Optimal value function, by state index.
+
+"""
+struct DDPValueFunction{TIM<:IndexMap,Tval}
+    im::TIM
+    v::Vector{Tval}
+end
+
+"""
+    DDPValueFunction(res; im=IndexMap(res.ddp.state_values))
+
+Construct the value function of a solved model.
+
+# Arguments
+
+- `res::DPSolveResult`: Object that contains result variables.
+- `;im::IndexMap`: Index map over `res.ddp.state_values`; pass a shared
+  one to construct several decode functors with a single map. Must
+  index `res.ddp.state_values` in the same order (validated at
+  construction).
+
+# Returns
+
+- `vf::DDPValueFunction`: Callable value function; `vf(s)` returns the
+  optimal value at the state with value `s`.
+
+"""
+function DDPValueFunction(res::DPSolveResult;
+                          im::IndexMap=
+                              _state_values_index_map(res.ddp.state_values))
+    _check_im_matches(im, res.ddp.state_values)
+    return DDPValueFunction(im, res.v)
+end
+
+(vf::DDPValueFunction)(s) = vf.v[vf.im[s]]
 
 """
     RQ_sigma(ddp, sigma)
