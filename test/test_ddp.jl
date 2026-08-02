@@ -659,13 +659,14 @@ Tests for markov/ddp.jl
             @test QuantEcon._max_abs_diff([1.0, 3.0], [0.0, 0.0]) == 3.0
         end
 
-        @testset "PFI argmax with mixed precision" begin
-            # the state-action value buffer of the PFI greedy step must
+        @testset "solver argmax with mixed precision" begin
+            # the state-action value buffers of the solver loops must
             # use the promoted element type, not eltype(v): with Float32
             # rewards and a Float64 beta, the two actions at state 1 are
             # near-tied (~1e-11 apart at ~10), distinguishable in Float64
             # but rounded to equality in Float32, where the first-action
-            # tie-break would flip the policy to [1, 1]
+            # tie-break would flip the policy to [1, 1] (issue #403; the
+            # PFI case is the #401 regression)
             _R_mp = Float32[1.0 -8.0; 2.0 2.0]
             _Q_mp = zeros(Float32, 2, 2, 2)
             _Q_mp[1, 1, 1] = 1.0
@@ -674,6 +675,10 @@ Tests for markov/ddp.jl
             _Q_mp[2, 2, 2] = 1.0
             _ddp_mp = DiscreteDP(_R_mp, _Q_mp, 0.900000000001)
             @test solve(_ddp_mp, PFI).sigma == [2, 1]
+            @test solve(_ddp_mp, VFI;
+                        max_iter=100_000, epsilon=1e-10).sigma == [2, 1]
+            @test solve(_ddp_mp, MPFI;
+                        max_iter=100_000, epsilon=1e-10).sigma == [2, 1]
         end
 
         @testset "s_wise_max! argmax with mixed precision" begin
