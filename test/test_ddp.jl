@@ -674,11 +674,27 @@ Tests for markov/ddp.jl
             _Q_mp[2, 1, 2] = 1.0
             _Q_mp[2, 2, 2] = 1.0
             _ddp_mp = DiscreteDP(_R_mp, _Q_mp, 0.900000000001)
-            @test solve(_ddp_mp, PFI).sigma == [2, 1]
-            @test solve(_ddp_mp, VFI;
-                        max_iter=100_000, epsilon=1e-10).sigma == [2, 1]
-            @test solve(_ddp_mp, MPFI;
-                        max_iter=100_000, epsilon=1e-10).sigma == [2, 1]
+            for _Algo in (PFI, VFI, MPFI)
+                _res_mp = solve(_ddp_mp, _Algo;
+                                max_iter=100_000, epsilon=1e-10)
+                @test _res_mp.sigma == [2, 1]
+                # the result carries the promoted value type
+                @test eltype(_res_mp.v) === Float64
+                @test eltype(_res_mp.Tv) === Float64
+            end
+
+            # finite horizon: the value array must be promoted likewise,
+            # or the intermediate value functions are rounded to Float32
+            # between periods and stall short of the same near-tie
+            _vs_mp, _sigmas_mp = backward_induction(_ddp_mp, 241)
+            @test eltype(_vs_mp) === Float64
+            @test _sigmas_mp[:, 1] == [2, 1]
+
+            # homogeneous models keep their element type: no silent
+            # widening when beta matches the data
+            _ddp_32 = DiscreteDP(_R_mp, _Q_mp, 0.9f0)
+            @test eltype(solve(_ddp_32, PFI).v) === Float32
+            @test eltype(backward_induction(_ddp_32, 3)[1]) === Float32
         end
 
         @testset "s_wise_max! argmax with mixed precision" begin

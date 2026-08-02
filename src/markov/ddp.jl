@@ -514,6 +514,11 @@ Object for retaining results and associated metadata after solving the model.
 Returned by `solve`; immutable and constructed complete (the contents of the
 array fields may still be mutated).
 
+The value element type `Tval` is the promoted Bellman value type
+`promote_type(eltype(ddp.R), eltype(v_init), typeof(ddp.beta))`, in which the
+solution methods run: for mixed-precision models (e.g. `Float32` rewards with
+a `Float64` `beta`) it is wider than the reward element type.
+
 # Fields
 
 - `ddp::DiscreteDP`: The model solved. Held by reference, not copied: if the
@@ -804,7 +809,7 @@ function _default_v_init(ddp::DiscreteDP, ::Type{MPFI})
 end
 
 """
-    backward_induction(ddp, J[, v_term=zeros(num_states(ddp))])
+    backward_induction(ddp, J[, v_term=zeros(T, num_states(ddp))])
 
 Solve by backward induction a ``J``-period finite horizon discrete dynamic 
 program with stationary reward ``r`` and transition probability functions ``q``
@@ -826,14 +831,20 @@ and
             \\quad (s \\in S)
 ```
 
-for ``j= J, \\ldots, 1``, where the terminal value function ``v_{J+1}`` is 
+for ``j= J, \\ldots, 1``, where the terminal value function ``v_{J+1}`` is
 exogenously given by `v_term`.
+
+The value functions are computed and stored in the promoted element type
+of ``r + \\beta (q v)``, also incorporating `eltype(v_term)`, so that the
+intermediate value functions of mixed-precision models (e.g. `Float32`
+rewards with a `Float64` discount factor) are not rounded between
+periods.
 
 # Arguments
 
 - `ddp::DiscreteDP{T}`: Object that contains the model parameters.
 - `J::Integer`: Number of decision periods.
-- `v_term::AbstractVector{<:Real}=zeros(num_states(ddp))`: Terminal value 
+- `v_term::AbstractVector{<:Real}=zeros(T, num_states(ddp))`: Terminal value
   function of length equal to n (the number of states).
 
 # Returns
@@ -846,9 +857,9 @@ exogenously given by `v_term`.
 """
 function backward_induction(ddp::DiscreteDP{T}, J::Integer,
                             v_term::AbstractVector{<:Real}=
-                            zeros(num_states(ddp))) where {T}
+                            zeros(T, num_states(ddp))) where {T}
     n = num_states(ddp)
-    S = typeof(zero(T)/one(T))
+    S = promote_type(typeof(zero(T)/one(T)), _bellman_eltype(ddp, v_term))
     vs = Matrix{S}(undef, n, J+1)
     vs[:,end] = v_term
     sigmas = Matrix{Int}(undef, n, J)
