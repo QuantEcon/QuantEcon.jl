@@ -514,6 +514,11 @@ Object for retaining results and associated metadata after solving the model.
 Returned by `solve`; immutable and constructed complete (the contents of the
 array fields may still be mutated).
 
+The value element type `Tval` is the promoted Bellman value type
+`promote_type(eltype(ddp.R), eltype(v_init), typeof(ddp.beta))`, in which the
+solution methods run: for mixed-precision models (e.g. `Float32` rewards with
+a `Float64` `beta`) it is wider than the reward element type.
+
 # Fields
 
 - `ddp::DiscreteDP`: The model solved. Held by reference, not copied: if the
@@ -586,10 +591,19 @@ function bellman_operator!(
         ddp::DiscreteDP, v::AbstractVector, Tv::AbstractVector,
         sigma::AbstractVector
     )
-    vals = similar(ddp.R, promote_type(eltype(ddp.R), eltype(v),
-                                       typeof(ddp.beta)))
+    vals = similar(ddp.R, _bellman_eltype(ddp, v))
     bellman_operator!(ddp, v, Tv, sigma, vals)
 end
+
+# Element type of the Bellman values R + beta * (Q v) under promotion.
+# Both the value iterates and the state-action value buffers must use
+# this type, not eltype(v) or eltype(R) alone: with mixed-precision
+# models (e.g. Float32 rewards with a Float64 beta), a narrower buffer
+# rounds near-tied action values to equality before the argmax, and a
+# narrower value iterate stalls short of the fixed point, either of
+# which can flip the policy via the first-action tie-break (issue #403).
+_bellman_eltype(ddp::DiscreteDP, v::AbstractVector) =
+    promote_type(eltype(ddp.R), eltype(v), typeof(ddp.beta))
 
 # Method with a preallocated buffer `vals` (of the same shape as `ddp.R`)
 # for the state-action values; used by the solution methods to avoid
@@ -766,8 +780,10 @@ function _solve(ddp::DiscreteDP{T}, v_init::AbstractVector,
                 ::Type{Algo}, max_iter::Integer, epsilon::Real,
                 k::Integer) where {Algo<:DDPAlgorithm,T}
     # copy the input so that the caller's array is not overwritten by
-    # the solution methods
-    v = Vector{T}(undef, length(v_init))
+    # the solution methods; the iteration runs in the promoted Bellman
+    # value type (see _bellman_eltype), as QuantEcon.py does under NumPy
+    # promotion rules
+    v = Vector{_bellman_eltype(ddp, v_init)}(undef, length(v_init))
     copyto!(v, v_init)
     Tv = similar(v)
     sigma = similar(v, Int)
@@ -793,7 +809,7 @@ function _default_v_init(ddp::DiscreteDP, ::Type{MPFI})
 end
 
 """
-    backward_induction(ddp, J[, v_term=zeros(num_states(ddp))])
+    backward_induction(ddp, J[, v_term=zeros(T, num_states(ddp))])
 
 Solve by backward induction a ``J``-period finite horizon discrete dynamic 
 program with stationary reward ``r`` and transition probability functions ``q``
@@ -815,14 +831,20 @@ and
             \\quad (s \\in S)
 ```
 
-for ``j= J, \\ldots, 1``, where the terminal value function ``v_{J+1}`` is 
+for ``j= J, \\ldots, 1``, where the terminal value function ``v_{J+1}`` is
 exogenously given by `v_term`.
+
+The value functions are computed and stored in the promoted element type
+of ``r + \\beta (q v)``, also incorporating `eltype(v_term)`, so that the
+intermediate value functions of mixed-precision models (e.g. `Float32`
+rewards with a `Float64` discount factor) are not rounded between
+periods.
 
 # Arguments
 
 - `ddp::DiscreteDP{T}`: Object that contains the model parameters.
 - `J::Integer`: Number of decision periods.
-- `v_term::AbstractVector{<:Real}=zeros(num_states(ddp))`: Terminal value 
+- `v_term::AbstractVector{<:Real}=zeros(T, num_states(ddp))`: Terminal value
   function of length equal to n (the number of states).
 
 # Returns
@@ -835,9 +857,9 @@ exogenously given by `v_term`.
 """
 function backward_induction(ddp::DiscreteDP{T}, J::Integer,
                             v_term::AbstractVector{<:Real}=
-                            zeros(num_states(ddp))) where {T}
+                            zeros(T, num_states(ddp))) where {T}
     n = num_states(ddp)
-    S = typeof(zero(T)/one(T))
+    S = promote_type(typeof(zero(T)/one(T)), _bellman_eltype(ddp, v_term))
     vs = Matrix{S}(undef, n, J+1)
     vs[:,end] = v_term
     sigmas = Matrix{Int}(undef, n, J)
@@ -1496,7 +1518,7 @@ function _solve!(
         tol = epsilon * (1-ddp.beta) / (2*ddp.beta)
     end
 
-    vals = similar(ddp.R, eltype(v))  # buffer for state-action values
+    vals = similar(ddp.R, _bellman_eltype(ddp, v))  # state-action values
 
     num_iter = 0
     for i in 1:max_iter
@@ -1555,13 +1577,7 @@ function _solve!(
         throw(ArgumentError("method invalid for beta = 1"))
     end
 
-    # buffer for state-action values, in the same promoted element type
-    # as allocated by the 4-arg bellman_operator! method that the greedy
-    # step used to go through: with mixed-precision models (e.g. Float32
-    # rewards with a Float64 beta), a buffer in eltype(v) would round
-    # near-tied action values to equality before the argmax
-    vals = similar(ddp.R, promote_type(eltype(ddp.R), eltype(v),
-                                       typeof(ddp.beta)))
+    vals = similar(ddp.R, _bellman_eltype(ddp, v))  # state-action values
 
     num_iter = 0
     for i in 1:max_iter
@@ -1623,7 +1639,7 @@ function _solve!(
 
     tol = beta > 0 ? epsilon * (1-beta) / beta : Inf
 
-    vals = similar(ddp.R, eltype(v))  # buffer for state-action values
+    vals = similar(ddp.R, _bellman_eltype(ddp, v))  # state-action values
     dif = similar(v)
 
     num_iter = 0
