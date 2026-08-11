@@ -77,6 +77,18 @@ whatever the model's numerical element types. Transition weights are
 taken from `transition(m, s, a)` as-is, with only exactly-zero branches
 dropped: their validity (nonnegativity, summing to one) is the model's
 responsibility, as it is the caller's in the native constructors.
+
+# Arguments
+
+- `m::POMDPs.MDP`: Explicit-finite POMDPs.jl model to tabulate.
+- `;sparse::Val(Val(true))`: Value-typed tabulation-formulation flag:
+  `Val(true)` for the state-action pair form with a sparse transition
+  matrix, `Val(false)` for the dense product form.
+
+# Returns
+
+- `ddp::DiscreteDP`: The tabulated model, with `state_values` and
+  `action_values` attached.
 """
 function QuantEcon.DiscreteDP(m::POMDPs.MDP;
                               sparse::Val{S}=Val(true)) where {S}
@@ -167,16 +179,22 @@ end
 # ------ #
 
 """
-    DiscreteDPSolver(algo=VFI; sparse=Val(true), max_iter=250,
-                     epsilon=1e-3, k=20)
+    DiscreteDPSolver{Algo,S}
 
-POMDPs.jl solver based on the `DiscreteDP` solution methods. `algo` is
-one of `VFI`, `PFI`, or `MPFI`; `sparse` selects the tabulation
-formulation (`Val(true)` for state-action pair form with sparse
-storage, `Val(false)` for dense product form; value-typed, and carried
-as a type parameter of the solver); the remaining keyword options are
-those of `solve`. `POMDPs.solve(solver, m)` tabulates `m` via
-`DiscreteDP(m)`, solves it, and returns a `DiscreteDPPolicy`.
+POMDPs.jl solver based on the `DiscreteDP` solution methods:
+`POMDPs.solve(solver, m)` tabulates `m` via `DiscreteDP(m)`, solves it,
+and returns a `DiscreteDPPolicy`. The type parameters carry the
+solution algorithm (`Algo`, one of `VFI`, `PFI`, or `MPFI`) and the
+tabulation-formulation flag (`S`, the `Bool` of the constructor's
+value-typed `sparse` keyword); the fields store the `solve` options.
+Construct with `DiscreteDPSolver(algo; sparse, max_iter, epsilon, k)`.
+
+# Fields
+
+- `max_iter::Int`: Maximum number of iterations, passed to `solve`.
+- `epsilon::Float64`: Value for epsilon-optimality, passed to `solve`.
+- `k::Int`: Number of iterations for partial policy evaluation, passed
+  to `solve`.
 """
 struct DiscreteDPSolver{Algo<:DDPAlgorithm,S} <: POMDPs.Solver
     max_iter::Int
@@ -184,6 +202,31 @@ struct DiscreteDPSolver{Algo<:DDPAlgorithm,S} <: POMDPs.Solver
     k::Int
 end
 
+"""
+    DiscreteDPSolver(algo=VFI; sparse=Val(true), max_iter=250,
+                     epsilon=1e-3, k=20)
+
+Construct a `DiscreteDPSolver` with solution algorithm `algo`.
+
+# Arguments
+
+- `algo::Type{<:DDPAlgorithm}(VFI)`: Solution algorithm: `VFI`, `PFI`,
+  or `MPFI`.
+- `;sparse::Val(Val(true))`: Value-typed tabulation-formulation flag,
+  carried as a type parameter of the solver: `Val(true)` for the
+  state-action pair form with a sparse transition matrix, `Val(false)`
+  for the dense product form.
+- `;max_iter::Integer(250)`: Maximum number of iterations, passed to
+  `solve`.
+- `;epsilon::Real(1e-3)`: Value for epsilon-optimality, passed to
+  `solve`.
+- `;k::Integer(20)`: Number of iterations for partial policy
+  evaluation, passed to `solve`.
+
+# Returns
+
+- `solver::DiscreteDPSolver`: The solver instance.
+"""
 function DiscreteDPSolver(::Type{Algo}=VFI; sparse::Val{S}=Val(true),
                           max_iter::Integer=250, epsilon::Real=1e-3,
                           k::Integer=20) where {Algo<:DDPAlgorithm,S}

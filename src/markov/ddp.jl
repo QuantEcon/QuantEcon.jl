@@ -1109,12 +1109,24 @@ end
     DiscreteDPSolver
 
 Solver for POMDPs.jl models based on the `DiscreteDP` solution methods,
-constructed as `DiscreteDPSolver(algo; sparse, max_iter, epsilon, k)`
-with `algo` one of `VFI` (the default), `PFI`, or `MPFI`, `sparse` the
-value-typed tabulation-formulation flag (`Val(true)` by default), and
-the remaining keyword options those of `solve`. Provided by the
-POMDPs.jl integration: load both POMDPs and POMDPTools
-(`using POMDPs, POMDPTools`) to enable it.
+constructed as `DiscreteDPSolver(algo; sparse, max_iter, epsilon, k)`.
+Provided by the POMDPs.jl integration: load both POMDPs and POMDPTools
+(`using POMDPs, POMDPTools`) to enable it, and see the extension's
+documentation for the full constructor contract.
+
+# Arguments
+
+- `algo::Type{<:DDPAlgorithm}(VFI)`: Solution algorithm: `VFI`, `PFI`,
+  or `MPFI`.
+- `;sparse::Val(Val(true))`: Value-typed tabulation-formulation flag.
+- `;max_iter::Integer(250)`, `;epsilon::Real(1e-3)`, `;k::Integer(20)`:
+  Options passed to `solve`.
+
+# Returns
+
+- `solver::DiscreteDPSolver`: A `POMDPs.Solver`; `POMDPs.solve(solver,
+  m)` tabulates `m` via `DiscreteDP(m)`, solves it, and returns a
+  `DiscreteDPPolicy`.
 """
 function DiscreteDPSolver end
 
