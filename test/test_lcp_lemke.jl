@@ -128,6 +128,24 @@ end
         @test res.status == 3
     end
 
+    @testset "Initial ratio test: ties anchored to the minimum" begin
+        # Chained near-ties in the initial ratios q ./ d: the second is
+        # within `tol_ratio_diff` of the first, the third within the
+        # tolerance of the second but not of the first. Ties are measured
+        # against the minimum, so the artificial variable enters at row 2,
+        # not at row 3 (chaining). With max_iter=1 only the initial pivot
+        # is performed.
+        n, tol = 3, 1e-13
+        M = Matrix{Float64}(I, n, n)
+        q = [-3., -3. + 0.9tol, -3. + 1.8tol]
+        z = Vector{Float64}(undef, n)
+        tableau = Matrix{Float64}(undef, n, 2n+2)
+        basis = Vector{Int}(undef, n)
+        res = lcp_lemke!(z, tableau, basis, M, q; max_iter=1)
+        @test res.status == 1
+        @test basis[2] == 2n + 1  # Artificial variable
+    end
+
     @testset "Bimatrix game" begin
         A = [
             3  3
