@@ -218,14 +218,21 @@ function lcp_lemke!(
     art_var = 2n + 1  # Artificial variable
     pivcol = art_var
 
-    # Equivalent to lex_min_ratio_test specialized
+    # Equivalent to lex_min_ratio_test specialized: the lexicographic tie
+    # breaking reduces to taking the largest row index, as the slack
+    # columns form the identity matrix. Ties are measured against the
+    # smallest ratio found so far, which is not updated on a tie, so that
+    # the accepted set cannot drift away from the minimum by chaining
+    # tolerances.
     pivrow = 1
     ratio_min = q[1] / d[1]
     @inbounds for i in 2:n
         ratio = q[i] / d[i]
-        if ratio <= ratio_min + piv_options.tol_ratio_diff
+        if ratio < ratio_min - piv_options.tol_ratio_diff  # Smaller
             pivrow = i
             ratio_min = ratio
+        elseif ratio <= ratio_min + piv_options.tol_ratio_diff  # Tie
+            pivrow = i
         end
     end
 
