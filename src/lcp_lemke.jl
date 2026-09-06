@@ -234,7 +234,7 @@ function lcp_lemke!(
     num_iter += 1
 
     while num_iter < max_iter
-        pivrow_found, pivrow = _lex_min_ratio_test!(
+        pivrow_found, pivrow, _ = _lex_min_ratio_test!(
             tableau, pivcol, 1, argmins,
             tol_piv=piv_options.tol_piv,
             tol_ratio_diff=piv_options.tol_ratio_diff

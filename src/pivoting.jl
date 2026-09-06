@@ -158,6 +158,10 @@ function _min_ratio_test_no_tie_breaking!(tableau::AbstractMatrix{T},
     ratio_min = typemax(T)
     num_argmins = 0
 
+    # `ratio_min` is deliberately not updated when a tie is recorded:
+    # ties are measured against the smallest ratio found so far, not
+    # against the last tied ratio, so that the accepted set cannot drift
+    # away from the minimum by chaining tolerances.
     @inbounds for k in 1:num_candidates
         i = argmins[k]
         denom = tableau[i, pivot]
@@ -205,10 +209,25 @@ Perform the lexico-minimum ratio test.
 
 - `found::Bool`: `false` if there is no positive entry in the pivot column (up
   to `tol_piv`), `true` otherwise.
-- `row_min::Int`: Index of the row with the lexico-minimum ratio. If the
-  lexicographic tie breaking fails to single out one row, which can only
-  happen when the remaining candidate rows are indistinguishable within
-  `tol_ratio_diff`, the first of them.
+- `row_min::Int`: Index of the row with the lexico-minimum ratio (meaningless
+  if `found` is `false`). If the lexicographic tie breaking fails to single out
+  one row, which can only happen when the remaining candidate rows are
+  indistinguishable within `tol_ratio_diff`, the first of them.
+- `resolved::Bool`: `true` if `row_min` is the unique lexico-minimum row,
+  `false` if `found` is `false` or the tie breaking failed to single out one
+  row. In exact arithmetic the latter cannot happen (the rows of the tableau
+  restricted to the slack columns are linearly independent), so
+  `found && !resolved` signals a numerical breakdown that callers may want to
+  act on.
+
+# Notes
+
+The last column of `tableau` must contain the values of the basic variables
+(the right hand side), and the columns `slack_start`, ...,
+`slack_start + nrows - 1` must be those that initially formed an identity
+matrix (typically the slack or artificial variables), so that they contain the
+inverse of the current basis matrix: the lexicographic rule breaks the ties in
+the ratio test by comparing these columns in order.
 """
 function _lex_min_ratio_test!(tableau::AbstractMatrix,
                               pivot::Integer, slack_start::Integer,
@@ -229,7 +248,7 @@ function _lex_min_ratio_test!(tableau::AbstractMatrix,
         tableau, pivot, ncols, argmins, num_candidates, tol_piv, tol_ratio_diff
     )
     if num_argmins == 0  # No positive entry in the pivot column
-        return found, argmins[1]
+        return found, argmins[1], false
     end
 
     # `found` is true from here: the pivot column has a positive entry.
@@ -252,6 +271,7 @@ function _lex_min_ratio_test!(tableau::AbstractMatrix,
             end
         end
     end
+    resolved = num_argmins == 1
 
-    return found, argmins[1]
+    return found, argmins[1], resolved
 end

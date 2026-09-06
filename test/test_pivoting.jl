@@ -25,15 +25,17 @@ using QuantEcon: _pivoting!, _lex_min_ratio_test!
             aux_start = size(tableau, 2) - L
 
             pivcol = 1
-            pivrow_found, pivrow = @inferred _lex_min_ratio_test!(
+            pivrow_found, pivrow, resolved = @inferred _lex_min_ratio_test!(
                 tableau[1:L, :], pivcol, aux_start, argmins
             )
+            @test pivrow_found && resolved
             @inferred _pivoting!(tableau, pivcol, pivrow, col_buf)
 
             pivcol = 3
-            pivrow_found, pivrow = _lex_min_ratio_test!(
+            pivrow_found, pivrow, resolved = _lex_min_ratio_test!(
                 tableau[1:L, :], pivcol, aux_start, argmins
             )
+            @test pivrow_found && resolved
             _pivoting!(tableau, pivcol, pivrow, col_buf)
 
             @test isapprox(tableau, tableau_opt)
@@ -44,29 +46,47 @@ using QuantEcon: _pivoting!, _lex_min_ratio_test!
         # Columns: pivot, slack block (2 columns), right hand side
         argmins = Vector{Int}(undef, 2)
 
+        # Unique minimum ratio
+        tableau = [1. 1. 0. 2.
+                   1. 0. 1. 1.]
+        found, row, resolved = _lex_min_ratio_test!(tableau, 1, 2, argmins)
+        @test found && resolved
+        @test row == 2
+
+        # Equal ratios in the right hand side column; the slack columns
+        # break the tie
+        tableau = [1. 1. 0. 1.
+                   1. 0. 1. 1.]
+        found, row, resolved = _lex_min_ratio_test!(tableau, 1, 2, argmins)
+        @test found && resolved
+        @test row == 2
+
         # Two identical rows (including the slack block): the ratios tie
         # in every column. The pivot column has positive entries, so the
-        # row must be reported as found.
+        # row must be reported as found, but not as resolved.
         tableau = [1. 1. 0. 0.
                    1. 1. 0. 0.]
-        found, row = _lex_min_ratio_test!(tableau, 1, 2, argmins)
+        found, row, resolved = _lex_min_ratio_test!(tableau, 1, 2, argmins)
         @test found
+        @test !resolved
         @test row in (1, 2)
 
         # Entries of order 1e14: the ratios in the slack columns tie within
         # `tol_ratio_diff = 1e-13`; must not be reported as not found
         tableau = [1e14 1. 0. 0.
                    1e14 0. 1. 0.]
-        found, row = _lex_min_ratio_test!(
+        found, row, resolved = _lex_min_ratio_test!(
             tableau, 1, 2, argmins, tol_piv=1e-7, tol_ratio_diff=1e-13
         )
         @test found
+        @test !resolved
 
         # No positive entry in the pivot column
         tableau = [-1. 1. 0. 1.
                     0. 0. 1. 1.]
-        found, row = _lex_min_ratio_test!(tableau, 1, 2, argmins)
+        found, row, resolved = _lex_min_ratio_test!(tableau, 1, 2, argmins)
         @test !found
+        @test !resolved
     end
 
     @testset "Loop and BLAS kernels agree" begin
