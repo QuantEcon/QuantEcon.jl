@@ -40,6 +40,35 @@ using QuantEcon: _pivoting!, _lex_min_ratio_test!
         end
     end
 
+    @testset "Lexico-minimum ratio test outcomes" begin
+        # Columns: pivot, slack block (2 columns), right hand side
+        argmins = Vector{Int}(undef, 2)
+
+        # Two identical rows (including the slack block): the ratios tie
+        # in every column. The pivot column has positive entries, so the
+        # row must be reported as found.
+        tableau = [1. 1. 0. 0.
+                   1. 1. 0. 0.]
+        found, row = _lex_min_ratio_test!(tableau, 1, 2, argmins)
+        @test found
+        @test row in (1, 2)
+
+        # Entries of order 1e14: the ratios in the slack columns tie within
+        # `tol_ratio_diff = 1e-13`; must not be reported as not found
+        tableau = [1e14 1. 0. 0.
+                   1e14 0. 1. 0.]
+        found, row = _lex_min_ratio_test!(
+            tableau, 1, 2, argmins, tol_piv=1e-7, tol_ratio_diff=1e-13
+        )
+        @test found
+
+        # No positive entry in the pivot column
+        tableau = [-1. 1. 0. 1.
+                    0. 0. 1. 1.]
+        found, row = _lex_min_ratio_test!(tableau, 1, 2, argmins)
+        @test !found
+    end
+
     @testset "Loop and BLAS kernels agree" begin
         rng = MersenneTwister(0)
         pivcol, pivrow = 3, 2
