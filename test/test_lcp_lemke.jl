@@ -144,6 +144,14 @@ end
         res = lcp_lemke!(z, tableau, basis, M, q; max_iter=1)
         @test res.status == 1
         @test basis[2] == 2n + 1  # Artificial variable
+
+        # Decreasing then increasing: the second ratio is the minimum, the
+        # third is within the tolerance of the first but not of the
+        # minimum
+        q = [-3., -3. - 0.9tol, -3. + 0.9tol]
+        res = lcp_lemke!(z, tableau, basis, M, q; max_iter=1)
+        @test res.status == 1
+        @test basis[2] == 2n + 1  # Artificial variable
     end
 
     @testset "Bimatrix game" begin
