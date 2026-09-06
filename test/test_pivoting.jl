@@ -1,4 +1,4 @@
-using QuantEcon: _pivoting!, _lex_min_ratio_test!
+using QuantEcon: _pivoting!, _lex_min_ratio_test!, _min_ratio_test_no_tie_breaking!
 
 @testset "Testing pivoting.jl" begin
     # Test case from Border "The Gauss–Jordan and Simplex Algorithms"
@@ -80,6 +80,25 @@ using QuantEcon: _pivoting!, _lex_min_ratio_test!
         )
         @test found
         @test !resolved
+
+        # Ratios -3.00, -3.09, -2.91 with tolerance 0.1: the second is
+        # within the tolerance of the first, the third within the
+        # tolerance of the first but not of the minimum (the second), so
+        # the candidates must be the first two rows only
+        tableau = [1. 1. 0. 0. -3.00
+                   1. 0. 1. 0. -3.09
+                   1. 0. 0. 1. -2.91]
+        argmins3 = collect(1:3)
+        num_argmins = _min_ratio_test_no_tie_breaking!(
+            tableau, 1, 5, argmins3, 3, 1e-7, 0.1
+        )
+        @test num_argmins == 2
+        @test Set(argmins3[1:2]) == Set([1, 2])
+        found, row, resolved = _lex_min_ratio_test!(
+            tableau, 1, 2, argmins3, tol_piv=1e-7, tol_ratio_diff=0.1
+        )
+        @test found && resolved
+        @test row == 2
 
         # No positive entry in the pivot column
         tableau = [-1. 1. 0. 1.

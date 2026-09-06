@@ -155,13 +155,10 @@ function _min_ratio_test_no_tie_breaking!(tableau::AbstractMatrix{T},
                                           num_candidates::Integer,
                                           tol_piv::Real,
                                           tol_ratio_diff::Real) where {T}
+    # Ties are measured against the exact minimum ratio, determined in a
+    # first pass, so that the accepted set cannot drift away from the
+    # minimum by chaining tolerances
     ratio_min = typemax(T)
-    num_argmins = 0
-
-    # `ratio_min` is deliberately not updated when a tie is recorded:
-    # ties are measured against the smallest ratio found so far, not
-    # against the last tied ratio, so that the accepted set cannot drift
-    # away from the minimum by chaining tolerances.
     @inbounds for k in 1:num_candidates
         i = argmins[k]
         denom = tableau[i, pivot]
@@ -169,13 +166,20 @@ function _min_ratio_test_no_tie_breaking!(tableau::AbstractMatrix{T},
             continue
         end
         ratio = tableau[i, test_col] / denom
-        if ratio > ratio_min + tol_ratio_diff  # Ratio large for i
-            continue
-        elseif ratio < ratio_min - tol_ratio_diff  # Ratio smaller for i
+        if ratio < ratio_min
             ratio_min = ratio
-            num_argmins = 1
-            argmins[1] = i
-        else  # Ratio equal
+        end
+    end
+
+    num_argmins = 0
+    @inbounds for k in 1:num_candidates
+        i = argmins[k]
+        denom = tableau[i, pivot]
+        if denom <= tol_piv  # Treated as nonpositive
+            continue
+        end
+        ratio = tableau[i, test_col] / denom
+        if ratio <= ratio_min + tol_ratio_diff  # Ratio minimal for i
             num_argmins += 1
             argmins[num_argmins] = i
         end
