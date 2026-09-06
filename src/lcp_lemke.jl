@@ -37,6 +37,7 @@ Struct containing the result from `lcp_lemke`.
   * 0: Solution found successfully
   * 1: Iteration limit reached
   * 2: Secondary ray termination
+  * 3: Numerical difficulties encountered
 - `num_iter::Int`: The number of iterations performed.
 """
 struct LCPResult{T<:Real}
@@ -85,6 +86,7 @@ by Lemke's algorithm (with the lexicographic pivoting rule).
       * 0: Solution found successfully
       * 1: Iteration limit reached
       * 2: Secondary ray termination
+      * 3: Numerical difficulties encountered
   - `num_iter::Int`: Number of iterations performed.
 
 # Examples
@@ -241,7 +243,7 @@ function lcp_lemke!(
     num_iter += 1
 
     while num_iter < max_iter
-        pivrow_found, pivrow, _ = _lex_min_ratio_test!(
+        pivrow_found, pivrow, resolved = _lex_min_ratio_test!(
             tableau, pivcol, 1, argmins,
             tol_piv=piv_options.tol_piv,
             tol_ratio_diff=piv_options.tol_ratio_diff
@@ -250,6 +252,11 @@ function lcp_lemke!(
         if !pivrow_found  # Ray termination
             success = false
             status = 2
+            break
+        end
+        if !resolved  # Numerical breakdown: lexicographic tie not broken,
+            success = false  # impossible in exact arithmetic
+            status = 3
             break
         end
 

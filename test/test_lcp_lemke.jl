@@ -114,6 +114,20 @@ end
         _assert_success(res2, M, q; atol=1e-13)
     end
 
+    @testset "Numerical breakdown" begin
+        # Entries of order 1e14: the lexicographic tie breaking fails
+        # within `tol_ratio_diff`; an arbitrary pivot led to a wrong
+        # "solution" reported as success
+        s = 2e14
+        M = [-1.  -4.  1.
+             -5s   s   3s
+             -5s   3s  s]
+        q = -ones(3)
+        res = lcp_lemke(M, q)
+        @test !res.success
+        @test res.status == 3
+    end
+
     @testset "Bimatrix game" begin
         A = [
             3  3
