@@ -155,9 +155,10 @@ function _min_ratio_test_no_tie_breaking!(tableau::AbstractMatrix{T},
                                           num_candidates::Integer,
                                           tol_piv::Real,
                                           tol_ratio_diff::Real) where {T}
+    # Ties are measured against the exact minimum ratio, determined in a
+    # first pass, so that the accepted set cannot drift away from the
+    # minimum by chaining tolerances
     ratio_min = typemax(T)
-    num_argmins = 0
-
     @inbounds for k in 1:num_candidates
         i = argmins[k]
         denom = tableau[i, pivot]
@@ -165,13 +166,20 @@ function _min_ratio_test_no_tie_breaking!(tableau::AbstractMatrix{T},
             continue
         end
         ratio = tableau[i, test_col] / denom
-        if ratio > ratio_min + tol_ratio_diff  # Ratio large for i
-            continue
-        elseif ratio < ratio_min - tol_ratio_diff  # Ratio smaller for i
+        if ratio < ratio_min
             ratio_min = ratio
-            num_argmins = 1
-            argmins[1] = i
-        else  # Ratio equal
+        end
+    end
+
+    num_argmins = 0
+    @inbounds for k in 1:num_candidates
+        i = argmins[k]
+        denom = tableau[i, pivot]
+        if denom <= tol_piv  # Treated as nonpositive
+            continue
+        end
+        ratio = tableau[i, test_col] / denom
+        if ratio <= ratio_min + tol_ratio_diff  # Ratio minimal for i
             num_argmins += 1
             argmins[num_argmins] = i
         end
@@ -203,8 +211,27 @@ Perform the lexico-minimum ratio test.
 
 # Returns
 
-- `found::Bool`: `false` if there is no positive entry in the pivot column.
-- `row_min::Int`: Index of the row with the lexico-minimum ratio.
+- `found::Bool`: `false` if there is no positive entry in the pivot column (up
+  to `tol_piv`), `true` otherwise.
+- `row_min::Int`: Index of the row with the lexico-minimum ratio (meaningless
+  if `found` is `false`). If the lexicographic tie breaking fails to single out
+  one row, which can only happen when the remaining candidate rows are
+  indistinguishable within `tol_ratio_diff`, the first of them.
+- `resolved::Bool`: `true` if `row_min` is the unique lexico-minimum row,
+  `false` if `found` is `false` or the tie breaking failed to single out one
+  row. In exact arithmetic the latter cannot happen (the rows of the tableau
+  restricted to the slack columns are linearly independent), so
+  `found && !resolved` signals a numerical breakdown that callers may want to
+  act on.
+
+# Notes
+
+The last column of `tableau` must contain the values of the basic variables
+(the right hand side), and the columns `slack_start`, ...,
+`slack_start + nrows - 1` must be those that initially formed an identity
+matrix (typically the slack or artificial variables), so that they contain the
+inverse of the current basis matrix: the lexicographic rule breaks the ties in
+the ratio test by comparing these columns in order.
 """
 function _lex_min_ratio_test!(tableau::AbstractMatrix,
                               pivot::Integer, slack_start::Integer,
@@ -224,9 +251,17 @@ function _lex_min_ratio_test!(tableau::AbstractMatrix,
     num_argmins = _min_ratio_test_no_tie_breaking!(
         tableau, pivot, ncols, argmins, num_candidates, tol_piv, tol_ratio_diff
     )
-    if num_argmins == 1
-        found = true
-    elseif num_argmins >= 2
+    if num_argmins == 0  # No positive entry in the pivot column
+        return found, argmins[1], false
+    end
+
+    # `found` is true from here: the pivot column has a positive entry.
+    # The lexicographic passes below only refine the choice among the
+    # rows that tie in the ratio test; if they fail to single out one
+    # row, the remaining candidates are numerically indistinguishable
+    # (they cannot be linearly dependent), and the first is taken.
+    found = true
+    if num_argmins >= 2
         @inbounds for j in slack_start:(slack_start + nrows - 1)
             if j == pivot
                 continue
@@ -236,10 +271,11 @@ function _lex_min_ratio_test!(tableau::AbstractMatrix,
                 tol_piv, tol_ratio_diff
             )
             if num_argmins == 1
-                found = true
                 break
             end
         end
     end
-    return found, argmins[1]
+    resolved = num_argmins == 1
+
+    return found, argmins[1], resolved
 end
