@@ -97,3 +97,34 @@ function hamilton_filter(y::AbstractVector, h::Integer)
     y_trend = y - y_cycle
     return y_cycle, y_trend
 end
+
+@doc doc"""
+This function applies "Baxter King filter" to `y <:AbstractVector`.
+
+Reference: https://www.mitpressjournals.org/doi/abs/10.1162/003465399558454?casa_token=pfn7A97wi0QAAAAA:78AlfSOyiz__a6_snyH7jwydLu8uGZV-U3ZVY5Vo3dTi0r7da5uuVtUyUR87-uZBAuarQAYMiywJ76o
+
+##### Arguments
+- `y::AbstractVector` : data to be filtered
+- `wu::Real` : upper cutoff frequencies
+- `wl::Real` : lower cutoff frequencies
+- `K::Integer` : number of leads and lags of the moving average
+
+##### Returns
+- `y_cycle::Vector` : cyclical component
+- `y_trend::Vector` : trend component
+"""
+function bk_filter(y::AbstractVector, wu::Real, wl::Real, K::Integer)
+    T = length(y)
+    w1 = 2pi/wu
+    w2 = 2pi/wl
+    b = vcat((w2-w1)/pi, [(sin(w2*i)-sin(w1*i))/(i*pi) for i=1:K])
+    theta = (b[1] + 2*sum(b[2:end]))/(2K+1)
+    B = b .- theta
+    y_cycle = Vector{Union{Missing, Float64}}(undef, T)
+    for t = K+1:T-K
+        y_cycle[t] = y[t]*B[1] + 
+            dot(y[t-1:-1:t-K], B[2:end]) + dot(y[t+1:t+K], B[2:end])
+    end
+    y_trend = y - y_cycle
+    return y_cycle, y_trend
+end
