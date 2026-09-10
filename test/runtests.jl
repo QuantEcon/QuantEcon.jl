@@ -3,7 +3,7 @@ activate(joinpath(@__DIR__, ".."))
 using QuantEcon
 using Base.Iterators: take, cycle
 using DataStructures: counter
-using Distributions: LogNormal, pdf
+using Distributions: Normal, LogNormal, pdf
 using LinearAlgebra
 using Random
 using FFTW
