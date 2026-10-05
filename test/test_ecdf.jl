@@ -23,3 +23,13 @@
 
 
 end  # testset
+
+@testset "ECDF deprecation is gone" begin
+    # `ECDF` was a deprecation for `StatsBase.ecdf` that could never work, since
+    # the module name `StatsBase` is not bound inside `QuantEcon`; it was removed.
+    # The replacement `ecdf`, re-exported from StatsBase, is unaffected.
+    @test !isdefined(QuantEcon, :ECDF)
+    @test !(:ECDF in names(QuantEcon))
+    @test :ecdf in names(QuantEcon)
+    @test ecdf([1.0, 2.0, 3.0])(2.0) ≈ 2 / 3
+end  # testset
