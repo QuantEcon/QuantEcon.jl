@@ -1,15 +1,42 @@
 #=
 Tests for the POMDPs.jl extension (ext/QuantEconPOMDPsExt.jl)
 
-NOTE: this file must run LAST: `using POMDPs` makes the bare names
-`solve` and `simulate` ambiguous in Main for every subsequently
-included test file, and loading the extension gives the
-`DiscreteDPSolver` stub methods (test_ddp.jl tests the method-less
-stub). All `solve` calls below are qualified.
+The tests live in their own module, which loads the packages the way a
+user does (`using QuantEcon, POMDPs, POMDPTools`): they run in the
+user's namespace, where the bare names `solve` and `simulate` are
+ambiguous and must be qualified, and the POMDPs exports stay out of
+Main, so that the other test files are unaffected. The file can run at
+any position in the test list.
 =#
 
-using POMDPs
-using POMDPTools
+module TestPOMDPs
+
+using QuantEcon
+using Test
+
+# This testset must precede the loading of POMDPs and POMDPTools below:
+# the stub has no methods until the extension is loaded, and its
+# MethodError carries the hint. Loading the two packages activates the
+# extension for the whole process, so the testset is skipped if that
+# has already happened in the session.
+@testset "DiscreteDPSolver stub without the extension" begin
+    if Base.get_extension(QuantEcon, :QuantEconPOMDPsExt) === nothing
+        @test DiscreteDPSolver isa Function
+        _err = try
+            DiscreteDPSolver()
+        catch _e
+            _e
+        end
+        @test _err isa MethodError
+        @test occursin("POMDPTools", sprint(showerror, _err))
+    else
+        @test_skip isempty(methods(DiscreteDPSolver))
+    end
+end
+
+using POMDPs, POMDPTools
+using Random: MersenneTwister
+using SparseArrays: issparse
 
 @testset "Testing ext/QuantEconPOMDPsExt.jl" begin
 
@@ -242,3 +269,5 @@ using POMDPTools
     end
 
 end
+
+end # module
