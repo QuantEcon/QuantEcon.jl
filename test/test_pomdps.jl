@@ -166,6 +166,51 @@ using SparseArrays: issparse
         end
     end
 
+    @testset "importer: duplicate actions with finite or infinite rewards" begin
+        struct ActionListMDP{TA} <: POMDPs.MDP{Int,Int}
+            first_reward::Float64
+            feasible_actions::TA
+            transition_calls::Vector{Tuple{Int,Int}}
+        end
+        POMDPs.states(::ActionListMDP) = 1:2
+        POMDPs.actions(::ActionListMDP) = 1:2
+        POMDPs.actions(m::ActionListMDP, s::Int) = m.feasible_actions
+        POMDPs.discount(::ActionListMDP) = 0.9
+        function POMDPs.transition(m::ActionListMDP, s::Int, a::Int)
+            push!(m.transition_calls, (s, a))
+            return Deterministic(s)
+        end
+        POMDPs.reward(m::ActionListMDP, s::Int, a::Int) =
+            a == 1 ? m.first_reward : 0.0
+
+        for _reward in (1.0, -Inf, Inf)
+            _err = ArgumentError(
+                "actions(m, s) at state 1 yields the duplicate action 1")
+            for (_actions, _expected_calls) in (
+                    ((1, 1, 2), [(1, 1)]),
+                    ((2, 1, 1), [(1, 2), (1, 1)]),
+                    ((1, 2, 1), [(1, 1), (1, 2)])),
+                    _sparse in (Val(true), Val(false))
+                _m = ActionListMDP(_reward, _actions, Tuple{Int,Int}[])
+                @test_throws _err DiscreteDP(_m; sparse=_sparse)
+                # Stop before evaluating the duplicate's transition or
+                # enumerating the rest of the model.
+                @test _m.transition_calls == _expected_calls
+            end
+
+            # Each action may appear once in each state, including an
+            # infinite-reward action alongside a finite-reward action.
+            for _sparse in (Val(true), Val(false))
+                _unique = ActionListMDP(_reward, (1, 2), Tuple{Int,Int}[])
+                _ddp = to_product_form(DiscreteDP(_unique; sparse=_sparse))
+                @test _ddp.R == [_reward 0.0; _reward 0.0]
+                @test vec(sum(_ddp.Q; dims=3)) == ones(4)
+                @test _unique.transition_calls ==
+                      [(1, 1), (1, 2), (2, 1), (2, 2)]
+            end
+        end
+    end
+
     @testset "importer: validation" begin
         # Failed lookup must retain its contextual error, but an exception
         # raised while hashing a query must propagate unchanged.

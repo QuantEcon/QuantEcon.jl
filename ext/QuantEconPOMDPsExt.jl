@@ -48,6 +48,16 @@ function _action_index(amap::IndexMap, s, a)
     return i
 end
 
+# Record the state index of each visit, avoiding a full reset of the
+# global action space at every state when feasible action sets are small.
+function _action_index!(last_seen, amap::IndexMap, s_i, s, a)
+    i = _action_index(amap, s, a)
+    last_seen[i] == s_i && throw(ArgumentError(
+        "actions(m, s) at state $s yields the duplicate action $a"))
+    last_seen[i] = s_i
+    return i
+end
+
 """
     DiscreteDP(m::POMDPs.MDP; sparse=Val(true))
 
@@ -107,6 +117,7 @@ function _tabulate(m::POMDPs.MDP, svals, smap, avals, amap, bet,
                    ::Val{true})
     s_indices = Int[]; a_indices = Int[]; R = Float64[]
     QI = Int[]; QJ = Int[]; QV = Float64[]
+    last_seen = zeros(Int, length(avals))
     L = 0
     for (s_i, s) in enumerate(svals)
         if POMDPs.isterminal(m, s)
@@ -122,9 +133,10 @@ function _tabulate(m::POMDPs.MDP, svals, smap, avals, amap, bet,
             end
         else
             for a in POMDPs.actions(m, s)
+                a_i = _action_index!(last_seen, amap, s_i, s, a)
                 L += 1
                 push!(s_indices, s_i)
-                push!(a_indices, _action_index(amap, s, a))
+                push!(a_indices, a_i)
                 r_sa = 0.0
                 for (sp, w) in weighted_iterator(POMDPs.transition(m, s, a))
                     iszero(w) && continue
@@ -141,14 +153,15 @@ function _tabulate(m::POMDPs.MDP, svals, smap, avals, amap, bet,
                       state_values=svals, action_values=avals)
 end
 
-# dense product form, constructed directly: n and m are known upfront,
-# so the final arrays are the only allocations; infeasible pairs keep
-# the -Inf reward and zero transition row of the dense convention
+# Construct dense arrays directly, without an intermediate sparse model.
+# Reuse action-visit markers to reject duplicates; infeasible pairs keep
+# the -Inf reward and zero transition row of the dense convention.
 function _tabulate(m::POMDPs.MDP, svals, smap, avals, amap, bet,
                    ::Val{false})
     n = length(svals)
     R = fill(-Inf, n, length(avals))
     Q = zeros(n, length(avals), n)
+    last_seen = zeros(Int, length(avals))
     for (s_i, s) in enumerate(svals)
         if POMDPs.isterminal(m, s)
             # zero-reward self-loop under every global action;
@@ -158,9 +171,7 @@ function _tabulate(m::POMDPs.MDP, svals, smap, avals, amap, bet,
             Q[s_i, :, s_i] .= 1.0
         else
             for a in POMDPs.actions(m, s)
-                a_i = _action_index(amap, s, a)
-                isinf(R[s_i, a_i]) || throw(ArgumentError(
-                    "actions(m, s) at state $s yields the duplicate action $a"))
+                a_i = _action_index!(last_seen, amap, s_i, s, a)
                 r_sa = 0.0
                 for (sp, w) in weighted_iterator(POMDPs.transition(m, s, a))
                     iszero(w) && continue
