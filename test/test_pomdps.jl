@@ -140,6 +140,26 @@ using POMDPTools
     end
 
     @testset "importer: validation" begin
+        # Failed lookup must retain its contextual error, but an exception
+        # raised while hashing a query must propagate unchanged.
+        _lookup_map = IndexMap([1, 2])
+        _action_error = ArgumentError("actions(m, s) at state 1 yields action " *
+            "3, which is not in actions(m): per-state action sets " *
+            "must be subsets of the global action space")
+        @test_throws _action_error ext._action_index(_lookup_map, 1, 3)
+
+        struct FailingLookupKey{E<:Exception}
+            error::E
+        end
+        Base.hash(key::FailingLookupKey, ::UInt) = throw(key.error)
+        for _error in (ErrorException("model hash failed"), InterruptException())
+            _key = FailingLookupKey(_error)
+            @test_throws typeof(_error) get(_lookup_map, _key, nothing)
+            @test_throws typeof(_error) _lookup_map[_key]
+            @test_throws typeof(_error) ext._action_index(_lookup_map, 1, _key)
+            @test_throws typeof(_error) ext._next_state_index(_lookup_map, 1, 1, _key)
+        end
+
         # duplicated states are rejected at tabulation
         struct DupMDP <: POMDPs.MDP{Int,Int} end
         POMDPs.states(::DupMDP) = [1, 1]

@@ -29,23 +29,23 @@ using SparseArrays: sparse
 # ------------ #
 
 function _next_state_index(smap::IndexMap, s, a, sp)
-    try
-        return smap[sp]
-    catch
+    i = get(smap, sp, nothing)
+    if i === nothing
         throw(ArgumentError("transition at state $s under action $a " *
             "yields next state $sp, which is not in states(m): the " *
             "state space must be closed under transitions"))
     end
+    return i
 end
 
 function _action_index(amap::IndexMap, s, a)
-    try
-        return amap[a]
-    catch
+    i = get(amap, a, nothing)
+    if i === nothing
         throw(ArgumentError("actions(m, s) at state $s yields action " *
             "$a, which is not in actions(m): per-state action sets " *
             "must be subsets of the global action space"))
     end
+    return i
 end
 
 """

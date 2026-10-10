@@ -442,6 +442,7 @@ k_array_rank(a::Vector{<:Integer}) = k_array_rank(Int, a)
 Mapping from the values of a vector to their indices: `im[v]` returns
 the index `i` such that `im.vals[i]` equals `v`, and throws an
 informative `ArgumentError` when `v` is not among the values.
+`get(im, v, default)` returns `default` instead for a missing value.
 Construction requires the values to be unique. For an
 `AbstractUnitRange` no dictionary is stored and lookups use
 bounds-checked arithmetic.
@@ -518,14 +519,38 @@ _indexmap_notfound(v) =
         "IndexMap (lookups use isequal; query with values obtained " *
         "from the wrapped vector)")
 
-function Base.getindex(im::IndexMap, v)
-    idx = get(im.dict, v, nothing)
-    idx === nothing && throw(_indexmap_notfound(v))
-    return idx
-end
+"""
+    get(im::IndexMap, v, default)
 
-function Base.getindex(
-        im::IndexMap{<:AbstractUnitRange{<:Integer},Nothing}, v
+Return the index of `v` in `im`, or `default` if the value is absent.
+Lookups use the same `isequal` semantics as `im[v]`.
+
+# Arguments
+
+- `im::IndexMap`: Value-to-index mapping.
+- `v`: Value to look up.
+- `default`: Value returned when `v` is absent.
+
+# Returns
+
+- `index`: Integer index of `v`, or `default` when `v` is absent.
+
+# Examples
+
+```julia
+julia> im = IndexMap(5:9);
+
+julia> get(im, 7, 0)
+3
+
+julia> get(im, 10, 0)
+0
+```
+"""
+Base.get(im::IndexMap, v, default) = get(im.dict, v, default)
+
+function Base.get(
+        im::IndexMap{<:AbstractUnitRange{<:Integer},Nothing}, v, default
     )
     r = im.vals
     # the arithmetic only proposes a candidate position; the isequal
@@ -538,12 +563,20 @@ function Base.getindex(
     P = promote_type(eltype(r), Int)
     i = try
         Int(v - convert(P, first(r))) + 1
-    catch
-        throw(_indexmap_notfound(v))
+    catch err
+        # Nonnumeric queries and offsets that cannot be represented as
+        # Int are misses; interrupts and other unexpected errors propagate.
+        (err isa MethodError || err isa InexactError ||
+         err isa OverflowError) || rethrow()
+        return default
     end
-    (checkbounds(Bool, r, i) && isequal(r[i], v)) ||
-        throw(_indexmap_notfound(v))
-    return i
+    return checkbounds(Bool, r, i) && isequal(r[i], v) ? i : default
+end
+
+function Base.getindex(im::IndexMap, v)
+    idx = get(im, v, nothing)
+    idx === nothing && throw(_indexmap_notfound(v))
+    return idx
 end
 
 Base.length(im::IndexMap) = length(im.vals)
