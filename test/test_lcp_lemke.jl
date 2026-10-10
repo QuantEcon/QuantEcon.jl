@@ -114,6 +114,47 @@ end
         _assert_success(res2, M, q; atol=1e-13)
     end
 
+    @testset "Numerical breakdown" begin
+        # Entries of order 1e14: the lexicographic tie breaking fails
+        # within `tol_ratio_diff`. This used to be reported as ray
+        # termination, and pivoting through the tie leads to a wrong
+        # "solution" reported as success; it is a numerical breakdown
+        s = 2e14
+        M = [-1.  -4.  1.
+             -5s   s   3s
+             -5s   3s  s]
+        q = -ones(3)
+        res = lcp_lemke(M, q)
+        @test !res.success
+        @test res.status == 3
+    end
+
+    @testset "Initial ratio test: ties anchored to the minimum" begin
+        # Chained near-ties in the initial ratios q ./ d: the second is
+        # within `tol_ratio_diff` of the first, the third within the
+        # tolerance of the second but not of the first. Ties are measured
+        # against the minimum, so the artificial variable enters at row 2,
+        # not at row 3 (chaining). With max_iter=1 only the initial pivot
+        # is performed.
+        n, tol = 3, 1e-13
+        M = Matrix{Float64}(I, n, n)
+        q = [-3., -3. + 0.9tol, -3. + 1.8tol]
+        z = Vector{Float64}(undef, n)
+        tableau = Matrix{Float64}(undef, n, 2n+2)
+        basis = Vector{Int}(undef, n)
+        res = lcp_lemke!(z, tableau, basis, M, q; max_iter=1)
+        @test res.status == 1
+        @test basis[2] == 2n + 1  # Artificial variable
+
+        # Decreasing then increasing: the second ratio is the minimum, the
+        # third is within the tolerance of the first but not of the
+        # minimum
+        q = [-3., -3. - 0.9tol, -3. + 0.9tol]
+        res = lcp_lemke!(z, tableau, basis, M, q; max_iter=1)
+        @test res.status == 1
+        @test basis[2] == 2n + 1  # Artificial variable
+    end
+
     @testset "Bimatrix game" begin
         A = [
             3  3

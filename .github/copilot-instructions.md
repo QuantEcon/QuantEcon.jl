@@ -2,32 +2,18 @@
 
 QuantEcon.jl is a Julia package providing algorithms and tools for quantitative economics. It includes implementations of dynamic programming, Markov chains, ARMA models, linear-quadratic control, utility functions, and many other quantitative economics tools.
 
-Always reference these instructions first and fallback to search or bash commands only when you encounter unexpected information that does not match the info here.
-
 ## Working Effectively
 
-### Bootstrap, build, and test the repository:
-- Install dependencies: `julia --project=. -e "using Pkg; Pkg.instantiate()"` -- takes ~60 seconds. NEVER CANCEL. Set timeout to 120+ seconds.
+### Setup and tests:
+- Install dependencies: `julia --project=. -e "using Pkg; Pkg.instantiate()"` -- takes ~60 seconds.
 - Run all tests: `julia --project=. -e "using Pkg; Pkg.test()"` -- takes ~5 minutes. NEVER CANCEL. Set timeout to 10+ minutes.
-- Load package interactively: `julia --project=. -e "using QuantEcon; println(\"QuantEcon.jl loaded successfully\")"`
+- Run individual test files: `julia --project=. -e 'using Pkg; Pkg.test(test_args=["mc_tools", "ddp"])'`, with names taken from the `tests` list in `test/runtests.jl` (the file names without `test_` and `.jl`) -- takes 2-60 seconds per file. Do not `include` a test file directly: the test files rely on the `using` statements in `test/runtests.jl`.
+- Julia 1.10+ is required (the `[compat]` bound in `Project.toml` is `julia = "1.10"`). MKL download warnings during the first install are normal.
 
 ### Documentation:
-- Setup documentation: `julia --project=docs -e "using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()"` -- takes ~2 minutes. NEVER CANCEL. Set timeout to 5+ minutes.
-- Build documentation: `julia --project=docs docs/make.jl` -- takes ~30 seconds. 
-- Serve documentation locally: `cd docs && go run serve.go` (optional - serves on http://localhost:3000)
-
-### Documentation Build Testing:
-Always test documentation builds when making docstring changes to ensure no parsing errors are introduced:
-- Test documentation build: `julia --project=docs docs/make.jl` -- should complete without docstring parsing errors
-- Watch for warnings about docstring formatting or parsing issues in the build output
-- Documentation builds must pass before committing docstring changes
-
-### Examples Section Testing:
-Always test Examples sections in docstrings to ensure they execute without error:
-- Execute each code block in the Examples section manually using `julia --project=.`
-- Ensure all examples run without errors and produce the expected output shown in the docstring
-- For REPL-style examples, verify the actual output matches what is documented
-- Test Examples sections before committing any docstring changes that include or modify Examples
+- Setup (once): `julia --project=docs -e "using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()"` -- takes ~2 minutes.
+- Build: `julia --project=docs docs/make.jl` -- takes ~30 seconds. Run it after any docstring change: it must complete without docstring parsing or formatting warnings. Warnings about network issues or missing git remotes are normal.
+- Serve locally (optional): `cd docs && go run serve.go` (serves on http://localhost:3000).
 
 ### Benchmarks:
 The repository has a benchmark suite in the standard BenchmarkTools.jl format under `benchmark/` (see `benchmark/README.md` for full usage):
@@ -38,8 +24,8 @@ The repository has a benchmark suite in the standard BenchmarkTools.jl format un
 - **Never change the workload behind an existing benchmark key**: `judge` compares keys across commits, so a changed workload silently invalidates before/after comparisons. Add a new key instead (e.g. `dense_n10_prealloc` vs `dense_n10_full_workspace` in `benchmark/lcp_lemke.jl`).
 - For performance-sensitive changes (especially under `src/markov/`), report before/after numbers from this suite in the PR description.
 
-### No linting or formatting tools are configured
-Julia packages typically do not use external linters or formatters like other language ecosystems. Code style follows the Julia community conventions in the [Julia Style Guide](https://docs.julialang.org/en/v1/manual/style-guide/).
+### Code style:
+No linter or formatter is configured. Code style follows the [Julia Style Guide](https://docs.julialang.org/en/v1/manual/style-guide/).
 
 ### Docstring Style Guide
 When writing or updating docstrings in this codebase, follow these conventions:
@@ -50,8 +36,9 @@ When writing or updating docstrings in this codebase, follow these conventions:
 3. Add a blank line between section headers and their content
 4. Always include both `# Arguments` and `# Returns` sections for functions
 5. Use consistent formatting for parameter descriptions: no space before colon and end with period
-6. **Preserve `@doc doc` formatting**: If a docstring uses `@doc doc"""` syntax, preserve it - do not change it to plain `"""`. This is used for mathematical notation and LaTeX formatting.
-7. **Do not escape LaTeX commands**: In docstrings with `@doc doc"""`, LaTeX commands like `\frac`, `\sum`, `\pi`, `\ldots` should remain as single backslash, not double backslash.
+6. **Use `@doc raw"""` for docstrings that contain backslashes** (LaTeX): in a plain `"""` docstring a backslash starts an escape sequence, so `\frac` is silently corrupted and `\sum` is a syntax error. Write LaTeX commands like `\frac`, `\sum`, `\pi`, `\ldots` with a single backslash there, not a double backslash. A docstring without backslashes needs only the plain form.
+7. **Use `@doc doc"""` only when the docstring also needs `$` interpolation**: `$name` is interpolated in the `doc` form but not in the `raw` form (e.g. the `lcp_lemke` docstring, which combines LaTeX with `$_TOL_PIV`).
+8. **Do not change an existing `@doc raw"""` or `@doc doc"""` to plain `"""`**, and do not change an existing `@doc doc"""` to `@doc raw"""` if it contains `$` interpolation.
 
 Example:
 ```julia
@@ -72,9 +59,9 @@ Brief description of what the function does.
 """
 ```
 
-Example with `@doc doc` for mathematical notation:
+Example with `@doc raw` for mathematical notation:
 ````julia
-@doc doc"""
+@doc raw"""
     function_with_math(x)
 
 Description with mathematical formula.
@@ -91,8 +78,12 @@ f(x) = \frac{1}{n} \sum_{i=1}^{n} x_i
 
 - `result::Float64`: Computed result.
 """
-function_with_math
+function function_with_math(x::Vector)
+    return sum(x) / length(x)
+end
 ````
+
+Place the docstring directly before the definition, as above. Only when a single docstring documents a function whose methods are defined separately, follow it with the bare function name instead (as for `stationary_distributions` in `src/markov/mc_tools.jl`).
 
 #### For Types/Structs:
 1. Start with a four-space indented type signature showing just the type name (do not include constructor parameters)
@@ -117,7 +108,7 @@ Brief description of the type.
 
 #### For Examples Sections:
 1. Use REPL-style format showing `julia>` prompts and expected output
-2. Always test Examples sections to ensure they execute without error
+2. Always test Examples sections: run each code block with `julia --project=.` and check that the output matches what the docstring shows
 3. Keep examples simple and focused on basic usage
 4. Do not include complex plotting or external file dependencies in Examples
 
@@ -135,23 +126,25 @@ julia> result = my_function(x, y)
 ```
 ````
 
-#### Quality Control Procedures:
-1. **Ensure all docstring descriptions end with periods:** Every parameter, field, return value, and general description in a docstring must end with a period for consistency
-2. **Check for typos in docstrings:** Always proofread docstrings for spelling errors, especially in technical terms and commonly misspelled words like "representation," "calculating," "response"
-3. **Apply these checks systematically:** When updating any docstring, review the entire file for similar formatting inconsistencies and typos
+When updating a docstring, check the rest of the file for the same formatting inconsistencies and for typos.
 
 ## Contribution Conventions
 
 ### Keeping these instructions up to date:
 - This file (`.github/copilot-instructions.md`) is the single source of repository instructions for AI agents (`AGENTS.md` and `CLAUDE.md` only point here). Update it whenever necessary as part of the change that makes it outdated: when adding or restructuring directories, changing workflows or conventions, bumping the required Julia version, or learning a repository-specific pitfall worth passing on. Stale instructions are worse than none.
 
-### Commit and PR titles:
-- Prefix commit subjects and PR titles with the change type: `FIX:` for bug fixes (use `FIX:`, not `BUG:`), `PERF:` for performance changes, `TEST:` for test-only changes, `DOC:` for documentation, `MAINT:` for maintenance.
+### Commit, PR and issue titles:
+- Prefix commit subjects and PR and issue titles with the change type: `ENH:` for new features and enhancements, `FIX:` for bug fixes (use `FIX:`, not `BUG:`), `PERF:` for performance changes, `TEST:` for test-only changes, `DOC:` for documentation, `MAINT:` for maintenance, `RFC:` for refactoring.
 
-### PR descriptions:
+### PR descriptions and other GitHub text:
 - Do not hard-wrap lines: keep each paragraph and each bullet point on a single line (GitHub soft-wraps; manual line breaks render poorly).
-- State explicitly whether the change is behavior-preserving; if it removes or changes anything that appears in the published API documentation (including docstrings picked up by `@autodocs`, even for internal or `Base`-extending methods), describe it as a breaking change and flag it for the release notes.
+- Wrap every `@`-prefixed token in backticks, in PR and issue descriptions, comments, and commit messages alike: a bare `@name` (typically a Julia macro such as `@inferred` or `@test`) is a GitHub mention and notifies whoever owns that username.
+- State explicitly whether the change is behavior-preserving; if it removes or changes anything that appears in the published API documentation (including docstrings picked up by `@autodocs`, even for internal or `Base`-extending methods), flag it as a breaking change in the PR description. (Release notes are created on the [GitHub Releases page](https://github.com/QuantEcon/QuantEcon.jl/releases) at release time; `CHANGELOG.md` is not maintained.)
 - For performance PRs, include measured before/after numbers from the benchmark suite.
+
+### Declaration of AI assistance:
+- End every PR description, issue, and comment written with AI assistance with a one-line declaration naming the tool and the model, in the form `Assisted-by: <tool> (<model>)` or `Generated with <tool> (<model>)`; for example `Assisted-by: Claude Code (Claude Fable 5.1)` or `🤖 Generated with [Claude Code](https://claude.com/claude-code) (Claude Fable 5.1)`.
+- In commit messages, keep the `Co-Authored-By:` trailer that the tool emits.
 
 ### Cross-language parity with QuantEcon.py:
 - Parts of this package mirror [QuantEcon.py](https://github.com/QuantEcon/QuantEcon.py); in particular, `src/markov/ddp.jl` mirrors `quantecon/markov/ddp.py`.
@@ -168,65 +161,7 @@ When replacing a library call with a hand-written kernel (or adding caching), a 
 
 ## Validation
 
-### Always manually validate changes by running complete scenarios:
-After making any code changes, ALWAYS run these validation scenarios to ensure functionality works correctly:
-
-#### Scenario 1: Core Markov Chain Operations
-```julia
-julia --project=. -e "
-using QuantEcon
-P = [0.7 0.3; 0.4 0.6]
-mc = MarkovChain(P)
-sim = simulate(mc, 10)
-println(\"Markov chain simulation: \", sim)
-stat_dist = stationary_distributions(mc)
-println(\"Stationary distribution: \", stat_dist[1])
-"
-```
-
-#### Scenario 2: ARMA Time Series Model
-```julia
-julia --project=. -e "
-using QuantEcon
-ar_coeffs = [0.5, -0.2]
-ma_coeffs = [0.3]
-arma = ARMA(ar_coeffs, ma_coeffs, 1.0)
-impulse = impulse_response(arma; impulse_length=5)
-println(\"ARMA impulse response: \", impulse)
-"
-```
-
-#### Scenario 3: Utility Functions and Economics Tools
-```julia
-julia --project=. -e "
-using QuantEcon
-u = LogUtility(2.0)
-val = u(1.5)
-deriv = derivative(u, 1.5)
-println(\"Log utility u(1.5) = \", val, \", derivative = \", deriv)
-grid = gridmake([1,2,3], [4,5])
-println(\"Grid created with size: \", size(grid))
-"
-```
-
-#### Scenario 4: Dynamic Programming Example
-```julia
-julia --project=. -e "
-include(\"examples/finite_dp_og_example.jl\")
-using QuantEcon
-og = SimpleOG()
-ddp = DiscreteDP(og.R, og.Q, og.beta)
-results = solve(ddp, VFI)
-println(\"VFI converged in \", results.num_iter, \" iterations\")
-"
-```
-
-### Critical validation requirements:
-- ALL scenarios above must run successfully after any code change
-- Run each scenario in its own `julia -e` process as shown: scenario 3 binds `u`, which collides with the `function u` defined by scenario 4's example file if run in a shared process
-- NEVER commit code changes without running these validation scenarios
-- If any validation scenario fails, investigate and fix before proceeding
-- Run the full test suite (`Pkg.test()`) before finalizing any significant changes
+After making code changes, run the test files relevant to the change (`Pkg.test(test_args=[...])`, see "Setup and tests" above), then the full test suite (`Pkg.test()`) before finalizing. If a test fails, investigate and fix before committing.
 
 ## Repository Structure
 
@@ -241,80 +176,29 @@ println(\"VFI converged in \", results.num_iter, \" iterations\")
   - `optimization.jl`, `zeros.jl` - Numerical optimization and root finding
   - `interp.jl`, `quad.jl` - Interpolation and quadrature methods
   - `util.jl` - Grid generation and utility functions
-- `test/` - Test files following `test_*.jl` naming convention
+- `test/` - Test files `test_<name>.jl`; `test/runtests.jl` runs only those whose `<name>` is in its `tests` list (`quad` is commented out there, because `test_quad.jl` needs MAT.jl, so changes to `src/quad.jl` are not covered by the test suite)
 - `benchmark/` - Benchmark suite in BenchmarkTools.jl/PkgBenchmark.jl format (see `benchmark/README.md`)
 - `docs/` - Documentation source and build system using Documenter.jl
-- `examples/` - Example usage scripts
+- `examples/` - Example usage scripts; run them from the repository root, e.g. `julia --project=. examples/finite_dp_og_example.jl`
 - `Project.toml` - Package metadata and dependencies
-
-### Major functional areas:
-This package provides comprehensive tools for quantitative economics:
-- **Dynamic Programming**: DiscreteDP for finite-horizon and infinite-horizon problems
-- **Markov Processes**: MarkovChain simulation, stationary distributions, communication classes
-- **Time Series**: ARMA models, Kalman filtering, linear state space models
-- **Control Theory**: Linear-quadratic control and robust control (RBLQ)
-- **Game Theory**: Linear-quadratic Nash equilibrium computation
-- **Numerical Methods**: Root finding, optimization, interpolation, quadrature
-- **Utility Functions**: Log, CRRA, CFE, and other utility specifications
-- **Random Sampling**: Markov chain sampling, multivariate normal sampling
-- **Grid Tools**: Grid generation for computational economics
 
 ## Common Tasks
 
-When working on this codebase, developers frequently need to:
-
 ### Adding new functionality:
-1. Add the implementation to appropriate file in `src/`
-2. Export the function/type in `src/QuantEcon.jl`
-3. Add comprehensive tests in `test/test_[module].jl`
-4. Add docstrings following Julia conventions
-5. Run all validation scenarios above
-6. Run full test suite: `julia --project=. -e "using Pkg; Pkg.test()"`
-
-### Testing changes:
-1. ALWAYS run the manual validation scenarios above
-2. Run full test suite: `julia --project=. -e "using Pkg; Pkg.test()"`
-3. Run individual test file: `julia --project=. -e "using Pkg, Test, QuantEcon; @testset \"Single test\" begin include(\"test/test_FILENAME.jl\") end"`
-4. Test timing: Full test suite takes ~5 minutes, individual test files take 2-60 seconds each
+- Export new functions and types in `src/QuantEcon.jl`.
+- Put tests in `test/test_<name>.jl` and add `<name>` to the `tests` list in `test/runtests.jl`.
+- Add docstrings following the style guide above.
 
 ### Writing tests — scope pitfall:
 In Julia, an assignment inside a `@testset` to a name defined in the enclosing scope reassigns the enclosing variable rather than creating a local one. In test files where fixtures (`R`, `Q`, `beta`, ...) are shared across testsets at the top level, use fresh local names inside testsets (e.g. `_R`, `R_bi`) instead of reusing fixture names; otherwise later testsets silently run against the wrong data. This has caused vacuously passing tests in this repository before (see the fix in PR #384).
 
-### Working with examples:
-- Run examples from repository root: `julia --project=. examples/finite_dp_og_example.jl`
-- Examples demonstrate real-world usage patterns
-- Use examples as templates for validation scenarios
+## CI
 
-## CI/CD Information
-
-### GitHub Actions workflows:
-- `.github/workflows/ci.yml` - Main CI running tests on Julia LTS, latest, and nightly
-- `.github/workflows/documentation.yml` - Documentation building and deployment  
-- Tests run on Ubuntu, macOS, and Windows
-- All tests must pass for merging pull requests
-
-### Performance expectations:
-- Package instantiation: ~60 seconds
-- Full test suite: ~5 minutes  
-- Documentation build: ~2 minutes
-- Individual test modules: 5-60 seconds each
-
-## Troubleshooting
-
-### Common issues:
-- Network connectivity required for first-time dependency installation
-- Documentation warnings about network issues or missing git remotes are normal in CI
-- MKL dependency download warnings during first install are normal
-
-### If builds fail:
-1. Check network connectivity for package installation
-2. Ensure Julia 1.10+ is installed (the `[compat]` bound in `Project.toml` is `julia = "1.10"`)
-3. Clear package cache: `julia -e "using Pkg; Pkg.gc()"`
-4. Reinstall dependencies: `julia --project=. -e "using Pkg; Pkg.instantiate()"`
+- `.github/workflows/ci.yml` runs the tests on Julia LTS, latest, and nightly, on Ubuntu, macOS, and Windows. All tests must pass for merging pull requests.
+- `.github/workflows/documentation.yml` builds and deploys the documentation.
 
 ## References
 
 - Main library website: https://quantecon.org/quantecon-jl/
-- Package documentation: https://QuantEcon.github.io/QuantEcon.jl/latest
-- QuantEcon lecture site with examples: https://lectures.quantecon.org/
-- Julia package manager documentation: https://docs.julialang.org/en/v1/stdlib/Pkg/
+- Package documentation: https://QuantEcon.github.io/QuantEcon.jl/stable
+- QuantEcon lecture site with examples: https://julia.quantecon.org/
