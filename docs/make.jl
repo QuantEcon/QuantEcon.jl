@@ -1,14 +1,18 @@
 using Documenter, QuantEcon
+using POMDPs, POMDPTools  # trigger packages of QuantEconPOMDPsExt
+
+const QuantEconPOMDPsExt = Base.get_extension(QuantEcon, :QuantEconPOMDPsExt)
 
 makedocs(
-    modules = [QuantEcon],
+    modules = [QuantEcon, QuantEconPOMDPsExt],
     format = Documenter.HTML(prettyurls = false, size_threshold = nothing),
     sitename = "QuantEcon.jl",
     pages = Any[ # Compat: `Any` for 0.4 compat
         "Home" => "index.md",
         # "User Guide" => "man/guide.md",
         "API" => Any[
-            "QuantEcon" => "api/QuantEcon.md"
+            "QuantEcon" => "api/QuantEcon.md",
+            "QuantEconPOMDPsExt" => "api/QuantEconPOMDPsExt.md"
         ],
         "Contributing" => "man/contributing.md"
     ]

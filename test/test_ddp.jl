@@ -866,6 +866,11 @@ Tests for markov/ddp.jl
             @test_throws ArgumentError DDPValueFunction(_res; im=_bad)
         end
 
+        @testset "markov_chain" begin
+            _res = solve(ddp0, PFI)
+            @test (@inferred markov_chain(_res)) === _res.mc
+        end
+
         @testset "duplicated values: decoration yes, inversion no" begin
             # repeated action labels are legal (shared display names)
             _ddp_a = DiscreteDP(R, Q, beta; action_values=[:stay, :stay])

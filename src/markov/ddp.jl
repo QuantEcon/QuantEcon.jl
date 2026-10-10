@@ -894,6 +894,26 @@ QuantEcon.MarkovChain(ddp::DiscreteDP, sigma::AbstractVector{<:Integer}) =
     MarkovChain(RQ_sigma(ddp, sigma)[2], ddp.state_values)
 
 """
+    markov_chain(res)
+
+Return the controlled Markov chain of a solved model, `res.mc`: the
+chain induced by the optimal policy, computed at the end of `solve` and
+carrying `res.ddp.state_values`. It is returned by reference, not
+copied, and is not recomputed from the current contents of `res.sigma`
+(for that, use `MarkovChain(ddp, sigma)`).
+
+# Arguments
+
+- `res::DPSolveResult`: Object that contains result variables.
+
+# Returns
+
+- `mc::MarkovChain`: Controlled Markov chain.
+
+"""
+markov_chain(res::DPSolveResult) = res.mc
+
+"""
     sigma_values(res)
 
 Return the optimal policy decoded to action values,
@@ -1084,6 +1104,31 @@ function DDPValueFunction(res::DPSolveResult;
 end
 
 (vf::DDPValueFunction)(s) = vf.v[vf.im[s]]
+
+"""
+    DiscreteDPSolver
+
+Solver for POMDPs.jl models based on the `DiscreteDP` solution methods,
+constructed as `DiscreteDPSolver(algo; sparse, max_iter, epsilon, k)`.
+Provided by the POMDPs.jl integration: load both POMDPs and POMDPTools
+(`using POMDPs, POMDPTools`) to enable it, and see the extension's
+documentation for the full constructor contract.
+
+# Arguments
+
+- `algo::Type{<:DDPAlgorithm}(VFI)`: Solution algorithm: `VFI`, `PFI`,
+  or `MPFI`.
+- `;sparse::Val(Val(true))`: Value-typed tabulation-formulation flag.
+- `;max_iter::Integer(250)`, `;epsilon::Real(1e-3)`, `;k::Integer(20)`:
+  Options passed to `solve`.
+
+# Returns
+
+- `solver::DiscreteDPSolver`: A `POMDPs.Solver`; `POMDPs.solve(solver,
+  m)` tabulates `m` via `DiscreteDP(m)`, solves it, and returns a
+  `DiscreteDPPolicy`.
+"""
+function DiscreteDPSolver end
 
 """
     RQ_sigma(ddp, sigma)

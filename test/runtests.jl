@@ -39,6 +39,7 @@ tests = [
         "interp",
         "sampler",
         "util",
+        "pomdps",
         ]
 
 

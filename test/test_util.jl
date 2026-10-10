@@ -133,6 +133,37 @@
     end
 
     @testset "IndexMap" begin
+        @testset "get returns indices or the supplied default" begin
+            im_get = IndexMap([:low, :high])
+            fallback = Ref(:absent)
+            @test (@inferred get(im_get, :high, 0)) == 2
+            @test get(im_get, :missing, fallback) === fallback
+            @test get(im_get, :missing, nothing) === nothing
+            @test_throws ArgumentError im_get[:missing]
+
+            # Both representations must agree, including on empty ranges,
+            # signed zero, mixed numeric types, and unrepresentable offsets.
+            big_lo = big(typemax(Int)) + 1
+            for r_get in (0:2, 5:9, 1:0,
+                          typemin(Int8):typemax(Int8),
+                          UInt8(250):UInt8(255), false:true,
+                          big_lo:(big_lo + 2))
+                im_range = IndexMap(r_get)
+                im_vector = IndexMap(collect(r_get))
+                for query in (first(r_get), last(r_get), 2.0, 2.5,
+                              -0.0, 0.0, 2 + 0im, Inf, NaN,
+                              :missing, nothing, big_lo + 10)
+                    @test get(im_range, query, fallback) ===
+                          get(im_vector, query, fallback)
+                    @test get(im_range, query, nothing) ===
+                          get(im_vector, query, nothing)
+                end
+            end
+            @test (@inferred get(IndexMap(5:9), 7, 0)) == 3
+            @test get(IndexMap(typemin(Int8):typemax(Int8)),
+                      typemax(Int8), 0) == 256
+        end
+
         @testset "vector of tuples" begin
             vals = [(0.0, 0.1), (1.0, 0.1), (0.0, 1.0), (1.0, 1.0)]
             im = IndexMap(vals)
