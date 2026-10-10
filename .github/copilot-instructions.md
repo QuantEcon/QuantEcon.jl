@@ -176,9 +176,10 @@ After making code changes, run the test files relevant to the change (`Pkg.test(
   - `optimization.jl`, `zeros.jl` - Numerical optimization and root finding
   - `interp.jl`, `quad.jl` - Interpolation and quadrature methods
   - `util.jl` - Grid generation and utility functions
+- `ext/` - Package extensions. `QuantEconPOMDPsExt.jl` is the POMDPs.jl integration, loaded when both `POMDPs` and `POMDPTools` are loaded (weak dependencies in `Project.toml`). `ext/examples/` holds example scripts that need those packages; they are kept there on purpose, do not move them to `examples/`
 - `test/` - Test files `test_<name>.jl`; `test/runtests.jl` runs only those whose `<name>` is in its `tests` list (`quad` is commented out there, because `test_quad.jl` needs MAT.jl, so changes to `src/quad.jl` are not covered by the test suite)
 - `benchmark/` - Benchmark suite in BenchmarkTools.jl/PkgBenchmark.jl format (see `benchmark/README.md`)
-- `docs/` - Documentation source and build system using Documenter.jl
+- `docs/` - Documentation source and build system using Documenter.jl; `docs/make.jl` loads `POMDPs` and `POMDPTools` so that the extension's docstrings are built into `docs/src/api/QuantEconPOMDPsExt.md`
 - `examples/` - Example usage scripts; run them from the repository root, e.g. `julia --project=. examples/finite_dp_og_example.jl`
 - `Project.toml` - Package metadata and dependencies
 
@@ -188,6 +189,14 @@ After making code changes, run the test files relevant to the change (`Pkg.test(
 - Export new functions and types in `src/QuantEcon.jl`.
 - Put tests in `test/test_<name>.jl` and add `<name>` to the `tests` list in `test/runtests.jl`.
 - Add docstrings following the style guide above.
+
+### Working on the POMDPs.jl extension:
+- `solve` and `simulate` are exported by both QuantEcon and POMDPs: qualify them (`QuantEcon.solve`, `POMDPs.solve`, ...) wherever both packages are loaded, in docs, examples, and tests alike.
+- The core defines `DiscreteDPSolver` as a method-less function with a `MethodError` hint (registered in `__init__`); the extension imports names from QuantEcon selectively and extends that function with a single qualified forwarding method. Do not load QuantEcon wholesale (`using QuantEcon`) inside the extension.
+- `as_mdp` is currently internal (unexported) and serves as round-trip test infrastructure.
+- The extension's docstrings are published through `@autodocs`, so the rule on changes to the published API documentation applies to them. `docs/src/api/QuantEconPOMDPsExt.md` sets `CurrentModule` to the extension, so cross-references to core names need the `QuantEcon.` prefix.
+- `test/test_pomdps.jl` runs in its own module with `using QuantEcon, POMDPs, POMDPTools`, to test in the namespace a user has and to keep the POMDPs exports out of `Main`. Keep the stub testset at the top of that module, before `POMDPs` and `POMDPTools` are loaded.
+- `POMDPs` and `POMDPTools` are test-only dependencies and are not available under `julia --project=.`; to try the extension interactively, use the docs environment (`julia --project=docs`).
 
 ### Writing tests — scope pitfall:
 In Julia, an assignment inside a `@testset` to a name defined in the enclosing scope reassigns the enclosing variable rather than creating a local one. In test files where fixtures (`R`, `Q`, `beta`, ...) are shared across testsets at the top level, use fresh local names inside testsets (e.g. `_R`, `R_bi`) instead of reusing fixture names; otherwise later testsets silently run against the wrong data. This has caused vacuously passing tests in this repository before (see the fix in PR #384).
