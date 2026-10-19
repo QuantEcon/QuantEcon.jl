@@ -1,0 +1,151 @@
+@pipeline RegPipe(std = Standardizer(),
+                  hot = OneHotEncoder(),
+                  reg = LinearRegressor())
+
+model = RegPipe()
+pipe  = machine(model, Xc, y)
+fit!(pipe, rows=train)
+ŷ = predict(pipe, rows=test)
+round(rms(ŷ, y[test])^2, sigdigits=4)
+
+
+
+
+r  = range(model, :(reg.lambda), lower=1e-2, upper=100_000, scale=:log10)
+tm = TunedModel(model=model, ranges=r, tuning=Grid(resolution=50),
+                resampling=CV(nfolds=3, rng=4141), measure=rms)
+mtm = machine(tm, Xc, y)
+fit!(mtm, rows=train)
+best_mdl = fitted_params(mtm).best_model
+round(best_mdl.reg.lambda, sigdigits=4)
+
+
+
+
+
+
+
+ConfInt[1, usevariab] <- pmax(
+				ConfInt[1, usevariab, drop = FALSE], 
+				tmp$coefficients + qnorm(1 - alpha/4) * tmp$coefficientsvar, 
+				na.rm = TRUE)
+				
+				
+ConfInt[2, usevariab] <- pmin(
+				ConfInt[2, usevariab, drop = FALSE], 
+				tmp$coefficients - qnorm(1 - alpha/4) * tmp$coefficientsvar, 
+				na.rm = TRUE)
+				
+				
+quantile(Normal(0, 1), 1 - alpha/4)
+
+is qnorm(n)
+				
+
+
+ConfInt[1, usevariab] <- max(
+				ConfInt[1, t], 
+				r$coefs + quantile(Normal(0, 1), 1 - alpha/4) * r$coefsStd)
+				
+				
+				
+				
+*********************				
+InvariantCausalPrediction(dfX1[:,1:2],dfY1, dfE1)
+
+
+InvariantCausalPrediction(dfX2[:,1:2],dfY2, dfE2)
+
+
+
+
+if (length(notusevariab) >= 1) {
+                ConfInt[1, notusevariab] <- pmax(ConfInt[1, notusevariab, drop = FALSE], 0, na.rm = TRUE)
+                ConfInt[2, notusevariab] <- pmin(ConfInt[2, notusevariab, drop = FALSE], 0, na.rm = TRUE)
+            }
+
+
+
+Dict{Symbol,Tuple{Float64,Float64}}
+
+
+println(" normalQuantile ",  normalQuantile, " typeof ", typeof(normalQuantile))
+
+
+
+function MLJ.fit(model::KNNRidgeBlend, verbosity::Int, X, y)
+    Xs = source(X)
+    ys = source(y, kind=:target)
+    hot = machine(OneHotEncoder(), Xs)
+    W = transform(hot, Xs)
+    z = log(ys)
+    ridge_model = model.ridge_model
+    knn_model = model.knn_model
+    ridge = machine(ridge_model, W, z)
+    knn = machine(knn_model, W, z)
+    # and finally
+    ẑ = model.knn_weight * predict(knn, W) + (1.0 - model.knn_weight) * predict(ridge, W)
+    ŷ = exp(ẑ)
+    fit!(ŷ, verbosity=0)
+    return fitresults(ŷ)
+end
+	
+
+
+
+names X [:ethnicity, :score]
+ ^^ coefs [-0.43851241719212836, -0.12750153569721762, 0.5660139626794835, 0.9966932091483689] typeof Array{Float64,1}
+ ^^ coefsMeanStd [(0.0, 0.0) (53.443939401645856, 8.05828188259464) (0.0, 0.0) (0.0, 0.0)] typeof Array{Tuple{Float64,Float64},2}
+ ***********fp[3].mean_and_std_given_feature Dict(:score => (53.443939401645856, 8.05828188259464))   Dict{Symbol,Tuple{Float64,Float64}}
+getPValue       (pval = 0.8823106350159862, coefs = [-0.43851241719212836, -0.12750153569721762, 0.5660139626794835, 0.9966932091483689], coefsMeanStd = [(0.0, 0.0) (53.443939401645856, 8.05828188259464) 
+(0.0, 0.0) (0.0, 0.0)])
+
+
+
+
+^^ ŷ  UnivariateFinite{Float64,UInt32,Float64}[UnivariateFinite(0.0=>0.949, 1.0=>0.051), UnivariateFinite(0.0=>0.848, 1.0=>0.152), UnivariateFinite(0.0=>0.85, 1.0=>0.15), UnivariateFinite(0.0=>0.978, 1.
+0=>0.0225), UnivariateFinite(0.0=>0.94, 1.0=>0.0596), UnivariateFinite(0.0=>0.731, 1.0=>0.269), UnivariateFinite(0.0=>0.696, 1.0=>0.304), UnivariateFinite(0.0=>0.727, 1.0=>0.273), UnivariateFinite(0.0=>0.44, 1.0=>0.56), UnivariateFinite(0.0=>0.697, 1.0=>0.303), UnivariateFinite(0.0=>0.927, 1.0=>0.0729), UnivariateFinite(0.0=>0.769, 1.0=>0.231), UnivariateFinite(0.0=>0.59, 1.0=>0.41), UnivariateFinite(0.0=>0.622, 1.0=>0.378), UnivariateFinite(0.0=>0.893, 1.0=>0.107), UnivariateFinite(0.0=>0.539, 1.0=>0.461), UnivariateFinite(0.0=>0.78, 1.0=>0.22), UnivariateFinite(0.0=>0.9, 1.0=>0.0999), UnivariateFinite(0.0=>0.652, 1.0=>0.348), UnivariateFinite(0.0=>0.604, 1.0=>0.396), UnivariateFinite(0.0=>0.812, 1.0=>0.188), UnivariateFinite(0.0=>0.598, 1.0=>0.402), UnivariateFinite(0.0=>0.631, 1.0=>0.369), UnivariateFinite(0.0=>0.706, 1.0=>0.294), UnivariateFinite(0.0=>0.561, 1.0=>0.439), UnivariateFinite(0.0=>0.977, 1.0=>0.023), UnivariateFinite(0.0=>0.83, 1.0=>0.17), UnivariateFinite(0.0=>0.594, 1.0=>0.406), UnivariateFinite(0.0=>0.575, 1.0=>0.425), UnivariateFinite(0.0=>0.581, 1.0=>0.419), UnivariateFinite(0.0=>0.328, 1.0=>0.672), UnivariateFinite(0.0=>0.924, 1.0=>0.0762), UnivariateFinite(0.0=>0.625, 1.0=>0.375), UnivariateFinite(0.0=>0.64, 1.0=>0.36), UnivariateFinite(0.0=>0.616, 1.0=>0.384), UnivariateFinite(0.0=>0.84, 1.0=>0.16), UnivariateFinite(0.0=>0.872, 1.0=>0.128), UnivariateFinite(0.0=>0.554, 1.0=>0.446), UnivariateFinite(0.0=>0.739, 1.0=>0.261), UnivariateFinite(0.0=>0.341, 1.0=>0.659), UnivariateFinite(0.0=>0.288, 1.0=>0.712), UnivariateFinite(0.0=>0.626, 1.0=>0.374), UnivariateFinite(0.0=>0.853, 1.0=>0.147), Univar
+
+
+ ^^ yhatResponse  [0.05102592260187594, 0.15176502584882587, 0.14970673437591983, 0.022467381668184575, 0.059605807730697354, 0.26923634617768955, 0.30358417118602393, 0.2726568004116155, 0.5602226353177788, 0.3033227815469683, 0.07287565760642183, 0.23098085120784356, 0.4102924068129813, 0.3784018987252601, 0.10664530105038635, 0.46102881453551103, 0.21957666442020243, 0.0999076928572241, 0.3480903817243252, 0.39571244207943845, 0.1875465105479224, 0.4016427014001162, 0.3694261116026364, 0.293996660381078, 0.4392963653811644, 0.02301713062212841, 0.1704705487907868, 0.4055128860619639, 0.4247296570824781, 0.418998064613374, 0.6719501875280678, 0.07620270391490977, 0.37520703356698015, 0.3602546803397965, 0.38365256719850804, 0.1598987710603979, 0.12772839618710788, 0.44600939705855996, 0.2605662841312744, 0.6592881299622488, 0.7119801033886627, 0.37375841813607713, 0.1470498042465337, 0.1909624750840662, 0.0526057619872685, 0.2758571893942018, 0.025937606790600656, 0.2843363939799493, 0.03784736023496059
+ 
+ 
+ 
+https://github.com/alan-turing-institute/MLJ.jl/issues/489#issuecomment-612882956
+
+  
+
+using MLJ, CSV, DataFrames 
+
+xgc = @load XGBoostClassifier;
+xgr = @load XGBoostRegressor;
+ 
+ 
+pipe = @pipeline MyPipe(hot=OneHotEncoder(), xgr = xgr) ######prediction_type=:probabilistic
+
+
+r1 = range(pipe, :(xgr.max_depth), lower = 3, upper = 10)
+r2 = range(pipe, :(xgr.num_round), lower = 1, upper = 25)
+tmr = TunedModel(
+                   model = pipe,
+                   tuning = Grid(resolution = 7),
+                   resampling = CV(rng = 11),
+                   ranges = [r1, r2],
+				   measure=rms
+               )
+			   
+X = copy(dfX3)
+y = dfY3
+coerce!(X, autotype(X, :string_to_multiclass))
+y = float.(y[:,1])
+
+mtmr = machine(tmr, X, y)
+fit!(mtmr)
+
+
+
+
+
+qnorm(1 - alpha/4) * tmp$coefficientsvar
+	
+	
