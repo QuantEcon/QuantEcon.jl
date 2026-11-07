@@ -32,7 +32,13 @@ end
     end
 
     @testset "irreducible sparse chain" begin
-        P = random_stochastic_matrix(rng, 200, 5, sparse=Val(true))
+        # a random sparse stochastic matrix need not be irreducible (and the
+        # draw depends on the Julia version): mix in the cycle 1 -> 2 -> ...
+        # -> n -> 1, which makes the chain irreducible by construction
+        n = 200
+        P = random_stochastic_matrix(rng, n, 5, sparse=Val(true))
+        C = sparse(1:n, mod1.(2:n+1, n), 1.0, n, n)
+        P = 0.9 * P + 0.1 * C
         mc = MarkovChain(P)
         @test is_irreducible(mc)
         x = @inferred arnoldi_solve(P)
