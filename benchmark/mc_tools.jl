@@ -1,9 +1,10 @@
 #=
 Benchmarks for markov/mc_tools.jl (MarkovChain)
 
-Covers the GTH linear solver (`gth_solve`), stationary distribution
-computation, and simulation (`simulate`, `simulate!`, `simulate_indices`),
-for both dense and sparse transition matrices.
+Covers the GTH linear solver (`gth_solve`), the Arnoldi solver
+(`arnoldi_solve`, in markov/arnoldi_solve.jl), stationary
+distribution computation, and simulation (`simulate`, `simulate!`,
+`simulate_indices`), for both dense and sparse transition matrices.
 
 The simulation benchmarks include a long-path case (per-step sampling cost
 dominates) and a short-path case with many states (per-call setup cost —
@@ -77,6 +78,19 @@ let grp = suite["gth_solve"] = BenchmarkGroup()
         A = mc_random_stochastic_matrix(new_mc_rng(), n)
         grp["n$n"] = @benchmarkable gth_solve($A)
     end
+end
+
+# arnoldi_solve: Krylov solver on the push-forward operator. The dense
+# n1000 case shares its matrix size with gth_solve/n1000 for the crossover;
+# the sparse cases are the regime the solver is for (GTH would densify).
+let grp = suite["arnoldi_solve"] = BenchmarkGroup()
+    A = mc_random_stochastic_matrix(new_mc_rng(), 1000)
+    grp["dense_n1000"] = @benchmarkable QuantEcon.arnoldi_solve($A)
+    S = mc_random_sparse_stochastic_matrix(new_mc_rng(), 1000, 4)
+    grp["sparse_n1000_k4"] = @benchmarkable QuantEcon.arnoldi_solve($S)
+    S_large = mc_random_sparse_stochastic_matrix(new_mc_rng(), 100_000, 4)
+    grp["sparse_n100000_k4"] =
+        @benchmarkable QuantEcon.arnoldi_solve($S_large)
 end
 
 # Model cases shared by the remaining groups
