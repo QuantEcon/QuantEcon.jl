@@ -171,6 +171,10 @@ end
     @testset "small chains" begin
         @test arnoldi_solve(ones(1, 1)) == [1.0]
         @test arnoldi_solve(ones(1, 1), [3.0]) == [1.0]
+        @test arnoldi_solve(x -> x, [2.0]) == [1.0]
+        # a single state is still checked for stochasticity
+        @test_throws ArgumentError arnoldi_solve(fill(0.9, 1, 1))
+        @test_throws ArgumentError arnoldi_solve(x -> 0.9 * x, [1.0])
         P = [0.3 0.7; 0.6 0.4]
         @test arnoldi_solve(P) ≈ gth_reference(P) atol=1e-10
     end

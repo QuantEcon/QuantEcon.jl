@@ -53,9 +53,9 @@ a `Vector{Float32}`.
 - `x::Vector{T}`: Stationary distribution of the chain, with `T`
   `Float64` or `Float32` as described above.
 
-An `ArgumentError` is thrown if the eigenvalue found is not 1 up to the
-accuracy of the solver, which means that the operator is not stochastic, and an
-`ErrorException` if the iteration does not converge within `max_iter`
+An `ArgumentError` is thrown if the eigenvalue found is not 1 within
+`sqrt(max(tol, eps(T)))`, which means that the operator is not stochastic,
+and an `ErrorException` if the iteration does not converge within `max_iter`
 restarts.
 
 # Notes
@@ -135,8 +135,17 @@ function _arnoldi_solve(op, x0::Vector{T};
     s = sum(x0)
     (isfinite(s) && s > zero(T)) ||
         throw(ArgumentError("x0 must have positive finite sum"))
-    n == 1 && return [one(T)]
     x0 ./= s
+    # slack for the check that the eigenvalue found is 1: the error of a
+    # converged eigenvalue is of the order of tol
+    slack = sqrt(max(tol, eps(T)))
+
+    if n == 1
+        # the operator is the scalar eigenvalue itself
+        lam = _arnoldi_apply(op, x0)[1]
+        _arnoldi_check_eigenvalue(lam, slack)
+        return [one(T)]
+    end
 
     vals, vecs, info = eigsolve(op, x0, 1, :LR; tol=tol, maxiter=max_iter,
                                 krylovdim=min(krylovdim, n), verbosity=0,
@@ -145,12 +154,7 @@ function _arnoldi_solve(op, x0::Vector{T};
         error("arnoldi_solve did not converge after $(info.numiter) " *
               "restarts ($(info.numops) operator applications); residual " *
               "norm $(info.normres[1]). Increase max_iter or krylovdim.")
-    # slack for the check that the eigenvalue found is 1: the error of a
-    # converged eigenvalue is of the order of tol
-    lam = vals[1]
-    abs(lam - 1) <= sqrt(max(tol, eps(T))) ||
-        throw(ArgumentError("the largest eigenvalue $lam is not 1: the " *
-                            "operator is not stochastic (rows must sum to 1)"))
+    _arnoldi_check_eigenvalue(vals[1], slack)
 
     # the eigenvector is complex for a nonsymmetric operator (with zero
     # imaginary part at a real eigenvalue) and has arbitrary sign and scale;
@@ -163,4 +167,16 @@ function _arnoldi_solve(op, x0::Vector{T};
     x = Vector{T}(real.(vecs[1]))::Vector{T}
     x ./= sum(x)
     return x
+end
+
+# Apply the operator as eigsolve does: a matrix by multiplication, anything
+# else by calling it
+_arnoldi_apply(op::AbstractMatrix, x) = op * x
+_arnoldi_apply(op, x) = op(x)
+
+function _arnoldi_check_eigenvalue(lam, slack)
+    abs(lam - 1) <= slack ||
+        throw(ArgumentError("the largest eigenvalue $lam is not 1: the " *
+                            "operator is not stochastic (rows must sum to 1)"))
+    return nothing
 end

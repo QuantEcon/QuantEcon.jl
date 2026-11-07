@@ -83,13 +83,14 @@ end
 # arnoldi_solve: Krylov solver on the push-forward operator. The dense
 # n1000 case shares its matrix size with gth_solve/n1000 for the crossover;
 # the sparse cases are the regime the solver is for (GTH would densify).
-let grp = suite["arnoldi_solve"] = BenchmarkGroup(), arnoldi_solve = QuantEcon.arnoldi_solve
+let grp = suite["arnoldi_solve"] = BenchmarkGroup()
     A = mc_random_stochastic_matrix(new_mc_rng(), 1000)
-    grp["dense_n1000"] = @benchmarkable arnoldi_solve($A)
+    grp["dense_n1000"] = @benchmarkable QuantEcon.arnoldi_solve($A)
     S = mc_random_sparse_stochastic_matrix(new_mc_rng(), 1000, 4)
-    grp["sparse_n1000_k4"] = @benchmarkable arnoldi_solve($S)
+    grp["sparse_n1000_k4"] = @benchmarkable QuantEcon.arnoldi_solve($S)
     S_large = mc_random_sparse_stochastic_matrix(new_mc_rng(), 100_000, 4)
-    grp["sparse_n100000_k4"] = @benchmarkable arnoldi_solve($S_large)
+    grp["sparse_n100000_k4"] =
+        @benchmarkable QuantEcon.arnoldi_solve($S_large)
 end
 
 # Model cases shared by the remaining groups
