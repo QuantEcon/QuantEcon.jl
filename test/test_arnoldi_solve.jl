@@ -87,11 +87,40 @@ end
         end
         @test issymmetric(P)
         @test (@inferred arnoldi_solve(P)) ≈ fill(1/n, n) atol=1e-10
-        # keyword arguments are forwarded to eigsolve: the function form
-        # cannot detect symmetry, but can be told
+        # symmetry is not detected but opted in, through the keyword
+        # arguments forwarded to eigsolve, in either form
+        @test arnoldi_solve(P; issymmetric=true) ≈ fill(1/n, n) atol=1e-10
+        @test arnoldi_solve(sparse(P); issymmetric=true) ≈
+              fill(1/n, n) atol=1e-10
         f(v) = P * v
         @test arnoldi_solve(f, fill(1/n, n); issymmetric=true) ≈
               fill(1/n, n) atol=1e-10
+    end
+
+    @testset "reducible chain" begin
+        # two recurrent classes: the eigenvalue 1 is double, and the
+        # eigenvector returned by the solver may have opposite signs on the
+        # two classes; the result must still be a stationary distribution
+        P = [0    1    0    0
+             0.25 0.75 0    0
+             0    0    0    1
+             0    0    0.75 0.25]
+        for Pc in (P, Float32.(P), sparse(P))
+            x = arnoldi_solve(Pc)
+            @test all(x .>= 0)
+            @test sum(x) ≈ 1
+            @test transpose(Pc) * x ≈ x atol=1e-5
+        end
+        n = 50
+        A = random_stochastic_matrix(rng, n)
+        B = random_stochastic_matrix(rng, n)
+        P2 = [A zeros(n, n); zeros(n, n) B]
+        for Pc in (P2, sparse(P2))
+            x = arnoldi_solve(Pc)
+            @test all(x .>= 0)
+            @test sum(x) ≈ 1
+            @test transpose(Pc) * x ≈ x atol=1e-10
+        end
     end
 
     @testset "periodic chain" begin
@@ -156,6 +185,14 @@ end
         x16 = @inferred arnoldi_solve(Float16.(Qr))
         @test x16 isa Vector{Float64}
         @test x16 ≈ xr atol=1e-10
+        # Float16 entries whose rows sum to 1 only in Float16 (accepted by
+        # MarkovChain): the eigenvalue check allows the precision of P, and
+        # the result is the stationary distribution of the normalized chain
+        P16 = Float16[0.3 0.7; 0.3 0.7]
+        @test MarkovChain(P16) isa MarkovChain
+        v = Float64.(P16[1, :])
+        @test arnoldi_solve(P16) ≈ v / sum(v) atol=1e-10
+        @test arnoldi_solve(sparse(P16)) ≈ v / sum(v) atol=1e-10
         # function form: T is determined by eltype(x0) in the same way
         P = random_stochastic_matrix(rng, 10)
         f(v) = transpose(P) * v

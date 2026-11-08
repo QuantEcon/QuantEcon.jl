@@ -21,8 +21,9 @@ step, `transpose(P) * x`, so that the matrix need not be stored. The solver is
 [`KrylovKit.eigsolve`](https://jutho.github.io/KrylovKit.jl/stable/man/eig/),
 called for the eigenvalue of largest real part, which is 1 for a stochastic
 operator; `tol`, `max_iter`, and `krylovdim` are passed to it as `tol`,
-`maxiter`, and `krylovdim`, and `kwargs` as they are. It uses the Lanczos
-algorithm when `P` is symmetric.
+`maxiter`, and `krylovdim`, and `kwargs` as they are. Symmetry is not
+detected: pass `issymmetric=true` for a symmetric `P`, or `f`, to use the
+Lanczos algorithm.
 
 The solver calls LAPACK internally, which supports only `Float64` and
 `Float32`, so the returned vector is a `Vector{Float64}`, unless `P`, or
@@ -54,19 +55,20 @@ a `Vector{Float32}`.
   `Float64` or `Float32` as described above.
 
 An `ArgumentError` is thrown if the eigenvalue found is not 1 within
-`sqrt(max(tol, eps(T)))`, which means that the operator is not stochastic,
-and an `ErrorException` if the iteration does not converge within `max_iter`
+`sqrt(max(tol, eps))`, where `eps` is the machine epsilon of `T`, or that of
+the element type of `P` if it is a floating-point type of lower precision
+(such as `Float16`), which means that the operator is not stochastic, and an
+`ErrorException` if the iteration does not converge within `max_iter`
 restarts.
 
 # Notes
 
 [`gth_solve`](@ref) computes the stationary distribution of an irreducible
 stochastic matrix by the GTH algorithm, a variant of Gaussian elimination
-without subtractions; it converts the matrix to a dense array, even for a
-sparse input. `arnoldi_solve` wraps a general-purpose iterative solver
-that acts on the matrix, or the operator, as given, so it is suited to chains
-too large to densify, and to chains given by the push-forward operator, for
-which the matrix need not be formed.
+without subtractions; it requires a dense matrix. `arnoldi_solve` wraps a
+general-purpose iterative solver that acts on the matrix, or the operator, as
+given, so it is suited to chains too large to densify, and to chains given by
+the push-forward operator, for which the matrix need not be formed.
 
 # Examples
 
@@ -100,18 +102,19 @@ function arnoldi_solve(
     length(x0) == n ||
         throw(DimensionMismatch("x0 must have length $n; got $(length(x0))"))
     T = _arnoldi_float_type(eltype(P))
+    eps_P = max(eps(T), _arnoldi_eps(eltype(P)))
     # transpose(P) * x is x * P as a column vector. P is never copied: when
     # its products with a Vector{T} are of element type T (Float32, Float64,
     # Int, Rational{Int}, ...), the lazy transpose is passed to eigsolve
-    # itself, which then detects symmetry and uses Lanczos; when they are
-    # wider (BigInt, BigFloat, Rational{BigInt}), the products are converted
-    # to Vector{T}, as KrylovKit's Krylov vectors must be Float32 or Float64
+    # itself; when they are wider (BigInt, BigFloat, Rational{BigInt}), the
+    # products are converted to Vector{T}, as KrylovKit's Krylov vectors must
+    # be Float32 or Float64
     Pt = transpose(P)
     if Base.promote_op(*, eltype(P), T) === T
-        return _arnoldi_solve(Pt, Vector{T}(x0); kwargs...)
+        return _arnoldi_solve(Pt, Vector{T}(x0), eps_P; kwargs...)
     else
-        return _arnoldi_solve(x -> convert(Vector{T}, Pt * x), Vector{T}(x0);
-                              kwargs...)
+        return _arnoldi_solve(x -> convert(Vector{T}, Pt * x), Vector{T}(x0),
+                              eps_P; kwargs...)
     end
 end
 
@@ -119,12 +122,18 @@ end
 _arnoldi_float_type(::Type{Float32}) = Float32
 _arnoldi_float_type(::Type{<:Real}) = Float64
 
+# Precision of the stored transition probabilities, to which their rows sum
+# to 1 (as accepted by MarkovChain); exact types have none
+_arnoldi_eps(::Type{S}) where {S<:AbstractFloat} = eps(S)
+_arnoldi_eps(::Type{<:Real}) = 0
+
 arnoldi_solve(f, x0::AbstractVector{<:Real}; kwargs...) =
     _arnoldi_solve(f, Vector{_arnoldi_float_type(eltype(x0))}(x0); kwargs...)
 
 # `op` is either a matrix (the transposed transition matrix) or a function;
-# `eigsolve` dispatches on it
-function _arnoldi_solve(op, x0::Vector{T};
+# `eigsolve` dispatches on it. `eps_P` is the precision to which the rows of
+# the transition matrix sum to 1
+function _arnoldi_solve(op, x0::Vector{T}, eps_P::Real=eps(T);
                         tol::Real=KrylovDefaults.tol[],
                         max_iter::Integer=KrylovDefaults.maxiter[],
                         krylovdim::Integer=KrylovDefaults.krylovdim[],
@@ -137,8 +146,9 @@ function _arnoldi_solve(op, x0::Vector{T};
         throw(ArgumentError("x0 must have positive finite sum"))
     x0 ./= s
     # slack for the check that the eigenvalue found is 1: the error of a
-    # converged eigenvalue is of the order of tol
-    slack = sqrt(max(tol, eps(T)))
+    # converged eigenvalue is of the order of tol, and the eigenvalue lies
+    # between the smallest and the largest row sum, which are 1 within eps_P
+    slack = sqrt(max(tol, eps_P))
 
     if n == 1
         # the operator is the scalar eigenvalue itself
@@ -147,8 +157,12 @@ function _arnoldi_solve(op, x0::Vector{T};
         return [one(T)]
     end
 
+    # symmetry is not detected (for a sparse matrix, KrylovKit would check
+    # the lazy transpose entry by entry, in quadratic time): Lanczos is
+    # opted in with issymmetric=true, which overrides the defaults given here
     vals, vecs, info = eigsolve(op, x0, 1, :LR; tol=tol, maxiter=max_iter,
                                 krylovdim=min(krylovdim, n), verbosity=0,
+                                issymmetric=false, ishermitian=false,
                                 kwargs...)
     info.converged >= 1 ||
         error("arnoldi_solve did not converge after $(info.numiter) " *
@@ -156,15 +170,18 @@ function _arnoldi_solve(op, x0::Vector{T};
               "norm $(info.normres[1]). Increase max_iter or krylovdim.")
     _arnoldi_check_eigenvalue(vals[1], slack)
 
-    # the eigenvector is complex for a nonsymmetric operator (with zero
-    # imaginary part at a real eigenvalue) and has arbitrary sign and scale;
-    # normalizing by the sum fixes both. Entries that are negative at
-    # rounding level are left as they are, as is the convention for
-    # eigenvector-based solvers. The type assertion pins the return type:
-    # the output of eigsolve is not inferable for a function operator, and
-    # a function returning Any (e.g. one that captures a non-const global)
-    # would otherwise make the result Any as well
-    x = Vector{T}(real.(vecs[1]))::Vector{T}
+    # the eigenvector is complex for a nonsymmetric operator and has
+    # arbitrary phase and scale. Moreover, for a reducible chain the
+    # eigenvalue 1 is multiple, and rounding can mix in eigenvectors with
+    # opposite signs on different recurrent classes. The absolute value
+    # fixes the phase and the signs: for an eigenvector v of a stochastic
+    # operator, |v| is an eigenvector too (A|v| >= |Av| = |v| entrywise, with
+    # equality as A preserves the sum), and normalizing by the sum fixes the
+    # scale. The type assertion pins the return type: the output of eigsolve
+    # is not inferable for a function operator, and a function returning Any
+    # (e.g. one that captures a non-const global) would otherwise make the
+    # result Any as well
+    x = Vector{T}(abs.(vecs[1]))::Vector{T}
     x ./= sum(x)
     return x
 end
