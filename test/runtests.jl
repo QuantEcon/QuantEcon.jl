@@ -26,6 +26,7 @@ tests = [
         "markov_approx",
         "matrix_eqn",
         "mc_tools",
+        "arnoldi_solve",
         "modeltool", # Check the submodule issue
         # "quad",
         "quadsum",
