@@ -98,9 +98,13 @@ end
     end
 
     @testset "reducible chain" begin
-        # two recurrent classes: the eigenvalue 1 is double, and the
-        # eigenvector returned by the solver may have opposite signs on the
-        # two classes; the result must still be a stationary distribution
+        # two recurrent classes: the eigenvalue 1 is double. In exact
+        # arithmetic the solver would return the long-run distribution from
+        # x0, but when the Krylov space is nearly invariant, as for these
+        # fast-mixing blocks, rounding mixes in eigenvectors with opposite
+        # signs on the two classes (in about a quarter of the draws with
+        # the real part normalized by the sum). The result must still be a
+        # stationary distribution
         P = [0    1    0    0
              0.25 0.75 0    0
              0    0    0    1
@@ -112,14 +116,37 @@ end
             @test transpose(Pc) * x ≈ x atol=1e-5
         end
         n = 50
-        A = random_stochastic_matrix(rng, n)
-        B = random_stochastic_matrix(rng, n)
-        P2 = [A zeros(n, n); zeros(n, n) B]
-        for Pc in (P2, sparse(P2))
+        for seed in 1:20
+            rng_s = MersenneTwister(seed)
+            A = random_stochastic_matrix(rng_s, n)
+            B = random_stochastic_matrix(rng_s, n)
+            P2 = [A zeros(n, n); zeros(n, n) B]
+            for Pc in (P2, sparse(P2))
+                x = arnoldi_solve(Pc)
+                @test all(x .>= 0)
+                @test sum(x) ≈ 1
+                @test transpose(Pc) * x ≈ x atol=1e-10
+            end
+        end
+    end
+
+    @testset "reducible chain with a transient state" begin
+        # recurrent classes {1, 2} and {3, 4}; state 5 is transient, so its
+        # entry is zero in every stationary distribution, and must not come
+        # out negative at rounding level (which stationary distribution is
+        # returned depends on rounding: in Float32 the masses of the two
+        # classes come out as 0.31 and 0.69 rather than 1/2 each)
+        P = [0    1    0    0    0
+             0.25 0.75 0    0    0
+             0    0    0    1    0
+             0    0    0.75 0.25 0
+             0.2  0.2  0.2  0.2  0.2]
+        for Pc in (P, Float32.(P), sparse(P))
             x = arnoldi_solve(Pc)
             @test all(x .>= 0)
             @test sum(x) ≈ 1
-            @test transpose(Pc) * x ≈ x atol=1e-10
+            @test transpose(Pc) * x ≈ x atol=1e-5
+            @test x[5] ≈ 0 atol=1e-6
         end
     end
 

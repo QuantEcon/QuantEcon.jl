@@ -171,16 +171,18 @@ function _arnoldi_solve(op, x0::Vector{T}, eps_P::Real=eps(T);
     _arnoldi_check_eigenvalue(vals[1], slack)
 
     # the eigenvector is complex for a nonsymmetric operator and has
-    # arbitrary phase and scale. Moreover, for a reducible chain the
-    # eigenvalue 1 is multiple, and rounding can mix in eigenvectors with
-    # opposite signs on different recurrent classes. The absolute value
-    # fixes the phase and the signs: for an eigenvector v of a stochastic
-    # operator, |v| is an eigenvector too (A|v| >= |Av| = |v| entrywise, with
-    # equality as A preserves the sum), and normalizing by the sum fixes the
-    # scale. The type assertion pins the return type: the output of eigsolve
-    # is not inferable for a function operator, and a function returning Any
-    # (e.g. one that captures a non-const global) would otherwise make the
-    # result Any as well
+    # arbitrary phase and scale, and entries that are zero in exact
+    # arithmetic (at transient states) may come out negative at rounding
+    # level. Moreover, for a reducible chain the eigenvalue 1 is multiple,
+    # and when the Krylov space is nearly invariant, the normalized rounding
+    # noise mixes in eigenvectors with opposite signs on different recurrent
+    # classes. The absolute value fixes the phase and the signs: for an
+    # eigenvector v of a stochastic operator, |v| is an eigenvector too
+    # (A|v| >= |Av| = |v| entrywise, with equality as A preserves the sum),
+    # and normalizing by the sum fixes the scale. The type assertion pins
+    # the return type: the output of eigsolve is not inferable for a function
+    # operator, and a function returning Any (e.g. one that captures a
+    # non-const global) would otherwise make the result Any as well
     x = Vector{T}(abs.(vecs[1]))::Vector{T}
     x ./= sum(x)
     return x
