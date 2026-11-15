@@ -55,10 +55,8 @@ a `Vector{Float32}`.
   `Float64` or `Float32` as described above.
 
 An `ArgumentError` is thrown if the eigenvalue found is not 1 within
-`sqrt(max(tol, eps))`, where `eps` is the machine epsilon of `T`, or that of
-the element type of `P` if it is a floating-point type of lower precision
-(such as `Float16`), which means that the operator is not stochastic, and an
-`ErrorException` if the iteration does not converge within `max_iter`
+`sqrt(max(tol, eps(T)))`, which means that the operator is not stochastic,
+and an `ErrorException` if the iteration does not converge within `max_iter`
 restarts.
 
 # Notes
@@ -102,7 +100,6 @@ function arnoldi_solve(
     length(x0) == n ||
         throw(DimensionMismatch("x0 must have length $n; got $(length(x0))"))
     T = _arnoldi_float_type(eltype(P))
-    eps_P = max(eps(T), _arnoldi_eps(eltype(P)))
     # transpose(P) * x is x * P as a column vector. P is never copied: when
     # its products with a Vector{T} are of element type T (Float32, Float64,
     # Int, Rational{Int}, ...), the lazy transpose is passed to eigsolve
@@ -111,10 +108,10 @@ function arnoldi_solve(
     # be Float32 or Float64
     Pt = transpose(P)
     if Base.promote_op(*, eltype(P), T) === T
-        return _arnoldi_solve(Pt, Vector{T}(x0), eps_P; kwargs...)
+        return _arnoldi_solve(Pt, Vector{T}(x0); kwargs...)
     else
-        return _arnoldi_solve(x -> convert(Vector{T}, Pt * x), Vector{T}(x0),
-                              eps_P; kwargs...)
+        return _arnoldi_solve(x -> convert(Vector{T}, Pt * x), Vector{T}(x0);
+                              kwargs...)
     end
 end
 
@@ -122,18 +119,12 @@ end
 _arnoldi_float_type(::Type{Float32}) = Float32
 _arnoldi_float_type(::Type{<:Real}) = Float64
 
-# Precision of the stored transition probabilities, to which their rows sum
-# to 1 (as accepted by MarkovChain); exact types have none
-_arnoldi_eps(::Type{S}) where {S<:AbstractFloat} = eps(S)
-_arnoldi_eps(::Type{<:Real}) = 0
-
 arnoldi_solve(f, x0::AbstractVector{<:Real}; kwargs...) =
     _arnoldi_solve(f, Vector{_arnoldi_float_type(eltype(x0))}(x0); kwargs...)
 
 # `op` is either a matrix (the transposed transition matrix) or a function;
-# `eigsolve` dispatches on it. `eps_P` is the precision to which the rows of
-# the transition matrix sum to 1
-function _arnoldi_solve(op, x0::Vector{T}, eps_P::Real=eps(T);
+# `eigsolve` dispatches on it
+function _arnoldi_solve(op, x0::Vector{T};
                         tol::Real=KrylovDefaults.tol[],
                         max_iter::Integer=KrylovDefaults.maxiter[],
                         krylovdim::Integer=KrylovDefaults.krylovdim[],
@@ -146,9 +137,8 @@ function _arnoldi_solve(op, x0::Vector{T}, eps_P::Real=eps(T);
         throw(ArgumentError("x0 must have positive finite sum"))
     x0 ./= s
     # slack for the check that the eigenvalue found is 1: the error of a
-    # converged eigenvalue is of the order of tol, and the eigenvalue lies
-    # between the smallest and the largest row sum, which are 1 within eps_P
-    slack = sqrt(max(tol, eps_P))
+    # converged eigenvalue is of the order of tol
+    slack = sqrt(max(tol, eps(T)))
 
     if n == 1
         # the operator is the scalar eigenvalue itself

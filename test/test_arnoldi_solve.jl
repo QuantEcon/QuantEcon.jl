@@ -212,14 +212,11 @@ end
         x16 = @inferred arnoldi_solve(Float16.(Qr))
         @test x16 isa Vector{Float64}
         @test x16 ≈ xr atol=1e-10
-        # Float16 entries whose rows sum to 1 only in Float16 (accepted by
-        # MarkovChain): the eigenvalue check allows the precision of P, and
-        # the result is the stationary distribution of the normalized chain
+        # Float16 entries whose rows sum to 1 only in Float16: the matrix is
+        # used as given, and it is not stochastic in Float64
         P16 = Float16[0.3 0.7; 0.3 0.7]
-        @test MarkovChain(P16) isa MarkovChain
-        v = Float64.(P16[1, :])
-        @test arnoldi_solve(P16) ≈ v / sum(v) atol=1e-10
-        @test arnoldi_solve(sparse(P16)) ≈ v / sum(v) atol=1e-10
+        @test_throws ArgumentError arnoldi_solve(P16)
+        @test_throws ArgumentError arnoldi_solve(sparse(P16))
         # function form: T is determined by eltype(x0) in the same way
         P = random_stochastic_matrix(rng, 10)
         f(v) = transpose(P) * v
@@ -255,7 +252,9 @@ end
         @test_throws ArgumentError arnoldi_solve(P, [-1.0; ones(9)])
         @test_throws ArgumentError arnoldi_solve(P, [NaN; ones(9)])
         @test_throws ArgumentError arnoldi_solve(P, [Inf; ones(9)])
-        # non-square
+        # empty, non-square
+        @test_throws ArgumentError arnoldi_solve(zeros(0, 0))
+        @test_throws ArgumentError arnoldi_solve(spzeros(0, 0))
         @test_throws DimensionMismatch arnoldi_solve(ones(2, 3) / 3)
         # non-convergence: a nearly decomposable chain with one restart of
         # a two-dimensional Krylov space
