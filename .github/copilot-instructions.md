@@ -158,6 +158,7 @@ When replacing a library call with a hand-written kernel (or adding caching), a 
 - **Stale caches**: fields like `R`, `Q`, `beta` are documented mutable attributes; do not cache derived objects (views, factorizations) of them at construction unless the cache is invalidated on rebinding. Prefer computing cheap views per call.
 - **Workspace aliasing**: caller-supplied workspace arrays of matching type and length invite reuse by callers. Check whether the algorithm reads any array after another is overwritten, and assert non-aliasing with `Base.mightalias` where corruption would be silent (e.g. `argmins` must not alias `basis` in `lcp_lemke!`).
 - Verify optimization ideas by measurement before adopting them; vectorized library code often beats hand-written loops.
+- **KrylovKit operators must return fresh vectors**: `KrylovKit.eigsolve`/`linsolve` store the vector returned by the operator in the Krylov basis, so an operator passed to them (as in `arnoldi_solve`) must not return a reused buffer or its input.
 
 ## Validation
 
@@ -168,7 +169,7 @@ After making code changes, run the test files relevant to the change (`Pkg.test(
 ### Key directories and files:
 - `src/QuantEcon.jl` - Main module file exporting all functionality
 - `src/` - Core implementation files organized by topic:
-  - `markov/` - Markov chains, discrete DP, random matrix tools
+  - `markov/` - Markov chains, discrete DP, random matrix tools; `arnoldi_solve.jl` is the Krylov stationary-distribution solver built on KrylovKit.jl (`eigsolve` on the push-forward operator `x -> x P`); `arnoldi_solve` is not exported, call it as `QuantEcon.arnoldi_solve`
   - `modeltools/` - Utility functions and economic model tools  
   - `arma.jl` - ARMA time series models
   - `lqcontrol.jl`, `lqnash.jl` - Linear quadratic control and games
