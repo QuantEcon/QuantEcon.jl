@@ -176,6 +176,23 @@ end
         @test x ≈ gth_reference(P) atol=1e-8
     end
 
+    @testset "slowly mixing chain" begin
+        # birth-death chain on a path of 1500 states, up with probability
+        # 0.3 and down with 0.31: the stationary distribution is geometric
+        # with ratio 0.3/0.31. Traversing the path takes many steps, so the
+        # iteration needs more than 100 restarts (KrylovKit's default);
+        # the default max_iter, 10 per state, is sufficient
+        n, p, q = 1500, 0.3, 0.31
+        P = spdiagm(-1 => fill(q, n - 1), 0 => fill(1 - p - q, n),
+                    1 => fill(p, n - 1))
+        P[1, 1] += q
+        P[n, n] += p
+        ref = (p / q) .^ (0:n-1)
+        ref ./= sum(ref)
+        @test arnoldi_solve(P) ≈ ref atol=1e-8
+        @test_throws ErrorException arnoldi_solve(P; max_iter=100)
+    end
+
     @testset "Float32" begin
         P = Float32.(random_stochastic_matrix(rng, 20))
         P ./= sum(P, dims=2)

@@ -7,8 +7,8 @@ operator x -> x P.
 using KrylovKit: eigsolve, KrylovDefaults
 
 @doc raw"""
-    arnoldi_solve(P[, x0]; tol=1e-12, max_iter=100, krylovdim=30, kwargs...)
-    arnoldi_solve(f, x0; tol=1e-12, max_iter=100, krylovdim=30, kwargs...)
+    arnoldi_solve(P[, x0]; tol=1e-12, max_iter=10n, krylovdim=30, kwargs...)
+    arnoldi_solve(f, x0; tol=1e-12, max_iter=10n, krylovdim=30, kwargs...)
 
 Compute a stationary distribution of a Markov chain with `n` states by
 restarted Arnoldi iteration on the push-forward operator ``x \mapsto x P``,
@@ -42,7 +42,7 @@ a `Vector{Float32}`.
   defaults to the uniform distribution; required for `f`, which does not
   reveal `n`.
 - `;tol::Real(1e-12)`: Residual tolerance of the eigenproblem.
-- `;max_iter::Integer(100)`: Maximum number of restarts of the Arnoldi
+- `;max_iter::Integer(10n)`: Maximum number of restarts of the Arnoldi
   iteration.
 - `;krylovdim::Integer(30)`: Number of Arnoldi vectors generated per
   restart (capped at `n`); larger values use more memory but converge in
@@ -126,7 +126,7 @@ arnoldi_solve(f, x0::AbstractVector{<:Real}; kwargs...) =
 # `eigsolve` dispatches on it
 function _arnoldi_solve(op, x0::Vector{T};
                         tol::Real=KrylovDefaults.tol[],
-                        max_iter::Integer=KrylovDefaults.maxiter[],
+                        max_iter::Integer=10 * length(x0),
                         krylovdim::Integer=KrylovDefaults.krylovdim[],
                         kwargs...) where {T<:AbstractFloat}
     n = length(x0)
