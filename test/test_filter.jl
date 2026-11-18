@@ -20,4 +20,11 @@
         @test isapprox(data["ham_c"], data["ham_c_mat"], nans=true, rtol=1e-7, atol=1e-7)
         @test isapprox(data["ham_rw_c"], data["ham_rw_c_mat"], nans=true)
     end
+
+    @testset "test baxter king filter" begin
+        bk_cyc, _ = bk_filter([1,5,4,7,3,2,4,8], 24, 6, 2)
+        cyc_py = [missing, missing, 0.5401001384504593, 0.34785164507573785,
+                  -0.05672021307788492, -0.887951783526198, missing, missing]
+        @test all((ismissing.(bk_cyc) .& ismissing.(cyc_py)).| isapprox.(bk_cyc, cyc_py))
+    end
 end
