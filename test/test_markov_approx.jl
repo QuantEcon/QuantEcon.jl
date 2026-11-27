@@ -412,4 +412,48 @@
     @test isapprox(mc.p, P1_matlab, atol = 1e-7, rtol = 1e-7)
     # test state values
     @test isapprox(mc.state_values, D1_matlab)
+
+    # Regression tests for #411: the zero initial guess must be constructed from
+    # the length of the moment vector, not by calling zeros on a vector.
+    @testset "discrete_approximation initial guesses" begin
+        D4 = [-2.0, -1.0, 0.0, 1.0, 2.0]
+        T4 = x -> reshape(x, 1, :)
+        Tbar4 = [0.0]
+        q4 = ones(length(D4)) / length(D4)
+
+        # Default lambda0 (previously MethodError: zeros(::Vector))
+        p4, lambda4, err4 = QuantEcon.discrete_approximation(D4, T4, Tbar4)
+        @test size(p4) == (1, length(D4))
+        @test isapprox(sum(p4), 1.0; atol = 1e-10)
+        @test length(lambda4) == 1
+        @test length(err4) == 1
+
+        # Non-converging nonzero start triggers the zero retry (previously
+        # MethodError: zeros(::Vector) inside the retry branch)
+        p5, lambda5, err5 = @test_logs (:warn, r"Failed to find a solution") begin
+            QuantEcon.discrete_approximation(D4, T4, Tbar4, q4, [1000.0])
+        end
+        @test size(p5) == (1, length(D4))
+        @test isapprox(sum(p5), 1.0; atol = 1e-10)
+        @test length(lambda5) == 1
+        @test length(err5) == 1
+    end
+
+    # Regression test for #412: complex eigenvalues must be compared by modulus.
+    @testset "warn_persistency with complex eigenvalues" begin
+        b2 = zeros(2)
+        B2 = [0.5 0.4; -0.4 0.5]
+        Psi2 = [1.0 0.0; 0.0 1.0]
+
+        mc2 = discrete_var(b2, B2, Psi2, 5, 2, Quadrature())
+        @test mc2 isa MarkovChain
+        @test all(isapprox.(sum(mc2.p, dims = 2), 1.0; atol = 1e-10))
+
+        # modulus 0.64: no warning
+        @test_logs QuantEcon.warn_persistency(B2, Quadrature())
+
+        # modulus 0.97: warning
+        B3 = [0.0 0.97; -0.97 0.0]
+        @test_logs (:warn, r"highly persistent") QuantEcon.warn_persistency(B3, Quadrature())
+    end
 end  # @testset

@@ -440,7 +440,7 @@ Check persistency when `method` is `Quadrature` and give warning if needed.
 
 """
 function warn_persistency(B::AbstractMatrix, ::Quadrature)
-    if any(eigen(B).values .> 0.9)
+    if any(abs.(eigen(B).values) .> 0.9)
         @warn("The quadrature method may perform poorly for highly persistent processes.")
     end
     return nothing
@@ -699,7 +699,7 @@ allcomb3(A::AbstractMatrix) =
     reverse(gridmake(reverse([A[:, i] for i in 1:size(A, 2)], dims = 1)...), dims = 2)
 
 """
-    discrete_approximation(D, T, Tbar, q=ones(length(D))/length(D), lambda0=zeros(Tbar))
+    discrete_approximation(D, T, Tbar, q=ones(length(D))/length(D), lambda0=zeros(length(Tbar)))
 
 Compute a discrete state approximation to a distribution with known moments,
 using the maximum entropy procedure proposed in Tanaka and Toda (2013).
@@ -732,7 +732,7 @@ using the maximum entropy procedure proposed in Tanaka and Toda (2013).
 """
 function discrete_approximation(D::AbstractVector, T::Function, Tbar::AbstractVector,
                                   q::AbstractVector=ones(length(D))/length(D), # Default prior weights
-                                  lambda0::AbstractVector=zeros(Tbar))
+                                  lambda0::AbstractVector=zeros(length(Tbar)))
 
     # Input error checking
     N = length(D)
@@ -755,7 +755,7 @@ function discrete_approximation(D::AbstractVector, T::Function, Tbar::AbstractVe
     # of all zeros.
     if !Optim.converged(res) && all(lambda0 .!= 0.0)
         @warn("Failed to find a solution from provided initial guess. Trying new initial guess.")
-        res = Optim.optimize(obj, grad!, hess!, zeros(lambda0), Optim.Newton(), options)
+        res = Optim.optimize(obj, grad!, hess!, zeros(length(lambda0)), Optim.Newton(), options)
         # check convergence
         Optim.converged(res) || error("Failed to find a solution.")
     end
